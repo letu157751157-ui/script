@@ -1,0 +1,7 @@
+{
+  "resource_pack_name": "aatrox",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "aatrox_darkin_blade": { "textures": "textures/items/darkin_blade" }
+  }
+}

@@ -1,4 +1,9 @@
-# Kiếm Aatrox — Script kỹ năng cho Roblox
+# Kiếm Aatrox — Script kỹ năng
+
+- **Roblox**: hướng dẫn ngay bên dưới (thư mục `AatroxSword/`).
+- **Minecraft Bedrock (addon)**: xem [`bedrock/README.md`](bedrock/README.md).
+
+## Roblox
 
 Bộ script Luau cho một **Tool kiếm** trong Roblox, bộ chiêu mô phỏng theo Aatrox (Liên Minh Huyền Thoại).
 Server tính toàn bộ hồi chiêu, hitbox và sát thương nên người chơi không hack được sát thương hay hồi chiêu.
