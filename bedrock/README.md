@@ -133,3 +133,27 @@ bedrock/
 
 - Choáng = hiệu ứng Chậm Chạp cấp tối đa; mục tiêu bị choáng vẫn nhảy được. Người chơi bị choáng thì không dùng được chiêu của kiếm.
 - Mob vừa trúng đòn có khoảng bất tử ngắn (0.5 giây), nên dùng Q ngay sau một đòn đánh thường có thể bị giảm sát thương.
+
+## Khắc phục sự cố
+
+### Kiếm không hiển thị model 3D
+- Kiểm tra xem **Behavior Pack** và **Resource Pack** đều bật chưa
+- Tải lại thế giới (thoát rồi vào lại)
+- Nếu vẫn không có, thử xóa các pack đã cũ của addon và tải lại file `.mcaddon`
+
+### Không kích hoạt được chiêu
+- Kiểm tra xem đang **cầm kiếm Darkin** (kiểm tra tay trái trong hotbar)
+- **Action bar** (thanh trên hotbar) phải hiển thị "§4[Quỷ Kiếm Darkin]" nếu cầm đúng
+- Không thể dùng chiêu khi bị choáng (Slowness cấp tối đa)
+- Chờ cooldown: nhìn vào thanh hiển thị thời gian hồi chiêu ở action bar
+- **Trên điện thoại**: nhấn giữ nút Dùng (Use/Attack) thay vì chuột phải
+
+### Sát thương quá mạnh/yếu
+- Chỉnh lại thông số trong [`AatroxBP/scripts/config.js`](AatroxBP/scripts/config.js)
+- Chạy `python3 build.py` để tạo lại addon
+- Tải lại thế giới
+
+### Model hiển thị ở vị trí sai hoặc quay sai
+- Chỉnh lại **position** và **rotation** trong [`AatroxRP/animations/darkin_blade.animation.json`](AatroxRP/animations/darkin_blade.animation.json)
+- Thông số khởi đầu lấy theo cây đinh ba (trident) của Minecraft; nếu kiếm cầm lệch hoặc quá to thì chỉnh 3 giá trị này
+- Sau khi sửa, chạy `python3 build.py` rồi tải lại thế giới
