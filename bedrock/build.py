@@ -3,48 +3,15 @@
 Chạy: python3 build.py
 """
 import os
+import shutil
 import struct
 import zipfile
 import zlib
 
 import model
+import particles
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-
-BLADE = (150, 10, 25, 255)
-EDGE = (235, 60, 60, 255)
-EYE = (255, 200, 60, 255)
-GUARD = (60, 10, 15, 255)
-HANDLE = (90, 50, 30, 255)
-OUTLINE = (25, 0, 5, 255)
-
-
-def sword_pixels():
-    """Kiếm 16x16 chéo từ góc dưới trái lên góc trên phải."""
-    grid = [[(0, 0, 0, 0)] * 16 for _ in range(16)]
-
-    def put(x, y, color):
-        if 0 <= x < 16 and 0 <= y < 16:
-            grid[y][x] = color
-
-    for i in range(6, 15):  # lưỡi kiếm, rộng 2-3 px
-        put(i, 15 - i, EDGE)
-        put(i - 1, 15 - i, BLADE)
-        put(i, 16 - i, BLADE)
-        put(i - 1, 16 - i, OUTLINE if i < 14 else BLADE)
-    put(9, 7, EYE)  # "con mắt" Darkin trên lưỡi
-    for k in range(-2, 3):  # chắn kiếm vuông góc với lưỡi
-        put(5 + k, 10 + k, GUARD)
-    put(8, 7, EYE)
-    for i in range(2, 5):  # chuôi
-        put(i, 15 - i, HANDLE)
-    put(1, 14, GUARD)  # núm chuôi
-    return grid
-
-
-def scale(grid, factor):
-    return [[px for px in row for _ in range(factor)] for row in grid for _ in range(factor)]
-
 
 def write_png(path, grid):
     height, width = len(grid), len(grid[0])
@@ -63,11 +30,17 @@ def write_png(path, grid):
 
 
 def make_images():
-    sword = sword_pixels()
-    write_png(os.path.join(ROOT, "AatroxRP/textures/items/darkin_blade.png"), sword)
-    icon = scale(sword, 4)
-    write_png(os.path.join(ROOT, "AatroxRP/pack_icon.png"), icon)
-    write_png(os.path.join(ROOT, "AatroxBP/pack_icon.png"), icon)
+    """Icon túi đồ và icon pack được render sẵn từ model 3D (thư mục art/)."""
+    art = os.path.join(ROOT, "art")
+    targets = {
+        "item_icon.png": ["AatroxRP/textures/items/darkin_blade.png"],
+        "pack_icon.png": ["AatroxRP/pack_icon.png", "AatroxBP/pack_icon.png"],
+    }
+    for source, destinations in targets.items():
+        for destination in destinations:
+            path = os.path.join(ROOT, destination)
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            shutil.copyfile(os.path.join(art, source), path)
 
 
 def build_addon():
@@ -85,4 +58,5 @@ def build_addon():
 if __name__ == "__main__":
     make_images()
     model.write_model(ROOT, write_png)
+    particles.write_particles(ROOT, write_png)
     build_addon()

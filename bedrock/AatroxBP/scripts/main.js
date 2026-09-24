@@ -7,21 +7,27 @@
 //   Nhảy + chuột phải    W  Xiềng Xích Địa Ngục
 //   Nhìn lên + chuột phải R Kẻ Diệt Thế
 
-import { world, system, EquipmentSlot, EntityDamageCause } from "@minecraft/server";
+import { world, system, EquipmentSlot, EntityDamageCause, MolangVariableMap } from "@minecraft/server";
 import { CONFIG } from "./config.js";
 
 const ITEM_ID = "aatrox:darkin_blade";
 const TPS = 20;
 const SKILLS = ["Q", "E", "W", "R"];
 
+// Particle riêng nằm trong resource pack (AatroxRP/particles)
 const P = {
-  flame: "minecraft:basic_flame_particle",
-  lava: "minecraft:lava_particle",
-  crit: "minecraft:critical_hit_emitter",
-  boom: "minecraft:large_explosion",
-  bigBoom: "minecraft:huge_explosion_emitter",
-  heart: "minecraft:heart_particle",
-  angry: "minecraft:villager_angry",
+  ember: "aatrox:ember",
+  spark: "aatrox:hit_spark",
+  blood: "aatrox:blood_burst",
+  flash: "aatrox:flash",
+  slash: "aatrox:slash",
+  mark: "aatrox:ground_mark",
+  markSweet: "aatrox:ground_mark_sweet",
+  ring: "aatrox:shock_ring",
+  chain: "aatrox:chain_link",
+  aura: "aatrox:ult_aura",
+  lifesteal: "aatrox:lifesteal",
+  stun: "minecraft:villager_angry",
   smoke: "minecraft:basic_smoke_particle",
 };
 
@@ -98,9 +104,9 @@ function getHealth(entity) {
   }
 }
 
-function particle(dimension, id, location) {
+function particle(dimension, id, location, molang) {
   try {
-    dimension.spawnParticle(id, location);
+    dimension.spawnParticle(id, location, molang);
   } catch {
     // chunk chưa tải hoặc particle không tồn tại: bỏ qua
   }
@@ -125,6 +131,19 @@ function particleLine(dimension, id, from, to, spacing = 0.7) {
       z: from.z + (to.z - from.z) * t,
     });
   }
+}
+
+// Vòng sóng xung kích phẳng trên mặt đất, lan tới bán kính `radius`
+function shockRing(dimension, center, radius) {
+  const molang = new MolangVariableMap();
+  molang.setFloat("variable.radius", radius);
+  particle(dimension, P.ring, add(center, { x: 0, y: 0.15, z: 0 }), molang);
+}
+
+// Nổ máu: chớp sáng + máu văng
+function bloodBurst(dimension, location) {
+  particle(dimension, P.flash, location);
+  particle(dimension, P.blood, location);
 }
 
 function particleRing(dimension, id, center, radius, count = Math.ceil(radius * 6)) {
@@ -180,7 +199,9 @@ function dealDamage(player, target, amount) {
   if (!target.isValid) return false;
   if (isUltActive(getState(player))) amount *= CONFIG.R.damageMultiplier;
   try {
-    return target.applyDamage(amount, { cause: EntityDamageCause.entityAttack, damagingEntity: player });
+    const hit = target.applyDamage(amount, { cause: EntityDamageCause.entityAttack, damagingEntity: player });
+    if (hit) particle(target.dimension, P.spark, add(target.location, { x: 0, y: 1, z: 0 }));
+    return hit;
   } catch {
     return false;
   }
@@ -191,6 +212,7 @@ function heal(player, amount) {
   if (!health || amount <= 0 || health.currentValue <= 0) return;
   if (isUltActive(getState(player))) amount *= CONFIG.R.healMultiplier;
   health.setCurrentValue(Math.min(health.effectiveMax, health.currentValue + amount));
+  if (amount >= 1) particle(player.dimension, P.lifesteal, add(player.location, { x: 0, y: 0.3, z: 0 }));
 }
 
 function stun(entity, seconds) {
@@ -202,7 +224,7 @@ function stun(entity, seconds) {
   } catch {
     // bỏ qua
   }
-  particleRing(entity.dimension, P.angry, add(entity.location, { x: 0, y: 2.2, z: 0 }), 0.5, 4);
+  particleRing(entity.dimension, P.stun, add(entity.location, { x: 0, y: 2.2, z: 0 }), 0.5, 4);
 }
 
 function knockback(entity, direction, strength, vertical) {
@@ -236,14 +258,14 @@ world.afterEvents.entityHitEntity.subscribe(({ damagingEntity: player, hitEntity
   const cfg = CONFIG.passive;
   const maxHealth = getHealth(target)?.effectiveMax ?? 20;
   const bonus = Math.min(cfg.maxBonus, Math.max(cfg.minBonus, maxHealth * cfg.maxHealthPct));
-  particle(target.dimension, P.lava, add(target.location, { x: 0, y: 1, z: 0 }));
+  particle(target.dimension, P.ember, add(target.location, { x: 0, y: 1, z: 0 }));
 
   // Nổ sau khi hết thời gian bất tử của đòn đánh thường
   system.runTimeout(() => {
     if (!player.isValid || !target.isValid) return;
     dealDamage(player, target, bonus);
     heal(player, bonus * cfg.healRatio);
-    particle(target.dimension, P.boom, add(target.location, { x: 0, y: 1, z: 0 }));
+    bloodBurst(target.dimension, add(target.location, { x: 0, y: 1, z: 0 }));
     sound(target.dimension, "random.anvil_land", target.location, 1.6);
   }, ticks(cfg.delay));
 });
@@ -266,18 +288,24 @@ function drawQTelegraph(player, cast, direction) {
 
   if (cast.shape === "circle") {
     const center = add(ground, direction, cast.offset);
-    particleRing(dimension, P.lava, center, cast.radius);
-    particleRing(dimension, P.flame, center, cast.radius - cast.sweet);
-    particle(dimension, P.flame, center);
+    // Đĩa tròn: vành ngoài là điểm ngọt
+    for (let dx = -cast.radius; dx <= cast.radius; dx += 0.8) {
+      for (let dz = -cast.radius; dz <= cast.radius; dz += 0.8) {
+        const distance = Math.hypot(dx, dz);
+        if (distance > cast.radius) continue;
+        const id = distance >= cast.radius - cast.sweet ? P.markSweet : P.mark;
+        particle(dimension, id, { x: center.x + dx, y: center.y, z: center.z + dz });
+      }
+    }
     return;
   }
 
   const right = { x: -direction.z, y: 0, z: direction.x };
-  for (let along = 1; along <= cast.length; along += 0.8) {
+  for (let along = 0.6; along <= cast.length; along += 0.8) {
     const isSweet = along >= cast.length - cast.sweet;
-    for (let side = -cast.width / 2; side <= cast.width / 2 + 0.01; side += 1.2) {
+    for (let side = -cast.width / 2 + 0.4; side <= cast.width / 2 - 0.39; side += 0.8) {
       const point = add(add(ground, direction, along), right, side);
-      particle(dimension, isSweet ? P.lava : P.flame, point);
+      particle(dimension, isSweet ? P.markSweet : P.mark, point);
     }
   }
 }
@@ -317,7 +345,6 @@ function castQ(player, state, direction) {
   }
   sound(player.dimension, "item.trident.throw", player.location, 0.6);
   drawQTelegraph(player, cast, direction);
-  system.runTimeout(() => player.isValid && drawQTelegraph(player, cast, direction), Math.floor(windup / 2));
   system.runTimeout(() => slamQ(player, cast, direction), windup);
 }
 
@@ -333,15 +360,18 @@ function slamQ(player, cast, direction) {
     const center = add(origin, direction, cast.offset);
     targets = getTargetsNear(player, center, cast.radius + 0.5);
     isSweetSpot = (entity) => horizontalDistance(entity.location, center) >= cast.radius - cast.sweet;
-    particle(dimension, P.bigBoom, add(center, { x: 0, y: 0.5, z: 0 }));
+    shockRing(dimension, center, cast.radius + 0.5);
+    bloodBurst(dimension, add(center, { x: 0, y: 0.5, z: 0 }));
   } else {
     targets = getTargetsInBox(player, origin, direction, cast.length, cast.width);
     isSweetSpot = (entity) => {
       const along = (entity.location.x - origin.x) * direction.x + (entity.location.z - origin.z) * direction.z;
       return along >= cast.length - cast.sweet;
     };
-    particleLine(dimension, P.crit, add(origin, { x: 0, y: 1, z: 0 }), add(add(origin, direction, cast.length), { x: 0, y: 1, z: 0 }), 1);
-    particle(dimension, P.boom, add(add(origin, direction, cast.length - cast.sweet / 2), { x: 0, y: 0.5, z: 0 }));
+    for (let along = 1.5; along <= cast.length; along += 1.5) {
+      particle(dimension, P.slash, add(add(origin, direction, along), { x: 0, y: 1, z: 0 }));
+    }
+    particle(dimension, P.flash, add(add(origin, direction, cast.length - cast.sweet / 2), { x: 0, y: 0.5, z: 0 }));
   }
   sound(dimension, "random.explode", origin, 1.4);
 
@@ -353,9 +383,8 @@ function slamQ(player, cast, direction) {
       damage *= cfg.sweetMultiplier;
       knockback(target, { x: 0, z: 0 }, 0, cfg.knockup);
       stun(target, cfg.stun);
-      particle(dimension, P.lava, add(target.location, { x: 0, y: 1, z: 0 }));
+      bloodBurst(dimension, add(target.location, { x: 0, y: 1, z: 0 }));
     }
-    particle(dimension, P.crit, add(target.location, { x: 0, y: 1, z: 0 }));
     dealDamage(player, target, damage);
   }
 
@@ -380,7 +409,7 @@ function castE(player, state, direction) {
   const trail = system.runInterval(() => {
     if (!player.isValid || ++count > 6) return system.clearRun(trail);
     particle(player.dimension, P.smoke, add(player.location, { x: 0, y: 0.8, z: 0 }));
-    particle(player.dimension, P.flame, add(player.location, { x: 0, y: 1.2, z: 0 }));
+    particle(player.dimension, P.ember, add(player.location, { x: 0, y: 1.1, z: 0 }));
   }, 1);
 }
 
@@ -415,7 +444,8 @@ function castW(player, state, direction) {
     for (let step = 0; step < 3; step++) {
       head = add(head, direction, cfg.speed / 3);
       travelled += cfg.speed / 3;
-      particle(dimension, P.flame, head);
+      particle(dimension, P.chain, head);
+      if (step === 0) particle(dimension, P.ember, head);
 
       const target = getTargetsNear(player, head, cfg.hitRadius)[0];
       if (target) {
@@ -459,10 +489,10 @@ function tether(player, target) {
     }
 
     if (elapsed % 2 === 0) {
-      particleLine(dimension, P.flame, add(player.location, { x: 0, y: 1.2, z: 0 }), add(target.location, { x: 0, y: 1, z: 0 }));
+      particleLine(dimension, P.chain, add(player.location, { x: 0, y: 1.2, z: 0 }), add(target.location, { x: 0, y: 1, z: 0 }), 0.4);
     }
     if (elapsed % 8 === 0) {
-      particleRing(dimension, P.lava, add(anchor, { x: 0, y: 0.1, z: 0 }), cfg.escapeRadius, 16);
+      particleRing(dimension, P.chain, add(anchor, { x: 0, y: 0.1, z: 0 }), cfg.escapeRadius, 24);
     }
 
     if (elapsed >= pullTick) {
@@ -475,7 +505,7 @@ function tether(player, target) {
       }
       stun(target, cfg.stun);
       dealDamage(player, target, cfg.pullDamage);
-      particle(dimension, P.boom, add(target.location, { x: 0, y: 1, z: 0 }));
+      bloodBurst(dimension, add(target.location, { x: 0, y: 1, z: 0 }));
       sound(dimension, "mob.ravager.stun", target.location);
     }
   }, 1);
@@ -499,7 +529,8 @@ function castR(player, state) {
     // bỏ qua
   }
   sound(player.dimension, "mob.wither.spawn", player.location, 1.3);
-  particleRing(player.dimension, P.lava, player.location, 1.5, 10);
+  particle(player.dimension, P.aura, player.location);
+  shockRing(player.dimension, player.location, 1.5);
 
   system.runTimeout(() => {
     if (!canAct(player)) return;
@@ -521,9 +552,9 @@ function castR(player, state) {
     }
 
     // Sóng xung kích lan ra
-    particle(dimension, P.bigBoom, add(origin, { x: 0, y: 0.5, z: 0 }));
-    for (let i = 1; i <= 3; i++) {
-      system.runTimeout(() => particleRing(dimension, P.flame, add(origin, { x: 0, y: 0.2, z: 0 }), (cfg.radius * i) / 3), i * 2);
+    bloodBurst(dimension, add(origin, { x: 0, y: 1, z: 0 }));
+    for (let i = 0; i < 3; i++) {
+      system.runTimeout(() => shockRing(dimension, origin, cfg.radius * (0.6 + i * 0.25)), i * 3);
     }
     sound(dimension, "random.explode", origin, 0.6);
 
@@ -567,6 +598,13 @@ world.afterEvents.playerLeave.subscribe(({ playerId }) => {
 // Thanh hồi chiêu (action bar) + hào quang khi biến hình
 // ---------------------------------------------------------------------------
 
+// Vị trí gần đúng của lưỡi kiếm trên tay phải
+function bladeLocation(player) {
+  const forward = aimDirection(player);
+  const right = { x: -forward.z, y: 0, z: forward.x };
+  return add(add(add(player.location, { x: 0, y: 1.3, z: 0 }), right, -0.45), forward, 0.35);
+}
+
 function formatCooldown(ticksLeft) {
   if (ticksLeft <= 0) return "§a✔";
   const seconds = ticksLeft / TPS;
@@ -596,7 +634,10 @@ system.runInterval(() => {
     }
     if (isUltActive(state)) {
       parts.push(`§6§lDIỆT THẾ ${Math.ceil((state.ultUntil - t) / TPS)}s`);
-      particleRing(player.dimension, P.flame, add(player.location, { x: 0, y: 0.3, z: 0 }), 0.9, 6);
+      particle(player.dimension, P.aura, player.location);
+    } else if (t % 10 === 0) {
+      // Tàn lửa bốc lên từ lưỡi kiếm đang cầm
+      particle(player.dimension, P.ember, bladeLocation(player));
     }
     player.onScreenDisplay.setActionBar(parts.join("§r  "));
   }
