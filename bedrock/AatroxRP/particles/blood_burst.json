@@ -4,7 +4,7 @@
     "description": {
       "identifier": "aatrox:blood_burst",
       "basic_render_parameters": {
-        "material": "particles_blend",
+        "material": "particles_alpha",
         "texture": "textures/particle/aatrox_particles"
       }
     },
@@ -31,33 +31,28 @@
         ],
         "linear_drag_coefficient": 1.2
       },
+      "minecraft:particle_motion_collision": {
+        "collision_radius": 0.05,
+        "coefficient_of_restitution": 0.1,
+        "collision_drag": 6
+      },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          "0.11 * (1 - v.particle_age / v.particle_lifetime * 0.6)",
-          "0.11 * (1 - v.particle_age / v.particle_lifetime * 0.6)"
+          "0.12 * (1 - v.particle_age / v.particle_lifetime * 0.5)",
+          "0.12 * (1 - v.particle_age / v.particle_lifetime * 0.5)"
         ],
         "facing_camera_mode": "rotate_xyz",
         "uv": {
-          "texture_width": 64,
-          "texture_height": 64,
+          "texture_width": 128,
+          "texture_height": 128,
           "uv": [
-            32,
-            16
+            64,
+            80
           ],
           "uv_size": [
-            16,
-            16
+            8,
+            8
           ]
-        }
-      },
-      "minecraft:particle_appearance_tinting": {
-        "color": {
-          "interpolant": "v.particle_age / v.particle_lifetime",
-          "gradient": {
-            "0.0": "#FFB4101C",
-            "0.7": "#FF6E0612",
-            "1.0": "#00400208"
-          }
         }
       }
     }

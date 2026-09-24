@@ -33,20 +33,20 @@
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          0.06,
-          0.08
+          0.1,
+          0.1
         ],
         "facing_camera_mode": "lookat_y",
         "uv": {
-          "texture_width": 64,
-          "texture_height": 64,
+          "texture_width": 128,
+          "texture_height": 128,
           "uv": [
-            32,
-            16
+            64,
+            80
           ],
           "uv_size": [
-            16,
-            16
+            8,
+            8
           ]
         }
       },
@@ -54,8 +54,8 @@
         "color": {
           "interpolant": "v.particle_age / v.particle_lifetime",
           "gradient": {
-            "0.0": "#FFFF3C46",
-            "1.0": "#00A00A1E"
+            "0.0": "#FFFFB4B4",
+            "1.0": "#00FF5050"
           }
         }
       }

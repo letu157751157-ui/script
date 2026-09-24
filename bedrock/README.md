@@ -7,8 +7,8 @@ Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, conso
 
 ![Model 3D Quỷ Kiếm Darkin](preview.png)
 
-Khi cầm trên tay, kiếm hiển thị bằng **model 3D** (159 khối) với **texture pixel art đúng mật độ Minecraft**
-(1 pixel texture = 1/16 block, bảng màu giới hạn, sáng trên-trái, tối dưới-phải, nhiễu dither như texture gốc của game).
+Khi cầm trên tay, kiếm hiển thị bằng **model 3D** (164 khối) với **texture pixel art kiểu Minecraft**
+(bảng màu giới hạn, sáng trên-trái, tối dưới-phải, nhiễu dither như texture gốc của game).
 
 ### Thiết kế bám theo bản gốc
 
@@ -22,13 +22,26 @@ Từ đó model gồm:
 - lưỡi rộng dần, **mũi vát chéo**, sống lưỡi có **4 răng cưa lớn** và **ngạnh móc** gần mũi, lưỡi bén có khía nhỏ
 - **khung kim loại tối** viền ngoài (dày hơn lõi), **lõi thịt đỏ thẫm** lõm vào giữa
 - **dòng dung nham phân nhánh như cây** chảy từ mắt lên gần mũi, hắt ánh cam lên phần thịt xung quanh
-- **mắt Darkin đồng tử dọc** trong hốc thịt ở chắn kiếm, **cặp sừng đen** cong ôm hai bên gốc lưỡi, gai ngang và **móng vuốt** quặp phía dưới
+- **mắt Darkin đồng tử dọc** trong hốc thịt ở chắn kiếm (có **mí mắt chớp** mỗi 4 giây), **cặp sừng đen** cong ôm hai bên gốc lưỡi, gai ngang và **móng vuốt** quặp phía dưới
 - tay cầm dài quấn da (cầm hai tay) với 3 vòng kim loại, núm chuôi có gai
 
-Dung nham và mắt dùng material phát sáng (`entity_emissive`) nên vẫn rực lên ban đêm.
-Icon trong túi đồ là sprite pixel art render từ chính model 3D.
+Dung nham và mắt là một lớp riêng vẽ bằng material `entity_emissive` với texture `.tga`
+(kênh alpha thấp = phát sáng, giống texture blaze gốc) nên vẫn rực lên ban đêm.
 Đây là model tự dựng theo phong cách Minecraft, mô phỏng thiết kế kiếm của Aatrox, không phải model hay texture gốc của Riot
 (addon không chứa bất kỳ hình ảnh nào của Riot).
+
+### Cầm kiếm và animation
+
+![Cầm kiếm và animation chiêu](preview_animation.png)
+
+- **Cầm kiếm:** tay nắm đúng chuôi kiếm, lưỡi chếch lên phía trước (giống cách cầm kiếm thường của Minecraft), dài xấp xỉ chiều cao nhân vật.
+  Góc nhìn thứ nhất: kiếm nằm góc phải dưới, lưỡi chéo lên, thấy rõ mắt và dòng dung nham mà không che tâm ngắm.
+- **Animation khi dùng chiêu** (cả người xung quanh lẫn chính bạn đều thấy):
+  - **Q1** giơ kiếm qua vai rồi chém chéo xuống, **Q2** quét ngang từ phải sang trái, **Q3** nhảy lên hai tay giơ kiếm rồi nện xuống đất
+  - **E** lao người về trước, kiếm kéo lê phía sau
+  - **W** tay trái vung phóng xích (xích bay ra đúng lúc vung tay)
+  - **R** khom người rồi gầm lên, dang tay giơ kiếm lên trời
+- **Mắt Darkin trên kiếm chớp mắt** định kỳ.
 
 ## Cài đặt
 
@@ -37,71 +50,87 @@ Icon trong túi đồ là sprite pixel art render từ chính model 3D.
 
 Sau đó tạo/sửa thế giới → **Behavior Packs** → bật *Aatrox - Quỷ Kiếm Darkin (BP)* (Resource Pack sẽ tự bật theo).
 
+> **Đã cài bản cũ?** Bản này là **v1.2.0**. Trong thế giới, gỡ pack cũ (1.0.0) ra rồi bật lại bản 1.2.0.
+> Nếu vẫn thấy kiếm cầm như cây thương hoặc không có animation, vào **Cài đặt → Bộ nhớ** xoá hết pack Aatrox cũ rồi nhập lại file `.mcaddon`.
+
 Lấy kiếm:
 - Lệnh: `/give @s aatrox:darkin_blade`
 - Chế tạo (bàn chế tạo, không cần xếp hình): **Kiếm Netherite + Ngôi sao Nether + Khối Redstone**
 - Hoặc tìm trong túi đồ Sáng Tạo, mục Trang bị → Kiếm.
 
-## Điều khiển
+## Cách dùng chiêu
 
-Bedrock không cho addon gán phím riêng, nên chiêu được chọn theo **tư thế lúc bấm chuột phải** (điện thoại: nhấn giữ / nút Dùng). Hành động bar sẽ hiển thị chiêu nào sắp được kích hoạt dựa trên tư thế hiện tại.
+Bedrock không cho addon gán phím riêng, nên **mọi chiêu đều dùng nút "Dùng vật phẩm"**:
+**chuột phải** trên máy tính, **chạm màn hình** (hoặc nút Dùng/Đặt) trên điện thoại, **cò trái (LT/L2)** trên tay cầm.
+Chiêu nào được dùng phụ thuộc vào **tư thế lúc bấm**:
 
-### Các chiêu
-
-| Thao tác | Kích hoạt | Hiệu ứng |
+| Tư thế lúc bấm | Chiêu | Hiệu ứng |
 |---|---|---|
-| **Chuột phải** (thường) | Q — Quỷ Kiếm Darkin | Chém 3 lần liên tiếp (4 giây giữa mỗi lần). Vùng chém có lửa dưới đất đánh dấu. **Điểm ngọt** (mép kiếm cam): x1.6 sát thương, hất tung, choáng 1s, giảm hồi nội tại 3s. Lần 3 là nện vùng tròn |
-| **Ngồi + Chuột phải** | E — Bước Nhảy Hắc Ám | Lướt nhanh theo hướng nhìn, bốc tàn lửa |
-| **Nhảy + Chuột phải** (đang bay) | W — Xiềng Xích Địa Ngục | Phóng xích lửa. **Trúng**: sát thương + làm chậm + vòng trói. Nếu mục tiêu chưa chạy ra khỏi vòng sau 1.5s thì bị kéo về, chịu thêm sát thương + choáng |
-| **Nhìn lên trời + Chuột phải** | R — Kẻ Diệt Thế | Sóng xung kích hất văng + làm chậm xung quanh. Biến hình 10s: **+30% sát thương chiêu**, **+50% hồi máu**, Tốc Độ II, Sức Mạnh I, nội tại hồi 2x nhanh |
-| **Đánh thường** (với kiếm) | Nội tại — Tư Thế Tử Thần | Khi sẵn sàng (8s cooldown): vết chém phát nổ, gây **+8% máu tối đa** tới mục tiêu + **hồi máu bằng lượng đó** |
-
-### Lưu ý: Kích hoạt chiêu
-
-- **Action bar** (thanh phía trên hotbar) sẽ hiển thị **"Sắp dùng: X"** để cho biết chiêu nào sẽ kích hoạt nếu nhấn chuột phải ngay lúc này
-- **Ví dụ**: Nếu đang ngồi, sẽ hiển thị **"Sắp dùng: E (ngồi)"**
-- Bấm **chuột phải** để kích hoạt chiêu được hiển thị
-- Thanh action bar cũng hiển thị **cooldown** (hồi chiêu) và **trạng thái nội tại**
+| **Đứng / chạy bình thường** | **Q — Quỷ Kiếm Darkin** | Bấm 3 lần liên tiếp (mỗi lần có 4 giây để bấm tiếp). Vùng chém hiện bằng ô rune dưới đất; **ô màu cam là điểm ngọt**: x1.6 sát thương, hất tung, choáng, giảm hồi chiêu nội tại. Lần 3 nện xuống vùng tròn |
+| **Đang ngồi** (Shift / nút ngồi) | **E — Bước Nhảy Hắc Ám** | Lướt nhanh theo hướng nhìn |
+| **Đang nhảy** (bấm nhảy rồi bấm dùng khi còn trên không) | **W — Xiềng Xích Địa Ngục** | Phóng xích lửa. Trúng thì gây sát thương, làm chậm, tạo vòng trói; sau 1.5 giây mục tiêu chưa chạy ra khỏi vòng thì bị kéo về, chịu thêm sát thương và bị choáng |
+| **Ngước nhìn lên trời** (góc nhìn cao hơn 50°) | **R — Kẻ Diệt Thế** | Sóng xung kích hất văng + làm chậm xung quanh, rồi biến hình 10 giây: +30% sát thương chiêu, +50% hồi máu, Tốc Độ II, Sức Mạnh I, nội tại hồi nhanh gấp đôi |
+| **Đánh thường** (chuột trái / chạm vào mob) | **Nội tại — Tư Thế Tử Thần** | Khi sẵn sàng (8 giây): vết chém phát nổ thêm 8% máu tối đa của mục tiêu và hồi máu bằng lượng đó |
 
 Mọi sát thương gây ra khi cầm kiếm đều **hút máu 15%**.
+
+Bấm lúc tâm ngắm đang chỉ vào **khoảng không, mặt đất, tường hay mob** đều ra chiêu.
+Riêng block/mob có thao tác riêng (rương, cửa, bàn chế tạo, giường, dân làng, ngựa, thuyền...) thì vẫn mở/dùng như thường.
+
+**Để biết đang dùng được chiêu gì:**
+- Lần đầu cầm kiếm sẽ hiện tiêu đề và hướng dẫn trong khung chat. Gõ `/scriptevent aatrox:help` để xem lại.
+- Mô tả của kiếm (giữ chuột lên kiếm / chọn kiếm trong túi đồ) ghi sẵn cách dùng từng chiêu.
+- **Thanh phía trên hotbar** hiện:
+  `Nội tại ✔  Bấm: Q  Q ✔  E ✔  W 3.2s  R ✔`, trong đó **"Bấm: …"** là chiêu sẽ ra nếu bấm ngay lúc này (đổi theo tư thế: `E (đang ngồi)`, `W (đang nhảy)`, `R (nhìn lên)`),
+  phía sau là thời gian hồi chiêu. Bấm khi chiêu đang hồi sẽ nghe tiếng "cạch" và thanh hiện `W đang hồi chiêu: 3.2s`.
+
 ### Hiệu ứng particle
 
-Addon có 11 particle riêng (texture pixel art tự vẽ, nằm trong `AatroxRP/particles`):
+![Texture particle](preview_particles.png)
 
-| Particle | Dùng ở đâu |
-|---|---|
-| `aatrox:ground_mark` / `ground_mark_sweet` | Ô đỏ và ô cam phát sáng dưới đất báo trước vùng chém Q và điểm ngọt |
-| `aatrox:slash` | Nhát chém lưỡi liềm dọc theo đường Q |
-| `aatrox:hit_spark` | Tia lửa bắn ra mỗi khi chiêu trúng |
-| `aatrox:blood_burst` + `aatrox:flash` | Máu văng và chớp sáng khi trúng điểm ngọt, nội tại phát nổ, kéo xích |
-| `aatrox:shock_ring` | Vòng sóng xung kích lan trên mặt đất (Q lần 3, R) |
-| `aatrox:chain_link` | Sợi xích lửa của W và vòng trói |
-| `aatrox:ember` | Tàn lửa bốc lên từ lưỡi kiếm khi cầm, vệt lướt E |
-| `aatrox:ult_aura` | Lửa đỏ đen bao quanh người khi biến hình R |
-| `aatrox:lifesteal` | Giọt máu phát sáng bay lên khi hút máu |
+Addon có 11 particle riêng, texture pixel art tự vẽ. Phần lớn là **flipbook nhiều khung hình**:
+hiệu ứng chạy hết các khung trong thời gian sống của particle.
 
-Thanh phía trên hotbar (action bar) hiện hồi chiêu của nội tại, Q, E, W, R, số lần chém Q và thời gian biến hình còn lại.
+| Particle | Hình | Dùng ở đâu |
+|---|---|---|
+| `aatrox:slash` | Lưỡi liềm lửa 4 khung: loé lên → rực nhất → rạn → vỡ thành tia lửa | Nhát chém Q |
+| `aatrox:shock_ring` | Vòng lửa 3 khung: dày → mỏng → vỡ vụn | Sóng xung kích Q3, R |
+| `aatrox:ground_mark` / `ground_mark_sweet` | Ô rune 3 khung hiện dần (khung → hình thoi → lõi), tô đỏ / cam | Báo trước vùng chém Q và điểm ngọt |
+| `aatrox:ult_aura` | Ngọn lửa 4 khung bập bùng | Hào quang khi biến hình R |
+| `aatrox:ember` | Tàn lửa 4 khung: cháy sáng → tàn thành đốm đỏ | Lửa bốc lên từ lưỡi kiếm, vệt lướt E |
+| `aatrox:flash` | Chớp sáng hình sao 3 khung | Nổ điểm ngọt, nội tại, kéo xích |
+| `aatrox:hit_spark` | Tia lửa dài bay theo hướng văng | Mỗi khi chiêu trúng |
+| `aatrox:blood_burst` | Giọt máu pixel đặc, rơi xuống đất | Trúng điểm ngọt, nội tại, kéo xích |
+| `aatrox:chain_link` | Mắt xích sắt nung đỏ | Sợi xích W và vòng trói |
+| `aatrox:lifesteal` | Giọt máu phát sáng bay lên | Khi hút máu |
 
 ## Tuỳ chỉnh
 
-Mọi thông số nằm trong [`AatroxBP/scripts/config.js`](AatroxBP/scripts/config.js): sát thương, hồi chiêu, tầm, góc nhìn lên để dùng R (`lookUpPitch`), bật/tắt đánh người chơi (`pvp`)...
+Mọi thông số chiêu nằm trong [`AatroxBP/scripts/config.js`](AatroxBP/scripts/config.js): sát thương, hồi chiêu, tầm, góc nhìn lên để dùng R (`lookUpPitch`), bật/tắt đánh người chơi (`pvp`)...
 Sát thương đánh thường của kiếm (9) nằm ở `minecraft:damage` trong [`AatroxBP/items/darkin_blade.json`](AatroxBP/items/darkin_blade.json).
 
-Sửa xong thì chạy `python3 build.py` để tạo lại texture, model và file `.mcaddon`.
+Sửa xong thì chạy `python3 build.py` để tạo lại texture, model, animation, particle và file `.mcaddon`.
+Nếu sửa rồi nhập lại vào game, nhớ tăng `version` trong 2 file `manifest.json` (nếu không Minecraft sẽ giữ bản cũ).
 
 **Model 3D:** hình dáng kiếm là bản vẽ mặt trước dạng pixel trong [`sword_art.py`](sword_art.py)
 (đường viền lưỡi, răng cưa, sừng, mắt, tay cầm; mỗi vật liệu có độ dày riêng trong `MATERIALS`).
 [`model.py`](model.py) đùn bản vẽ thành khối 3D, gộp pixel cùng vật liệu thành khối lớn, vẽ texture pixel art (bảng màu trong `PALETTES`)
-và xuất 2 file geometry: `darkin_blade.geo.json` (phần thường) và `darkin_blade_glow.geo.json` (phần phát sáng).
+và xuất 2 geometry: `darkin_blade.geo.json` (phần thường + bone `eyelid` cho mí mắt) và `darkin_blade_glow.geo.json` (phần phát sáng, texture `darkin_blade_glow.tga`).
 Có thể mở các file `.geo.json` bằng Blockbench để chỉnh tay.
 
-**Particle:** chỉnh trong [`particles.py`](particles.py) (hình sprite, màu, tốc độ, thời gian sống), chạy lại `build.py`. Sprite particle là pixel art 16×16 cạnh cứng giống particle gốc của Minecraft.
+**Tư thế cầm kiếm** nằm trong [`AatroxRP/animations/darkin_blade.animation.json`](AatroxRP/animations/darkin_blade.animation.json).
+Model attachable được gắn sao cho điểm `(0, 24, 0)` của model nằm ở bàn tay (đã kiểm chứng bằng model đinh ba, khiên, ống nhòm gốc),
+và tâm tay cầm của kiếm đặt đúng điểm này, nên `position` chỉ dịch nhẹ vào lòng bàn tay, `rotation` là hướng kiếm, `scale` là độ lớn
+(góc nhìn thứ 3: 0.5, góc nhìn thứ nhất: 0.45).
+
+**Animation chiêu** sinh từ [`player_anims.py`](player_anims.py) ra `AatroxRP/animations/aatrox_player.animation.json`, script phát bằng `playAnimation`:
+- góc nhìn thứ 3: độ xoay/dịch cộng thêm cho các bone của người chơi, cộng với hướng lưỡi kiếm mong muốn (cổ tay được giải ngược cho đúng hướng)
+- góc nhìn thứ nhất: vị trí nắm tay và hướng lưỡi kiếm trên màn hình, script tự tính ra chuyển động của tay
+- keyframe chém của Q ở 0.45 giây khớp với `Q.windup` trong `config.js`; đổi `windup` thì dời keyframe theo
+
+**Particle:** chỉnh trong [`particles.py`](particles.py) (hình sprite, bảng màu, số khung, tốc độ, thời gian sống), chạy lại `build.py`.
 
 **Icon:** `art/item_icon.png` (túi đồ, 64×64) và `art/pack_icon.png` được render từ model 3D; thay 2 file này nếu muốn icon khác.
-
-**Vị trí kiếm trên tay** nằm trong [`AatroxRP/animations/darkin_blade.animation.json`](AatroxRP/animations/darkin_blade.animation.json)
-(`position`, `rotation`, `scale` cho góc nhìn thứ nhất và thứ ba). Thông số khởi đầu lấy theo cây đinh ba (trident) của Minecraft;
-nếu kiếm cầm lệch hoặc quá to thì chỉnh 3 giá trị này.
 
 ## Cấu trúc
 
@@ -112,20 +141,21 @@ bedrock/
 │   ├── items/darkin_blade.json
 │   ├── recipes/darkin_blade.json
 │   └── scripts/
-│       ├── main.js            toàn bộ logic chiêu
+│       ├── main.js            toàn bộ logic chiêu, nhận thao tác, hướng dẫn
 │       └── config.js          thông số
 ├── AatroxRP/                  Resource pack
 │   ├── attachables/           thay model cầm tay bằng model 3D
-│   ├── animations/            vị trí kiếm khi cầm (ngôi thứ nhất / thứ ba)
+│   ├── animations/            tư thế cầm kiếm, chớp mắt, animation chiêu của người chơi
 │   ├── render_controllers/    vẽ lớp phát sáng
 │   ├── models/entity/         model 3D (.geo.json) + lớp phát sáng
 │   ├── particles/             11 particle riêng
-│   └── textures/              icon, texture model, texture particle
+│   └── textures/              icon, texture model (.png + .tga phát sáng), texture particle
 ├── art/                       icon render từ model 3D
 ├── sword_art.py               bản vẽ pixel mặt trước của kiếm (hình dáng)
 ├── model.py                   đùn bản vẽ thành model 3D + vẽ texture pixel art
+├── player_anims.py            thiết kế + giải ngược animation chiêu của người chơi
 ├── particles.py               định nghĩa particle + vẽ texture particle
-├── build.py                   tạo texture, model, particle + đóng gói .mcaddon
+├── build.py                   tạo texture, model, animation, particle + đóng gói .mcaddon
 └── dist/AatroxDarkinBlade.mcaddon
 ```
 
@@ -136,24 +166,7 @@ bedrock/
 
 ## Khắc phục sự cố
 
-### Kiếm không hiển thị model 3D
-- Kiểm tra xem **Behavior Pack** và **Resource Pack** đều bật chưa
-- Tải lại thế giới (thoát rồi vào lại)
-- Nếu vẫn không có, thử xóa các pack đã cũ của addon và tải lại file `.mcaddon`
-
-### Không kích hoạt được chiêu
-- Kiểm tra xem đang **cầm kiếm Darkin** (kiểm tra tay trái trong hotbar)
-- **Action bar** (thanh trên hotbar) phải hiển thị "§4[Quỷ Kiếm Darkin]" nếu cầm đúng
-- Không thể dùng chiêu khi bị choáng (Slowness cấp tối đa)
-- Chờ cooldown: nhìn vào thanh hiển thị thời gian hồi chiêu ở action bar
-- **Trên điện thoại**: nhấn giữ nút Dùng (Use/Attack) thay vì chuột phải
-
-### Sát thương quá mạnh/yếu
-- Chỉnh lại thông số trong [`AatroxBP/scripts/config.js`](AatroxBP/scripts/config.js)
-- Chạy `python3 build.py` để tạo lại addon
-- Tải lại thế giới
-
-### Model hiển thị ở vị trí sai hoặc quay sai
-- Chỉnh lại **position** và **rotation** trong [`AatroxRP/animations/darkin_blade.animation.json`](AatroxRP/animations/darkin_blade.animation.json)
-- Thông số khởi đầu lấy theo cây đinh ba (trident) của Minecraft; nếu kiếm cầm lệch hoặc quá to thì chỉnh 3 giá trị này
-- Sau khi sửa, chạy `python3 build.py` rồi tải lại thế giới
+- **Bấm không ra chiêu, không có thanh hồi chiêu phía trên hotbar:** script chưa chạy. Kiểm tra đã bật **Behavior Pack** (không chỉ Resource Pack) và game từ **1.21.90** trở lên.
+- **Có thanh hồi chiêu nhưng bấm không ra chiêu:** xem chữ **"Bấm: …"** trên thanh để biết chiêu sẽ ra; nếu chiêu đang hồi sẽ có thông báo thời gian. Đang bị choáng thì không dùng được chiêu.
+- **Kiếm hiện dạng hình phẳng 2D, không có model 3D:** Resource Pack chưa bật hoặc đang dùng bản cũ, xem mục *Đã cài bản cũ?* ở trên.
+- **Muốn đổi độ to / cách cầm kiếm:** sửa `scale`, `rotation` trong `AatroxRP/animations/darkin_blade.animation.json`.

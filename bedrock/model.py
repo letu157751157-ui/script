@@ -11,14 +11,26 @@ Mặt trước và mặt sau cùng lấy màu theo toạ độ thật trên than
 văn liền mạch qua các khối.
 
 Các vật liệu phát sáng (dung nham, mắt) được xuất sang geometry riêng, vẽ bằng
-material entity_emissive nên sáng rực cả ban đêm.
+material entity_emissive với texture .tga riêng: entity_emissive lấy kênh alpha
+làm mức phát sáng (alpha càng thấp càng sáng, giống texture blaze gốc).
+
+Mí mắt Darkin là bone riêng (eyelid) phủ lên mắt, animation co giãn theo trục Y
+để mắt chớp.
 """
 import json
 import os
+import struct
 
 from sword_art import ART, MATERIALS
 
-GRIP_Y = 24  # tâm tay cầm trùng điểm xoay bone gốc (giống model cây đinh ba)
+# Điểm (0, 24, 0) của model attachable nằm đúng bàn tay (điểm xoay bone rightItem),
+# nên đặt tâm tay cầm tại đây thì animation chỉ cần xoay kiếm quanh nắm tay.
+GRIP_Y = 24
+GLOW_ALPHA = 24  # alpha của lớp phát sáng: 0 = sáng hoàn toàn, 255 = không phát sáng
+EYE_PIXELS = sorted(p for p, m in ART.items() if m == "eye")
+EYE_TOP = max(y for _, y in EYE_PIXELS) + 1
+LID_DEPTH = MATERIALS["eye"]["depth"]
+LID_INFLATE = 0.2  # mí mắt phủ trùm ra ngoài mắt một chút
 
 # Bảng màu từ tối tới sáng
 PALETTES = {
@@ -33,12 +45,13 @@ PALETTES = {
     "band": [(30, 30, 38), (46, 48, 59), (66, 69, 84), (92, 96, 114), (128, 133, 154)],
     "pommel": [(26, 26, 33), (40, 42, 52), (58, 61, 75), (82, 86, 104), (116, 121, 142)],
     "spike": [(14, 14, 18), (24, 24, 31), (38, 39, 48), (58, 60, 73), (86, 90, 108)],
+    "lid": [(30, 3, 8), (52, 7, 14), (78, 13, 22), (106, 22, 30), (140, 38, 44)],
 }
 PUPIL = (22, 2, 5)
 BASE_SHADE = {"frame": 2, "horn": 1, "core": 2, "lava": 2, "socket": 2, "eye": 3,
-              "guard": 2, "grip": 2, "band": 2, "pommel": 2, "spike": 1}
+              "guard": 2, "grip": 2, "band": 2, "pommel": 2, "spike": 1, "lid": 2}
 DITHER = {"frame": 0.18, "horn": 0.14, "core": 0.22, "socket": 0.2, "guard": 0.12,
-          "pommel": 0.12, "band": 0.1, "spike": 0.1, "grip": 0.0, "lava": 0.0, "eye": 0.0}
+          "pommel": 0.12, "band": 0.1, "spike": 0.1, "grip": 0.0, "lava": 0.0, "eye": 0.0, "lid": 0.2}
 
 
 def hash01(x, y, salt=0):
@@ -102,6 +115,18 @@ def front_color(x, y):
     return palette[max(0, min(len(palette) - 1, shade))]
 
 
+def lid_color(x, y):
+    """Mí mắt: viền mi tối ở mép dưới, gờ sáng ngay trên, phần còn lại là thịt sẫm."""
+    palette = PALETTES["lid"]
+    bottom = min(yy for xx, yy in EYE_PIXELS if xx == x)
+    if y == bottom:
+        return palette[0]
+    if y == bottom + 1:
+        return palette[3]
+    n = hash01(x, y, 5)
+    return palette[1] if n < 0.2 else palette[2]
+
+
 def side_color(material, x, y, face):
     """Màu các mặt bên (độ dày): tối hơn mặt trước, mặt trên sáng hơn."""
     palette = PALETTES[material]
@@ -146,8 +171,11 @@ def build_cubes():
         pixels = [p for p, m in ART.items() if m == material]
         for x, y, w, h in rectangles(pixels):
             d = info["depth"]
-            cubes.append({"material": material, "glow": info["glow"],
+            cubes.append({"material": material, "glow": info["glow"], "bone": "sword",
                           "origin": (x, y, -d / 2), "size": (w, h, d)})
+    for x, y, w, h in rectangles(EYE_PIXELS):
+        cubes.append({"material": "lid", "glow": False, "bone": "eyelid", "inflate": LID_INFLATE,
+                      "origin": (x, y, -LID_DEPTH / 2), "size": (w, h, LID_DEPTH)})
     return cubes
 
 
@@ -185,11 +213,12 @@ def build_texture(cubes, uvs, size):
         ox, oy, _ = cube["origin"]
         w, h, d = cube["size"]
         material = cube["material"]
+        face = lid_color if material == "lid" else front_color
         for j in range(h):
             y = oy + h - 1 - j  # hàng trên cùng của mặt = đỉnh khối
             for i in range(w):
-                put(u + d + i, v + d + j, front_color(ox + i, y))  # mặt bắc: trái -> phải = x tăng
-                put(u + 2 * d + w + i, v + d + j, front_color(ox + w - 1 - i, y))  # mặt nam: x giảm
+                put(u + d + i, v + d + j, face(ox + i, y))  # mặt bắc: trái -> phải = x tăng
+                put(u + 2 * d + w + i, v + d + j, face(ox + w - 1 - i, y))  # mặt nam: x giảm
             for k in range(d):
                 put(u + k, v + d + j, side_color(material, ox, y, "east"))
                 put(u + d + w + k, v + d + j, side_color(material, ox + w - 1, y, "west"))
@@ -201,13 +230,27 @@ def build_texture(cubes, uvs, size):
 
 
 def build_geometry(identifier, cubes, uvs, size, glow):
-    """glow=False: phần thường; glow=True: chỉ các khối phát sáng."""
-    entries = []
+    """glow=False: phần thường + mí mắt; glow=True: chỉ các khối phát sáng."""
+    entries = {"sword": [], "eyelid": []}
     for cube, uv in zip(cubes, uvs):
         if cube["glow"] != glow:
             continue
         ox, oy, oz = cube["origin"]
-        entries.append({"origin": [ox, oy + GRIP_Y, oz], "size": list(cube["size"]), "uv": list(uv)})
+        entry = {"origin": [ox, oy + GRIP_Y, oz], "size": list(cube["size"]), "uv": list(uv)}
+        if cube.get("inflate"):
+            entry["inflate"] = cube["inflate"]
+        entries[cube["bone"]].append(entry)
+    bones = [
+        {
+            "name": "darkin_blade",
+            # Gắn vào xương tay đang cầm (rightitem / leftitem)
+            "binding": "q.item_slot_to_bone_name(c.item_slot)",
+            "pivot": [0, GRIP_Y, 0],
+        },
+        {"name": "sword", "parent": "darkin_blade", "pivot": [0, GRIP_Y, 0], "cubes": entries["sword"]},
+    ]
+    if entries["eyelid"]:
+        bones.append({"name": "eyelid", "parent": "sword", "pivot": [0, EYE_TOP + GRIP_Y, 0], "cubes": entries["eyelid"]})
     return {
         "format_version": "1.16.0",
         "minecraft:geometry": [
@@ -220,15 +263,7 @@ def build_geometry(identifier, cubes, uvs, size, glow):
                     "visible_bounds_height": 6,
                     "visible_bounds_offset": [0, 1.5, 0],
                 },
-                "bones": [
-                    {
-                        "name": "darkin_blade",
-                        # Gắn vào xương tay đang cầm (rightitem / leftitem)
-                        "binding": "q.item_slot_to_bone_name(c.item_slot)",
-                        "pivot": [0, GRIP_Y, 0],
-                    },
-                    {"name": "sword", "parent": "darkin_blade", "pivot": [0, GRIP_Y, 0], "cubes": entries},
-                ],
+                "bones": bones,
             }
         ],
     }
@@ -241,10 +276,25 @@ def write_json(path, data):
         f.write("\n")
 
 
+def write_tga(path, grid, alpha):
+    """TGA 32-bit không nén, gốc dưới-trái như texture gốc; pixel có màu nhận alpha cho trước."""
+    height, width = len(grid), len(grid[0])
+    header = struct.pack("<BBBHHBHHHHBB", 0, 0, 2, 0, 0, 0, 0, 0, width, height, 32, 8)
+    body = bytearray()
+    for row in reversed(grid):
+        for r, g, b, a in row:
+            body += bytes((b, g, r, alpha if a else 0))
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "wb") as f:
+        f.write(header + bytes(body))
+
+
 def write_model(root, write_png):
     cubes = build_cubes()
     uvs, size = pack_uvs(cubes)
-    write_png(os.path.join(root, "AatroxRP/textures/entity/darkin_blade.png"), build_texture(cubes, uvs, size))
+    texture = build_texture(cubes, uvs, size)
+    write_png(os.path.join(root, "AatroxRP/textures/entity/darkin_blade.png"), texture)
+    write_tga(os.path.join(root, "AatroxRP/textures/entity/darkin_blade_glow.tga"), texture, GLOW_ALPHA)
     models = os.path.join(root, "AatroxRP/models/entity")
     write_json(os.path.join(models, "darkin_blade.geo.json"),
                build_geometry("geometry.aatrox.darkin_blade", cubes, uvs, size, glow=False))

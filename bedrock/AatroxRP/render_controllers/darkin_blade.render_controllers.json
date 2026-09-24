@@ -4,7 +4,7 @@
     "controller.render.aatrox.darkin_blade_glow": {
       "geometry": "Geometry.glow",
       "materials": [{ "*": "Material.glow" }],
-      "textures": ["Texture.default"]
+      "textures": ["Texture.glow"]
     }
   }
 }

@@ -10,7 +10,8 @@
       },
       "textures": {
         "default": "textures/entity/darkin_blade",
-        "enchanted": "textures/misc/enchanted_item_glint"
+        "enchanted": "textures/misc/enchanted_item_glint",
+        "glow": "textures/entity/darkin_blade_glow"
       },
       "geometry": {
         "default": "geometry.aatrox.darkin_blade",
@@ -18,16 +19,14 @@
       },
       "animations": {
         "hold_first_person": "animation.aatrox.darkin_blade.hold_first_person",
-        "hold_third_person": "animation.aatrox.darkin_blade.hold_third_person"
+        "hold_third_person": "animation.aatrox.darkin_blade.hold_third_person",
+        "blink": "animation.aatrox.darkin_blade.blink"
       },
       "scripts": {
         "animate": [
-          {
-            "hold_first_person": "c.is_first_person == 1.0"
-          },
-          {
-            "hold_third_person": "c.is_first_person == 0.0"
-          }
+          { "hold_first_person": "c.is_first_person" },
+          { "hold_third_person": "!c.is_first_person" },
+          "blink"
         ]
       },
       "render_controllers": [

@@ -227,6 +227,15 @@ function stun(entity, seconds) {
   particleRing(entity.dimension, P.stun, add(entity.location, { x: 0, y: 2.2, z: 0 }), 0.5, 4);
 }
 
+// Animation người chơi khi ra chiêu (AatroxRP/animations/aatrox_player.animation.json)
+function playAnim(player, name) {
+  try {
+    player.playAnimation(`animation.aatrox.${name}`, { blendOutTime: 0.12 });
+  } catch {
+    // bỏ qua
+  }
+}
+
 function knockback(entity, direction, strength, vertical) {
   try {
     entity.applyKnockback({ x: direction.x * strength, z: direction.z * strength }, vertical);
@@ -344,6 +353,7 @@ function castQ(player, state, direction) {
     // bỏ qua
   }
   sound(player.dimension, "item.trident.throw", player.location, 0.6);
+  playAnim(player, `q${stage}`);
   drawQTelegraph(player, cast, direction);
   system.runTimeout(() => slamQ(player, cast, direction), windup);
 }
@@ -372,10 +382,6 @@ function slamQ(player, cast, direction) {
       particle(dimension, P.slash, add(add(origin, direction, along), { x: 0, y: 1, z: 0 }));
     }
     particle(dimension, P.flash, add(add(origin, direction, cast.length - cast.sweet / 2), { x: 0, y: 0.5, z: 0 }));
-    // Hiệu ứng thêm tại vị trí người chơi khi chém
-    for (let i = 0; i < 2; i++) {
-      particle(dimension, P.spark, add(origin, { x: 0, y: 1.2, z: 0 }));
-    }
   }
   sound(dimension, "random.explode", origin, 1.4);
 
@@ -406,6 +412,7 @@ function castE(player, state, direction) {
   const cfg = CONFIG.E;
   if (now() < state.cd.E) return;
   startCooldown(state, "E");
+  playAnim(player, "e");
   knockback(player, direction, cfg.strength, cfg.vertical);
   sound(player.dimension, "item.trident.riptide_1", player.location, 1.2);
 
@@ -431,15 +438,22 @@ function isBlocked(dimension, location) {
 }
 
 function castW(player, state, direction) {
-  const cfg = CONFIG.W;
   const t = now();
   if (t < state.busyUntil || t < state.cd.W) return;
   startCooldown(state, "W");
-  state.busyUntil = t + 4;
-  sound(player.dimension, "mob.blaze.shoot", player.location, 0.7);
+  state.busyUntil = t + 8;
+  playAnim(player, "w");
+  // Xích bay ra đúng lúc tay trái vung tới trong animation (0.25 giây)
+  system.runTimeout(() => launchChain(player, direction), 5);
+}
 
+function launchChain(player, direction) {
+  if (!canAct(player)) return;
+  const cfg = CONFIG.W;
   const dimension = player.dimension;
-  let head = add(player.location, { x: 0, y: 1.3, z: 0 });
+  sound(dimension, "mob.blaze.shoot", player.location, 0.7);
+  const left = { x: direction.z, y: 0, z: -direction.x };
+  let head = add(add(player.location, { x: 0, y: 1.3, z: 0 }), left, 0.35);
   let travelled = 0;
 
   const flight = system.runInterval(() => {
@@ -524,6 +538,7 @@ function castR(player, state) {
   const t = now();
   if (t < state.busyUntil || t < state.cd.R) return;
   startCooldown(state, "R");
+  playAnim(player, "r");
   const castTicks = ticks(cfg.castTime);
   state.busyUntil = t + castTicks;
 
@@ -579,18 +594,93 @@ function castR(player, state) {
 // Nhận thao tác
 // ---------------------------------------------------------------------------
 
-world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
-  if (itemStack?.typeId !== ITEM_ID || !canAct(player) || isStunned(player)) return;
+const SKILL_NAMES = { Q: "Quỷ Kiếm Darkin", E: "Bước Nhảy Hắc Ám", W: "Xiềng Xích Địa Ngục", R: "Kẻ Diệt Thế" };
+const STANCE_HINT = { Q: "", E: " (đang ngồi)", W: " (đang nhảy)", R: " (nhìn lên)" };
+// Hiện trong mô tả của kiếm (giữ chuột lên kiếm trong túi đồ)
+const LORE = [
+  "§7Chuột phải/chạm: §cQ §7Quỷ Kiếm",
+  "§7Ngồi + chuột phải: §cE §7Lướt",
+  "§7Nhảy + chuột phải: §cW §7Xiềng Xích",
+  "§7Nhìn lên + chuột phải: §cR §7Diệt Thế",
+  "§7Đánh thường: §cNội tại",
+];
+// Bấm vào những block/mob có thao tác riêng thì dùng chúng như thường, không ra chiêu
+const INTERACTIVE_BLOCK =
+  /door|gate|button|lever|chest|barrel|shulker|furnace|smoker|crafting|crafter|anvil|table|:bed$|bell|hopper|dispenser|dropper|loom|grindstone|stonecutter|beacon|lectern|repeater|comparator|noteblock|jukebox|cake|campfire|anchor|lodestone|composter|cauldron|brewing|sign|frame|vault|chiseled_bookshelf|decorated_pot/;
+const INTERACTIVE_ENTITY = new Set(["minecraft:villager", "minecraft:villager_v2", "minecraft:wandering_trader", "minecraft:armor_stand"]);
+
+function chooseSkill(player) {
+  if (player.getRotation().x <= CONFIG.lookUpPitch) return "R";
+  if (player.isSneaking) return "E";
+  if (!player.isOnGround) return "W";
+  return "Q";
+}
+
+function notify(state, text, seconds = 1.2) {
+  state.notice = text;
+  state.noticeUntil = now() + ticks(seconds);
+}
+
+function cooldownLeft(state, skill) {
+  if (skill === "Q" && state.qStage > 1) return 0; // đang trong thời gian chém tiếp
+  return state.cd[skill] - now();
+}
+
+function trySkill(player) {
+  if (!canAct(player)) return;
   const state = getState(player);
-  // Chặn một lần bấm bị tính 2 lần
-  if (now() - state.lastUse < 3) return;
+  // Một lần bấm có thể bắn nhiều sự kiện (dùng vật phẩm + chạm block)
+  if (now() - state.lastUse < 4) return;
   state.lastUse = now();
+  if (isStunned(player)) return notify(state, "§cĐang bị choáng, không dùng được chiêu!");
+  if (now() < state.busyUntil) return;
+
+  const skill = chooseSkill(player);
+  const left = cooldownLeft(state, skill);
+  if (left > 0) {
+    try {
+      player.playSound("note.bass", { pitch: 0.6, volume: 0.7 });
+    } catch {
+      // bỏ qua
+    }
+    return notify(state, `§c${skill} đang hồi chiêu: ${(left / TPS).toFixed(1)}s`);
+  }
 
   const direction = aimDirection(player);
-  if (player.getRotation().x <= CONFIG.lookUpPitch) castR(player, state);
-  else if (player.isSneaking) castE(player, state, direction);
-  else if (!player.isOnGround) castW(player, state, direction);
+  const stage = state.qStage;
+  if (skill === "R") castR(player, state);
+  else if (skill === "E") castE(player, state, direction);
+  else if (skill === "W") castW(player, state, direction);
   else castQ(player, state, direction);
+  const label = skill === "Q" ? `Q${stage}` : skill;
+  notify(state, `§6▶ ${label}: ${SKILL_NAMES[skill]}`);
+}
+
+// Chuột phải / chạm vào khoảng không
+world.afterEvents.itemUse.subscribe(({ source, itemStack }) => {
+  if (itemStack?.typeId === ITEM_ID) trySkill(source);
+});
+
+// Chuột phải / chạm khi tâm ngắm đang chỉ vào block (mặt đất, tường...)
+world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
+  if (event.itemStack?.typeId !== ITEM_ID || event.isFirstEvent === false) return;
+  if (INTERACTIVE_BLOCK.test(event.block.typeId)) return;
+  const player = event.player;
+  system.run(() => trySkill(player));
+});
+
+// Chuột phải / chạm giữ vào mob
+world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
+  if (event.itemStack?.typeId !== ITEM_ID) return;
+  const target = event.target;
+  if (INTERACTIVE_ENTITY.has(target.typeId)) return;
+  try {
+    if (target.getComponent("minecraft:rideable")) return; // ngựa, thuyền... để cưỡi như thường
+  } catch {
+    // bỏ qua
+  }
+  const player = event.player;
+  system.run(() => trySkill(player));
 });
 
 world.afterEvents.playerLeave.subscribe(({ playerId }) => {
@@ -599,14 +689,46 @@ world.afterEvents.playerLeave.subscribe(({ playerId }) => {
 });
 
 // ---------------------------------------------------------------------------
+// Hướng dẫn: tiêu đề + chat khi cầm kiếm lần đầu, mô tả trên kiếm, /scriptevent aatrox:help
+// ---------------------------------------------------------------------------
+
+function sendGuide(player) {
+  player.sendMessage("§4━━━━━━━━ Quỷ Kiếm Darkin ━━━━━━━━");
+  player.sendMessage("§7Cầm kiếm rồi §fbấm chuột phải §7(điện thoại: §fchạm màn hình§7 hoặc nút §fDùng§7).");
+  player.sendMessage("§7Chiêu được chọn theo tư thế lúc bấm:");
+  player.sendMessage("§c Q §f— đứng yên hoặc chạy: §7chém 3 lần, mép lửa cam là điểm ngọt");
+  player.sendMessage("§c E §f— đang ngồi (Shift / nút ngồi): §7lướt theo hướng nhìn");
+  player.sendMessage("§c W §f— đang nhảy (bấm nhảy rồi bấm dùng khi còn trên không): §7phóng xích lửa");
+  player.sendMessage("§c R §f— ngước nhìn lên trời: §7biến hình Kẻ Diệt Thế");
+  player.sendMessage("§c Nội tại §f— đánh thường: §7vết chém phát nổ, hồi máu");
+  player.sendMessage("§7Thanh trên hotbar hiện chiêu sắp dùng và thời gian hồi chiêu. Gõ §f/scriptevent aatrox:help §7để xem lại.");
+}
+
+function ensureLore(player) {
+  try {
+    const equippable = player.getComponent("minecraft:equippable");
+    const item = equippable?.getEquipment(EquipmentSlot.Mainhand);
+    if (item?.typeId !== ITEM_ID || item.getLore().length > 0) return;
+    item.setLore(LORE);
+    equippable.setEquipment(EquipmentSlot.Mainhand, item);
+  } catch {
+    // bỏ qua
+  }
+}
+
+system.afterEvents.scriptEventReceive.subscribe(({ id, sourceEntity }) => {
+  if (id === "aatrox:help" && sourceEntity?.typeId === "minecraft:player") sendGuide(sourceEntity);
+});
+
+// ---------------------------------------------------------------------------
 // Thanh hồi chiêu (action bar) + hào quang khi biến hình
 // ---------------------------------------------------------------------------
 
-// Vị trí gần đúng của lưỡi kiếm trên tay phải
+// Vị trí gần đúng của lưỡi kiếm: kiếm cầm tay phải, lưỡi chếch lên phía trước
 function bladeLocation(player) {
   const forward = aimDirection(player);
   const right = { x: -forward.z, y: 0, z: forward.x };
-  return add(add(add(player.location, { x: 0, y: 1.3, z: 0 }), right, -0.45), forward, 0.35);
+  return add(add(add(player.location, { x: 0, y: 1.6, z: 0 }), right, 0.55), forward, 0.8);
 }
 
 function formatCooldown(ticksLeft) {
@@ -623,35 +745,29 @@ system.runInterval(() => {
 
     if (!greeted.has(player.id)) {
       greeted.add(player.id);
-      player.sendMessage("§4━━━━━━━━━━━━ Quỷ Kiếm Darkin ━━━━━━━━━━━━");
-      player.sendMessage("§4Chiêu:");
-      player.sendMessage("§cChuột phải§r: Q — Quỷ Kiếm (3 lần chém)");
-      player.sendMessage("§cNgồi + chuột phải§r: E — Bước Nhảy");
-      player.sendMessage("§cNhảy + chuột phải§r: W — Xiềng Xích");
-      player.sendMessage("§cNhìn lên + chuột phải§r: R — Kẻ Diệt Thế");
-      player.sendMessage("§4Đánh thường: Nội tại Tư Thế (khi sẵn sàng)");
+      sendGuide(player);
+      try {
+        player.onScreenDisplay.setTitle("§4Quỷ Kiếm Darkin", {
+          subtitle: "§7Bấm chuột phải / chạm màn hình để dùng chiêu §cQ",
+          fadeInDuration: 10,
+          stayDuration: 60,
+          fadeOutDuration: 20,
+        });
+      } catch {
+        // bỏ qua
+      }
       particle(player.dimension, P.aura, player.location);
-      sound(player.dimension, "random.levelup", player.location, 1.0);
+      sound(player.dimension, "mob.wither.ambient", player.location, 1.4);
     }
+    ensureLore(player);
 
-    const parts = [`§4Nội tại ${formatCooldown(state.passiveReadyAt - t)}§r`];
-
-    // Hiển thị chiêu sắp dùng dựa trên tư thế của người chơi
-    let nextSkill = "§aQ";
-    let stanceHint = "";
-    if (player.getRotation().x <= CONFIG.lookUpPitch) {
-      nextSkill = "§cR";
-      stanceHint = " (nhìn lên)";
-    } else if (player.isSneaking) {
-      nextSkill = "§cE";
-      stanceHint = " (ngồi)";
-    } else if (!player.isOnGround) {
-      nextSkill = "§cW";
-      stanceHint = " (nhảy)";
+    const parts = [`§4Nội tại ${formatCooldown(state.passiveReadyAt - t)}`];
+    if (t < (state.noticeUntil ?? 0)) {
+      parts.push(state.notice);
+    } else {
+      const next = chooseSkill(player);
+      parts.push(`§fBấm: §e${next}${STANCE_HINT[next]}`);
     }
-
-    parts.push(`Sắp dùng: ${nextSkill}${stanceHint}§r`);
-
     for (const skill of SKILLS) {
       if (skill === "Q" && state.qStage > 1 && t < state.qWindowEnd) {
         parts.push(`§6Q ${state.qStage}/${CONFIG.Q.casts.length}`);

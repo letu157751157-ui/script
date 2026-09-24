@@ -10,6 +10,7 @@ import zlib
 
 import model
 import particles
+import player_anims
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -58,5 +59,6 @@ def build_addon():
 if __name__ == "__main__":
     make_images()
     model.write_model(ROOT, write_png)
+    player_anims.write_player_animations(ROOT)
     particles.write_particles(ROOT, write_png)
     build_addon()
