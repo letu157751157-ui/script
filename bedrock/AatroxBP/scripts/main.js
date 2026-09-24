@@ -619,12 +619,35 @@ system.runInterval(() => {
 
     if (!greeted.has(player.id)) {
       greeted.add(player.id);
-      player.sendMessage(
-        "§4[Quỷ Kiếm Darkin]§r Chuột phải: §cQ§r | Ngồi + chuột phải: §cE§r | Nhảy + chuột phải: §cW§r | Nhìn lên + chuột phải: §cR"
-      );
+      player.sendMessage("§4━━━━━━━━━━━━ Quỷ Kiếm Darkin ━━━━━━━━━━━━");
+      player.sendMessage("§4Chiêu:");
+      player.sendMessage("§cChuột phải§r: Q — Quỷ Kiếm (3 lần chém)");
+      player.sendMessage("§cNgồi + chuột phải§r: E — Bước Nhảy");
+      player.sendMessage("§cNhảy + chuột phải§r: W — Xiềng Xích");
+      player.sendMessage("§cNhìn lên + chuột phải§r: R — Kẻ Diệt Thế");
+      player.sendMessage("§4Đánh thường: Nội tại Tư Thế (khi sẵn sàng)");
+      particle(player.dimension, P.aura, player.location);
+      sound(player.dimension, "random.levelup", player.location, 1.0);
     }
 
-    const parts = [`§4Nội tại ${formatCooldown(state.passiveReadyAt - t)}`];
+    const parts = [`§4Nội tại ${formatCooldown(state.passiveReadyAt - t)}§r`];
+
+    // Hiển thị chiêu sắp dùng dựa trên tư thế của người chơi
+    let nextSkill = "§aQ";
+    let stanceHint = "";
+    if (player.getRotation().x <= CONFIG.lookUpPitch) {
+      nextSkill = "§cR";
+      stanceHint = " (nhìn lên)";
+    } else if (player.isSneaking) {
+      nextSkill = "§cE";
+      stanceHint = " (ngồi)";
+    } else if (!player.isOnGround) {
+      nextSkill = "§cW";
+      stanceHint = " (nhảy)";
+    }
+
+    parts.push(`Sắp dùng: ${nextSkill}${stanceHint}§r`);
+
     for (const skill of SKILLS) {
       if (skill === "Q" && state.qStage > 1 && t < state.qWindowEnd) {
         parts.push(`§6Q ${state.qStage}/${CONFIG.Q.casts.length}`);

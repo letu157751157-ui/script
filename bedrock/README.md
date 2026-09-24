@@ -44,15 +44,24 @@ Lấy kiếm:
 
 ## Điều khiển
 
-Bedrock không cho addon gán phím riêng, nên chiêu được chọn theo **tư thế lúc bấm chuột phải** (điện thoại: nhấn giữ / nút Dùng):
+Bedrock không cho addon gán phím riêng, nên chiêu được chọn theo **tư thế lúc bấm chuột phải** (điện thoại: nhấn giữ / nút Dùng). Hành động bar sẽ hiển thị chiêu nào sắp được kích hoạt dựa trên tư thế hiện tại.
 
-| Thao tác khi cầm kiếm | Chiêu |
-|---|---|
-| Đánh thường | **Nội tại — Tư Thế Tử Thần**: khi sẵn sàng (8 giây), vết chém phát nổ thêm 8% máu tối đa của mục tiêu và hồi máu bằng lượng đó |
-| Chuột phải | **Q — Quỷ Kiếm Darkin**: chém 3 lần (mỗi lần có 4 giây để chém tiếp). Vùng chém hiện bằng lửa dưới đất, **mép kiếm màu dung nham là điểm ngọt**: x1.6 sát thương, hất tung, choáng, giảm hồi chiêu nội tại. Lần 3 là cú nện vùng tròn |
-| Ngồi + chuột phải | **E — Bước Nhảy Hắc Ám**: lướt theo hướng nhìn |
-| Nhảy + chuột phải (đang ở trên không) | **W — Xiềng Xích Địa Ngục**: phóng xích lửa. Trúng thì gây sát thương, làm chậm và tạo vòng trói; sau 1.5 giây mục tiêu chưa chạy ra khỏi vòng thì bị kéo về, chịu thêm sát thương và bị choáng |
-| Nhìn lên trời + chuột phải | **R — Kẻ Diệt Thế**: sóng xung kích hất văng + làm chậm kẻ địch xung quanh, rồi biến hình 10 giây: +30% sát thương chiêu, +50% hồi máu, Tốc Độ II, Sức Mạnh I, nội tại hồi nhanh gấp đôi |
+### Các chiêu
+
+| Thao tác | Kích hoạt | Hiệu ứng |
+|---|---|---|
+| **Chuột phải** (thường) | Q — Quỷ Kiếm Darkin | Chém 3 lần liên tiếp (4 giây giữa mỗi lần). Vùng chém có lửa dưới đất đánh dấu. **Điểm ngọt** (mép kiếm cam): x1.6 sát thương, hất tung, choáng 1s, giảm hồi nội tại 3s. Lần 3 là nện vùng tròn |
+| **Ngồi + Chuột phải** | E — Bước Nhảy Hắc Ám | Lướt nhanh theo hướng nhìn, bốc tàn lửa |
+| **Nhảy + Chuột phải** (đang bay) | W — Xiềng Xích Địa Ngục | Phóng xích lửa. **Trúng**: sát thương + làm chậm + vòng trói. Nếu mục tiêu chưa chạy ra khỏi vòng sau 1.5s thì bị kéo về, chịu thêm sát thương + choáng |
+| **Nhìn lên trời + Chuột phải** | R — Kẻ Diệt Thế | Sóng xung kích hất văng + làm chậm xung quanh. Biến hình 10s: **+30% sát thương chiêu**, **+50% hồi máu**, Tốc Độ II, Sức Mạnh I, nội tại hồi 2x nhanh |
+| **Đánh thường** (với kiếm) | Nội tại — Tư Thế Tử Thần | Khi sẵn sàng (8s cooldown): vết chém phát nổ, gây **+8% máu tối đa** tới mục tiêu + **hồi máu bằng lượng đó** |
+
+### Lưu ý: Kích hoạt chiêu
+
+- **Action bar** (thanh phía trên hotbar) sẽ hiển thị **"Sắp dùng: X"** để cho biết chiêu nào sẽ kích hoạt nếu nhấn chuột phải ngay lúc này
+- **Ví dụ**: Nếu đang ngồi, sẽ hiển thị **"Sắp dùng: E (ngồi)"**
+- Bấm **chuột phải** để kích hoạt chiêu được hiển thị
+- Thanh action bar cũng hiển thị **cooldown** (hồi chiêu) và **trạng thái nội tại**
 
 Mọi sát thương gây ra khi cầm kiếm đều **hút máu 15%**.
 ### Hiệu ứng particle
