@@ -2,7 +2,7 @@
   "format_version": "1.10.0",
   "particle_effect": {
     "description": {
-      "identifier": "aatrox:slash",
+      "identifier": "aatrox:bind_circle",
       "basic_render_parameters": {
         "material": "particles_add",
         "texture": "textures/particle/aatrox_particles"
@@ -17,47 +17,39 @@
       },
       "minecraft:emitter_shape_point": {},
       "minecraft:particle_lifetime_expression": {
-        "max_lifetime": 0.28
+        "max_lifetime": 1.5
       },
       "minecraft:particle_initial_spin": {
-        "rotation": "math.random(-50, 50)"
+        "rotation": 0,
+        "rotation_rate": 60
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          "1.2 + v.particle_age / v.particle_lifetime * 0.4",
-          "1.2 + v.particle_age / v.particle_lifetime * 0.4"
+          "v.radius",
+          "v.radius"
         ],
-        "facing_camera_mode": "rotate_xyz",
+        "facing_camera_mode": "emitter_transform_xz",
         "uv": {
           "texture_width": 256,
           "texture_height": 256,
-          "flipbook": {
-            "base_UV": [
-              0,
-              0
-            ],
-            "size_UV": [
-              32,
-              32
-            ],
-            "step_UV": [
-              32,
-              0
-            ],
-            "frames_per_second": 12,
-            "max_frame": 4,
-            "stretch_to_lifetime": true,
-            "loop": false
-          }
+          "uv": [
+            160,
+            64
+          ],
+          "uv_size": [
+            32,
+            32
+          ]
         }
       },
       "minecraft:particle_appearance_tinting": {
         "color": {
           "interpolant": "v.particle_age / v.particle_lifetime",
           "gradient": {
-            "0.0": "#FFFFFFFF",
-            "0.7": "#FFFFFFFF",
-            "1.0": "#00FFFFFF"
+            "0.0": "#00FF281E",
+            "0.15": "#FFFF281E",
+            "0.85": "#FFFF6428",
+            "1.0": "#00FFB450"
           }
         }
       }

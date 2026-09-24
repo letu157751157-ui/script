@@ -28,7 +28,17 @@ const P = {
   aura: "aatrox:ult_aura",
   lifesteal: "aatrox:lifesteal",
   stun: "minecraft:villager_angry",
-  smoke: "minecraft:basic_smoke_particle",
+  smoke: "aatrox:smoke",
+  crack: "aatrox:ground_crack",
+  debris: "aatrox:debris",
+  pillar: "aatrox:fire_pillar",
+  charge: "aatrox:charge",
+  afterimage: "aatrox:afterimage",
+  chainHead: "aatrox:chain_head",
+  bind: "aatrox:bind_circle",
+  wings: "aatrox:wings",
+  xSlash: "aatrox:x_slash",
+  bloodOrb: "aatrox:blood_orb",
 };
 
 const ticks = (seconds) => Math.max(1, Math.round(seconds * TPS));
@@ -135,15 +145,61 @@ function particleLine(dimension, id, from, to, spacing = 0.7) {
 
 // Vòng sóng xung kích phẳng trên mặt đất, lan tới bán kính `radius`
 function shockRing(dimension, center, radius) {
-  const molang = new MolangVariableMap();
-  molang.setFloat("variable.radius", radius);
-  particle(dimension, P.ring, add(center, { x: 0, y: 0.15, z: 0 }), molang);
+  particle(dimension, P.ring, add(center, { x: 0, y: 0.15, z: 0 }), withRadius(radius));
 }
 
 // Nổ máu: chớp sáng + máu văng
 function bloodBurst(dimension, location) {
   particle(dimension, P.flash, location);
   particle(dimension, P.blood, location);
+}
+
+function withRadius(radius) {
+  const molang = new MolangVariableMap();
+  molang.setFloat("variable.radius", radius);
+  return molang;
+}
+
+// Hố va chạm: đất nứt + đá văng + khói
+function crater(dimension, center, radius) {
+  particle(dimension, P.crack, add(center, { x: 0, y: 0.06, z: 0 }), withRadius(radius));
+  particle(dimension, P.debris, add(center, { x: 0, y: 0.2, z: 0 }));
+  particle(dimension, P.smoke, add(center, { x: 0, y: 0.4, z: 0 }));
+}
+
+// Rung màn hình người chơi (mob thì bỏ qua)
+function shake(entity, intensity, seconds) {
+  if (entity?.typeId !== "minecraft:player") return;
+  try {
+    entity.runCommand(`camerashake add @s ${intensity} ${seconds} positional`);
+  } catch {
+    // bỏ qua
+  }
+}
+
+// Chớp màn hình một màu (đỏ khi biến hình)
+function flashScreen(player, red, green, blue) {
+  try {
+    player.camera.fade({ fadeColor: { red, green, blue }, fadeTime: { fadeInTime: 0.05, holdTime: 0.05, fadeOutTime: 0.45 } });
+  } catch {
+    // bỏ qua
+  }
+}
+
+// Cầu máu bay từ `from` về người chơi
+function bloodOrbs(player, from) {
+  const to = add(player.location, { x: 0, y: 1, z: 0 });
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const dz = to.z - from.z;
+  const distance = Math.hypot(dx, dy, dz);
+  if (distance < 0.5 || distance > 24) return;
+  const molang = new MolangVariableMap();
+  molang.setFloat("variable.dir_x", dx / distance);
+  molang.setFloat("variable.dir_y", dy / distance);
+  molang.setFloat("variable.dir_z", dz / distance);
+  molang.setFloat("variable.speed", distance / 0.42);
+  particle(player.dimension, P.bloodOrb, from, molang);
 }
 
 function particleRing(dimension, id, center, radius, count = Math.ceil(radius * 6)) {
@@ -275,7 +331,11 @@ world.afterEvents.entityHitEntity.subscribe(({ damagingEntity: player, hitEntity
     dealDamage(player, target, bonus);
     heal(player, bonus * cfg.healRatio);
     bloodBurst(target.dimension, add(target.location, { x: 0, y: 1, z: 0 }));
+    particle(target.dimension, P.xSlash, add(target.location, { x: 0, y: 1, z: 0 }));
     sound(target.dimension, "random.anvil_land", target.location, 1.6);
+    sound(target.dimension, "mob.zombie.woodbreak", target.location, 0.7);
+    shake(player, 0.15, 0.15);
+    shake(target, 0.25, 0.2);
   }, ticks(cfg.delay));
 });
 
@@ -285,6 +345,11 @@ world.afterEvents.entityHurt.subscribe(({ damageSource, damage, hurtEntity }) =>
   if (!player || player.typeId !== "minecraft:player" || player.id === hurtEntity.id) return;
   if (!holdsBlade(player)) return;
   heal(player, damage * CONFIG.lifesteal);
+  const state = getState(player);
+  if (damage * CONFIG.lifesteal >= 0.5 && now() - (state.lastOrb ?? -100) >= 5) {
+    state.lastOrb = now();
+    bloodOrbs(player, add(hurtEntity.location, { x: 0, y: 1, z: 0 }));
+  }
 });
 
 // ---------------------------------------------------------------------------
@@ -355,6 +420,8 @@ function castQ(player, state, direction) {
   sound(player.dimension, "item.trident.throw", player.location, 0.6);
   playAnim(player, `q${stage}`);
   drawQTelegraph(player, cast, direction);
+  particle(player.dimension, P.charge, bladeLocation(player));
+  system.runTimeout(() => player.isValid && particle(player.dimension, P.charge, bladeLocation(player)), 4);
   system.runTimeout(() => slamQ(player, cast, direction), windup);
 }
 
@@ -372,6 +439,16 @@ function slamQ(player, cast, direction) {
     isSweetSpot = (entity) => horizontalDistance(entity.location, center) >= cast.radius - cast.sweet;
     shockRing(dimension, center, cast.radius + 0.5);
     bloodBurst(dimension, add(center, { x: 0, y: 0.5, z: 0 }));
+    crater(dimension, center, cast.radius);
+    // Cột lửa phun lên quanh vành (điểm ngọt)
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI * 2;
+      const at = { x: center.x + Math.cos(angle) * cast.radius, y: center.y, z: center.z + Math.sin(angle) * cast.radius };
+      system.runTimeout(() => particle(dimension, P.pillar, at), i);
+    }
+    system.runTimeout(() => shockRing(dimension, center, cast.radius + 1.5), 3);
+    shake(player, 0.4, 0.35);
+    sound(dimension, "mob.irongolem.throw", center, 0.6);
   } else {
     targets = getTargetsInBox(player, origin, direction, cast.length, cast.width);
     isSweetSpot = (entity) => {
@@ -381,7 +458,14 @@ function slamQ(player, cast, direction) {
     for (let along = 1.5; along <= cast.length; along += 1.5) {
       particle(dimension, P.slash, add(add(origin, direction, along), { x: 0, y: 1, z: 0 }));
     }
-    particle(dimension, P.flash, add(add(origin, direction, cast.length - cast.sweet / 2), { x: 0, y: 0.5, z: 0 }));
+    const sweetCenter = add(origin, direction, cast.length - cast.sweet / 2);
+    particle(dimension, P.flash, add(sweetCenter, { x: 0, y: 0.5, z: 0 }));
+    crater(dimension, sweetCenter, 1.1);
+    // Vệt chém thứ hai lệch lên cao cho nhát chém dày hơn
+    for (let along = 2.25; along <= cast.length; along += 1.5) {
+      particle(dimension, P.slash, add(add(origin, direction, along), { x: 0, y: 1.6, z: 0 }));
+    }
+    shake(player, 0.15, 0.2);
   }
   sound(dimension, "random.explode", origin, 1.4);
 
@@ -394,11 +478,17 @@ function slamQ(player, cast, direction) {
       knockback(target, { x: 0, z: 0 }, 0, cfg.knockup);
       stun(target, cfg.stun);
       bloodBurst(dimension, add(target.location, { x: 0, y: 1, z: 0 }));
+      particle(dimension, P.xSlash, add(target.location, { x: 0, y: 1, z: 0 }));
+      shake(target, 0.3, 0.25);
     }
     dealDamage(player, target, damage);
   }
 
   const state = getState(player);
+  if (hitSweetSpot) {
+    shake(player, 0.25, 0.2);
+    sound(dimension, "random.anvil_land", origin, 0.8);
+  }
   if (hitSweetSpot && !isPassiveReady(state)) {
     state.passiveReadyAt -= ticks(CONFIG.passive.sweetSpotReduction);
   }
@@ -416,11 +506,14 @@ function castE(player, state, direction) {
   knockback(player, direction, cfg.strength, cfg.vertical);
   sound(player.dimension, "item.trident.riptide_1", player.location, 1.2);
 
+  particle(player.dimension, P.smoke, add(player.location, { x: 0, y: 0.3, z: 0 }));
+  particle(player.dimension, P.debris, add(player.location, { x: 0, y: 0.1, z: 0 }));
   let count = 0;
   const trail = system.runInterval(() => {
-    if (!player.isValid || ++count > 6) return system.clearRun(trail);
-    particle(player.dimension, P.smoke, add(player.location, { x: 0, y: 0.8, z: 0 }));
+    if (!player.isValid || ++count > 7) return system.clearRun(trail);
+    if (count % 2 === 1) particle(player.dimension, P.afterimage, add(player.location, { x: 0, y: 1, z: 0 }));
     particle(player.dimension, P.ember, add(player.location, { x: 0, y: 1.1, z: 0 }));
+    if (count === 7) particle(player.dimension, P.smoke, add(player.location, { x: 0, y: 0.3, z: 0 }));
   }, 1);
 }
 
@@ -464,6 +557,7 @@ function launchChain(player, direction) {
       travelled += cfg.speed / 3;
       particle(dimension, P.chain, head);
       if (step === 0) particle(dimension, P.ember, head);
+      if (step === 2) particle(dimension, P.chainHead, head);
 
       const target = getTargetsNear(player, head, cfg.hitRadius)[0];
       if (target) {
@@ -487,6 +581,10 @@ function tether(player, target) {
 
   dealDamage(player, target, cfg.damage);
   sound(dimension, "random.anvil_land", target.location, 0.6);
+  sound(dimension, "mob.evocation_illager.cast_spell", anchor, 0.8);
+  particle(dimension, P.bind, add(anchor, { x: 0, y: 0.08, z: 0 }), withRadius(cfg.escapeRadius));
+  particle(dimension, P.smoke, add(anchor, { x: 0, y: 0.5, z: 0 }));
+  shake(target, 0.2, 0.2);
   try {
     target.addEffect("slowness", pullTick, { amplifier: cfg.slowAmplifier, showParticles: false });
   } catch {
@@ -502,6 +600,7 @@ function tether(player, target) {
     // Mục tiêu chạy ra khỏi vòng trói: xích đứt
     if (horizontalDistance(target.location, anchor) > cfg.escapeRadius) {
       particle(dimension, P.smoke, add(target.location, { x: 0, y: 1, z: 0 }));
+      particle(dimension, P.spark, add(target.location, { x: 0, y: 1, z: 0 }));
       sound(dimension, "random.break", target.location);
       return system.clearRun(run);
     }
@@ -524,6 +623,9 @@ function tether(player, target) {
       stun(target, cfg.stun);
       dealDamage(player, target, cfg.pullDamage);
       bloodBurst(dimension, add(target.location, { x: 0, y: 1, z: 0 }));
+      crater(dimension, anchor, 1.3);
+      shake(player, 0.2, 0.2);
+      shake(target, 0.35, 0.3);
       sound(dimension, "mob.ravager.stun", target.location);
     }
   }, 1);
@@ -549,6 +651,8 @@ function castR(player, state) {
   }
   sound(player.dimension, "mob.wither.spawn", player.location, 1.3);
   particle(player.dimension, P.aura, player.location);
+  particle(player.dimension, P.charge, add(player.location, { x: 0, y: 1.2, z: 0 }));
+  particle(player.dimension, P.smoke, add(player.location, { x: 0, y: 0.4, z: 0 }));
   shockRing(player.dimension, player.location, 1.5);
 
   system.runTimeout(() => {
@@ -570,6 +674,22 @@ function castR(player, state) {
       state.passiveReadyAt = now() + Math.floor(remaining * cfg.passiveCooldownMultiplier);
     }
 
+    // Chớp đỏ màn hình, rung, cột lửa phun lên quanh người, đất nứt
+    flashScreen(player, 0.55, 0.02, 0.02);
+    shake(player, 0.5, 0.7);
+    sound(dimension, "mob.enderdragon.growl", origin, 0.8);
+    sound(dimension, "mob.ravager.roar", origin, 0.7);
+    particle(dimension, P.pillar, origin);
+    crater(dimension, origin, cfg.radius * 0.55);
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      const at = { x: origin.x + Math.cos(angle) * 2.6, y: origin.y, z: origin.z + Math.sin(angle) * 2.6 };
+      system.runTimeout(() => {
+        particle(dimension, P.pillar, at);
+        particle(dimension, P.debris, add(at, { x: 0, y: 0.2, z: 0 }));
+      }, 2 + i);
+    }
+
     // Sóng xung kích lan ra
     bloodBurst(dimension, add(origin, { x: 0, y: 1, z: 0 }));
     for (let i = 0; i < 3; i++) {
@@ -586,6 +706,7 @@ function castR(player, state) {
         // bỏ qua
       }
       dealDamage(player, target, cfg.castDamage);
+      shake(target, 0.35, 0.35);
     }
   }, castTicks);
 }
@@ -734,6 +855,19 @@ function ensureLore(player) {
 system.afterEvents.scriptEventReceive.subscribe(({ id, sourceEntity }) => {
   if (id === "aatrox:help" && sourceEntity?.typeId === "minecraft:player") sendGuide(sourceEntity);
 });
+
+// Cánh quỷ sau lưng khi đang biến hình (sinh liên tục để bám theo người)
+system.runInterval(() => {
+  const t = now();
+  for (const player of world.getAllPlayers()) {
+    const state = states.get(player.id);
+    if (!state || !isUltActive(state)) continue;
+    const back = aimDirection(player);
+    const molang = new MolangVariableMap();
+    molang.setFloat("variable.flap", Math.sin(t * 0.35));
+    particle(player.dimension, P.wings, add(add(player.location, { x: 0, y: 1.45, z: 0 }), back, -0.35), molang);
+  }
+}, 2);
 
 // ---------------------------------------------------------------------------
 // Thanh hồi chiêu (action bar) + hào quang khi biến hình

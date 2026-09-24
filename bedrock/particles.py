@@ -11,7 +11,7 @@ import json
 import math
 import os
 
-ATLAS = 128
+ATLAS = 256
 TEXTURE = "textures/particle/aatrox_particles"
 
 FIRE = {
@@ -250,8 +250,211 @@ def flash_frame(frame):
     return grid(16, 16, pixel)
 
 
+SMOKE = {"H": (112, 46, 40), "A": (72, 26, 26), "B": (46, 16, 18), "C": (28, 10, 12)}
+ROCK = {"K": (48, 42, 44), "S": (92, 84, 86), "L": (140, 132, 134), "R": (240, 96, 36)}
+CRACK = {"K": (26, 8, 8), "D": (84, 16, 12), "O": (255, 120, 40), "Y": (255, 214, 110)}
+GHOST = {"D": (96, 8, 16), "R": (190, 28, 38), "O": (255, 112, 48)}
+WING = {"K": (22, 8, 10), "D": (92, 10, 18), "R": (168, 24, 30), "O": (255, 110, 40)}
+
+
+def smoke_frame(frame):
+    """Cụm khói đỏ đen 16x16: nở ra rồi tan thành lỗ chỗ."""
+    radius, holes = ((3.6, 0.0), (5.0, 0.08), (6.2, 0.3), (7.0, 0.58))[frame]
+    blobs = ((8, 9, 1.0), (5.5, 7, 0.75), (10.5, 6.5, 0.7), (8, 5, 0.6))
+
+    def pixel(x, y):
+        best = min(math.hypot(x + 0.5 - bx, y + 0.5 - by) / (radius * s) for bx, by, s in blobs)
+        if best > 1 or hash01(x, y, 70 + frame) < holes:
+            return "."
+        if best > 0.82:
+            return "C"
+        light = (x - 8) + (y - 8)  # sáng trên-trái, tối dưới-phải
+        return "H" if light < -5 and best < 0.6 else "B" if light > 4 else "A"
+
+    return grid(16, 16, pixel)
+
+
+DEBRIS = [
+    ["........", "..KSS...", ".KSLLS..", ".KSSLSK.", ".KKSSSK.", "..KKKK..", "........", "........"],
+    ["........", "........", "...SL...", "..KSSS..", "..KKSK..", "...KK...", "........", "........"],
+    ["........", ".KSS....", ".KSRS...", ".KSSSK..", "..KKK...", "........", "........", "........"],
+]
+
+CHAIN_HEAD = [
+    "................",
+    ".......WW.......",
+    "......WLLW......",
+    "......LMML......",
+    ".....LMKKML.....",
+    ".....MK..KM.....",
+    "....LMK..KML....",
+    "....MK....KM....",
+    "...LMK....KML...",
+    "...MMKK..KKMM...",
+    "....KKM..MKK....",
+    ".......MM.......",
+    ".......MM.......",
+    ".......KK.......",
+    ".......KK.......",
+    "................",
+]
+
+AFTERIMAGE = [
+    "................",
+    "..............O.",
+    ".............RO.",
+    ".............RR.",
+    ".....DDDD....RR.",
+    "....DRRRRD...RR.",
+    "....DRRRRD...RR.",
+    "....DRRRRD...RR.",
+    "....DRRRRD..DRR.",
+    ".....DDDD...DRR.",
+    "...DDDDDDDD.DRR.",
+    "..DRRRRRRRRDDRD.",
+    "..DRDRRRRDRRRD..",
+    "..DRDRRRRDRRD...",
+    "..DRDRRRRDDDD...",
+    "..DRDRRRRD......",
+    "..DRDRRRRD......",
+    "..DD.RRRR.......",
+    ".....RRRR.......",
+    ".....RRRR.......",
+    ".....RRRR.......",
+    ".....RR.RR......",
+    ".....RR.RR......",
+    ".....RR.RR......",
+    ".....RR.RR......",
+    ".....RR.RR......",
+    ".....RR.RR......",
+    ".....RR.RR......",
+    ".....DD.DD......",
+    "................",
+    "................",
+    "................",
+]
+
+
+def x_slash_frame(frame):
+    """Vết chém chữ X 32x32 của nội tại: nhát thứ nhất -> đủ hai nhát -> tan."""
+    fade, holes = ((1.0, 0.0), (1.0, 0.0), (0.7, 0.4))[frame]
+
+    def stroke(dx, dy, sign):
+        along = (dx + sign * dy) / math.sqrt(2)
+        across = abs(dx - sign * dy) / math.sqrt(2)
+        if abs(along) > 13:
+            return 0.0
+        thick = 2.3 * (1 - (along / 13) ** 2)
+        return max(0.0, 1 - across / thick) if thick > 0 else 0.0
+
+    def pixel(x, y):
+        dx, dy = x + 0.5 - 16, y + 0.5 - 16
+        heat = stroke(dx, dy, 1)
+        if frame:
+            heat = max(heat, stroke(dx, dy, -1))
+        if hash01(x, y, 110 + frame) < holes:
+            return "."
+        return fire_char(heat * fade)
+
+    return grid(32, 32, pixel)
+
+
+def ground_crack():
+    """Đất nứt 32x32: các vết nứt ngoằn ngoèo toả ra từ tâm, gần tâm còn rực dung nham."""
+    cells = {}
+    for ray in range(7):
+        angle = ray / 7 * 2 * math.pi + hash01(ray, 1, 5) * 0.6
+        x, y = 16.0, 16.0
+        for step in range(15):
+            angle += (hash01(ray, step, 6) - 0.5) * 0.9
+            x += math.cos(angle)
+            y += math.sin(angle)
+            if not (1 <= x < 31 and 1 <= y < 31):
+                break
+            core = "Y" if step < 3 else "O" if step < 7 else "D"
+            cells[(int(x), int(y))] = core
+    out = []
+    for yy in range(32):
+        row = ""
+        for xx in range(32):
+            if (xx, yy) in cells:
+                row += cells[(xx, yy)]
+            elif any((xx + dx, yy + dy) in cells for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                row += "K"
+            else:
+                row += "."
+        out.append(row)
+    return out
+
+
+def bind_circle():
+    """Vòng rune trói 32x32 (thang xám, tô đỏ bằng tinting): hai vòng tròn, 6 ký tự, ngôi sao sáu cánh."""
+    marks = [(16 + 12.7 * math.cos(k * math.pi / 3), 16 + 12.7 * math.sin(k * math.pi / 3)) for k in range(6)]
+    star = [(16 + 10 * math.cos(k * math.pi / 3 + math.pi / 6), 16 + 10 * math.sin(k * math.pi / 3 + math.pi / 6)) for k in range(6)]
+
+    def near_segment(px, py, a, b):
+        ax, ay = a
+        bx, by = b
+        t = max(0, min(1, ((px - ax) * (bx - ax) + (py - ay) * (by - ay)) / ((bx - ax) ** 2 + (by - ay) ** 2)))
+        return math.hypot(px - ax - t * (bx - ax), py - ay - t * (by - ay)) < 0.6
+
+    def pixel(x, y):
+        px, py = x + 0.5, y + 0.5
+        d = math.hypot(px - 16, py - 16)
+        if abs(d - 15) < 0.7:
+            return "#"
+        if abs(d - 10.8) < 0.5:
+            return "+"
+        if any(abs(px - mx) < 1.3 and abs(py - my) < 1.3 and (x + y) % 2 == 0 for mx, my in marks):
+            return "#"
+        if any(near_segment(px, py, star[k], star[(k + 2) % 6]) for k in range(6)):
+            return "-"
+        return "."
+
+    return grid(32, 32, pixel)
+
+
+def wings():
+    """Cặp cánh quỷ 48x24 đối xứng: xương đen, màng đỏ thẫm, mép rực lửa."""
+    bones = [-28, -8, 12, 32]  # góc (độ) của các nan xương, âm = chếch lên
+
+    def half(x, y):
+        rx, ry = x + 0.5, y + 0.5 - 12  # gốc cánh ở giữa mép trái của nửa phải
+        r = math.hypot(rx, ry)
+        theta = math.degrees(math.atan2(ry, rx))
+        if r < 1.5 or not -34 <= theta <= 40:
+            return "."
+        reach = 23 - (theta + 34) * 0.16
+        # mép sau lượn sóng giữa các nan xương
+        gap = min(abs(theta - b) for b in bones)
+        reach -= 0.18 * gap * (1 if theta > bones[0] else 0)
+        if r > reach:
+            return "."
+        if any(abs(r * math.sin(math.radians(theta - b))) < 0.7 and math.cos(math.radians(theta - b)) > 0 for b in bones):
+            return "K"
+        if reach - r < 1.0:
+            return "O"
+        if reach - r < 2.2:
+            return "R"
+        return "D"
+
+    rows = []
+    for y in range(24):
+        right = "".join(half(x, y) for x in range(24))
+        rows.append(right[::-1] + right)
+    return rows
+
+
 # (tên, x, y, danh sách khung, bảng màu); các khung xếp liền nhau theo chiều ngang
 SPRITES = {
+    "smoke": (128, 0, [smoke_frame(i) for i in range(4)], SMOKE),
+    "debris": (192, 0, DEBRIS, ROCK),
+    "chain_head": (224, 0, [CHAIN_HEAD], HOT_IRON),
+    "x_slash": (128, 32, [x_slash_frame(i) for i in range(3)], FIRE),
+    "crack": (128, 64, [ground_crack()], CRACK),
+    "bind": (160, 64, [bind_circle()], GRAY),
+    "afterimage": (192, 64, [AFTERIMAGE], GHOST),
+    "wings": (128, 96, [wings()], WING),
     "slash": (0, 0, [slash_frame(i) for i in range(4)], FIRE),
     "ring": (0, 32, [ring_frame(i) for i in range(3)], FIRE),
     "flame": (0, 64, [flame_frame(i) for i in range(4)], FIRE),
@@ -445,6 +648,134 @@ PARTICLES = {
             "uv": uv("flame"),
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#FFFFFFFF", "0.5": "#FFFF9A8A", "1.0": "#00A0302A"}),
+    }),
+    # Khói đỏ đen (lướt E, biến hình R, xích đứt)
+    "smoke": particle("aatrox:smoke", "particles_blend", {
+        **burst(5),
+        "minecraft:emitter_shape_sphere": {"radius": 0.35, "direction": "outwards"},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.6, 1.0)"},
+        "minecraft:particle_initial_speed": "math.random(0.3, 0.9)",
+        "minecraft:particle_initial_spin": {"rotation": "math.random(0, 360)"},
+        "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, 0.8, 0], "linear_drag_coefficient": 2.5},
+        "minecraft:particle_appearance_billboard": {
+            "size": [f"0.3 + {AGE} * 0.25", f"0.3 + {AGE} * 0.25"], "facing_camera_mode": "rotate_xyz", "uv": uv("smoke"),
+        },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#E6FFFFFF", "0.6": "#B3FFFFFF", "1.0": "#00FFFFFF"}),
+    }),
+    # Đất nứt dưới chân (điểm chém Q, Q3, R); bán kính truyền qua variable.radius
+    "ground_crack": particle("aatrox:ground_crack", "particles_blend", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 1.6},
+        "minecraft:particle_initial_spin": {"rotation": "math.random(0, 360)"},
+        "minecraft:particle_appearance_billboard": {
+            "size": ["v.radius", "v.radius"], "facing_camera_mode": "emitter_transform_xz", "uv": uv("crack"),
+        },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#FFFFFFFF", "0.6": "#FFFFFFFF", "1.0": "#00FFFFFF"}),
+    }),
+    # Đá văng lên rồi rơi, nảy trên mặt đất
+    "debris": particle("aatrox:debris", "particles_alpha", {
+        **burst(12),
+        "minecraft:emitter_shape_disc": {"radius": 0.6, "plane_normal": "y", "direction": "outwards"},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.7, 1.2)"},
+        "minecraft:particle_initial_speed": "math.random(2, 4)",
+        "minecraft:particle_initial_spin": {"rotation": "math.random(0, 360)", "rotation_rate": "math.random(-360, 360)"},
+        "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -18, 0]},
+        "minecraft:particle_motion_collision": {"collision_radius": 0.06, "coefficient_of_restitution": 0.35,
+                                                "collision_drag": 4},
+        "minecraft:particle_appearance_billboard": {
+            "size": ["0.06 + v.particle_random_2 * 0.05", "0.06 + v.particle_random_2 * 0.05"],
+            "facing_camera_mode": "rotate_xyz",
+            "uv": {"texture_width": ATLAS, "texture_height": ATLAS,
+                   "uv": ["192 + math.floor(v.particle_random_1 * 2.99) * 8", 0], "uv_size": [8, 8]},
+        },
+    }),
+    # Cột lửa phun thẳng lên (điểm nện Q3, biến hình R)
+    "fire_pillar": particle("aatrox:fire_pillar", "particles_add", {
+        **burst(18, 0.15),
+        "minecraft:emitter_shape_disc": {"radius": 0.3, "plane_normal": "y", "direction": [0, 1, 0]},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.4, 0.7)"},
+        "minecraft:particle_initial_speed": "math.random(4, 7)",
+        "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -2, 0], "linear_drag_coefficient": 1.5},
+        "minecraft:particle_appearance_billboard": {
+            "size": [f"0.3 * (1 - {AGE} * 0.6)", f"0.3 * (1 - {AGE} * 0.6)"], "facing_camera_mode": "lookat_y", "uv": uv("flame"),
+        },
+        "minecraft:particle_appearance_tinting": FADE,
+    }),
+    # Năng lượng tụ về lưỡi kiếm khi vung Q
+    "charge": particle("aatrox:charge", "particles_add", {
+        **burst(10),
+        "minecraft:emitter_shape_sphere": {"radius": 1.3, "surface_only": True, "direction": "inwards"},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.35},
+        "minecraft:particle_initial_speed": 3.5,
+        "minecraft:particle_appearance_billboard": {
+            "size": [0.09, 0.09], "facing_camera_mode": "rotate_xyz", "uv": uv("ember"),
+        },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#00FFFFFF", "0.3": "#FFFFFFFF", "1.0": "#FFFFFFFF"}),
+    }),
+    # Bóng mờ đỏ thẫm để lại phía sau khi lướt E
+    "afterimage": particle("aatrox:afterimage", "particles_blend", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.4},
+        "minecraft:particle_appearance_billboard": {
+            "size": [0.5, 1.0], "facing_camera_mode": "rotate_y", "uv": uv("afterimage"),
+        },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#B3FFFFFF", "1.0": "#00FFFFFF"}),
+    }),
+    # Đầu móc rực lửa ở mũi sợi xích W
+    "chain_head": particle("aatrox:chain_head", "particles_add", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.1},
+        "minecraft:particle_appearance_billboard": {
+            "size": [0.22, 0.22], "facing_camera_mode": "rotate_xyz", "uv": uv("chain_head"),
+        },
+    }),
+    # Vòng rune trói dưới chân mục tiêu trúng W, xoay chậm; bán kính qua variable.radius
+    "bind_circle": particle("aatrox:bind_circle", "particles_add", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 1.5},
+        "minecraft:particle_initial_spin": {"rotation": 0, "rotation_rate": 60},
+        "minecraft:particle_appearance_billboard": {
+            "size": ["v.radius", "v.radius"], "facing_camera_mode": "emitter_transform_xz", "uv": uv("bind"),
+        },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#00FF281E", "0.15": "#FFFF281E", "0.85": "#FFFF6428", "1.0": "#00FFB450"}),
+    }),
+    # Cánh quỷ sau lưng khi biến hình R (script sinh liên tục mỗi 2 tick)
+    "wings": particle("aatrox:wings", "particles_blend", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.14},
+        "minecraft:particle_appearance_billboard": {
+            "size": ["1.15 + v.flap * 0.1", "0.58 + v.flap * 0.06"],
+            "facing_camera_mode": "rotate_y",
+            "uv": uv("wings"),
+        },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#E6FFFFFF", "1.0": "#99FFFFFF"}),
+    }),
+    # Vết chém chữ X khi nội tại phát nổ
+    "x_slash": particle("aatrox:x_slash", "particles_add", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.3},
+        "minecraft:particle_initial_spin": {"rotation": "math.random(-20, 20)"},
+        "minecraft:particle_appearance_billboard": {
+            "size": [f"0.7 + {AGE} * 0.3", f"0.7 + {AGE} * 0.3"], "facing_camera_mode": "rotate_xyz", "uv": uv("x_slash"),
+        },
+        "minecraft:particle_appearance_tinting": FADE,
+    }),
+    # Cầu máu bay từ mục tiêu về người dùng khi hút máu; hướng và tốc độ do script truyền vào
+    "blood_orb": particle("aatrox:blood_orb", "particles_add", {
+        **burst(5),
+        "minecraft:emitter_shape_sphere": {"radius": 0.25, "direction": ["v.dir_x", "v.dir_y", "v.dir_z"]},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.45},
+        "minecraft:particle_initial_speed": "v.speed * math.random(0.85, 1.1)",
+        "minecraft:particle_appearance_billboard": {
+            "size": [0.1, 0.1], "facing_camera_mode": "rotate_xyz", "uv": uv("drop"),
+        },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#FFFF8C8C", "0.8": "#FFFF4646", "1.0": "#00FF4646"}),
     }),
     # Hút máu: giọt máu phát sáng bay lên quanh người
     "lifesteal": particle("aatrox:lifesteal", "particles_add", {

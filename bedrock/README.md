@@ -50,7 +50,7 @@ Dung nham và mắt là một lớp riêng vẽ bằng material `entity_emissive
 
 Sau đó tạo/sửa thế giới → **Behavior Packs** → bật *Aatrox - Quỷ Kiếm Darkin (BP)* (Resource Pack sẽ tự bật theo).
 
-> **Đã cài bản cũ?** Bản này là **v1.3.0**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.3.0.
+> **Đã cài bản cũ?** Bản này là **v1.4.0**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.4.0.
 > Nếu vẫn thấy kiếm cầm như cây thương hoặc không có animation, vào **Cài đặt → Bộ nhớ** xoá hết pack Aatrox cũ rồi nhập lại file `.mcaddon`.
 
 Lấy kiếm:
@@ -87,7 +87,7 @@ Riêng block/mob có thao tác riêng (rương, cửa, bàn chế tạo, giườ
 
 ![Texture particle](preview_particles.png)
 
-Addon có 11 particle riêng, texture pixel art tự vẽ. Phần lớn là **flipbook nhiều khung hình**:
+Addon có 22 particle riêng, texture pixel art tự vẽ. Phần lớn là **flipbook nhiều khung hình**:
 hiệu ứng chạy hết các khung trong thời gian sống của particle.
 
 | Particle | Hình | Dùng ở đâu |
@@ -102,6 +102,18 @@ hiệu ứng chạy hết các khung trong thời gian sống của particle.
 | `aatrox:blood_burst` | Giọt máu pixel đặc, rơi xuống đất | Trúng điểm ngọt, nội tại, kéo xích |
 | `aatrox:chain_link` | Mắt xích sắt nung đỏ | Sợi xích W và vòng trói |
 | `aatrox:lifesteal` | Giọt máu phát sáng bay lên | Khi hút máu |
+| `aatrox:blood_orb` | Cầu máu bay từ mục tiêu về người dùng | Khi hút máu |
+| `aatrox:x_slash` | Vết chém chữ X 3 khung | Nội tại phát nổ, trúng điểm ngọt Q |
+| `aatrox:ground_crack` + `aatrox:debris` + `aatrox:smoke` | Đất nứt rực dung nham, đá văng nảy trên mặt đất, khói đỏ đen 4 khung | Điểm chém Q, nện Q3, kéo xích W, biến hình R |
+| `aatrox:fire_pillar` | Cột lửa phun thẳng lên | Vành điểm ngọt Q3, 8 cột quanh người khi biến hình R |
+| `aatrox:charge` | Tàn lửa tụ về lưỡi kiếm | Lúc vung Q, lúc bắt đầu R |
+| `aatrox:afterimage` | Bóng mờ đỏ thẫm | Để lại phía sau khi lướt E |
+| `aatrox:chain_head` | Đầu móc sắt nung đỏ | Mũi sợi xích W |
+| `aatrox:bind_circle` | Vòng rune ngôi sao sáu cánh xoay chậm | Dưới chân mục tiêu trúng W (đúng bằng vòng trói) |
+| `aatrox:wings` | Cặp cánh quỷ vỗ nhẹ | Sau lưng suốt thời gian biến hình R |
+
+Ngoài particle, chiêu còn **rung màn hình** (Q3, trúng điểm ngọt, nội tại, kéo xích, R) và **chớp đỏ màn hình** khi biến hình R,
+kèm thêm tiếng gầm (rồng + ravager) khi biến hình.
 
 ## Tuỳ chỉnh
 
@@ -147,7 +159,7 @@ bedrock/
 │   ├── animations/            tư thế cầm kiếm, chớp mắt, animation chiêu của người chơi
 │   ├── render_controllers/    vẽ lớp phát sáng
 │   ├── models/entity/         model 3D (.geo.json) + lớp phát sáng
-│   ├── particles/             11 particle riêng
+│   ├── particles/             22 particle riêng
 │   └── textures/              icon, texture model (.png + .tga phát sáng), texture particle
 ├── art/                       icon render từ model 3D
 ├── sword_art.py               bản vẽ pixel mặt trước của kiếm (hình dáng)
