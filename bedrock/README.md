@@ -5,6 +5,12 @@ viết bằng Script API `@minecraft/server` 2.0.0. **Không cần bật Beta AP
 
 Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, console đều được).
 
+![Model 3D Quỷ Kiếm Darkin](preview.png)
+
+Khi cầm trên tay, kiếm hiển thị bằng **model 3D** (21 khối) gồm lưỡi đỏ máu có gân dung nham, sống lưỡi đầy gai,
+mũi kiếm cong, và **con mắt Darkin đồng tử dọc** ở gốc lưỡi. Trong túi đồ vẫn dùng icon 2D.
+Đây là model tự dựng theo phong cách khối của Minecraft, mô phỏng thiết kế kiếm của Aatrox chứ không phải model gốc của Riot.
+
 ## Cài đặt
 
 - **Nhanh nhất:** tải file [`dist/AatroxDarkinBlade.mcaddon`](dist/AatroxDarkinBlade.mcaddon) rồi mở nó, Minecraft sẽ tự nhập cả 2 pack.
@@ -37,7 +43,14 @@ Thanh phía trên hotbar (action bar) hiện hồi chiêu của nội tại, Q, 
 Mọi thông số nằm trong [`AatroxBP/scripts/config.js`](AatroxBP/scripts/config.js): sát thương, hồi chiêu, tầm, góc nhìn lên để dùng R (`lookUpPitch`), bật/tắt đánh người chơi (`pvp`)...
 Sát thương đánh thường của kiếm (9) nằm ở `minecraft:damage` trong [`AatroxBP/items/darkin_blade.json`](AatroxBP/items/darkin_blade.json).
 
-Sửa xong thì chạy `python3 build.py` để tạo lại texture và file `.mcaddon`.
+Sửa xong thì chạy `python3 build.py` để tạo lại texture, model và file `.mcaddon`.
+
+**Model 3D:** hình dáng kiếm khai báo trong [`model.py`](model.py) (danh sách `CUBES`); `build.py` tự xếp UV, vẽ texture
+và xuất `AatroxRP/models/entity/darkin_blade.geo.json`. Có thể mở file `.geo.json` bằng Blockbench để chỉnh tay.
+
+**Vị trí kiếm trên tay** nằm trong [`AatroxRP/animations/darkin_blade.animation.json`](AatroxRP/animations/darkin_blade.animation.json)
+(`position`, `rotation`, `scale` cho góc nhìn thứ nhất và thứ ba). Thông số khởi đầu lấy theo cây đinh ba (trident) của Minecraft;
+nếu kiếm cầm lệch hoặc quá to thì chỉnh 3 giá trị này.
 
 ## Cấu trúc
 
@@ -50,8 +63,13 @@ bedrock/
 │   └── scripts/
 │       ├── main.js            toàn bộ logic chiêu
 │       └── config.js          thông số
-├── AatroxRP/                  Resource pack (texture kiếm)
-├── build.py                   tạo texture + đóng gói .mcaddon
+├── AatroxRP/                  Resource pack
+│   ├── attachables/           thay model cầm tay bằng model 3D
+│   ├── animations/            vị trí kiếm khi cầm (ngôi thứ nhất / thứ ba)
+│   ├── models/entity/         model 3D (.geo.json)
+│   └── textures/              icon túi đồ + texture model
+├── model.py                   định nghĩa model 3D + texture
+├── build.py                   tạo texture, model + đóng gói .mcaddon
 └── dist/AatroxDarkinBlade.mcaddon
 ```
 

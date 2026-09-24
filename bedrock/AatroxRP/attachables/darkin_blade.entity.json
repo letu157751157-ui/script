@@ -1,0 +1,30 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "aatrox:darkin_blade",
+      "materials": {
+        "default": "entity_alphatest",
+        "enchanted": "entity_alphatest_glint"
+      },
+      "textures": {
+        "default": "textures/entity/darkin_blade",
+        "enchanted": "textures/misc/enchanted_item_glint"
+      },
+      "geometry": {
+        "default": "geometry.aatrox.darkin_blade"
+      },
+      "animations": {
+        "hold_first_person": "animation.aatrox.darkin_blade.hold_first_person",
+        "hold_third_person": "animation.aatrox.darkin_blade.hold_third_person"
+      },
+      "scripts": {
+        "animate": [
+          { "hold_first_person": "c.is_first_person == 1.0" },
+          { "hold_third_person": "c.is_first_person == 0.0" }
+        ]
+      },
+      "render_controllers": ["controller.render.item_default"]
+    }
+  }
+}

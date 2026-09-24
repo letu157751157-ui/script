@@ -1,4 +1,4 @@
-"""Tạo texture/icon và đóng gói addon thành dist/AatroxDarkinBlade.mcaddon.
+"""Tạo texture/icon, model 3D và đóng gói addon thành dist/AatroxDarkinBlade.mcaddon.
 
 Chạy: python3 build.py
 """
@@ -6,6 +6,8 @@ import os
 import struct
 import zipfile
 import zlib
+
+import model
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -82,4 +84,5 @@ def build_addon():
 
 if __name__ == "__main__":
     make_images()
+    model.write_model(ROOT, write_png)
     build_addon()
