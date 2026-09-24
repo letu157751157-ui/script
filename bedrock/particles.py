@@ -1,23 +1,25 @@
 """Particle riêng của Quỷ Kiếm Darkin: texture atlas + file JSON cho resource pack.
 
-Sprite vẽ màu trắng, hình dạng nằm ở kênh alpha; màu thật do tinting của từng
-particle quyết định, nên một sprite dùng được cho nhiều hiệu ứng.
+Sprite vẽ theo kiểu particle gốc của Minecraft: pixel art 16x16 cạnh cứng,
+3 mức xám (tâm sáng, viền tối); màu thật do tinting của từng particle quyết
+định, nên một sprite dùng được cho nhiều hiệu ứng.
 """
 import json
 import math
 import os
 
-ATLAS = 128  # atlas 128x128, mỗi sprite 32x32
+ATLAS = 64  # atlas 64x64, mỗi sprite 16x16
+CELL = 16
 TEXTURE = "textures/particle/aatrox_particles"
 
 SPRITES = {
     "glow": (0, 0),
-    "spark": (32, 0),
-    "ring": (64, 0),
-    "slash": (96, 0),
-    "tile": (0, 32),
-    "flame": (32, 32),
-    "drop": (64, 32),
+    "spark": (16, 0),
+    "ring": (32, 0),
+    "slash": (48, 0),
+    "tile": (0, 16),
+    "flame": (16, 16),
+    "drop": (32, 16),
 }
 
 
@@ -42,7 +44,7 @@ def sprite_alpha(name, x, y):
         return outer * inner * smooth(-0.9, -0.2, x + 0.6)
     if name == "tile":
         edge = max(abs(x), abs(y))
-        return 0.28 + 0.72 * smooth(0.6, 0.92, edge) * (1 - smooth(0.93, 1.0, edge))
+        return 0.4 + 0.6 * smooth(0.6, 0.92, edge) * (1 - smooth(0.93, 1.0, edge))
     if name == "flame":
         # Giọt lửa: đáy tròn, đỉnh nhọn
         if y < -0.3:
@@ -60,12 +62,16 @@ def sprite_alpha(name, x, y):
 
 def build_atlas():
     pixels = [[(255, 255, 255, 0)] * ATLAS for _ in range(ATLAS)]
+    half = CELL / 2
     for name, (ox, oy) in SPRITES.items():
-        for j in range(32):
-            for i in range(32):
-                x, y = (i + 0.5) / 16 - 1, 1 - (j + 0.5) / 16
-                alpha = max(0.0, min(1.0, sprite_alpha(name, x, y)))
-                pixels[oy + j][ox + i] = (255, 255, 255, int(alpha * 255))
+        for j in range(CELL):
+            for i in range(CELL):
+                x, y = (i + 0.5) / half - 1, 1 - (j + 0.5) / half
+                level = sprite_alpha(name, x, y)
+                if level < 0.3:
+                    continue  # cạnh cứng như particle gốc
+                gray = 255 if level > 0.75 else 205 if level > 0.5 else 150
+                pixels[oy + j][ox + i] = (gray, gray, gray, 255)
     return pixels
 
 
@@ -77,7 +83,7 @@ AGE = "v.particle_age / v.particle_lifetime"
 
 
 def uv(sprite):
-    return {"texture_width": ATLAS, "texture_height": ATLAS, "uv": list(SPRITES[sprite]), "uv_size": [32, 32]}
+    return {"texture_width": ATLAS, "texture_height": ATLAS, "uv": list(SPRITES[sprite]), "uv_size": [CELL, CELL]}
 
 
 def tint(stops):

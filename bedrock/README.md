@@ -7,16 +7,28 @@ Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, conso
 
 ![Model 3D Quỷ Kiếm Darkin](preview.png)
 
-Khi cầm trên tay, kiếm hiển thị bằng **model 3D 57 khối** với **texture HD 512×512**:
-- lưỡi đỏ máu có vân thớ thịt, gờ nổi giữa lưỡi, **gân dung nham phát sáng** chạy dọc và phân nhánh
-- **con mắt Darkin** ở gốc lưỡi: mống mắt cam, đồng tử dọc, mạch máu, có mí mắt và hốc thịt
-- sống lưỡi có đốt xương và 5 gai, lưỡi bén có răng cưa, mũi kiếm cong có ngạnh
-- chắn kiếm có sừng cong 2 tầng, nanh xương, đinh tán; chuôi quấn da với 3 vòng kim loại
-- núm chuôi là **viên ngọc máu phát sáng** kẹp trong 4 móng vuốt
+Khi cầm trên tay, kiếm hiển thị bằng **model 3D** (159 khối) với **texture pixel art đúng mật độ Minecraft**
+(1 pixel texture = 1/16 block, bảng màu giới hạn, sáng trên-trái, tối dưới-phải, nhiễu dither như texture gốc của game).
 
-Gân dung nham, mắt và viên ngọc dùng material phát sáng (`entity_emissive`) nên vẫn rực lên ban đêm.
-Icon trong túi đồ được render từ chính model 3D.
-Đây là model tự dựng theo phong cách khối của Minecraft, mô phỏng thiết kế kiếm của Aatrox chứ không phải model gốc của Riot.
+### Thiết kế bám theo bản gốc
+
+Hình dáng được dựng theo thanh kiếm của Aatrox sau bản làm lại năm 2018, đối chiếu từ nhiều nguồn:
+- **Splash art gốc** (Victor Maury vẽ): dòng dung nham sáng chảy dọc giữa lưỡi và phân nhánh, lõi sáng ở gốc lưỡi, cụm sừng đen cong vươn lên hai bên.
+- **Splash Sea Hunter và Justicar** (được vẽ lại theo mẫu kiếm mới trong đợt làm lại): mắt Darkin nằm ở chắn kiếm với móng vuốt ôm quanh, lưỡi rộng dần về phía mũi, mũi vát chéo, sống lưỡi răng cưa lớn và một ngạnh móc gần mũi.
+- **Icon chiêu Q và nội tại**: khung kim loại tối màu viền ngoài lưỡi, lõi thịt đỏ thẫm bên trong.
+- **Wiki và các bài giới thiệu bản làm lại** (Nexus, Polygon, Rift Herald): Aatrox là "chiến binh cầm đại kiếm", thanh kiếm là nhà tù sống chứa linh hồn hắn.
+
+Từ đó model gồm:
+- lưỡi rộng dần, **mũi vát chéo**, sống lưỡi có **4 răng cưa lớn** và **ngạnh móc** gần mũi, lưỡi bén có khía nhỏ
+- **khung kim loại tối** viền ngoài (dày hơn lõi), **lõi thịt đỏ thẫm** lõm vào giữa
+- **dòng dung nham phân nhánh như cây** chảy từ mắt lên gần mũi, hắt ánh cam lên phần thịt xung quanh
+- **mắt Darkin đồng tử dọc** trong hốc thịt ở chắn kiếm, **cặp sừng đen** cong ôm hai bên gốc lưỡi, gai ngang và **móng vuốt** quặp phía dưới
+- tay cầm dài quấn da (cầm hai tay) với 3 vòng kim loại, núm chuôi có gai
+
+Dung nham và mắt dùng material phát sáng (`entity_emissive`) nên vẫn rực lên ban đêm.
+Icon trong túi đồ là sprite pixel art render từ chính model 3D.
+Đây là model tự dựng theo phong cách Minecraft, mô phỏng thiết kế kiếm của Aatrox, không phải model hay texture gốc của Riot
+(addon không chứa bất kỳ hình ảnh nào của Riot).
 
 ## Cài đặt
 
@@ -45,7 +57,7 @@ Bedrock không cho addon gán phím riêng, nên chiêu được chọn theo **t
 Mọi sát thương gây ra khi cầm kiếm đều **hút máu 15%**.
 ### Hiệu ứng particle
 
-Addon có 11 particle riêng (texture tự vẽ, nằm trong `AatroxRP/particles`):
+Addon có 11 particle riêng (texture pixel art tự vẽ, nằm trong `AatroxRP/particles`):
 
 | Particle | Dùng ở đâu |
 |---|---|
@@ -68,13 +80,15 @@ Sát thương đánh thường của kiếm (9) nằm ở `minecraft:damage` tro
 
 Sửa xong thì chạy `python3 build.py` để tạo lại texture, model và file `.mcaddon`.
 
-**Model 3D:** hình dáng kiếm khai báo trong [`model.py`](model.py) (danh sách `CUBES`, mỗi khối có kiểu tô như `crimson`, `lava`, `eye`...).
-`build.py` tự xếp UV, vẽ texture HD và xuất 2 file geometry: `darkin_blade.geo.json` (phần thường) và `darkin_blade_glow.geo.json` (phần phát sáng).
+**Model 3D:** hình dáng kiếm là bản vẽ mặt trước dạng pixel trong [`sword_art.py`](sword_art.py)
+(đường viền lưỡi, răng cưa, sừng, mắt, tay cầm; mỗi vật liệu có độ dày riêng trong `MATERIALS`).
+[`model.py`](model.py) đùn bản vẽ thành khối 3D, gộp pixel cùng vật liệu thành khối lớn, vẽ texture pixel art (bảng màu trong `PALETTES`)
+và xuất 2 file geometry: `darkin_blade.geo.json` (phần thường) và `darkin_blade_glow.geo.json` (phần phát sáng).
 Có thể mở các file `.geo.json` bằng Blockbench để chỉnh tay.
 
-**Particle:** chỉnh trong [`particles.py`](particles.py) (hình sprite, màu, tốc độ, thời gian sống), chạy lại `build.py`.
+**Particle:** chỉnh trong [`particles.py`](particles.py) (hình sprite, màu, tốc độ, thời gian sống), chạy lại `build.py`. Sprite particle là pixel art 16×16 cạnh cứng giống particle gốc của Minecraft.
 
-**Icon:** `art/item_icon.png` (túi đồ) và `art/pack_icon.png` được render từ model 3D; thay 2 file này nếu muốn icon khác.
+**Icon:** `art/item_icon.png` (túi đồ, 64×64) và `art/pack_icon.png` được render từ model 3D; thay 2 file này nếu muốn icon khác.
 
 **Vị trí kiếm trên tay** nằm trong [`AatroxRP/animations/darkin_blade.animation.json`](AatroxRP/animations/darkin_blade.animation.json)
 (`position`, `rotation`, `scale` cho góc nhìn thứ nhất và thứ ba). Thông số khởi đầu lấy theo cây đinh ba (trident) của Minecraft;
@@ -97,9 +111,10 @@ bedrock/
 │   ├── render_controllers/    vẽ lớp phát sáng
 │   ├── models/entity/         model 3D (.geo.json) + lớp phát sáng
 │   ├── particles/             11 particle riêng
-│   └── textures/              icon, texture model HD, texture particle
+│   └── textures/              icon, texture model, texture particle
 ├── art/                       icon render từ model 3D
-├── model.py                   định nghĩa model 3D + vẽ texture HD
+├── sword_art.py               bản vẽ pixel mặt trước của kiếm (hình dáng)
+├── model.py                   đùn bản vẽ thành model 3D + vẽ texture pixel art
 ├── particles.py               định nghĩa particle + vẽ texture particle
 ├── build.py                   tạo texture, model, particle + đóng gói .mcaddon
 └── dist/AatroxDarkinBlade.mcaddon
