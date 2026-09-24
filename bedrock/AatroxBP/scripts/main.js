@@ -372,6 +372,10 @@ function slamQ(player, cast, direction) {
       particle(dimension, P.slash, add(add(origin, direction, along), { x: 0, y: 1, z: 0 }));
     }
     particle(dimension, P.flash, add(add(origin, direction, cast.length - cast.sweet / 2), { x: 0, y: 0.5, z: 0 }));
+    // Hiệu ứng thêm tại vị trí người chơi khi chém
+    for (let i = 0; i < 2; i++) {
+      particle(dimension, P.spark, add(origin, { x: 0, y: 1.2, z: 0 }));
+    }
   }
   sound(dimension, "random.explode", origin, 1.4);
 
