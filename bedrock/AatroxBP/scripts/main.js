@@ -2,12 +2,12 @@
 //
 // Cầm kiếm rồi:
 //   Đánh thường          Nội tại Tư Thế Tử Thần (khi sẵn sàng)
-//   Chuột phải           Q  Quỷ Kiếm Darkin (3 lần chém)
-//   Ngồi + chuột phải    E  Bước Nhảy Hắc Ám
-//   Nhảy + chuột phải    W  Xiềng Xích Địa Ngục
-//   Nhìn lên + chuột phải R Kẻ Diệt Thế
+//   Chuột phải              Q  Quỷ Kiếm Darkin (3 lần chém)
+//   Chạy nhanh + chém       E  Bước Nhảy Hắc Ám (chạy nhanh + chuột phải cũng được)
+//   Khụy + chuột phải       W  Xiềng Xích Địa Ngục
+//   Khụy + nhảy             R  Kẻ Diệt Thế
 
-import { world, system, EquipmentSlot, EntityDamageCause, MolangVariableMap } from "@minecraft/server";
+import { world, system, EquipmentSlot, InputButton, ButtonState, EntityDamageCause, MolangVariableMap } from "@minecraft/server";
 import { CONFIG } from "./config.js";
 
 const ITEM_ID = "aatrox:darkin_blade";
@@ -595,13 +595,13 @@ function castR(player, state) {
 // ---------------------------------------------------------------------------
 
 const SKILL_NAMES = { Q: "Quỷ Kiếm Darkin", E: "Bước Nhảy Hắc Ám", W: "Xiềng Xích Địa Ngục", R: "Kẻ Diệt Thế" };
-const STANCE_HINT = { Q: "", E: " (đang ngồi)", W: " (đang nhảy)", R: " (nhìn lên)" };
+const STANCE_HINT = { Q: "", E: " (chạy nhanh)", W: " (khụy)  §7Nhảy: §eR" };
 // Hiện trong mô tả của kiếm (giữ chuột lên kiếm trong túi đồ)
 const LORE = [
   "§7Chuột phải/chạm: §cQ §7Quỷ Kiếm",
-  "§7Ngồi + chuột phải: §cE §7Lướt",
-  "§7Nhảy + chuột phải: §cW §7Xiềng Xích",
-  "§7Nhìn lên + chuột phải: §cR §7Diệt Thế",
+  "§7Chạy nhanh + chém: §cE §7Lướt",
+  "§7Khụy + chuột phải: §cW §7Xiềng Xích",
+  "§7Khụy + nhảy: §cR §7Diệt Thế",
   "§7Đánh thường: §cNội tại",
 ];
 // Bấm vào những block/mob có thao tác riêng thì dùng chúng như thường, không ra chiêu
@@ -609,10 +609,10 @@ const INTERACTIVE_BLOCK =
   /door|gate|button|lever|chest|barrel|shulker|furnace|smoker|crafting|crafter|anvil|table|:bed$|bell|hopper|dispenser|dropper|loom|grindstone|stonecutter|beacon|lectern|repeater|comparator|noteblock|jukebox|cake|campfire|anchor|lodestone|composter|cauldron|brewing|sign|frame|vault|chiseled_bookshelf|decorated_pot/;
 const INTERACTIVE_ENTITY = new Set(["minecraft:villager", "minecraft:villager_v2", "minecraft:wandering_trader", "minecraft:armor_stand"]);
 
+// Chiêu ra khi bấm chuột phải (R dùng khụy + nhảy, xem playerButtonInput bên dưới)
 function chooseSkill(player) {
-  if (player.getRotation().x <= CONFIG.lookUpPitch) return "R";
-  if (player.isSneaking) return "E";
-  if (!player.isOnGround) return "W";
+  if (player.isSneaking) return "W";
+  if (player.isSprinting) return "E";
   return "Q";
 }
 
@@ -626,7 +626,9 @@ function cooldownLeft(state, skill) {
   return state.cd[skill] - now();
 }
 
-function trySkill(player) {
+// skill: chiêu cố định (E khi chạy nhanh chém, R khi khụy nhảy); bỏ trống = chọn theo tư thế.
+// quiet: không báo hồi chiêu (dùng cho đòn đánh thường lúc chạy, tránh kêu liên tục)
+function trySkill(player, forced, quiet = false) {
   if (!canAct(player)) return;
   const state = getState(player);
   // Một lần bấm có thể bắn nhiều sự kiện (dùng vật phẩm + chạm block)
@@ -635,9 +637,10 @@ function trySkill(player) {
   if (isStunned(player)) return notify(state, "§cĐang bị choáng, không dùng được chiêu!");
   if (now() < state.busyUntil) return;
 
-  const skill = chooseSkill(player);
+  const skill = forced ?? chooseSkill(player);
   const left = cooldownLeft(state, skill);
   if (left > 0) {
+    if (quiet) return;
     try {
       player.playSound("note.bass", { pitch: 0.6, volume: 0.7 });
     } catch {
@@ -683,6 +686,19 @@ world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
   system.run(() => trySkill(player));
 });
 
+// Khụy + nhảy: R
+world.afterEvents.playerButtonInput.subscribe(({ player, button, newButtonState }) => {
+  if (button !== InputButton.Jump || newButtonState !== ButtonState.Pressed) return;
+  if (player.isSneaking && holdsBlade(player)) trySkill(player, "R");
+});
+
+// Chạy nhanh + chém (đánh trúng mob hoặc block): E
+function sprintSlash(player) {
+  if (player?.typeId === "minecraft:player" && player.isSprinting && holdsBlade(player)) trySkill(player, "E", true);
+}
+world.afterEvents.entityHitEntity.subscribe(({ damagingEntity }) => sprintSlash(damagingEntity));
+world.afterEvents.entityHitBlock.subscribe(({ damagingEntity }) => sprintSlash(damagingEntity));
+
 world.afterEvents.playerLeave.subscribe(({ playerId }) => {
   states.delete(playerId);
   greeted.delete(playerId);
@@ -694,12 +710,11 @@ world.afterEvents.playerLeave.subscribe(({ playerId }) => {
 
 function sendGuide(player) {
   player.sendMessage("§4━━━━━━━━ Quỷ Kiếm Darkin ━━━━━━━━");
-  player.sendMessage("§7Cầm kiếm rồi §fbấm chuột phải §7(điện thoại: §fchạm màn hình§7 hoặc nút §fDùng§7).");
-  player.sendMessage("§7Chiêu được chọn theo tư thế lúc bấm:");
-  player.sendMessage("§c Q §f— đứng yên hoặc chạy: §7chém 3 lần, mép lửa cam là điểm ngọt");
-  player.sendMessage("§c E §f— đang ngồi (Shift / nút ngồi): §7lướt theo hướng nhìn");
-  player.sendMessage("§c W §f— đang nhảy (bấm nhảy rồi bấm dùng khi còn trên không): §7phóng xích lửa");
-  player.sendMessage("§c R §f— ngước nhìn lên trời: §7biến hình Kẻ Diệt Thế");
+  player.sendMessage("§7Cầm kiếm rồi dùng các thao tác sau (điện thoại: chuột phải = §fchạm màn hình§7 / nút §fDùng§7):");
+  player.sendMessage("§c Q §f— chuột phải: §7chém 3 lần, ô rune cam là điểm ngọt");
+  player.sendMessage("§c E §f— chạy nhanh + chém (hoặc chạy nhanh + chuột phải): §7lướt theo hướng nhìn");
+  player.sendMessage("§c W §f— khụy (Shift / nút ngồi) + chuột phải: §7phóng xích lửa");
+  player.sendMessage("§c R §f— khụy + nhảy: §7biến hình Kẻ Diệt Thế");
   player.sendMessage("§c Nội tại §f— đánh thường: §7vết chém phát nổ, hồi máu");
   player.sendMessage("§7Thanh trên hotbar hiện chiêu sắp dùng và thời gian hồi chiêu. Gõ §f/scriptevent aatrox:help §7để xem lại.");
 }
@@ -708,7 +723,7 @@ function ensureLore(player) {
   try {
     const equippable = player.getComponent("minecraft:equippable");
     const item = equippable?.getEquipment(EquipmentSlot.Mainhand);
-    if (item?.typeId !== ITEM_ID || item.getLore().length > 0) return;
+    if (item?.typeId !== ITEM_ID || item.getLore().join("\n") === LORE.join("\n")) return;
     item.setLore(LORE);
     equippable.setEquipment(EquipmentSlot.Mainhand, item);
   } catch {

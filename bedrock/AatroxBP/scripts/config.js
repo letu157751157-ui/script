@@ -4,8 +4,6 @@
 export const CONFIG = {
   // Chiêu có đánh trúng người chơi khác không (false = chỉ đánh mob)
   pvp: true,
-  // Nhìn lên cao hơn góc này (độ, số âm = nhìn lên) + chuột phải = dùng R
-  lookUpPitch: -50,
   // Hút máu: hồi % sát thương gây ra (cả đánh thường lẫn chiêu)
   lifesteal: 0.15,
 

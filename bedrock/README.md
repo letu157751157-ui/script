@@ -50,7 +50,7 @@ Dung nham và mắt là một lớp riêng vẽ bằng material `entity_emissive
 
 Sau đó tạo/sửa thế giới → **Behavior Packs** → bật *Aatrox - Quỷ Kiếm Darkin (BP)* (Resource Pack sẽ tự bật theo).
 
-> **Đã cài bản cũ?** Bản này là **v1.2.0**. Trong thế giới, gỡ pack cũ (1.0.0) ra rồi bật lại bản 1.2.0.
+> **Đã cài bản cũ?** Bản này là **v1.3.0**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.3.0.
 > Nếu vẫn thấy kiếm cầm như cây thương hoặc không có animation, vào **Cài đặt → Bộ nhớ** xoá hết pack Aatrox cũ rồi nhập lại file `.mcaddon`.
 
 Lấy kiếm:
@@ -60,16 +60,15 @@ Lấy kiếm:
 
 ## Cách dùng chiêu
 
-Bedrock không cho addon gán phím riêng, nên **mọi chiêu đều dùng nút "Dùng vật phẩm"**:
-**chuột phải** trên máy tính, **chạm màn hình** (hoặc nút Dùng/Đặt) trên điện thoại, **cò trái (LT/L2)** trên tay cầm.
-Chiêu nào được dùng phụ thuộc vào **tư thế lúc bấm**:
+Bedrock không cho addon gán phím riêng, nên chiêu dùng các nút sẵn có: **chuột phải** (điện thoại: **chạm màn hình** hoặc nút Dùng/Đặt; tay cầm: **LT/L2**),
+**khụy** (Shift / nút ngồi), **nhảy** và **chạy nhanh**:
 
-| Tư thế lúc bấm | Chiêu | Hiệu ứng |
+| Thao tác | Chiêu | Hiệu ứng |
 |---|---|---|
-| **Đứng / chạy bình thường** | **Q — Quỷ Kiếm Darkin** | Bấm 3 lần liên tiếp (mỗi lần có 4 giây để bấm tiếp). Vùng chém hiện bằng ô rune dưới đất; **ô màu cam là điểm ngọt**: x1.6 sát thương, hất tung, choáng, giảm hồi chiêu nội tại. Lần 3 nện xuống vùng tròn |
-| **Đang ngồi** (Shift / nút ngồi) | **E — Bước Nhảy Hắc Ám** | Lướt nhanh theo hướng nhìn |
-| **Đang nhảy** (bấm nhảy rồi bấm dùng khi còn trên không) | **W — Xiềng Xích Địa Ngục** | Phóng xích lửa. Trúng thì gây sát thương, làm chậm, tạo vòng trói; sau 1.5 giây mục tiêu chưa chạy ra khỏi vòng thì bị kéo về, chịu thêm sát thương và bị choáng |
-| **Ngước nhìn lên trời** (góc nhìn cao hơn 50°) | **R — Kẻ Diệt Thế** | Sóng xung kích hất văng + làm chậm xung quanh, rồi biến hình 10 giây: +30% sát thương chiêu, +50% hồi máu, Tốc Độ II, Sức Mạnh I, nội tại hồi nhanh gấp đôi |
+| **Chuột phải** | **Q — Quỷ Kiếm Darkin** | Bấm 3 lần liên tiếp (mỗi lần có 4 giây để bấm tiếp). Vùng chém hiện bằng ô rune dưới đất; **ô màu cam là điểm ngọt**: x1.6 sát thương, hất tung, choáng, giảm hồi chiêu nội tại. Lần 3 nện xuống vùng tròn |
+| **Chạy nhanh + chém** (đánh trúng mob/block lúc đang chạy nhanh, hoặc chạy nhanh + chuột phải) | **E — Bước Nhảy Hắc Ám** | Lướt nhanh theo hướng nhìn |
+| **Khụy + chuột phải** | **W — Xiềng Xích Địa Ngục** | Phóng xích lửa. Trúng thì gây sát thương, làm chậm, tạo vòng trói; sau 1.5 giây mục tiêu chưa chạy ra khỏi vòng thì bị kéo về, chịu thêm sát thương và bị choáng |
+| **Khụy + nhảy** | **R — Kẻ Diệt Thế** | Sóng xung kích hất văng + làm chậm xung quanh, rồi biến hình 10 giây: +30% sát thương chiêu, +50% hồi máu, Tốc Độ II, Sức Mạnh I, nội tại hồi nhanh gấp đôi |
 | **Đánh thường** (chuột trái / chạm vào mob) | **Nội tại — Tư Thế Tử Thần** | Khi sẵn sàng (8 giây): vết chém phát nổ thêm 8% máu tối đa của mục tiêu và hồi máu bằng lượng đó |
 
 Mọi sát thương gây ra khi cầm kiếm đều **hút máu 15%**.
@@ -81,7 +80,7 @@ Riêng block/mob có thao tác riêng (rương, cửa, bàn chế tạo, giườ
 - Lần đầu cầm kiếm sẽ hiện tiêu đề và hướng dẫn trong khung chat. Gõ `/scriptevent aatrox:help` để xem lại.
 - Mô tả của kiếm (giữ chuột lên kiếm / chọn kiếm trong túi đồ) ghi sẵn cách dùng từng chiêu.
 - **Thanh phía trên hotbar** hiện:
-  `Nội tại ✔  Bấm: Q  Q ✔  E ✔  W 3.2s  R ✔`, trong đó **"Bấm: …"** là chiêu sẽ ra nếu bấm ngay lúc này (đổi theo tư thế: `E (đang ngồi)`, `W (đang nhảy)`, `R (nhìn lên)`),
+  `Nội tại ✔  Bấm: Q  Q ✔  E ✔  W 3.2s  R ✔`, trong đó **"Bấm: …"** là chiêu sẽ ra nếu bấm chuột phải ngay lúc này (đổi theo tư thế: `E (chạy nhanh)`, `W (khụy)  Nhảy: R`),
   phía sau là thời gian hồi chiêu. Bấm khi chiêu đang hồi sẽ nghe tiếng "cạch" và thanh hiện `W đang hồi chiêu: 3.2s`.
 
 ### Hiệu ứng particle
@@ -106,7 +105,7 @@ hiệu ứng chạy hết các khung trong thời gian sống của particle.
 
 ## Tuỳ chỉnh
 
-Mọi thông số chiêu nằm trong [`AatroxBP/scripts/config.js`](AatroxBP/scripts/config.js): sát thương, hồi chiêu, tầm, góc nhìn lên để dùng R (`lookUpPitch`), bật/tắt đánh người chơi (`pvp`)...
+Mọi thông số chiêu nằm trong [`AatroxBP/scripts/config.js`](AatroxBP/scripts/config.js): sát thương, hồi chiêu, tầm, bật/tắt đánh người chơi (`pvp`)...
 Sát thương đánh thường của kiếm (9) nằm ở `minecraft:damage` trong [`AatroxBP/items/darkin_blade.json`](AatroxBP/items/darkin_blade.json).
 
 Sửa xong thì chạy `python3 build.py` để tạo lại texture, model, animation, particle và file `.mcaddon`.
