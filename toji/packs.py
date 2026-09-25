@@ -8,7 +8,7 @@ Item variants (the script swaps between them, keeping durability/enchantments/na
 import json
 import os
 
-VERSION = [1, 5, 0]
+VERSION = [1, 6, 0]
 MIN_ENGINE = [1, 21, 90]
 UUID = {
     "bp": "40e20d6e-1d50-49a8-bcfd-2df5de5e7686",

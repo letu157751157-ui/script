@@ -134,6 +134,14 @@ function getState(player) {
 }
 
 const isAwake = (state) => now() < state.awakeUntil;
+const EMP = () => CONFIG.awaken.empowered;
+
+// Awakened versions of the skills get a violet glow + Infinity-break ring when cast
+function empoweredCue(player) {
+  particle(player.dimension, P.glow, up(player.location, 1));
+  particle(player.dimension, P.nullGround, up(player.location, 0.08), withRadius(3));
+  sound(player.dimension, "item.trident.thunder", player.location, 2, 0.25);
+}
 const isThrown = (state) => now() < state.thrownUntil;
 const isStunned = (entity) => (stunnedUntil.get(entity.id) ?? 0) > now();
 
@@ -539,7 +547,8 @@ function countComboHit(player, state) {
   if (t - state.lastHit < 4) return; // several events from one click
   state.combo = t - state.lastHit <= ticks(CONFIG.combo.window) ? state.combo + 1 : 1;
   state.lastHit = t;
-  if (state.combo >= 4 && t >= state.busyUntil && !state.plunging) {
+  const needed = isAwake(state) ? EMP().comboHits : 4;
+  if (state.combo >= needed && t >= state.busyUntil && !state.plunging) {
     state.combo = 0;
     comboFinisher(player, state);
   }
@@ -559,19 +568,26 @@ function comboFinisher(player, state) {
     const origin = player.location;
     const direction = aimDirection(player);
     const right = { x: -direction.z, y: 0, z: direction.x };
-    // Crescent slashes sweeping from right to left in front
-    for (let i = 0; i < 5; i++) {
-      const angle = ((i / 4) * 2 - 1) * ((cfg.arc / 2) * Math.PI) / 180;
+    const empowered = isAwake(state);
+    const arc = empowered ? EMP().finisherArc : cfg.arc;
+    if (empowered) {
+      empoweredCue(player);
+      shockRing(dimension, origin, cfg.radius + 1.5);
+    }
+    // Crescent slashes sweeping from right to left in front (a full circle when awakened)
+    const count = empowered ? 10 : 5;
+    for (let i = 0; i < count; i++) {
+      const angle = ((i / (count - 1)) * 2 - 1) * ((arc / 2) * Math.PI) / 180;
       const d = add({ x: direction.x * Math.cos(angle), y: 0, z: direction.z * Math.cos(angle) }, right, -Math.sin(angle));
       system.runTimeout(() => particle(dimension, P.slash, up(add(origin, d, 2), 1.1)), i);
     }
     particle(dimension, P.dust, up(origin, 0.1));
     sound(dimension, "item.trident.throw", origin, 1.1);
     shake(player, 0.15, 0.15);
-    for (const target of getTargetsInArc(player, origin, direction, cfg.radius, cfg.arc)) {
+    for (const target of getTargetsInArc(player, origin, direction, cfg.radius, arc)) {
       const away = flatUnit({ x: target.location.x - origin.x, z: target.location.z - origin.z }) ?? direction;
       nullify(target);
-      dealDamage(player, target, cfg.damage);
+      dealDamage(player, target, cfg.damage * (empowered ? EMP().finisherDamage : 1));
       knockback(target, { x: away.x * cfg.knockback, z: away.z * cfg.knockback }, cfg.vertical);
       particle(dimension, P.flash, up(target.location, 1));
       particle(dimension, P.blood, up(target.location, 1));
@@ -603,21 +619,36 @@ function castThrust(player, state, direction) {
     particle(player.dimension, P.afterimage, up(player.location, 0.9));
   }, Math.max(1, windup - 3));
 
+  const empowered = isAwake(state);
+  const length = cfg.length * (empowered ? EMP().thrustRange : 1);
+  const damage = cfg.damage * (empowered ? EMP().thrustDamage : 1);
+  if (empowered) empoweredCue(player);
+
   system.runTimeout(() => {
     if (!canAct(player)) return;
     const dimension = player.dimension;
     const origin = player.location;
     const view = player.getViewDirection();
     const tip = spearTip(player);
-    particle(dimension, P.thrust, tip, withDirection(view));
-    particle(dimension, P.flash, add(tip, direction, 0.6));
-    particleLine(dimension, P.spark, tip, add(tip, direction, cfg.length - 1), 1.6);
+    // Awakened: three stabs in a blink (the damage of all three lands as one hit)
+    for (let k = 0; k < (empowered ? 3 : 1); k++) {
+      system.runTimeout(() => {
+        const side = { x: -direction.z * (k - 1) * 0.35, y: (k - 1) * 0.25, z: direction.x * (k - 1) * 0.35 };
+        particle(dimension, P.thrust, add(tip, side), withDirection(view));
+        particle(dimension, P.flash, add(add(tip, direction, 0.6), side));
+        if (k) sound(dimension, "item.trident.throw", origin, 0.9 + k * 0.15);
+      }, k * 3);
+    }
+    if (empowered) {
+      for (let along = 2; along <= length; along += 2.5) shockRing(dimension, add(origin, direction, along), 1.8);
+    }
+    particleLine(dimension, P.spark, tip, add(tip, direction, length - 1), 1.6);
     sound(dimension, "item.trident.throw", origin, 0.8);
     sound(dimension, "random.anvil_land", origin, 1.9, 0.5);
     shake(player, 0.12, 0.15);
 
-    const targets = getTargetsInBox(player, origin, direction, cfg.length, cfg.width);
-    const aimed = aimedTarget(player, cfg.length + 1);
+    const targets = getTargetsInBox(player, origin, direction, length, cfg.width);
+    const aimed = aimedTarget(player, length + 1);
     if (aimed && !targets.some((e) => e.id === aimed.id)) targets.push(aimed);
     for (const target of targets) {
       // The Infinity barrier appears between the spear and the target, then shatters as the spear goes through
@@ -629,7 +660,7 @@ function castThrust(player, state, direction) {
         sound(dimension, "random.glass", front, 1.4);
       }, 2);
       nullify(target, true);
-      dealDamage(player, target, cfg.damage);
+      dealDamage(player, target, damage);
       stun(target, cfg.stun);
       knockback(target, { x: direction.x * cfg.knockback, z: direction.z * cfg.knockback }, 0.25);
       particle(dimension, P.blood, up(target.location, 1));
@@ -670,16 +701,20 @@ function castChain(player, state) {
   releaseSpear(player, state, release + MAX_THROW);
 
   const dimension = player.dimension;
+  const empowered = isAwake(state);
+  const laps = empowered ? EMP().chainLaps : cfg.laps;
+  const spinRadius = cfg.spinRadius * (empowered ? EMP().chainRadius : 1);
+  if (empowered) empoweredCue(player);
   const start = Math.atan2(aimDirection(player).z, aimDirection(player).x) + Math.PI; // start behind
   const hitOnLap = new Map(); // entity id -> last lap it was hit on
   let elapsed = 0;
   const spin = system.runInterval(() => {
     if (!player.isValid || ++elapsed > spinTicks) return system.clearRun(spin);
     const progress = elapsed / spinTicks;
-    const lap = Math.floor(progress * cfg.laps);
+    const lap = Math.floor(progress * laps);
     // The chain pays out during the first half-lap, then keeps full length
-    const radius = cfg.spinRadius * Math.min(1, 0.35 + progress * 2);
-    const angle = start + progress * cfg.laps * Math.PI * 2;
+    const radius = spinRadius * Math.min(1, 0.35 + progress * 2);
+    const angle = start + progress * laps * Math.PI * 2;
     const center = up(player.location, 1.5);
     const head = { x: center.x + Math.cos(angle) * radius, y: center.y + 0.3 * Math.sin(angle * 2), z: center.z + Math.sin(angle) * radius };
     const tangent = { x: -Math.sin(angle), y: 0, z: Math.cos(angle) };
@@ -689,7 +724,8 @@ function castChain(player, state) {
     if (elapsed % 5 === 0) sound(dimension, "mob.phantom.swoop", head, 1.6, 0.8);
     if (elapsed % 3 === 0) particle(dimension, P.dust, { x: head.x, y: player.location.y + 0.1, z: head.z });
 
-    for (const target of getTargetsNear(player, head, 1.8)) {
+    if (empowered && elapsed % 3 === 0) particle(dimension, P.glow, head);
+    for (const target of getTargetsNear(player, head, empowered ? 2.4 : 1.8)) {
       if ((hitOnLap.get(target.id) ?? -1) >= lap) continue;
       hitOnLap.set(target.id, lap);
       const away = flatUnit({ x: target.location.x - player.location.x, z: target.location.z - player.location.z }) ?? tangent;
@@ -751,6 +787,13 @@ function launchChain(player, state) {
       if (target) {
         system.clearRun(flight);
         chainHitTarget(player, state, target);
+        if (isAwake(state)) {
+          // Awakened: the chain splits and hooks the enemies around the first one too
+          getTargetsNear(player, target.location, EMP().chainHookRadius)
+            .filter((e) => e.id !== target.id)
+            .slice(0, EMP().chainExtraHooks)
+            .forEach((extra, i) => system.runTimeout(() => chainHitTarget(player, state, extra, false), 2 + i * 2));
+        }
         return;
       }
       if (isBlocked(dimension, head)) {
@@ -786,7 +829,8 @@ function drawChain(player, getEnd, duration) {
 }
 
 // Spear hooks an enemy: drag it along the chain all the way to just in front of you
-function chainHitTarget(player, state, target) {
+// owner: this hook brings the spear back when it is done (extra hooks from the awakened split do not)
+function chainHitTarget(player, state, target, owner = true) {
   const cfg = CONFIG.chain;
   const dimension = player.dimension;
   nullify(target, true);
@@ -805,7 +849,7 @@ function chainHitTarget(player, state, target) {
   const run = system.runInterval(() => {
     if (!player.isValid || !target.isValid || ++elapsed > reel) {
       system.clearRun(run);
-      returnSpear(player, state);
+      if (owner) returnSpear(player, state);
       return;
     }
     // Destination: 1.5 blocks in front of you (follows you if you move); a small hop on the way
@@ -930,7 +974,17 @@ function castRush(player, state, direction) {
     return;
   }
 
-  // Reappear behind the target, facing its back
+  if (isAwake(state)) empoweredCue(player);
+  ambushStrike(player, state, target, isAwake(state) ? EMP().ambushChain - 1 : 0, new Set());
+}
+
+// Reappear behind `target`, cut an X into its back; awakened: jump on to the next enemy's back
+function ambushStrike(player, state, target, remaining, visited) {
+  const cfg = CONFIG.rush;
+  const dimension = player.dimension;
+  if (!player.isValid || !target.isValid) return;
+  visited.add(target.id);
+  const direction = aimDirection(player);
   const toTarget = flatUnit({ x: target.location.x - player.location.x, z: target.location.z - player.location.z }) ?? direction;
   let spot = add(target.location, toTarget, cfg.behind);
   if (!isFree(dimension, spot)) spot = add(target.location, { x: -toTarget.z, y: 0, z: toTarget.x }, cfg.behind); // side
@@ -968,6 +1022,12 @@ function castRush(player, state, direction) {
       sound(dimension, "random.anvil_land", target.location, 1.8, 0.6);
       shake(target, 0.35, 0.3);
       shake(player, 0.2, 0.15);
+      if (remaining > 0) {
+        const next = getTargetsNear(player, target.location, EMP().ambushHop)
+          .filter((e) => !visited.has(e.id))
+          .sort((a, b) => horizontalDistance(a.location, target.location) - horizontalDistance(b.location, target.location))[0];
+        if (next) system.runTimeout(() => ambushStrike(player, state, next, remaining - 1, visited), 2);
+      }
     }, ticks(at));
   });
 }
@@ -1214,22 +1274,29 @@ function jumpAttack(player, state, target) {
   system.runTimeout(() => {
     if (!player.isValid || !target.isValid) return;
     const at = target.location;
+    const empowered = isAwake(state);
+    const radius = cfg.radius * (empowered ? EMP().jumpRadius : 1);
+    if (empowered) {
+      empoweredCue(player);
+      for (let i = 1; i <= 2; i++) system.runTimeout(() => shockRing(dimension, at, radius + 1 + i * 2), i * 3);
+      system.runTimeout(() => crater(dimension, at, radius * 1.5), 3);
+    }
     knockback(target, { x: 0, z: 0 }, -1.5); // driven into the ground
     stun(target, 0.5);
     nullify(target);
     dealDamage(player, target, cfg.damage);
     crater(dimension, at, 2.4);
-    shockRing(dimension, at, cfg.radius + 1);
+    shockRing(dimension, at, radius + 1);
     particle(dimension, P.xSlash, up(at, 1), withRadius(2.2));
     particle(dimension, P.blood, up(at, 1));
     sound(dimension, "random.anvil_land", at, 0.8);
     sound(dimension, "item.trident.hit_ground", at, 0.7);
     shake(player, 0.3, 0.25);
     shake(target, 0.4, 0.3);
-    for (const other of getTargetsNear(player, at, cfg.radius)) {
+    for (const other of getTargetsNear(player, at, radius)) {
       if (other.id === target.id) continue;
-      dealDamage(player, other, cfg.splashDamage);
-      knockback(other, { x: 0, z: 0 }, 0.4);
+      dealDamage(player, other, empowered ? cfg.damage : cfg.splashDamage);
+      knockback(other, { x: 0, z: 0 }, empowered ? 0.8 : 0.4);
     }
   }, 3);
 }
@@ -1242,27 +1309,34 @@ function crouchAttack(player, state) {
   const dimension = player.dimension;
   const direction = aimDirection(player);
   const right = { x: -direction.z, y: 0, z: direction.x };
+  const empowered = isAwake(state);
+  const arc = empowered ? EMP().sweepArc : cfg.arc;
+  const radius = cfg.radius * (empowered ? EMP().sweepRadius : 1);
+  const launch = cfg.launch * (empowered ? EMP().sweepLaunch : 1);
+  if (empowered) empoweredCue(player);
   sound(dimension, "mob.phantom.swoop", player.location, 1.7, 0.8);
   // Low sweep at the ankles, then the upward flick launches everything it caught
   system.runTimeout(() => {
     if (!canAct(player)) return;
     const origin = player.location;
-    for (let i = 0; i < 5; i++) {
-      const angle = ((i / 4) * 2 - 1) * ((cfg.arc / 2) * Math.PI) / 180;
+    const count = empowered ? 10 : 5;
+    for (let i = 0; i < count; i++) {
+      const angle = ((i / (count - 1)) * 2 - 1) * ((arc / 2) * Math.PI) / 180;
       const d = add({ x: direction.x * Math.cos(angle), y: 0, z: direction.z * Math.cos(angle) }, right, Math.sin(angle));
       system.runTimeout(() => {
-        particle(dimension, P.slash, up(add(origin, d, 2.2), 0.4));
-        particle(dimension, P.dust, up(add(origin, d, 2.2), 0.1));
-      }, i);
+        particle(dimension, P.slash, up(add(origin, d, radius * 0.63), 0.4));
+        particle(dimension, P.dust, up(add(origin, d, radius * 0.63), 0.1));
+      }, Math.floor(i / 2));
     }
-    for (const target of getTargetsInArc(player, origin, direction, cfg.radius, cfg.arc)) {
+    if (empowered) shockRing(dimension, origin, radius + 1);
+    for (const target of getTargetsInArc(player, origin, direction, radius, arc)) {
       nullify(target);
       dealDamage(player, target, cfg.damage);
       stun(target, cfg.stun);
       particle(dimension, P.spark, up(target.location, 0.4));
       system.runTimeout(() => {
         if (!target.isValid) return;
-        knockback(target, { x: 0, z: 0 }, cfg.launch);
+        knockback(target, { x: 0, z: 0 }, launch);
         particle(dimension, P.slash, up(target.location, 1.2));
         particle(dimension, P.flash, up(target.location, 1));
         sound(dimension, "item.trident.hit", target.location, 1.3);

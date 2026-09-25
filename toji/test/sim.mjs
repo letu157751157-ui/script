@@ -155,8 +155,33 @@ clear();
 const victim = new Entity("minecraft:zombie", { x: 0.5, y: 64, z: 3.5 }, 80);
 useItem(player);
 tick(CONFIG.thrust.windup * 20 + 1);
-check("awakened thrust deals x1.3", near(damageTo(victim), CONFIG.thrust.damage * CONFIG.awaken.damageMultiplier), `${damageTo(victim)}`);
+check("awakened thrust deals x1.3 (and the upgrade bonus)", near(damageTo(victim), CONFIG.thrust.damage * CONFIG.awaken.empowered.thrustDamage * CONFIG.awaken.damageMultiplier), `${damageTo(victim)}`);
 away(victim);
+
+// --- Awakened: every other skill is upgraded
+{
+  const E = CONFIG.awaken.empowered;
+  clear();
+  const a = new Entity("minecraft:zombie", { x: 0.5, y: 64, z: 3.5 }, 200);
+  const b = new Entity("minecraft:zombie", { x: 0.5, y: 64, z: 8.5 }, 200); // beyond normal pierce reach
+  tick(CONFIG.thrust.cooldown * 20 * CONFIG.awaken.cooldownMultiplier);
+  clear();
+  useItem(player);
+  tick(CONFIG.thrust.windup * 20 + 8);
+  check("upgraded pierce: longer reach", damageTo(b) > 0, `${damageTo(b)}`);
+  check("upgraded pierce: harder", near(damageTo(a), CONFIG.thrust.damage * E.thrustDamage * CONFIG.awaken.damageMultiplier), `${damageTo(a)}`);
+  check("upgraded pierce: triple stab", log.particles.filter((p) => p.id === "toji:thrust").length >= 3);
+  [a, b].forEach(away);
+  // upgraded crouch sweep hits behind you too
+  clear();
+  const behind = new Entity("minecraft:zombie", { x: 0.5, y: 64, z: -2 }, 200);
+  player.isSneaking = true;
+  fire("entityHitEntity", { damagingEntity: player, hitEntity: behind });
+  tick(6);
+  player.isSneaking = false;
+  check("upgraded sweep: full circle", damageTo(behind) > 0 && knockbacksOf(behind).some((k) => near(k.vertical, CONFIG.crouchAttack.launch * E.sweepLaunch)));
+  away(behind);
+}
 
 // --- Hold 20 s + jump: Heaven's Execution
 tick(5); // wait for the thrust to finish
@@ -211,7 +236,7 @@ fire("entityHitEntity", { damagingEntity: player, hitEntity: flyer });
 tick(6);
 player.isSneaking = false;
 check("low sweep animation", anims().includes("animation.toji.low_sweep"));
-check("sweep launches the enemy", knockbacksOf(flyer).some((k) => k.vertical === CONFIG.crouchAttack.launch));
+check("sweep launches the enemy", knockbacksOf(flyer).some((k) => k.vertical >= CONFIG.crouchAttack.launch));
 away(flyer);
 
 // --- Letting go of the spear ends the awakening

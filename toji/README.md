@@ -2,7 +2,7 @@
 
 Addon thêm **Thiên Nghịch Mâu** (`toji:inverted_spear`) của Toji Fushiguro (Jujutsu Kaisen), bộ chiêu theo kiểu JJS.
 Viết bằng Script API `@minecraft/server` 2.0.0, **không cần bật Beta APIs / experiments**.
-Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, console). Phiên bản hiện tại: **v1.5.0**.
+Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, console). Phiên bản hiện tại: **v1.6.0**.
 
 ![Mô hình 3D](preview.png)
 
@@ -31,6 +31,21 @@ Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, conso
 | **Khuỵu + đánh** (đang khuỵu đánh trúng mob) | **Quét Chân** | Hạ thấp người quét mâu hình cung ngang mắt cá, rồi hất ngược lên tung kẻ địch lên trời. Hồi 3s |
 | **Đánh thường 4 lần liên tiếp** | **Combo M1 + Đòn Kết Liễu** | Đòn thứ 4 là cú xoay chém hình cung trước mặt, hất văng kẻ địch (như M1 trong JJS) |
 | **Mọi đòn đánh** | **Nội tại: Vô Hiệu Hoá** | Đòn đánh thường cũng xoá hiệu ứng có lợi của mục tiêu |
+
+### Thức Tỉnh nâng cấp mọi chiêu khác
+
+Trong 15s Thức Tỉnh (cầm mâu 20s), mọi chiêu khác đổi sang bản mạnh hơn (có quầng sáng tím và vòng rune dưới chân khi dùng):
+
+| Chiêu | Bản nâng cấp |
+|---|---|
+| Đâm Xuyên Vô Hạn | Tầm xa hơn 70%, sát thương x1.6, **đâm 3 nhát liên tiếp**, sóng xung kích chạy dọc đường đâm |
+| Xích Vạn Lý | Quay **3 vòng** rộng hơn 35%; mâu ném trúng địch thì **xích tách ra móc thêm 2 kẻ địch** gần đó và lôi cả 3 về |
+| Ám Sát Sau Lưng | Chém xong **nhảy sang sau lưng kẻ địch tiếp theo**, liên hoàn tối đa 3 con |
+| Bổ Trời (nhảy + đánh) | Vùng sóng xung kích **rộng gấp đôi**, mọi kẻ địch trong vùng nhận đủ sát thương, 3 lớp sóng |
+| Quét Chân (khuỵu + đánh) | Quét **trọn vòng 360°**, rộng hơn, hất cao hơn 50% |
+| Combo | Đòn kết liễu ra ở **đòn thứ 3** thay vì thứ 4, xoay trọn vòng, sát thương x1.5 |
+
+Cộng thêm các buff sẵn có của Thức Tỉnh: sát thương chiêu x1.3, hồi chiêu giảm một nửa.
 
 - Thanh phía trên hotbar hiện tiến độ cầm `▮▮▮▮▯▯ 12/20s`, chiêu mà chuột phải sẽ dùng (`Bấm: Đâm / Xích / Trảm`), số combo và thời gian hồi chiêu.
 - **Buông mâu (đổi sang ô khác) sẽ reset bộ đếm 20s và kết thúc Thức Tỉnh** (mất luôn buff). Hết Thức Tỉnh thì phải cầm lại 20s.
@@ -96,7 +111,7 @@ và **Đã ném** (trên tay chỉ còn sợi xích). Script tự đổi dạng 
 
 Không cần mở game, [`test/sim.mjs`](test/sim.mjs) chạy chính `main.js` với một bản giả lập của `@minecraft/server`
 và thử lần lượt: chuột phải, khuỵu + chuột phải (quay xích, ném trúng địch, móc vào tường), chạy + chém (hiện sau lưng / lướt khi không có mục tiêu), combo 4 đòn, cầm 20s, cầm 20s + nhảy,
-đổi ô khi đang Thức Tỉnh / đang lao xuống, và bị choáng thì không ra chiêu được (68 bước kiểm tra, có cả đánh người chơi khác):
+đổi ô khi đang Thức Tỉnh / đang lao xuống, và bị choáng thì không ra chiêu được (72 bước kiểm tra, có cả đánh người chơi khác và các bản nâng cấp khi Thức Tỉnh):
 
 ```
 node test/sim.mjs

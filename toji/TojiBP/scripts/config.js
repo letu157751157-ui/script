@@ -83,6 +83,24 @@ export const CONFIG = {
     resistanceAmplifier: 0,
     damageMultiplier: 1.3, // skill damage
     cooldownMultiplier: 0.5, // skill cooldowns while awakened
+    // While awakened every other skill is upgraded:
+    empowered: {
+      thrustRange: 1.7, // Pierce reaches 70% further...
+      thrustDamage: 1.6, // ...hits harder, and stabs 3 times (triple streak)
+      chainLaps: 3, // Chain whirls 3 laps...
+      chainRadius: 1.35, // ...in a wider circle
+      chainExtraHooks: 2, // the hurled spear also hooks up to 2 more enemies near the first one
+      chainHookRadius: 6,
+      ambushChain: 3, // Ambush jumps from back to back through up to 3 enemies
+      ambushHop: 10, // max distance to the next enemy
+      jumpRadius: 2, // Sky Splitter shockwave twice as wide, full damage to everyone in it
+      sweepArc: 360, // Low Sweep turns into a full circle...
+      sweepRadius: 1.3,
+      sweepLaunch: 1.5, // ...and launches 50% higher
+      comboHits: 3, // the finisher comes on the 3rd hit instead of the 4th...
+      finisherArc: 360, // ...and is a full spin
+      finisherDamage: 1.5,
+    },
   },
 
   // Hold 20 s + jump (while awakened) — Sorcerer Killer: Heaven's Execution.
