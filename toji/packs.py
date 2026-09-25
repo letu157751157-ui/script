@@ -8,7 +8,7 @@ Item variants (the script swaps between them, keeping durability/enchantments/na
 import json
 import os
 
-VERSION = [1, 4, 0]
+VERSION = [1, 5, 0]
 MIN_ENGINE = [1, 21, 90]
 UUID = {
     "bp": "40e20d6e-1d50-49a8-bcfd-2df5de5e7686",
@@ -28,7 +28,7 @@ HOLD = {
 VARIANTS = {
     "inverted_spear": {"name": "item.toji.inverted_spear.name", "geometry": "geometry.toji.isoh", "glow": False,
                        "visible": True},
-    "inverted_spear_awakened": {"name": "item.toji.inverted_spear_awakened.name", "geometry": "geometry.toji.isoh",
+    "inverted_spear_awakened": {"name": "item.toji.inverted_spear_awakened.name", "geometry": "geometry.toji.isoh_awakened",
                                 "glow": True, "visible": False},
     "inverted_spear_thrown": {"name": "item.toji.inverted_spear_thrown.name", "geometry": "geometry.toji.isoh_thrown",
                               "glow": False, "visible": False},
@@ -120,6 +120,22 @@ LANG = {
 }
 
 
+def worm_animation_bones(segments=30):
+    bones = {"worm": {"scale": "math.min(1, q.life_time * 1.4)"}}
+    for i in range(1, segments + 1):
+        phase = i * 22
+        bones[f"worm_seg{i}"] = {
+            "position": [f"math.sin(q.life_time * 220 - {phase}) * 0.6", f"math.cos(q.life_time * 220 - {phase}) * 0.45", 0],
+            "scale": f"1 + math.sin(q.life_time * 300 - {phase}) * 0.08",
+        }
+    bones["worm_head"] = {
+        "rotation": ["math.sin(q.life_time * 150) * 10 - 10", "math.sin(q.life_time * 90) * 18", 0],
+        "position": [0, "math.sin(q.life_time * 220) * 0.5", 0],
+    }
+    bones["worm_jaw"] = {"rotation": ["math.max(0, math.sin(q.life_time * 260)) * 35", 0, 0]}
+    return bones
+
+
 def write_json(root, path, data):
     full = os.path.join(root, path)
     os.makedirs(os.path.dirname(full), exist_ok=True)
@@ -180,7 +196,9 @@ def attachable(identifier, variant):
         description["textures"]["glow"] = "textures/entity/isoh_glow"
         description["geometry"]["glow"] = "geometry.toji.isoh_glow"
         description["animations"]["pulse"] = "animation.toji.isoh.pulse"
-        description["scripts"]["animate"].append("pulse")
+        description["animations"]["worm"] = "animation.toji.isoh.worm"
+        description["animations"]["worm_hide"] = "animation.toji.isoh.worm_hide_first_person"
+        description["scripts"]["animate"] += ["pulse", "worm", {"worm_hide": "c.is_first_person"}]
         description["render_controllers"].append("controller.render.toji.isoh_glow")
     return {"format_version": "1.10.0", "minecraft:attachable": {"description": description}}
 
@@ -237,6 +255,9 @@ def write_packs(root):
         "animation.toji.isoh.hold_third_person": {"loop": True, "bones": {"isoh": HOLD["third_person"]}},
         # Awakened: the spear breathes slightly
         "animation.toji.isoh.pulse": {"loop": True, "bones": {"spear": {"scale": "1 + math.sin(q.life_time * 540) * 0.015"}}},
+        # Inventory Curse worm: grows out of the body when the spear awakens, slithers, the mouth gnashes
+        "animation.toji.isoh.worm": {"loop": True, "bones": worm_animation_bones()},
+        "animation.toji.isoh.worm_hide_first_person": {"loop": True, "bones": {"worm": {"scale": 0}}},
     }})
     write_json(root, "TojiRP/render_controllers/isoh.render_controllers.json", {
         "format_version": "1.8.0",

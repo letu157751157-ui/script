@@ -14,13 +14,15 @@
         "glow": "textures/entity/isoh_glow"
       },
       "geometry": {
-        "default": "geometry.toji.isoh",
+        "default": "geometry.toji.isoh_awakened",
         "glow": "geometry.toji.isoh_glow"
       },
       "animations": {
         "hold_first_person": "animation.toji.isoh.hold_first_person",
         "hold_third_person": "animation.toji.isoh.hold_third_person",
-        "pulse": "animation.toji.isoh.pulse"
+        "pulse": "animation.toji.isoh.pulse",
+        "worm": "animation.toji.isoh.worm",
+        "worm_hide": "animation.toji.isoh.worm_hide_first_person"
       },
       "scripts": {
         "animate": [
@@ -30,7 +32,11 @@
           {
             "hold_third_person": "!c.is_first_person"
           },
-          "pulse"
+          "pulse",
+          "worm",
+          {
+            "worm_hide": "c.is_first_person"
+          }
         ]
       },
       "render_controllers": [

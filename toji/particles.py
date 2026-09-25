@@ -295,37 +295,100 @@ def x_slash_frame(frame):
     return grid(32, 32, pixel)
 
 
-def worm_body():
-    """16x16 segment of the Inventory Curse (the worm Toji stores his weapons in): ringed, fleshy."""
+HD = {"W": (255, 255, 255), "C": (225, 240, 255), "L": (185, 210, 250), "B": (135, 160, 235), "V": (150, 105, 235),
+      "P": (105, 60, 200), "D": (55, 30, 110)}
+
+
+def hd_char(heat):
+    for limit, char in ((0.86, "W"), (0.72, "C"), (0.58, "L"), (0.44, "B"), (0.3, "V"), (0.17, "P"), (0.06, "D")):
+        if heat > limit:
+            return char
+    return "."
+
+
+def slash_hd_frame(frame):
+    """64x64 crescent slash with a white-hot edge fading through blue to violet; tapers at both ends."""
+    fade = (1.0, 0.85, 0.55)[frame]
+    grow = (0.0, 2.0, 3.5)[frame]
+    holes = (0.0, 0.08, 0.4)[frame]
+    c1, r1 = (32.0, 36.0), 29.0 + grow
+    c2, r2 = (38.0, 27.0), 26.0 + grow
+
     def pixel(x, y):
-        d = math.hypot(x + 0.5 - 8, y + 0.5 - 8)
-        if d > 7:
+        px, py = x + 0.5, y + 0.5
+        d1, d2 = math.hypot(px - c1[0], py - c1[1]), math.hypot(px - c2[0], py - c2[1])
+        if d1 > r1 or d2 < r2:
             return "."
-        if d > 6.2:
-            return "K"
-        if (x + 1) % 5 == 0:
-            return "D"
-        return "L" if y < 6 else "M" if y < 11 else "D"
+        outer, inner = r1 - d1, d2 - r2
+        heat = 1 - outer / (outer + inner + 1e-6)
+        # taper: thin near the tips (top right / bottom right)
+        angle = math.atan2(py - c1[1], px - c1[0])
+        tip = min(1, abs(math.sin((angle - 0.25) / 2)) * 2.2)
+        heat = heat * fade * (0.45 + 0.55 * tip)
+        if hash01(x, y, 200 + frame) < holes * (1 - heat):
+            return "."
+        return hd_char(heat)
 
-    return grid(16, 16, pixel)
+    return grid(64, 64, pixel)
 
 
-def worm_head():
-    """16x16 worm head: round, a wide red mouth with teeth, two small eyes."""
+def x_slash_hd_frame(frame):
+    """64x64 X cut: two long blades of light crossing, white core, blue then violet fringe."""
+    fade = (1.0, 0.85, 0.5)[frame]
+    holes = (0.0, 0.1, 0.45)[frame]
+
+    def cut(px, py, sign):
+        t = (px + sign * py) / math.sqrt(2)
+        d = abs(px - sign * py) / math.sqrt(2)
+        width = 4.2 * max(0.0, 1 - (t / 31) ** 2)
+        return max(0.0, 1 - d / width) if width > 0 else 0.0
+
     def pixel(x, y):
-        px, py = x + 0.5 - 8, y + 0.5 - 8
+        px, py = x + 0.5 - 32, y + 0.5 - 32
+        heat = max(cut(px, py, 1), cut(px, py, -1)) * fade
+        if heat <= 0.04 or hash01(x, y, 220 + frame) < holes * (1 - heat):
+            return "."
+        return hd_char(heat)
+
+    return grid(64, 64, pixel)
+
+
+def glow_sprite():
+    """32x32 soft round glow, dithered edge (additive halo behind flashes and hits)."""
+    def pixel(x, y):
+        d = math.hypot(x + 0.5 - 16, y + 0.5 - 16) / 16
+        heat = max(0.0, 1 - d) ** 1.6
+        if heat <= 0 or hash01(x, y, 240) > heat * 2.2:
+            return "."
+        return hd_char(heat * 0.95)
+
+    return grid(32, 32, pixel)
+
+
+def impact_frame(frame):
+    """64x64 anime impact frame: speed lines bursting out from the center."""
+    inner = (8, 13, 19)[frame]
+    fade = (1.0, 0.8, 0.5)[frame]
+
+    def pixel(x, y):
+        px, py = x + 0.5 - 32, y + 0.5 - 32
         d = math.hypot(px, py)
-        if d > 7.5:
+        if d < inner or d > 31:
             return "."
-        if d > 6.7:
-            return "K"
-        if py > 0.5 and abs(px) < 5 and py < 5:
-            return "W" if py < 1.8 and x % 2 == 0 else "R"
-        if py < -2 and py > -4 and abs(abs(px) - 3) < 1:
-            return "K"
-        return "L" if py < -3 else "M"
+        a = math.atan2(py, px)
+        line = int((a + math.pi) / (2 * math.pi) * 40)
+        if hash01(line, 0, 250) < 0.45:
+            return "."
+        center = (line + 0.5) / 40 * 2 * math.pi - math.pi
+        width = 0.035 * (1 - (d - inner) / (32 - inner)) + 0.004
+        if abs(math.remainder(a - center, 2 * math.pi)) > width:
+            return "."
+        length = 20 + hash01(line, 1, 251) * 12
+        if d > length:
+            return "."
+        return hd_char((1 - (d - inner) / (length - inner)) * fade + 0.1)
 
-    return grid(16, 16, pixel)
+    return grid(64, 64, pixel)
 
 
 # name: (x, y, frames, palette or None for raw RGBA frames)
@@ -347,8 +410,10 @@ SPRITES = {
     "x_slash": (128, 0, [x_slash_frame(i) for i in range(3)], STEEL),
     "infinity": (128, 32, [infinity_frame(i) for i in range(3)], INFINITY),
     "shard_blue": (224, 32, [shard_frame(i) for i in range(3)], BLUE_SHARD),
-    "worm_body": (128, 64, [worm_body()], WORM),
-    "worm_head": (144, 64, [worm_head()], WORM),
+    "slash_hd": (0, 128, [slash_hd_frame(i) for i in range(3)], HD),
+    "x_slash_hd": (0, 192, [x_slash_hd_frame(i) for i in range(3)], HD),
+    "glow": (192, 128, [glow_sprite()], HD),
+    "impact": (192, 192, [impact_frame(0)], HD),
 }
 
 
@@ -452,7 +517,7 @@ PARTICLES = {
         "minecraft:particle_lifetime_expression": {"max_lifetime": 0.24},
         "minecraft:particle_initial_spin": {"rotation": "math.random(-180, 180)"},
         "minecraft:particle_appearance_billboard": {
-            "size": [f"1.3 + {AGE} * 0.5", f"1.3 + {AGE} * 0.5"], "facing_camera_mode": "rotate_xyz", "uv": uv("slash"),
+            "size": [f"1.9 + {AGE} * 0.7", f"1.9 + {AGE} * 0.7"], "facing_camera_mode": "rotate_xyz", "uv": uv("slash_hd"),
         },
         "minecraft:particle_appearance_tinting": FADE,
     }),
@@ -508,7 +573,7 @@ PARTICLES = {
     }),
     # Steel sparks on every hit
     "spark": particle("toji:spark", "particles_add", {
-        **burst(12),
+        **burst(20),
         "minecraft:emitter_shape_sphere": {"radius": 0.2, "direction": "outwards"},
         "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.15, 0.35)"},
         "minecraft:particle_initial_speed": "math.random(6, 10)",
@@ -615,7 +680,7 @@ PARTICLES = {
         "minecraft:emitter_shape_point": {},
         "minecraft:particle_lifetime_expression": {"max_lifetime": 0.22},
         "minecraft:particle_appearance_billboard": {
-            "size": [f"0.8 + {AGE} * 1.0", f"0.8 + {AGE} * 1.0"], "facing_camera_mode": "rotate_xyz", "uv": uv("flash"),
+            "size": [f"1.1 + {AGE} * 1.3", f"1.1 + {AGE} * 1.3"], "facing_camera_mode": "rotate_xyz", "uv": uv("flash"),
         },
         "minecraft:particle_appearance_tinting": FADE,
     }),
@@ -676,26 +741,30 @@ PARTICLES = {
         "minecraft:particle_initial_spin": {"rotation": "math.random(-15, 15)"},
         "minecraft:particle_appearance_billboard": {
             "size": [f"v.radius * (0.8 + {AGE} * 0.3)", f"v.radius * (0.8 + {AGE} * 0.3)"],
-            "facing_camera_mode": "rotate_xyz", "uv": uv("x_slash"),
+            "facing_camera_mode": "rotate_xyz", "uv": uv("x_slash_hd"),
         },
         "minecraft:particle_appearance_tinting": FADE,
     }),
-    # Inventory Curse worm: segments/head spawned every tick along its path (short-lived so it moves smoothly)
-    "worm_body": particle("toji:worm_body", "particles_alpha", {
+    # Soft glow halo behind every flash / big hit
+    "glow": particle("toji:glow", "particles_add", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
-        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.12},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.35},
         "minecraft:particle_appearance_billboard": {
-            "size": ["v.radius", "v.radius"], "facing_camera_mode": "rotate_xyz", "uv": uv("worm_body"),
+            "size": [f"1.6 + {AGE} * 1.4", f"1.6 + {AGE} * 1.4"], "facing_camera_mode": "rotate_xyz", "uv": uv("glow"),
         },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#FFFFFFFF", "0.3": "#CCC8B4FF", "1.0": "#008050E0"}),
     }),
-    "worm_head": particle("toji:worm_head", "particles_alpha", {
+    # Anime impact frame: speed lines bursting out, spinning a little
+    "impact": particle("toji:impact", "particles_add", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
-        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.12},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.3},
+        "minecraft:particle_initial_spin": {"rotation": "math.random(0, 360)", "rotation_rate": 40},
         "minecraft:particle_appearance_billboard": {
-            "size": [0.34, 0.34], "facing_camera_mode": "rotate_xyz", "uv": uv("worm_head"),
+            "size": [f"3 + {AGE} * 3", f"3 + {AGE} * 3"], "facing_camera_mode": "rotate_xyz", "uv": uv("impact"),
         },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#FFFFFFFF", "0.6": "#DDFFFFFF", "1.0": "#00FFFFFF"}),
     }),
     # Vanishing: dark smoke burst where Toji disappears (no cursed energy: he just vanishes)
     "vanish": particle("toji:vanish", "particles_alpha", {

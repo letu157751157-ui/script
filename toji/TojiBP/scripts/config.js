@@ -2,7 +2,8 @@
 // Units: health (20 = 10 hearts), blocks, seconds.
 
 export const CONFIG = {
-  // Whether skills can hit other players (false = mobs only)
+  // Whether skills hit other players (false = mobs only). When on, skills hurt players even if the world's
+  // PvP setting is off (their health is lowered directly); players in Creative/Spectator are never hurt.
   pvp: true,
   // Language of the spear's tooltip (item lore): "vi" or "en".
   // Chat, titles and the bar above the hotbar follow each player's game language automatically.
@@ -96,8 +97,8 @@ export const CONFIG = {
     liftTime: 1.0, // seconds to drag them up
     pierceRounds: 3, // Toji goes around the ring this many times
     pierceInterval: 3, // ticks between two pierces
-    damagePerPierce: 3, // a mob's pierces land as one hit at the end (mobs ignore hits for 0.5 s after each one)
-    slamDamage: 8,
+    damagePerPierce: 8, // a mob's pierces land as one hit at the end (mobs ignore hits for 0.5 s after each one)
+    slamDamage: 20,
     stun: 1.5,
   },
 

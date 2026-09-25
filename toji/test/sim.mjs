@@ -257,5 +257,25 @@ useItem(player);
 tick(8);
 check("stunned player cannot cast", !anims().includes("animation.toji.thrust"));
 
+// --- Other players: skills hurt them even with the world's PvP off, never in Creative
+other.isSneaking = false;
+tick(40);
+world.pvp = false;
+player.location = { x: 0.5, y: 64, z: 0.5 };
+player.view = { x: 0, y: 0, z: 1 };
+other.location = { x: 0.5, y: 64, z: 3.5 };
+const before = other.health.currentValue;
+tick(CONFIG.thrust.cooldown * 20);
+useItem(player);
+tick(CONFIG.thrust.windup * 20 + 2);
+check("skills hurt other players with PvP off", other.health.currentValue < before, `${before} -> ${other.health.currentValue}`);
+other.gameMode = "Creative";
+other.health.currentValue = 20;
+tick(CONFIG.thrust.cooldown * 20);
+useItem(player);
+tick(CONFIG.thrust.windup * 20 + 14);
+check("players in Creative are not hurt", other.health.currentValue === 20);
+world.pvp = true;
+
 console.log(failures ? `\n${failures} check(s) FAILED` : "\nAll checks passed");
 process.exit(failures ? 1 : 0);

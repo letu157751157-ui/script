@@ -27,9 +27,15 @@ MATERIALS = {
     "wrap": [(92, 60, 110), (64, 40, 80), (40, 24, 52)],
     "brass": [(226, 190, 112), (184, 144, 70), (130, 96, 44)],
     "chain": [(160, 164, 172), (116, 120, 130), (76, 78, 88)],
+    # Inventory Curse worm: pale, fleshy, ringed
+    "worm": [(214, 196, 196), (176, 150, 156), (124, 100, 110)],
+    "worm_ring": [(150, 118, 130), (112, 84, 98), (78, 56, 70)],
+    "mouth": [(190, 40, 60), (140, 20, 40), (80, 8, 24)],
+    "teeth": [(250, 244, 230), (226, 216, 200), (190, 178, 160)],
+    "eye": [(30, 20, 26), (20, 12, 18), (12, 6, 10)],
 }
 MAT_ROW = {name: i for i, name in enumerate(MATERIALS)}
-TEX_W, TEX_H = 64, 128
+TEX_W, TEX_H = 64, 192
 
 
 def cube(origin, size, mat, inflate=0.0):
@@ -132,6 +138,9 @@ def paint_patch(name, base, x, y, salt):
         k *= 1.08 - 0.16 * (y / 15)  # polished sheen: bright near the top of the patch
         if (x + y) % 7 == 0:
             k *= 1.08
+    elif name in ("worm", "worm_ring"):
+        # soft lumpy flesh
+        k *= 1.0 + 0.12 * math.sin(x * 0.9 + y * 0.4)
     elif name == "wrap":
         # Diamond cloth wrap
         if (x + y) % 4 == 0 or (x - y) % 4 == 0:
@@ -211,6 +220,82 @@ def geometry(identifier, bone, cubes, tex_w, tex_h, glow=False):
             ],
         }],
     }
+
+
+# ---------------------------------------------------------------------------
+# Inventory Curse worm (awakened form): coils around Toji's body
+# ---------------------------------------------------------------------------
+# Bones are bound to the player's 'body' bone. An attachable puts model point (0, 24, 0) at the pivot of the
+# bone it binds to and the body pivots at (0, 24, 0), so coordinates here are player model coordinates:
+# torso x -4..4, y 12..24, z -2..2, front = -Z, the player's right = -X.
+
+WORM_SEGMENTS = 30
+
+
+def worm_path(t):
+    """Point on the coil for t in [0, 1] (0 = head at the right shoulder, 1 = tail at the left hip)."""
+    angle = math.radians(200) + t * 2.0 * 2 * math.pi
+    return (math.cos(angle) * 6.0, 25.5 - t * 15, math.sin(angle) * 4.4)
+
+
+def worm_bones():
+    """(name, parent, pivot, cubes) for the worm: a root bound to the body, one bone per segment, the head."""
+    bones = [("worm", None, (0, 24, 0), [])]
+    for i in range(1, WORM_SEGMENTS + 1):
+        t = i / WORM_SEGMENTS
+        x, y, z = worm_path(t)
+        size = 4.0 - 2.0 * t
+        cubes = [cube((x - size / 2, y - size / 2, z - size / 2), (size, size, size), "worm")]
+        # a darker ring around the middle of each segment
+        cubes.append(cube((x - size / 2, y - 0.4, z - size / 2), (size, 0.8, size), "worm_ring", 0.15))
+        bones.append((f"worm_seg{i}", "worm", (x, y, z), cubes))
+    # Head: big round skull facing forward (-Z), gaping red mouth with teeth, two tiny eyes on top
+    x, y, z = worm_path(0)
+    head = [
+        cube((x - 3, y - 2.5, z - 3), (6, 5.5, 6), "worm"),
+        cube((x - 2.5, y + 3, z - 2.5), (5, 1, 5), "worm_ring"),
+        cube((x - 2, y - 2, z - 3.3), (4, 2.6, 0.5), "mouth"),
+        cube((x - 1.6, y - 1.6, z - 3.35), (3.2, 1.8, 0.4), "mouth", 0.05),
+        cube((x - 1.2, y + 1.6, z - 3.2), (0.8, 0.8, 0.4), "eye"),
+        cube((x + 0.4, y + 1.6, z - 3.2), (0.8, 0.8, 0.4), "eye"),
+    ]
+    for k in range(4):
+        head.append(cube((x - 1.8 + k * 1.05, y + 0.3, z - 3.45), (0.5, 0.5, 0.3), "teeth"))
+    jaw = [
+        cube((x - 2.6, y - 4, z - 2.8), (5.2, 1.6, 5), "worm"),
+        cube((x - 1.8, y - 2.6, z - 3.1), (3.6, 0.6, 0.3), "mouth"),
+    ]
+    for k in range(4):
+        jaw.append(cube((x - 1.8 + k * 1.05, y - 2.5, z - 3.25), (0.5, 0.5, 0.3), "teeth"))
+    bones.append(("worm_head", "worm", (x, y, z + 2), head))
+    bones.append(("worm_jaw", "worm_head", (x, y - 2.4, z + 2), jaw))
+    return bones
+
+
+def cube_json(cubes, glow=False):
+    out = []
+    for c in cubes:
+        entry = {"origin": c["origin"], "size": c["size"], "uv": face_uv(c, glow)}
+        if c["inflate"]:
+            entry["inflate"] = c["inflate"]
+        out.append(entry)
+    return out
+
+
+def awakened_geometry(cubes):
+    """The spear in the hand + the worm bound to the body."""
+    geo = geometry("geometry.toji.isoh_awakened", "isoh", cubes, TEX_W, TEX_H)
+    desc = geo["minecraft:geometry"][0]["description"]
+    desc["visible_bounds_width"], desc["visible_bounds_height"] = 6, 5
+    bones = geo["minecraft:geometry"][0]["bones"]
+    for name, parent, pivot, worm_cubes in worm_bones():
+        bone = {"name": name, "pivot": [round(v, 3) for v in pivot], "cubes": cube_json(worm_cubes)}
+        if parent:
+            bone["parent"] = parent
+        else:
+            bone["binding"] = "'body'"
+        bones.append(bone)
+    return geo
 
 
 # ---------------------------------------------------------------------------
@@ -311,6 +396,7 @@ def write_model(root, write_png):
     write_tga(os.path.join(rp, "textures/entity/isoh_glow.tga"), build_glow_texture())
     write_json(os.path.join(rp, "models/entity/isoh.geo.json"),
                geometry("geometry.toji.isoh", "isoh", cubes, TEX_W, TEX_H))
+    write_json(os.path.join(rp, "models/entity/isoh_awakened.geo.json"), awakened_geometry(cubes))
     write_json(os.path.join(rp, "models/entity/isoh_thrown.geo.json"),
                geometry("geometry.toji.isoh_thrown", "isoh", thrown_cubes(), TEX_W, TEX_H))
     write_json(os.path.join(rp, "models/entity/isoh_glow.geo.json"),

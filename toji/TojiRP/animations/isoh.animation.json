@@ -44,6 +44,281 @@
           "scale": "1 + math.sin(q.life_time * 540) * 0.015"
         }
       }
+    },
+    "animation.toji.isoh.worm": {
+      "loop": true,
+      "bones": {
+        "worm": {
+          "scale": "math.min(1, q.life_time * 1.4)"
+        },
+        "worm_seg1": {
+          "position": [
+            "math.sin(q.life_time * 220 - 22) * 0.6",
+            "math.cos(q.life_time * 220 - 22) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 22) * 0.08"
+        },
+        "worm_seg2": {
+          "position": [
+            "math.sin(q.life_time * 220 - 44) * 0.6",
+            "math.cos(q.life_time * 220 - 44) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 44) * 0.08"
+        },
+        "worm_seg3": {
+          "position": [
+            "math.sin(q.life_time * 220 - 66) * 0.6",
+            "math.cos(q.life_time * 220 - 66) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 66) * 0.08"
+        },
+        "worm_seg4": {
+          "position": [
+            "math.sin(q.life_time * 220 - 88) * 0.6",
+            "math.cos(q.life_time * 220 - 88) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 88) * 0.08"
+        },
+        "worm_seg5": {
+          "position": [
+            "math.sin(q.life_time * 220 - 110) * 0.6",
+            "math.cos(q.life_time * 220 - 110) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 110) * 0.08"
+        },
+        "worm_seg6": {
+          "position": [
+            "math.sin(q.life_time * 220 - 132) * 0.6",
+            "math.cos(q.life_time * 220 - 132) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 132) * 0.08"
+        },
+        "worm_seg7": {
+          "position": [
+            "math.sin(q.life_time * 220 - 154) * 0.6",
+            "math.cos(q.life_time * 220 - 154) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 154) * 0.08"
+        },
+        "worm_seg8": {
+          "position": [
+            "math.sin(q.life_time * 220 - 176) * 0.6",
+            "math.cos(q.life_time * 220 - 176) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 176) * 0.08"
+        },
+        "worm_seg9": {
+          "position": [
+            "math.sin(q.life_time * 220 - 198) * 0.6",
+            "math.cos(q.life_time * 220 - 198) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 198) * 0.08"
+        },
+        "worm_seg10": {
+          "position": [
+            "math.sin(q.life_time * 220 - 220) * 0.6",
+            "math.cos(q.life_time * 220 - 220) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 220) * 0.08"
+        },
+        "worm_seg11": {
+          "position": [
+            "math.sin(q.life_time * 220 - 242) * 0.6",
+            "math.cos(q.life_time * 220 - 242) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 242) * 0.08"
+        },
+        "worm_seg12": {
+          "position": [
+            "math.sin(q.life_time * 220 - 264) * 0.6",
+            "math.cos(q.life_time * 220 - 264) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 264) * 0.08"
+        },
+        "worm_seg13": {
+          "position": [
+            "math.sin(q.life_time * 220 - 286) * 0.6",
+            "math.cos(q.life_time * 220 - 286) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 286) * 0.08"
+        },
+        "worm_seg14": {
+          "position": [
+            "math.sin(q.life_time * 220 - 308) * 0.6",
+            "math.cos(q.life_time * 220 - 308) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 308) * 0.08"
+        },
+        "worm_seg15": {
+          "position": [
+            "math.sin(q.life_time * 220 - 330) * 0.6",
+            "math.cos(q.life_time * 220 - 330) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 330) * 0.08"
+        },
+        "worm_seg16": {
+          "position": [
+            "math.sin(q.life_time * 220 - 352) * 0.6",
+            "math.cos(q.life_time * 220 - 352) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 352) * 0.08"
+        },
+        "worm_seg17": {
+          "position": [
+            "math.sin(q.life_time * 220 - 374) * 0.6",
+            "math.cos(q.life_time * 220 - 374) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 374) * 0.08"
+        },
+        "worm_seg18": {
+          "position": [
+            "math.sin(q.life_time * 220 - 396) * 0.6",
+            "math.cos(q.life_time * 220 - 396) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 396) * 0.08"
+        },
+        "worm_seg19": {
+          "position": [
+            "math.sin(q.life_time * 220 - 418) * 0.6",
+            "math.cos(q.life_time * 220 - 418) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 418) * 0.08"
+        },
+        "worm_seg20": {
+          "position": [
+            "math.sin(q.life_time * 220 - 440) * 0.6",
+            "math.cos(q.life_time * 220 - 440) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 440) * 0.08"
+        },
+        "worm_seg21": {
+          "position": [
+            "math.sin(q.life_time * 220 - 462) * 0.6",
+            "math.cos(q.life_time * 220 - 462) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 462) * 0.08"
+        },
+        "worm_seg22": {
+          "position": [
+            "math.sin(q.life_time * 220 - 484) * 0.6",
+            "math.cos(q.life_time * 220 - 484) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 484) * 0.08"
+        },
+        "worm_seg23": {
+          "position": [
+            "math.sin(q.life_time * 220 - 506) * 0.6",
+            "math.cos(q.life_time * 220 - 506) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 506) * 0.08"
+        },
+        "worm_seg24": {
+          "position": [
+            "math.sin(q.life_time * 220 - 528) * 0.6",
+            "math.cos(q.life_time * 220 - 528) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 528) * 0.08"
+        },
+        "worm_seg25": {
+          "position": [
+            "math.sin(q.life_time * 220 - 550) * 0.6",
+            "math.cos(q.life_time * 220 - 550) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 550) * 0.08"
+        },
+        "worm_seg26": {
+          "position": [
+            "math.sin(q.life_time * 220 - 572) * 0.6",
+            "math.cos(q.life_time * 220 - 572) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 572) * 0.08"
+        },
+        "worm_seg27": {
+          "position": [
+            "math.sin(q.life_time * 220 - 594) * 0.6",
+            "math.cos(q.life_time * 220 - 594) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 594) * 0.08"
+        },
+        "worm_seg28": {
+          "position": [
+            "math.sin(q.life_time * 220 - 616) * 0.6",
+            "math.cos(q.life_time * 220 - 616) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 616) * 0.08"
+        },
+        "worm_seg29": {
+          "position": [
+            "math.sin(q.life_time * 220 - 638) * 0.6",
+            "math.cos(q.life_time * 220 - 638) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 638) * 0.08"
+        },
+        "worm_seg30": {
+          "position": [
+            "math.sin(q.life_time * 220 - 660) * 0.6",
+            "math.cos(q.life_time * 220 - 660) * 0.45",
+            0
+          ],
+          "scale": "1 + math.sin(q.life_time * 300 - 660) * 0.08"
+        },
+        "worm_head": {
+          "rotation": [
+            "math.sin(q.life_time * 150) * 10 - 10",
+            "math.sin(q.life_time * 90) * 18",
+            0
+          ],
+          "position": [
+            0,
+            "math.sin(q.life_time * 220) * 0.5",
+            0
+          ]
+        },
+        "worm_jaw": {
+          "rotation": [
+            "math.max(0, math.sin(q.life_time * 260)) * 35",
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "animation.toji.isoh.worm_hide_first_person": {
+      "loop": true,
+      "bones": {
+        "worm": {
+          "scale": 0
+        }
+      }
     }
   }
 }

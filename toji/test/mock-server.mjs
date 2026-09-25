@@ -177,6 +177,15 @@ export class Player extends Entity {
       setTitle: (title, options) => log.titles.push({ title, options }),
     };
     this.camera = { fade: () => {} };
+    this.gameMode = "Survival";
+  }
+  getGameMode() {
+    return this.gameMode;
+  }
+  applyDamage(amount, options) {
+    // The world's PvP setting blocks damage between players
+    if (options?.damagingEntity?.typeId === "minecraft:player" && !world.pvp) return false;
+    return super.applyDamage(amount, options);
   }
   getComponent(id) {
     if (id === "minecraft:equippable") return this.equippable;
@@ -203,6 +212,7 @@ export class Player extends Entity {
 }
 
 export const world = {
+  pvp: true,
   players: [],
   getAllPlayers: () => world.players.filter((p) => p.isValid),
   afterEvents: {

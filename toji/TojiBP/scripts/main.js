@@ -48,8 +48,6 @@ const P = {
   infinity: "toji:infinity",
   shardBlue: "toji:shard_blue",
   xSlash: "toji:x_slash",
-  wormBody: "toji:worm_body",
-  wormHead: "toji:worm_head",
   vanish: "toji:vanish",
   stun: "minecraft:villager_angry",
 };
@@ -184,9 +182,14 @@ function canAct(player) {
   return player.isValid && holdsSpear(player) && (getHealth(player)?.currentValue ?? 0) > 0;
 }
 
+// Layered effects: some particles always come with a companion (glow halo, anime impact lines)
+const COMPANIONS = { "toji:flash": "toji:glow", "toji:x_slash": "toji:impact" };
+
 function particle(dimension, id, location, molang) {
   try {
     dimension.spawnParticle(id, location, molang);
+    const companion = COMPANIONS[id];
+    if (companion) dimension.spawnParticle(companion, location);
   } catch {
     // chunk not loaded or particle missing: ignore
   }
@@ -373,9 +376,27 @@ function applySkillDamage(player, target, amount, attempt) {
   } catch {
     return false;
   }
+  if (!hit && target.typeId === "minecraft:player") hit = damagePlayerDirectly(target, amount);
   if (hit) particle(target.dimension, P.spark, up(target.location, 1));
   else if (attempt < 3) system.runTimeout(() => applySkillDamage(player, target, amount, attempt + 1), 4);
   return hit;
+}
+
+// Players often reject skill damage: the world's PvP setting is off, or they were hit less than 0.5 s ago.
+// With CONFIG.pvp on, skills still hurt them by lowering their health directly (never in Creative/Spectator).
+function damagePlayerDirectly(target, amount) {
+  if (!CONFIG.pvp) return false;
+  try {
+    const mode = String(target.getGameMode()).toLowerCase();
+    if (mode === "creative" || mode === "spectator") return false;
+  } catch {
+    return false;
+  }
+  const health = getHealth(target);
+  if (!health || health.currentValue <= 0) return false;
+  health.setCurrentValue(Math.max(0, health.currentValue - amount));
+  sound(target.dimension, "game.player.hurt", target.location);
+  return true;
 }
 
 function stun(entity, seconds) {
@@ -961,7 +982,6 @@ function awaken(player, state) {
   state.awakeUntil = now() + duration;
   state.plungeUsed = false;
   state.holdTicks = 0;
-  state.wormSince = now();
   playAnim(player, "awaken");
   syncSpear(player);
   addEffect(player, "speed", duration, cfg.speedAmplifier);
@@ -998,33 +1018,8 @@ function awaken(player, state) {
   }
 }
 
-// Inventory Curse: the worm Toji keeps his weapons in coils around his body while awakened.
-// It emerges from the ground in a spiral during the first second. Drawn every 2 ticks with short-lived
-// segments, so it looks like it slithers around him.
-const WORM_SEGMENTS = 10;
-
-function drawWorm(player, state, t) {
-  const age = t - (state.wormSince ?? t);
-  const shown = Math.min(WORM_SEGMENTS, Math.floor(age / 2) + 1);
-  const rise = Math.min(1, age / 20); // coils up from the feet to the shoulders
-  const base = player.location;
-  for (let i = 0; i < shown; i++) {
-    const phase = t * 0.22 - i * 0.5;
-    const radius = 0.62 + 0.9 * (1 - rise) * (i / WORM_SEGMENTS);
-    const height = (1.55 - i * 0.13) * rise + 0.1 * (1 - rise);
-    const at = { x: base.x + Math.cos(phase) * radius, y: base.y + Math.max(0.1, height), z: base.z + Math.sin(phase) * radius };
-    if (i === 0) particle(player.dimension, P.wormHead, at);
-    else particle(player.dimension, P.wormBody, at, withRadius(0.3 - i * 0.012));
-  }
-}
-
-system.runInterval(() => {
-  const t = now();
-  for (const player of world.getAllPlayers()) {
-    const state = states.get(player.id);
-    if (state && isAwake(state)) drawWorm(player, state, t);
-  }
-}, 2);
+// The Inventory Curse worm coiling around the body while awakened is a 3D model: it is part of the awakened
+// spear's attachable (bound to the player's body bone, see model.py worm_bones and packs.py).
 
 // Let go of the spear while awakened: the awakening and its buffs end
 function endAwakeningEarly(player, state) {
@@ -1080,7 +1075,6 @@ function castPlunge(player, state) {
   sound(dimension, "item.trident.thunder", center, 1.6, 0.5);
   particle(dimension, P.nullGround, up(center, 0.08), withRadius(cfg.radius * 1.4));
   for (let i = 0; i < 3; i++) system.runTimeout(() => shockRing(dimension, center, 3 + i * 3), i * 3);
-  particle(dimension, P.wormHead, up(center, 2.2));
 
   const starts = new Map(victims.map((v) => [v.id, { ...v.location }]));
   const tally = new Map();

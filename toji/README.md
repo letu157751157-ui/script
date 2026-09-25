@@ -2,7 +2,7 @@
 
 Addon thêm **Thiên Nghịch Mâu** (`toji:inverted_spear`) của Toji Fushiguro (Jujutsu Kaisen), bộ chiêu theo kiểu JJS.
 Viết bằng Script API `@minecraft/server` 2.0.0, **không cần bật Beta APIs / experiments**.
-Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, console). Phiên bản hiện tại: **v1.4.0**.
+Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, console). Phiên bản hiện tại: **v1.5.0**.
 
 ![Mô hình 3D](preview.png)
 
@@ -25,8 +25,8 @@ Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, conso
 | **Chuột phải** (điện thoại: chạm màn hình / nút Dùng) | **Đâm Xuyên Vô Hạn** | Cảnh Toji đâm xuyên Vô Hạn của Gojo: lướt tới và đâm thẳng 6 ô. Trước mặt mỗi mục tiêu hiện **lớp kết giới lục giác xanh (Vô Hạn) rồi vỡ vụn**; mục tiêu bị xuyên, choáng ngắn và **mất sạch hiệu ứng có lợi**. Hồi 5s |
 | **Khuỵu (Shift) + chuột phải** | **Xích Vạn Lý** | Mâu rời tay, **quay vòng quanh người theo sợi xích** (2 vòng, bán kính 4.5 ô), mỗi vòng quét trúng mọi kẻ địch xung quanh và hất văng ra; sau đó **ném mâu thẳng tới trước** (24 ô): trúng địch thì **lôi địch theo xích về tận trước mặt**, trúng tường/đất thì **đu người tới đó** theo đường vòng cung. Hồi 10s |
 | **Chạy + chém** (chạy nhanh rồi đánh, hoặc chạy + chuột phải) | **Ám Sát Sau Lưng** | Toji không có chú lực nên không ai cảm nhận được: **biến mất trong làn khói, hiện ra sau lưng kẻ địch bạn đang nhìn** (tới 14 ô) và **chém chữ X** vào lưng nó. Không có mục tiêu thì lướt đi. Hồi 7s |
-| **Cầm mâu 20 giây** | **Thiên Dữ Chú Phược: Thức Tỉnh** | Tự kích hoạt khi cầm liên tục đủ 20s: **chú linh kho chứa (con sâu) trồi lên và quấn quanh người** suốt 15s. Được Speed II, Strength II, Jump Boost II, Resistance I; sát thương chiêu x1.3, hồi chiêu giảm một nửa |
-| **Cầm 20 giây + nhảy** (khi đang Thức Tỉnh) | **Thiên Phạt Xử Quyết** | Chú linh kho chứa há miệng, **xích bắn ra móc mọi mob trong 12 ô** (tối đa 12 con), **lôi chúng lên trời treo thành vòng tròn** lơ lửng quanh bạn. Toji bay lên, **lao qua lại đâm xuyên từng con 3 vòng** (kết giới Vô Hạn vỡ, vết chém X, máu), rồi bay cao hơn và **đập tất cả xuống đất cùng lúc**: nứt đất 2 đợt, 4 sóng xung kích, chữ X khổng lồ, toàn bộ sát thương nổ ra một lần. Bất tử trong lúc dùng. 1 lần mỗi lần Thức Tỉnh |
+| **Cầm mâu 20 giây** | **Thiên Dữ Chú Phược: Thức Tỉnh** | Tự kích hoạt khi cầm liên tục đủ 20s: **chú linh kho chứa (con sâu, model 3D) mọc ra quấn 2 vòng quanh người** suốt 15s: thân trườn uốn lượn, đầu ở vai phải há miệng nhai (ẩn khi nhìn góc thứ nhất). Được Speed II, Strength II, Jump Boost II, Resistance I; sát thương chiêu x1.3, hồi chiêu giảm một nửa |
+| **Cầm 20 giây + nhảy** (khi đang Thức Tỉnh) | **Thiên Phạt Xử Quyết** | Chú linh kho chứa há miệng, **xích bắn ra móc mọi mob trong 12 ô** (tối đa 12 con), **lôi chúng lên trời treo thành vòng tròn** lơ lửng quanh bạn. Toji bay lên, **lao qua lại đâm xuyên từng con 3 vòng** (kết giới Vô Hạn vỡ, vết chém X, máu), rồi bay cao hơn và **đập tất cả xuống đất cùng lúc**: nứt đất 2 đợt, 4 sóng xung kích, chữ X khổng lồ, toàn bộ sát thương nổ ra một lần (**8 mỗi nhát đâm + 20 cú đập, x1.3 khi Thức Tỉnh ≈ 57 máu mỗi con**). Bất tử trong lúc dùng. 1 lần mỗi lần Thức Tỉnh |
 | **Nhảy + đánh** (đang trên không đánh trúng mob) | **Bổ Trời** | Giơ mâu hai tay rồi bổ thẳng xuống: địch bị đập xuống đất, nứt đất, lan sát thương xung quanh 2.5 ô. Hồi 3s |
 | **Khuỵu + đánh** (đang khuỵu đánh trúng mob) | **Quét Chân** | Hạ thấp người quét mâu hình cung ngang mắt cá, rồi hất ngược lên tung kẻ địch lên trời. Hồi 3s |
 | **Đánh thường 4 lần liên tiếp** | **Combo M1 + Đòn Kết Liễu** | Đòn thứ 4 là cú xoay chém hình cung trước mặt, hất văng kẻ địch (như M1 trong JJS) |
@@ -37,6 +37,7 @@ Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, conso
 - Chữ trong game (chat, tiêu đề, thanh hồi chiêu, tên mâu) **tự theo ngôn ngữ game**: tiếng Việt nếu game để tiếng Việt, còn lại là tiếng Anh.
   Riêng dòng mô tả khi rê chuột vào mâu thì chọn bằng `loreLanguage` trong `config.js` (`"vi"` hoặc `"en"`).
 - Gõ `/scriptevent toji:help` để xem lại hướng dẫn.
+- **Người chơi khác cũng dính chiêu**, kể cả khi world tắt PvP (máu bị trừ trực tiếp); người chơi ở Creative/Spectator không bị ảnh hưởng. Muốn chiêu chỉ đánh mob thì để `pvp: false` trong `config.js`.
 - Chuột phải vào rương, cửa, bàn chế tạo, dân làng, ngựa... vẫn dùng bình thường, không ra chiêu.
 
 ## Hiệu ứng: particle custom + animation
@@ -58,7 +59,8 @@ Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, conso
 | `toji:flash`, `toji:spark`, `toji:blood` | Chớp sáng, tia lửa thép, máu |
 | `toji:infinity` + `toji:shard_blue` | Kết giới Vô Hạn lục giác xanh nứt rồi vỡ thành mảnh kính xanh |
 | `toji:x_slash` | Vết chém chữ X khổng lồ (Ám Sát, Xử Quyết) |
-| `toji:worm_head` / `toji:worm_body` | Chú linh kho chứa quấn quanh người khi Thức Tỉnh |
+| `toji:glow` | Quầng sáng mềm đi kèm mọi chớp sáng |
+| `toji:impact` | Tia tốc độ kiểu anime bung ra ở mọi vết chém chữ X |
 | `toji:vanish` | Khói tối khi Toji biến mất |
 
 **Animation người chơi** (`TojiRP/animations/toji_player.animation.json`, tạo bởi `player_anims.py`), bản thân thấy góc nhìn thứ nhất, người khác thấy góc nhìn thứ ba:
@@ -94,7 +96,7 @@ và **Đã ném** (trên tay chỉ còn sợi xích). Script tự đổi dạng 
 
 Không cần mở game, [`test/sim.mjs`](test/sim.mjs) chạy chính `main.js` với một bản giả lập của `@minecraft/server`
 và thử lần lượt: chuột phải, khuỵu + chuột phải (quay xích, ném trúng địch, móc vào tường), chạy + chém (hiện sau lưng / lướt khi không có mục tiêu), combo 4 đòn, cầm 20s, cầm 20s + nhảy,
-đổi ô khi đang Thức Tỉnh / đang lao xuống, và bị choáng thì không ra chiêu được (66 bước kiểm tra):
+đổi ô khi đang Thức Tỉnh / đang lao xuống, và bị choáng thì không ra chiêu được (68 bước kiểm tra, có cả đánh người chơi khác):
 
 ```
 node test/sim.mjs
