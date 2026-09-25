@@ -1,0 +1,43 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "spawn_egg_a1c1214a"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "ABA",
+      "CDE",
+      "CAC"
+    ],
+    "key": {
+      "A": {
+        "item": "ytaun:thitthoiran",
+        "data": 0
+      },
+      "B": {
+        "item": "minecraft:zombie_head",
+        "data": 0
+      },
+      "C": {
+        "item": "minecraft:iron_block",
+        "data": 0
+      },
+      "D": {
+        "item": "ytaun:zombie_heart",
+        "data": 0
+      },
+      "E": {
+        "item": "minecraft:iron_ingot",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "minecraft:spawn_egg",
+      "count": 1,
+      "data": "query.get_actor_info_id('ytaun:giant_zombie')"
+    }
+  }
+}

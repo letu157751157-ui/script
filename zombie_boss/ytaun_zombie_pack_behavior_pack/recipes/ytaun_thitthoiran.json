@@ -1,0 +1,25 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "thitthoiran_ffedff55"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "AA",
+      "AA"
+    ],
+    "key": {
+      "A": {
+        "item": "minecraft:rotten_flesh",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "ytaun:thitthoiran",
+      "count": 1
+    }
+  }
+}

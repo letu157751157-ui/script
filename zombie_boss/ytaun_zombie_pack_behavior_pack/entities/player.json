@@ -1,0 +1,2275 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "minecraft:player",
+      "spawn_category": "creature",
+      "is_spawnable": false,
+      "is_summonable": false
+    },
+    "component_groups": {
+      "minecraft:add_raid_omen": {
+        "minecraft:spell_effects": {
+          "add_effects": [
+            {
+              "effect": "raid_omen",
+              "duration": 30,
+              "display_on_screen_animation": true
+            }
+          ],
+          "remove_effects": "bad_omen"
+        },
+        "minecraft:timer": {
+          "time": [
+            0,
+            0
+          ],
+          "looping": false,
+          "time_down_event": {
+            "event": "minecraft:clear_add_raid_omen",
+            "target": "self"
+          }
+        }
+      },
+      "minecraft:clear_raid_omen_spell_effect": {
+        "minecraft:spell_effects": {}
+      },
+      "minecraft:raid_trigger": {
+        "minecraft:raid_trigger": {
+          "triggered_event": {
+            "event": "minecraft:remove_raid_trigger",
+            "target": "self"
+          }
+        }
+      },
+      "pamobile:respawn": {
+        "minecraft:mark_variant": {
+          "value": 99999
+        },
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        },
+        "minecraft:attack": {
+          "damage": 1
+        },
+        "minecraft:spell_effects": {
+          "remove_effects": [
+            "fire_resistance",
+            "weakness",
+            "saturation",
+            "slowness",
+            "resistance",
+            "jump_boost",
+            "speed",
+            "night_vision",
+            "water_breathing",
+            "nausea",
+            "slow_falling",
+            "conduit_power",
+            "haste",
+            "village_hero",
+            "hunger"
+          ]
+        }
+      },
+      "ammo:1": {
+        "minecraft:mark_variant": {
+          "value": 1
+        }
+      },
+      "ytaun:bessingfromthehel": {
+        "minecraft:health": {
+          "value": 28,
+          "max": 28
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:bigobsidian_sword": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:candy_scythe": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:crab_legging": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:crab_boot": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:crab_helmet": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:crab_sword": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:crown": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:dark_night_boot": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:dark_night_helmet": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:dark_night_chestplate": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:crabl_chestplate": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:diamonspear": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:dark_night_legging": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:emerald_boot": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:emerald_sword": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:endbringer_sword": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:emerald_chestplate": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:emerald_helmet": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:emerald_legging": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frizen_sword": {
+        "minecraft:health": {
+          "value": 22,
+          "max": 22
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frizenscythe": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frog_boot": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frog_chestplate": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frog_helmet": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frog_legging": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frozen_boot": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frozen_chestplate": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frozemeral_chestplate": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frozen_sword": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frozen_helmet": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frozen_legging": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frozen_hat": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frozendscythe": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frozendsword": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frozenscythe": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frozether_legging": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:frozpeed_boot": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:harvester_scythe": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:ice_bar": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:longobsidian_sword": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:longobsidian_sword_upgrage": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:obsidian_battle_axe": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:nightvisionhelmet": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:obsidian_battle_axebig": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:obsidian_sword": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:obsidian_boot": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:obsidian_chestplate": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:obsidian_helmet": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:obsidian_leggings": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:protection_of_the_sea": {
+        "minecraft:health": {
+          "value": 28,
+          "max": 28
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:rast_boot": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:rast_cheatplate": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:rast_helmet": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:rast_legging": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:steel_sword": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:steel_boot": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:steel_cheatplate": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:steel_helmet": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:steel_legging": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:the_blessing_of_food": {
+        "minecraft:health": {
+          "value": 30,
+          "max": 30
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:the_trust_of_the_village": {
+        "minecraft:health": {
+          "value": 28,
+          "max": 28
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:update_diamon_spear": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:ugage_emeral_helmet": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:utimate_emeral_helmet": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      },
+      "ytaun:zombieaxe": {
+        "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:movement": {
+          "value": 0.1
+        }
+      }
+    },
+    "components": {
+      "minecraft:experience_reward": {
+        "on_death": "Math.Min(query.player_level * 7, 100)"
+      },
+      "minecraft:type_family": {
+        "family": [
+          "player"
+        ]
+      },
+      "minecraft:is_hidden_when_invisible": {},
+      "minecraft:loot": {
+        "table": "loot_tables/empty.json"
+      },
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 1.8
+      },
+      "minecraft:can_climb": {},
+      "minecraft:movement": {
+        "value": 0.1
+      },
+      "minecraft:hurt_on_condition": {
+        "damage_conditions": [
+          {
+            "filters": {
+              "test": "in_lava",
+              "subject": "self",
+              "operator": "==",
+              "value": true
+            },
+            "cause": "lava",
+            "damage_per_tick": 4
+          }
+        ]
+      },
+      "minecraft:attack": {
+        "damage": 1
+      },
+      "minecraft:exhaustion_values": {
+        "heal": 6,
+        "jump": 0.05,
+        "sprint_jump": 0.2,
+        "mine": 0.005,
+        "attack": 0.1,
+        "damage": 0.1,
+        "walk": 0,
+        "sprint": 0.1,
+        "swim": 0.01,
+        "lunge": 4
+      },
+      "minecraft:player.saturation": {
+        "value": 5,
+        "max": 20
+      },
+      "minecraft:player.exhaustion": {
+        "value": 0,
+        "max": 20
+      },
+      "minecraft:player.level": {
+        "value": 0,
+        "max": 24791
+      },
+      "minecraft:player.experience": {
+        "value": 0,
+        "max": 1
+      },
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": -1,
+        "inhale_time": 3.75,
+        "generates_bubbles": false
+      },
+      "minecraft:nameable": {
+        "always_show": true,
+        "allow_name_tag_renaming": false
+      },
+      "minecraft:physics": {
+        "push_towards_closest_space": true
+      },
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:insomnia": {
+        "days_until_insomnia": 3
+      },
+      "minecraft:rideable": {
+        "seat_count": 2,
+        "family_types": [
+          "parrot_tame"
+        ],
+        "pull_in_entities": true,
+        "seats": [
+          {
+            "position": [
+              0.4,
+              -0.2,
+              -0.1
+            ],
+            "min_rider_count": 0,
+            "max_rider_count": 0,
+            "lock_rider_rotation": 0
+          },
+          {
+            "position": [
+              -0.4,
+              -0.2,
+              -0.1
+            ],
+            "min_rider_count": 1,
+            "max_rider_count": 2,
+            "lock_rider_rotation": 0
+          }
+        ]
+      },
+      "minecraft:conditional_bandwidth_optimization": {},
+      "minecraft:block_climber": {},
+      "minecraft:environment_sensor": {
+        "triggers": [
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_mob_effect",
+                  "subject": "self",
+                  "value": "bad_omen"
+                },
+                {
+                  "test": "is_in_village",
+                  "subject": "self",
+                  "value": true
+                }
+              ]
+            },
+            "event": "minecraft:gain_raid_omen"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:bessingfromthehel"
+                }
+              ]
+            },
+            "event": "ytaun:bessingfromthehel_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:bigobsidian_sword"
+                }
+              ]
+            },
+            "event": "ytaun:bigobsidian_sword_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:candy_scythe"
+                }
+              ]
+            },
+            "event": "ytaun:candy_scythe_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:crab_legging"
+                }
+              ]
+            },
+            "event": "ytaun:crab_legging_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:crab_boot"
+                }
+              ]
+            },
+            "event": "ytaun:crab_boot_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:crab_helmet"
+                }
+              ]
+            },
+            "event": "ytaun:crab_helmet_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:crab_sword"
+                }
+              ]
+            },
+            "event": "ytaun:crab_sword_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:crown"
+                }
+              ]
+            },
+            "event": "ytaun:crown_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:dark_night_boot"
+                }
+              ]
+            },
+            "event": "ytaun:dark_night_boot_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:dark_night_helmet"
+                }
+              ]
+            },
+            "event": "ytaun:dark_night_helmet_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:dark_night_chestplate"
+                }
+              ]
+            },
+            "event": "ytaun:dark_night_chestplate_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:crabl_chestplate"
+                }
+              ]
+            },
+            "event": "ytaun:crabl_chestplate_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:diamonspear"
+                }
+              ]
+            },
+            "event": "ytaun:diamonspear_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:dark_night_legging"
+                }
+              ]
+            },
+            "event": "ytaun:dark_night_legging_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:emerald_boot"
+                }
+              ]
+            },
+            "event": "ytaun:emerald_boot_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:emerald_sword"
+                }
+              ]
+            },
+            "event": "ytaun:emerald_sword_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:endbringer_sword"
+                }
+              ]
+            },
+            "event": "ytaun:endbringer_sword_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:emerald_chestplate"
+                }
+              ]
+            },
+            "event": "ytaun:emerald_chestplate_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:emerald_helmet"
+                }
+              ]
+            },
+            "event": "ytaun:emerald_helmet_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:emerald_legging"
+                }
+              ]
+            },
+            "event": "ytaun:emerald_legging_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:frizen_sword"
+                }
+              ]
+            },
+            "event": "ytaun:frizen_sword_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:frizenscythe"
+                }
+              ]
+            },
+            "event": "ytaun:frizenscythe_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:frog_boot"
+                }
+              ]
+            },
+            "event": "ytaun:frog_boot_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:frog_chestplate"
+                }
+              ]
+            },
+            "event": "ytaun:frog_chestplate_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:frog_helmet"
+                }
+              ]
+            },
+            "event": "ytaun:frog_helmet_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:frog_legging"
+                }
+              ]
+            },
+            "event": "ytaun:frog_legging_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:frozen_boot"
+                }
+              ]
+            },
+            "event": "ytaun:frozen_boot_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:frozen_chestplate"
+                }
+              ]
+            },
+            "event": "ytaun:frozen_chestplate_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:frozemeral_chestplate"
+                }
+              ]
+            },
+            "event": "ytaun:frozemeral_chestplate_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:frozen_sword"
+                }
+              ]
+            },
+            "event": "ytaun:frozen_sword_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:frozen_helmet"
+                }
+              ]
+            },
+            "event": "ytaun:frozen_helmet_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:frozen_legging"
+                }
+              ]
+            },
+            "event": "ytaun:frozen_legging_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:frozen_hat"
+                }
+              ]
+            },
+            "event": "ytaun:frozen_hat_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:frozendscythe"
+                }
+              ]
+            },
+            "event": "ytaun:frozendscythe_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:frozendsword"
+                }
+              ]
+            },
+            "event": "ytaun:frozendsword_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:frozenscythe"
+                }
+              ]
+            },
+            "event": "ytaun:frozenscythe_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:frozether_legging"
+                }
+              ]
+            },
+            "event": "ytaun:frozether_legging_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:frozpeed_boot"
+                }
+              ]
+            },
+            "event": "ytaun:frozpeed_boot_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:harvester_scythe"
+                }
+              ]
+            },
+            "event": "ytaun:harvester_scythe_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:ice_bar"
+                }
+              ]
+            },
+            "event": "ytaun:ice_bar_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:longobsidian_sword"
+                }
+              ]
+            },
+            "event": "ytaun:longobsidian_sword_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:longobsidian_sword_upgrage"
+                }
+              ]
+            },
+            "event": "ytaun:longobsidian_sword_upgrage_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:obsidian_battle_axe"
+                }
+              ]
+            },
+            "event": "ytaun:obsidian_battle_axe_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:nightvisionhelmet"
+                }
+              ]
+            },
+            "event": "ytaun:nightvisionhelmet_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:obsidian_battle_axebig"
+                }
+              ]
+            },
+            "event": "ytaun:obsidian_battle_axebig_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:obsidian_sword"
+                }
+              ]
+            },
+            "event": "ytaun:obsidian_sword_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:obsidian_boot"
+                }
+              ]
+            },
+            "event": "ytaun:obsidian_boot_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:obsidian_chestplate"
+                }
+              ]
+            },
+            "event": "ytaun:obsidian_chestplate_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:obsidian_helmet"
+                }
+              ]
+            },
+            "event": "ytaun:obsidian_helmet_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:obsidian_leggings"
+                }
+              ]
+            },
+            "event": "ytaun:obsidian_leggings_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:protection_of_the_sea"
+                }
+              ]
+            },
+            "event": "ytaun:protection_of_the_sea_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:rast_boot"
+                }
+              ]
+            },
+            "event": "ytaun:rast_boot_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:rast_cheatplate"
+                }
+              ]
+            },
+            "event": "ytaun:rast_cheatplate_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:rast_helmet"
+                }
+              ]
+            },
+            "event": "ytaun:rast_helmet_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:rast_legging"
+                }
+              ]
+            },
+            "event": "ytaun:rast_legging_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:steel_sword"
+                }
+              ]
+            },
+            "event": "ytaun:steel_sword_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:steel_boot"
+                }
+              ]
+            },
+            "event": "ytaun:steel_boot_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:steel_cheatplate"
+                }
+              ]
+            },
+            "event": "ytaun:steel_cheatplate_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:steel_helmet"
+                }
+              ]
+            },
+            "event": "ytaun:steel_helmet_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:steel_legging"
+                }
+              ]
+            },
+            "event": "ytaun:steel_legging_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:the_blessing_of_food"
+                }
+              ]
+            },
+            "event": "ytaun:the_blessing_of_food_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:the_trust_of_the_village"
+                }
+              ]
+            },
+            "event": "ytaun:the_trust_of_the_village_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:update_diamon_spear"
+                }
+              ]
+            },
+            "event": "ytaun:update_diamon_spear_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:ugage_emeral_helmet"
+                }
+              ]
+            },
+            "event": "ytaun:ugage_emeral_helmet_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "armor",
+                  "value": "ytaun:utimate_emeral_helmet"
+                }
+              ]
+            },
+            "event": "ytaun:utimate_emeral_helmet_event"
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "has_equipment",
+                  "subject": "self",
+                  "domain": "hand",
+                  "value": "ytaun:zombieaxe"
+                }
+              ]
+            },
+            "event": "ytaun:zombieaxe_event"
+          }
+        ]
+      }
+    },
+    "events": {
+      "minecraft:gain_raid_omen": {
+        "add": {
+          "component_groups": [
+            "minecraft:add_raid_omen"
+          ]
+        }
+      },
+      "minecraft:clear_add_raid_omen": {
+        "remove": {
+          "component_groups": [
+            "minecraft:add_raid_omen"
+          ]
+        },
+        "add": {
+          "component_groups": [
+            "minecraft:clear_raid_omen_spell_effect"
+          ]
+        }
+      },
+      "minecraft:trigger_raid": {
+        "add": {
+          "component_groups": [
+            "minecraft:raid_trigger"
+          ]
+        }
+      },
+      "minecraft:remove_raid_trigger": {
+        "remove": {
+          "component_groups": [
+            "minecraft:raid_trigger"
+          ]
+        }
+      },
+      "minecraft:entity_spawned": {
+        "add": {
+          "component_groups": [
+            "pamobile:respawn"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "ytaun:bessingfromthehel",
+            "ytaun:bigobsidian_sword",
+            "ytaun:candy_scythe",
+            "ytaun:crab_legging",
+            "ytaun:crab_boot",
+            "ytaun:crab_helmet",
+            "ytaun:crab_sword",
+            "ytaun:crown",
+            "ytaun:dark_night_boot",
+            "ytaun:dark_night_helmet",
+            "ytaun:dark_night_chestplate",
+            "ytaun:crabl_chestplate",
+            "ytaun:diamonspear",
+            "ytaun:dark_night_legging",
+            "ytaun:emerald_boot",
+            "ytaun:emerald_sword",
+            "ytaun:endbringer_sword",
+            "ytaun:emerald_chestplate",
+            "ytaun:emerald_helmet",
+            "ytaun:emerald_legging",
+            "ytaun:frizen_sword",
+            "ytaun:frizenscythe",
+            "ytaun:frog_boot",
+            "ytaun:frog_chestplate",
+            "ytaun:frog_helmet",
+            "ytaun:frog_legging",
+            "ytaun:frozen_boot",
+            "ytaun:frozen_chestplate",
+            "ytaun:frozemeral_chestplate",
+            "ytaun:frozen_sword",
+            "ytaun:frozen_helmet",
+            "ytaun:frozen_legging",
+            "ytaun:frozen_hat",
+            "ytaun:frozendscythe",
+            "ytaun:frozendsword",
+            "ytaun:frozenscythe",
+            "ytaun:frozether_legging",
+            "ytaun:frozpeed_boot",
+            "ytaun:harvester_scythe",
+            "ytaun:ice_bar",
+            "ytaun:longobsidian_sword",
+            "ytaun:longobsidian_sword_upgrage",
+            "ytaun:obsidian_battle_axe",
+            "ytaun:nightvisionhelmet",
+            "ytaun:obsidian_battle_axebig",
+            "ytaun:obsidian_sword",
+            "ytaun:obsidian_boot",
+            "ytaun:obsidian_chestplate",
+            "ytaun:obsidian_helmet",
+            "ytaun:obsidian_leggings",
+            "ytaun:protection_of_the_sea",
+            "ytaun:rast_boot",
+            "ytaun:rast_cheatplate",
+            "ytaun:rast_helmet",
+            "ytaun:rast_legging",
+            "ytaun:steel_sword",
+            "ytaun:steel_boot",
+            "ytaun:steel_cheatplate",
+            "ytaun:steel_helmet",
+            "ytaun:steel_legging",
+            "ytaun:the_blessing_of_food",
+            "ytaun:the_trust_of_the_village",
+            "ytaun:update_diamon_spear",
+            "ytaun:ugage_emeral_helmet",
+            "ytaun:utimate_emeral_helmet",
+            "ytaun:zombieaxe"
+          ]
+        }
+      },
+      "ammo:1": {
+        "remove": {
+          "component_groups": [
+            "ammo:1"
+          ]
+        },
+        "add": {
+          "component_groups": [
+            "ammo:1"
+          ]
+        }
+      },
+      "ammo:2": {
+        "remove": {
+          "component_groups": [
+            "ammo:2"
+          ]
+        },
+        "add": {
+          "component_groups": [
+            "ammo:2"
+          ]
+        }
+      },
+      "ytaun:bessingfromthehel_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:bessingfromthehel"
+          ]
+        }
+      },
+      "ytaun:bigobsidian_sword_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:bigobsidian_sword"
+          ]
+        }
+      },
+      "ytaun:candy_scythe_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:candy_scythe"
+          ]
+        }
+      },
+      "ytaun:crab_legging_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:crab_legging"
+          ]
+        }
+      },
+      "ytaun:crab_boot_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:crab_boot"
+          ]
+        }
+      },
+      "ytaun:crab_helmet_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:crab_helmet"
+          ]
+        }
+      },
+      "ytaun:crab_sword_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:crab_sword"
+          ]
+        }
+      },
+      "ytaun:crown_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:crown"
+          ]
+        }
+      },
+      "ytaun:dark_night_boot_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:dark_night_boot"
+          ]
+        }
+      },
+      "ytaun:dark_night_helmet_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:dark_night_helmet"
+          ]
+        }
+      },
+      "ytaun:dark_night_chestplate_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:dark_night_chestplate"
+          ]
+        }
+      },
+      "ytaun:crabl_chestplate_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:crabl_chestplate"
+          ]
+        }
+      },
+      "ytaun:diamonspear_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:diamonspear"
+          ]
+        }
+      },
+      "ytaun:dark_night_legging_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:dark_night_legging"
+          ]
+        }
+      },
+      "ytaun:emerald_boot_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:emerald_boot"
+          ]
+        }
+      },
+      "ytaun:emerald_sword_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:emerald_sword"
+          ]
+        }
+      },
+      "ytaun:endbringer_sword_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:endbringer_sword"
+          ]
+        }
+      },
+      "ytaun:emerald_chestplate_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:emerald_chestplate"
+          ]
+        }
+      },
+      "ytaun:emerald_helmet_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:emerald_helmet"
+          ]
+        }
+      },
+      "ytaun:emerald_legging_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:emerald_legging"
+          ]
+        }
+      },
+      "ytaun:frizen_sword_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frizen_sword"
+          ]
+        }
+      },
+      "ytaun:frizenscythe_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frizenscythe"
+          ]
+        }
+      },
+      "ytaun:frog_boot_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frog_boot"
+          ]
+        }
+      },
+      "ytaun:frog_chestplate_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frog_chestplate"
+          ]
+        }
+      },
+      "ytaun:frog_helmet_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frog_helmet"
+          ]
+        }
+      },
+      "ytaun:frog_legging_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frog_legging"
+          ]
+        }
+      },
+      "ytaun:frozen_boot_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frozen_boot"
+          ]
+        }
+      },
+      "ytaun:frozen_chestplate_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frozen_chestplate"
+          ]
+        }
+      },
+      "ytaun:frozemeral_chestplate_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frozemeral_chestplate"
+          ]
+        }
+      },
+      "ytaun:frozen_sword_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frozen_sword"
+          ]
+        }
+      },
+      "ytaun:frozen_helmet_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frozen_helmet"
+          ]
+        }
+      },
+      "ytaun:frozen_legging_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frozen_legging"
+          ]
+        }
+      },
+      "ytaun:frozen_hat_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frozen_hat"
+          ]
+        }
+      },
+      "ytaun:frozendscythe_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frozendscythe"
+          ]
+        }
+      },
+      "ytaun:frozendsword_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frozendsword"
+          ]
+        }
+      },
+      "ytaun:frozenscythe_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frozenscythe"
+          ]
+        }
+      },
+      "ytaun:frozether_legging_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frozether_legging"
+          ]
+        }
+      },
+      "ytaun:frozpeed_boot_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:frozpeed_boot"
+          ]
+        }
+      },
+      "ytaun:harvester_scythe_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:harvester_scythe"
+          ]
+        }
+      },
+      "ytaun:ice_bar_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:ice_bar"
+          ]
+        }
+      },
+      "ytaun:longobsidian_sword_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:longobsidian_sword"
+          ]
+        }
+      },
+      "ytaun:longobsidian_sword_upgrage_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:longobsidian_sword_upgrage"
+          ]
+        }
+      },
+      "ytaun:obsidian_battle_axe_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:obsidian_battle_axe"
+          ]
+        }
+      },
+      "ytaun:nightvisionhelmet_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:nightvisionhelmet"
+          ]
+        }
+      },
+      "ytaun:obsidian_battle_axebig_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:obsidian_battle_axebig"
+          ]
+        }
+      },
+      "ytaun:obsidian_sword_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:obsidian_sword"
+          ]
+        }
+      },
+      "ytaun:obsidian_boot_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:obsidian_boot"
+          ]
+        }
+      },
+      "ytaun:obsidian_chestplate_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:obsidian_chestplate"
+          ]
+        }
+      },
+      "ytaun:obsidian_helmet_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:obsidian_helmet"
+          ]
+        }
+      },
+      "ytaun:obsidian_leggings_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:obsidian_leggings"
+          ]
+        }
+      },
+      "ytaun:protection_of_the_sea_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:protection_of_the_sea"
+          ]
+        }
+      },
+      "ytaun:rast_boot_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:rast_boot"
+          ]
+        }
+      },
+      "ytaun:rast_cheatplate_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:rast_cheatplate"
+          ]
+        }
+      },
+      "ytaun:rast_helmet_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:rast_helmet"
+          ]
+        }
+      },
+      "ytaun:rast_legging_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:rast_legging"
+          ]
+        }
+      },
+      "ytaun:steel_sword_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:steel_sword"
+          ]
+        }
+      },
+      "ytaun:steel_boot_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:steel_boot"
+          ]
+        }
+      },
+      "ytaun:steel_cheatplate_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:steel_cheatplate"
+          ]
+        }
+      },
+      "ytaun:steel_helmet_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:steel_helmet"
+          ]
+        }
+      },
+      "ytaun:steel_legging_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:steel_legging"
+          ]
+        }
+      },
+      "ytaun:the_blessing_of_food_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:the_blessing_of_food"
+          ]
+        }
+      },
+      "ytaun:the_trust_of_the_village_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:the_trust_of_the_village"
+          ]
+        }
+      },
+      "ytaun:update_diamon_spear_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:update_diamon_spear"
+          ]
+        }
+      },
+      "ytaun:ugage_emeral_helmet_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:ugage_emeral_helmet"
+          ]
+        }
+      },
+      "ytaun:utimate_emeral_helmet_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:utimate_emeral_helmet"
+          ]
+        }
+      },
+      "ytaun:zombieaxe_event": {
+        "add": {
+          "component_groups": [
+            "ytaun:zombieaxe"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "zombieaxe_651ea6f9"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "ABA",
+      " CB",
+      "D A"
+    ],
+    "key": {
+      "A": {
+        "item": "ytaun:waterofzombie",
+        "data": 0
+      },
+      "B": {
+        "item": "minecraft:diamond",
+        "data": 0
+      },
+      "C": {
+        "item": "minecraft:netherite_ingot",
+        "data": 0
+      },
+      "D": {
+        "item": "minecraft:blaze_rod",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "ytaun:zombieaxe",
+      "count": 1
+    }
+  }
+}

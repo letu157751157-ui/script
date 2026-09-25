@@ -1,0 +1,15 @@
+item.spawn_egg.entity.ytaun:giant_zombie.name=Spawn §l§2§lGIANT ZOMBIE§f
+entity.ytaun:giant_zombie.name=§l§2§lGIANT ZOMBIE§f
+item.ytaun:handgiantzombie.name=§2hand giant zombie
+item.ytaun:handgiantzombie=§2hand giant zombie
+item.ytaun:thitthoiran.name=Rotten Meat Bricks
+item.ytaun:thitthoiran=Rotten Meat Bricks
+item.ytaun:waterofzombie.name=§2water of zombie
+item.ytaun:waterofzombie=§2water of zombie
+item.ytaun:zombie_heart.name=Zombie Heart 
+item.ytaun:zombie_heart=Zombie Heart 
+item.spawn_egg.entity.ytaun:zombie_geneal.name=Spawn Zombie Geneal
+entity.ytaun:zombie_geneal.name=Zombie Geneal
+item.ytaun:zombieaxe.name=§2Zombie Axe 
+item.ytaun:zombieaxe=§2Zombie Axe 
+pa:itemGroup.name.§2§lgiantZombie=§2§lGiant zombie

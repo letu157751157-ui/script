@@ -1,0 +1,43 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "ytaun:zombie_geneal",
+      "textures": {
+        "default": "textures/entity/pamobile/ytaun_zombie_geneal"
+      },
+      "materials": {
+        "default": "skeleton"
+      },
+      "geometry": {
+        "default": "geometry.ytaun_zombie_geneal_default"
+      },
+      "render_controllers": [
+        "controller.render.translucence"
+      ],
+      "spawn_egg": {
+        "base_color": "#386842",
+        "overlay_color": "#000000"
+      },
+      "animations": {
+        "walk": "animation.ytaun_zombie_geneal.walk",
+        "idle": "animation.ytaun_zombie_geneal.idle",
+        "mad": "animation.ytaun_zombie_geneal.mad"
+      },
+      "scripts": {
+        "animate": [
+          "root",
+          {
+            "walk": "query.is_moving"
+          },
+          {
+            "mad": "query.is_moving && query.is_angry"
+          },
+          {
+            "idle": "!query.is_moving"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,1 @@
+give @s ytaun:zombie_heart

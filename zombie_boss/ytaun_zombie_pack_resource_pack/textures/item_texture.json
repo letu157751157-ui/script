@@ -1,0 +1,21 @@
+{
+  "resource_pack_name": "vanilla",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "ytaun:handgiantzombie": {
+      "textures": "textures/items/pamobile/ytaun_handgiantzombie"
+    },
+    "ytaun:thitthoiran": {
+      "textures": "textures/items/pamobile/ytaun_thitthoiran"
+    },
+    "ytaun:waterofzombie": {
+      "textures": "textures/items/pamobile/ytaun_waterofzombie"
+    },
+    "ytaun:zombie_heart": {
+      "textures": "textures/items/pamobile/ytaun_zombie_heart"
+    },
+    "ytaun_zombieaxe": {
+      "textures": "textures/items/pamobile/ytaun_zombieaxe"
+    }
+  }
+}

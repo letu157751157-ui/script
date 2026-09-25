@@ -1,0 +1,39 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.ytaun_zombieaxe.first_person": {
+      "loop": true,
+      "bones": {
+        "rightitem": {
+          "rotation": [
+            0,
+            0,
+            180
+          ],
+          "position": [
+            -5,
+            35,
+            -5.5
+          ]
+        }
+      }
+    },
+    "animation.ytaun_zombieaxe.third_person": {
+      "loop": true,
+      "bones": {
+        "rightitem": {
+          "rotation": [
+            90,
+            0,
+            90
+          ],
+          "position": [
+            0,
+            22,
+            5
+          ]
+        }
+      }
+    }
+  }
+}

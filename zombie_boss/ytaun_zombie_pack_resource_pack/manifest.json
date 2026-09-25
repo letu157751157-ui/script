@@ -1,0 +1,51 @@
+{
+  "format_version": 2,
+  "header": {
+    "description": "Fight the Giant Zombie boss - 8 telegraphed skills, 3 phases, custom particles & animations. Defeat it to unlock the Nether!",
+    "name": "BOSS-Giant Zombie",
+    "uuid": "f8783686-c778-4201-82a6-30f68de7f70f",
+    "version": [
+      1,
+      4,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      17,
+      0
+    ]
+  },
+  "modules": [
+    {
+      "description": "BOSS-Giant Zombie resource pack",
+      "type": "resources",
+      "uuid": "e49de9b0-0c2c-4e8f-ac94-ae1259920bf7",
+      "version": [
+        1,
+        4,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "b079bb69-d897-46ca-a9e2-994bcf39c9ed",
+      "version": [
+        0,
+        0,
+        1
+      ]
+    }
+  ],
+  "metadata": {
+    "authors": [
+      "YTAUN"
+    ],
+    "generated_with": {
+      "MAM": [
+        "3.9.7"
+      ]
+    },
+    "url": "https://addonsmaker.com/"
+  }
+}

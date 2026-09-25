@@ -1,0 +1,14 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_brewing_mix": {
+    "description": {
+      "identifier": "recipes_989c8b08"
+    },
+    "tags": [
+      "brewing_stand"
+    ],
+    "output": "ytaun:waterofzombie",
+    "input": "ytaun:handgiantzombie",
+    "reagent": "minecraft:honey_bottle"
+  }
+}

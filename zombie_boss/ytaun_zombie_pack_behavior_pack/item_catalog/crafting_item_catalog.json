@@ -1,0 +1,22 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:crafting_items_catalog": {
+    "categories": [
+      {
+        "category_name": "items",
+        "groups": [
+          {
+            "group_identifier": {
+              "icon": "ytaun:handgiantzombie",
+              "name": "pa:itemGroup.name.\u00a72\u00a7lgiantZombie"
+            },
+            "items": [
+              "ytaun:handgiantzombie",
+              "ytaun:waterofzombie"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
