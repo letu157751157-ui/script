@@ -256,20 +256,38 @@ function getTargetsInBox(player, origin, direction, length, width) {
     const dy = entity.location.y - origin.y;
     const along = dx * direction.x + dz * direction.z;
     const side = dx * right.x + dz * right.z;
-    return along >= -0.5 && along <= length + 0.5 && Math.abs(side) <= width / 2 + 0.5 && dy > -2.5 && dy < 3;
+    return along >= -1 && along <= length + 0.8 && Math.abs(side) <= width / 2 + 0.8 && dy > -3 && dy < 3.5;
   });
 }
 
-function dealDamage(player, target, amount) {
-  if (!target.isValid) return false;
-  if (isUltActive(getState(player))) amount *= CONFIG.R.damageMultiplier;
+// The mob under the crosshair is always hit if it is within reach
+function aimedTarget(player, reach) {
   try {
-    const hit = target.applyDamage(amount, { cause: EntityDamageCause.entityAttack, damagingEntity: player });
-    if (hit) particle(target.dimension, P.spark, add(target.location, { x: 0, y: 1, z: 0 }));
-    return hit;
+    const hit = player.getEntitiesFromViewDirection({ maxDistance: reach })[0];
+    return hit && isTarget(player, hit.entity) ? hit.entity : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function dealDamage(player, target, amount) {
+  if (isUltActive(getState(player))) amount *= CONFIG.R.damageMultiplier;
+  return applySkillDamage(player, target, amount, 0);
+}
+
+// A mob that was just hit is invulnerable for ~0.5 s and ignores smaller damage (e.g. Q right after a
+// normal hit). If the damage is rejected, try again every 4 ticks until the window is over.
+function applySkillDamage(player, target, amount, attempt) {
+  if (!target.isValid || !player.isValid) return false;
+  let hit = false;
+  try {
+    hit = target.applyDamage(amount, { cause: EntityDamageCause.entityAttack, damagingEntity: player });
   } catch {
     return false;
   }
+  if (hit) particle(target.dimension, P.spark, add(target.location, { x: 0, y: 1, z: 0 }));
+  else if (attempt < 3) system.runTimeout(() => applySkillDamage(player, target, amount, attempt + 1), 4);
+  return hit;
 }
 
 function heal(player, amount) {
@@ -470,6 +488,8 @@ function slamQ(player, cast, direction) {
     sound(dimension, "mob.irongolem.throw", center, 0.6);
   } else {
     targets = getTargetsInBox(player, origin, direction, cast.length, cast.width);
+    const aimed = aimedTarget(player, cast.length + 1);
+    if (aimed && !targets.some((e) => e.id === aimed.id)) targets.push(aimed);
     isSweetSpot = (entity) => {
       const along = (entity.location.x - origin.x) * direction.x + (entity.location.z - origin.z) * direction.z;
       return along >= cast.length - cast.sweet;

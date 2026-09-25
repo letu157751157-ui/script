@@ -27,9 +27,9 @@ export const CONFIG = {
     knockup: 0.8,
     stun: 0.6,
     casts: [
-      { shape: "box", length: 6, width: 2.5, sweet: 1.5, damage: 6 }, // long slash
-      { shape: "box", length: 5, width: 4.5, sweet: 1.5, damage: 7 }, // wide slash
-      { shape: "circle", offset: 2.5, radius: 2.5, sweet: 1, damage: 9 }, // ground slam
+      { shape: "box", length: 6, width: 3, sweet: 1.5, damage: 8 }, // long slash
+      { shape: "box", length: 5, width: 5, sweet: 1.5, damage: 9 }, // wide slash
+      { shape: "circle", offset: 2.5, radius: 3, sweet: 1, damage: 12 }, // ground slam
     ],
   },
 
