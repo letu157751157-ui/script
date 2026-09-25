@@ -260,6 +260,52 @@ ANIMATIONS = {
                   (0.6, -0.55, -0.55), ((-4, -3, 7), (-0.7, -0.55, 0.45))),
         0.85: key(),
     }},
+    # Hold 20 s + jump: Heavenly Rampage. Toji sprints around the area cutting every mob 40 times.
+    # cut_a / cut_b: running slashes (legs mid-stride, body leaning in), alternated on each cut (strike 0.1 s)
+    "cut_a": {"length": 0.28, "keys": {
+        0.0: key(),
+        0.04: key(pose(right=(-160, 20, 20), left=(30, 0, -15), body=(18, 20, 0), rleg=(35, 0, 0), lleg=(-40, 0, 0)),
+                  (0.4, 0.8, 0.3), ((-3, 8, 3), (-0.4, 0.9, 0.2))),
+        0.1: key(pose(right=(-40, -45, -10), left=(-30, 0, -15), body=(25, -30, 0), rleg=(-40, 0, 0), lleg=(35, 0, 0),
+                      root=(0, -0.8, 0)),
+                 (-0.7, -0.5, -0.5), ((8, -3, 7), (0.7, -0.6, 0.4))),
+        0.18: key(pose(right=(-45, -40, -10), left=(-25, 0, -15), body=(22, -25, 0), rleg=(-30, 0, 0), lleg=(25, 0, 0)),
+                  (-0.7, -0.45, -0.5), ((7, -3, 7), (0.7, -0.55, 0.45))),
+        0.28: key(),
+    }},
+    "cut_b": {"length": 0.28, "keys": {
+        0.0: key(),
+        0.04: key(pose(right=(-150, -35, -15), left=(-30, 0, -15), body=(18, -20, 0), rleg=(-40, 0, 0), lleg=(35, 0, 0)),
+                  (-0.4, 0.8, 0.3), ((5, 8, 3), (0.4, 0.9, 0.2))),
+        0.1: key(pose(right=(-50, 50, 20), left=(30, 0, -15), body=(25, 30, 0), rleg=(35, 0, 0), lleg=(-40, 0, 0),
+                      root=(0, -0.8, 0)),
+                 (0.7, -0.5, -0.5), ((-4, -3, 7), (-0.7, -0.6, 0.4))),
+        0.18: key(pose(right=(-52, 45, 18), left=(25, 0, -15), body=(22, 26, 0), rleg=(25, 0, 0), lleg=(-30, 0, 0)),
+                  (0.7, -0.45, -0.5), ((-4, -3, 7), (-0.7, -0.55, 0.45))),
+        0.28: key(),
+    }},
+    # Jumping cut: tuck the legs in mid-air with the spear overhead, chop down (strike 0.18 s)
+    "leap_cut": {"length": 0.4, "keys": {
+        0.0: key(),
+        0.08: key(pose(right=(-170, 0, 10), left=(-150, 0, -10), body=(-10, 0, 0), head=(-10, 0, 0),
+                       rleg=(-70, 0, 0), lleg=(-50, 0, 0), root=(0, 4, 0)),
+                  (0.0, 1.0, 0.1), ((2, 9, 4), (0.0, 1.0, 0.1))),
+        0.18: key(pose(right=(-40, 0, 0), left=(-30, 0, 0), body=(30, 0, 0), head=(10, 0, 0),
+                       rleg=(-40, 0, 0), lleg=(20, 0, 0), root=(0, 1, 0)),
+                  (0.0, -0.8, -0.6), ((6, -2, 9), (0.1, -0.9, 0.4))),
+        0.4: key(),
+    }},
+    # Back at the starting spot: skid to a stop in a low crouch, spear held out to the side, then stand up
+    "rampage_end": {"length": 1.2, "keys": {
+        0.0: key(),
+        0.1: key(pose(right=(-20, 0, 70), left=(-20, 0, -30), body=(25, 0, 0), head=(-15, 0, 0),
+                      rleg=(-45, 0, 0), lleg=(30, 0, -10), root=(0, -3, 0)),
+                 (1.0, -0.2, 0.1), ((-8, -2, 4), (-0.9, -0.2, 0.3))),
+        0.8: key(pose(right=(-18, 0, 65), left=(-18, 0, -28), body=(22, 0, 0), head=(-12, 0, 0),
+                      rleg=(-42, 0, 0), lleg=(28, 0, -10), root=(0, -2.8, 0)),
+                 (1.0, -0.25, 0.1), ((-8, -2, 4), (-0.9, -0.25, 0.3))),
+        1.2: key(),
+    }},
     # 4th normal hit: spinning finisher. Wind up to the right, sweep the spear all the way across to the left
     "finisher": {"length": 0.6, "keys": {
         0.0: key(),
@@ -290,27 +336,6 @@ ANIMATIONS = {
                        rleg=(10, 0, 0), lleg=(-16, 0, 5), root=(0, -0.5, 0)),
                   (0.6, -0.5, 0.6), ((-2, -2, 2), (-0.6, -0.4, 0.7))),
         1.4: key(),
-    }},
-    # Held 20 s + jump: Heaven-Splitting Plunge. Crouch, leap with the spear raised to the sky,
-    # flip it point-down at the apex and drive it into the ground (impact ~0.9 s)
-    "plunge": {"length": 1.6, "keys": {
-        0.0: key(),
-        0.1: key(pose(body=(20, 0, 0), right=(10, 0, 10), left=(10, 0, -10), rleg=(-25, 0, 0), lleg=(-25, 0, 0),
-                      root=(0, -1.5, 0)),
-                 (0.2, -0.2, -0.95), ((0, -3, 0), (0.2, 0.85, 0.45))),
-        0.35: key(pose(right=(-170, 0, 10), left=(-170, 0, -10), body=(-10, 0, 0), head=(-15, 0, 0),
-                       rleg=(-30, 0, 0), lleg=(-10, 0, 0)),
-                  (0.0, 1.0, 0.1), ((2, 9, 4), (0.0, 1.0, 0.1))),
-        0.7: key(pose(right=(-165, 0, 8), left=(-165, 0, -8), body=(-6, 0, 0), head=(-10, 0, 0),
-                      rleg=(-28, 0, 0), lleg=(-12, 0, 0)),
-                 (0.0, -1.0, -0.2), ((2, 8, 5), (0.0, -0.9, 0.4))),
-        0.9: key(pose(right=(-40, 0, 0), left=(-40, 0, 0), body=(35, 0, 0), head=(15, 0, 0),
-                      rleg=(-45, 0, 0), lleg=(30, 0, 0), root=(0, -2.5, 0)),
-                 (0.0, -0.9, -0.4), ((6, -2, 9), (0.1, -0.95, 0.3))),
-        1.25: key(pose(right=(-42, 0, 0), left=(-42, 0, 0), body=(32, 0, 0), head=(12, 0, 0),
-                       rleg=(-42, 0, 0), lleg=(28, 0, 0), root=(0, -2.2, 0)),
-                  (0.0, -0.9, -0.4), ((6, -2, 9), (0.1, -0.95, 0.3))),
-        1.6: key(),
     }},
 }
 BONES = ["root", "body", "head", "rightarm", "rightitem", "leftarm", "rightleg", "leftleg"]

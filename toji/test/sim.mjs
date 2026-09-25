@@ -154,31 +154,37 @@ tick(CONFIG.thrust.windup * 20 + 1);
 check("awakened thrust deals x1.3", near(damageTo(victim), CONFIG.thrust.damage * CONFIG.awaken.damageMultiplier), `${damageTo(victim)}`);
 away(victim);
 
-// --- Hold 20 s + jump: Heaven-Splitting Plunge
+// --- Hold 20 s + jump: Heavenly Rampage (40 cuts across a 20x20 area, then back to the start)
 tick(5); // wait for the thrust to finish
 clear();
-const crowd = [0, 1, 2].map((i) => new Entity("minecraft:zombie", { x: 1 + i * 0.8, y: 64, z: 3 }, 80));
+const cfgR = CONFIG.plunge;
+const start = { ...player.location };
+const crowd = [[6, 6], [-8, 3], [2, -9], [9, -9]].map(([dx, dz]) => new Entity("minecraft:zombie", { x: start.x + dx, y: 64, z: start.z + dz }, 200));
+const outside = new Entity("minecraft:zombie", { x: start.x + 14, y: 64, z: start.z }, 200);
 fire("playerButtonInput", { player, button: "Jump", newButtonState: "Pressed" });
-check("plunge animation", anims().includes("animation.toji.plunge"));
-check("plunge immunity", player.getEffect("resistance")?.amplifier === 4);
-tick(3);
-player.isOnGround = false;
-check("plunge leap", knockbacksOf(player).some((k) => k.vertical === CONFIG.plunge.leap));
-check("plunge homes onto the nearest enemy", knockbacksOf(player).some((k) => k.vertical === CONFIG.plunge.leap && k.horizontal.x > 0));
-tick(CONFIG.plunge.diveAt * 20);
-check("plunge dives down", knockbacksOf(player).some((k) => k.vertical === -CONFIG.plunge.diveSpeed));
-check("no damage before landing", crowd.every((z) => damageTo(z) === 0));
-player.isOnGround = true;
-tick(2);
-const plungeDamage = CONFIG.plunge.damage * CONFIG.awaken.damageMultiplier;
-check("plunge hits everyone in range", crowd.every((z) => near(damageTo(z), plungeDamage)), crowd.map(damageTo).join());
-check("plunge crater + rings", ["toji:crack", "toji:shock_ring", "toji:null_ground"].every((id) => log.particles.some((p) => p.id === id)));
+check("rampage immunity", player.getEffect("resistance")?.amplifier === 4);
+check("mobs in the area are pinned", crowd.every((z) => z.getEffect("slowness")?.amplifier === 255));
+tick(cfgR.cuts * cfgR.cutInterval + 2);
+const hops = log.teleports.filter((t) => t.entity === player.id);
+check("runs to every mob", crowd.every((z) => hops.some((t) => Math.hypot(t.location.x - z.location.x, t.location.z - z.location.z) < 2)));
+check("40 cuts", hops.length >= cfgR.cuts, `${hops.length}`);
+check("jumping cuts from above", hops.some((t) => t.location.y > 65));
+check("running + jumping animations", ["cut_a", "cut_b", "leap_cut"].every((n) => anims().includes(`animation.toji.${n}`)));
+check("mob outside the 20x20 area untouched", !hops.some((t) => Math.abs(t.location.x - outside.location.x) < 2));
+check("back to the starting spot", near(hops.at(-1).location.x, start.x) && near(hops.at(-1).location.z, start.z));
+check("landing animation", anims().includes("animation.toji.rampage_end"));
+check("no damage before the finale", crowd.every((z) => damageTo(z) === 0));
+tick(14);
+const perMob = (cfgR.cuts / crowd.length) * cfgR.damagePerCut * CONFIG.awaken.damageMultiplier;
+check("every cut lands at once", crowd.every((z) => near(damageTo(z), perMob)), crowd.map(damageTo).join());
+check("outside mob not damaged", damageTo(outside) === 0);
 tick(12);
-check("plunge immunity removed, awakening resistance kept", player.getEffect("resistance")?.amplifier === CONFIG.awaken.resistanceAmplifier);
+check("immunity removed, awakening resistance kept", player.getEffect("resistance")?.amplifier === CONFIG.awaken.resistanceAmplifier);
 clear();
 fire("playerButtonInput", { player, button: "Jump", newButtonState: "Pressed" });
-check("plunge only once per awakening", !anims().includes("animation.toji.plunge"));
-crowd.forEach(away);
+tick(4);
+check("rampage only once per awakening", !anims().includes("animation.toji.cut_a"));
+[...crowd, outside].forEach(away);
 
 // --- Letting go of the spear ends the awakening
 player.selectedSlotIndex = 3;
@@ -187,7 +193,7 @@ check("awakening buffs removed when switching slot", !player.getEffect("speed") 
 check("spear in the other slot reverted", player.slots[0].typeId === "toji:inverted_spear", player.slots[0].typeId);
 check("lore/durability kept through swaps", player.slots[0].getLore().length === 7);
 
-// --- Letting go mid-plunge: buffs are cleared once landed (immunity kept while falling)
+// --- Letting go mid-rampage: buffs are cleared once it ends (immunity kept meanwhile)
 player.selectedSlotIndex = 0;
 CONFIG.awaken.holdTime = 1;
 tick(25);
@@ -199,10 +205,8 @@ player.isOnGround = false;
 tick(4);
 player.selectedSlotIndex = 3;
 tick(5);
-check("immunity kept while falling after letting go", player.getEffect("resistance")?.amplifier === 4);
-tick(CONFIG.plunge.diveAt * 20);
-player.isOnGround = true;
-tick(15);
+check("immunity kept mid-rampage after letting go", player.getEffect("resistance")?.amplifier === 4);
+tick(CONFIG.plunge.cuts * CONFIG.plunge.cutInterval + 30);
 check("buffs cleared after landing", !player.getEffect("speed") && !player.getEffect("resistance"));
 
 // --- Stunned players cannot cast

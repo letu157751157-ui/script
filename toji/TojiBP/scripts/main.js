@@ -6,7 +6,7 @@
 //   Sneak + right-click            Thousand-Mile Chain whirl, then hurl
 //   Sprint + attack                Heavenly Ambush: vanish, reappear behind the target, X cut (sprint + right-click too)
 //   Hold the spear 20 s            Heavenly Restriction: Awakened (triggers by itself)
-//   Hold 20 s + jump (awakened)    Heaven-Splitting Plunge
+//   Hold 20 s + jump (awakened)    Heavenly Rampage: 40 cuts across a 20x20 area, then back to the start
 //   Normal attacks                 4-hit combo, the 4th hit is a spinning finisher
 //   Every hit                      Passive: Nullification (strips the target's positive effects)
 //
@@ -83,7 +83,7 @@ const LORE = {
     "§7Sneak + right-click: §fChain whirl + hurl",
     "§7Sprint + attack: §fHeavenly Ambush",
     "§7Hold 20s: §fHeavenly Restriction",
-    "§7Hold 20s + jump: §dHeaven-Splitting Plunge",
+    "§7Hold 20s + jump: §dHeavenly Rampage",
     "§7Attack x4: §fcombo finisher",
     "§7Every hit: §5nullifies effects",
   ],
@@ -92,7 +92,7 @@ const LORE = {
     "§7Khuỵu + chuột phải: §fXích Vạn Lý (quay + ném)",
     "§7Chạy + chém: §fÁm Sát Sau Lưng",
     "§7Cầm 20s: §fThiên Dữ Chú Phược",
-    "§7Cầm 20s + nhảy: §dGiáng Thiên Nhất Kích",
+    "§7Cầm 20s + nhảy: §dThiên Dữ Loạn Trảm",
     "§7Đánh 4 lần: §fđòn kết liễu",
     "§7Mọi đòn: §5vô hiệu buff",
   ],
@@ -973,148 +973,159 @@ function endAwakeningEarly(player, state) {
 }
 
 // ---------------------------------------------------------------------------
-// Held 20 s + jump — Heaven-Splitting Plunge
+// Held 20 s + jump — Heavenly Rampage
 // ---------------------------------------------------------------------------
 
-// The enemy to plunge onto: the closest one in front within lockRange
-function plungeTarget(player, range) {
-  const forward = aimDirection(player);
-  let best;
-  let bestDistance = Infinity;
-  for (const entity of getTargetsNear(player, player.location, range)) {
-    const to = flatUnit({ x: entity.location.x - player.location.x, z: entity.location.z - player.location.z });
-    const distance = horizontalDistance(entity.location, player.location);
-    if (to && to.x * forward.x + to.z * forward.z < 0.5) continue;
-    if (distance < bestDistance) {
-      bestDistance = distance;
-      best = entity;
-    }
+// Mobs inside the square area (halfSize blocks each way), closest first
+function rampageTargets(player, origin, halfSize) {
+  return getTargetsNear(player, origin, halfSize * 1.5)
+    .filter((e) => Math.abs(e.location.x - origin.x) <= halfSize && Math.abs(e.location.z - origin.z) <= halfSize && Math.abs(e.location.y - origin.y) < 6)
+    .sort((a, b) => horizontalDistance(a.location, origin) - horizontalDistance(b.location, origin));
+}
+
+// Where Toji lands for a cut: around the mob, at a different angle each time so he circles it
+function cutSpot(dimension, target, index) {
+  for (let k = 0; k < 4; k++) {
+    const angle = index * 2.4 + k * 1.57;
+    const spot = { x: target.location.x + Math.cos(angle) * 1.4, y: target.location.y, z: target.location.z + Math.sin(angle) * 1.4 };
+    if (isFree(dimension, spot)) return spot;
   }
-  return best;
+  return { ...target.location };
+}
+
+function moveTo(player, spot, facing) {
+  try {
+    player.teleport(spot, { facingLocation: facing });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function castPlunge(player, state) {
   const cfg = CONFIG.plunge;
-  const target = plungeTarget(player, cfg.lockRange);
-  let direction = aimDirection(player);
-  let push = cfg.forward;
-  if (target) {
-    direction = flatUnit({ x: target.location.x - player.location.x, z: target.location.z - player.location.z }) ?? direction;
-    push = Math.min(cfg.maxHoming, horizontalDistance(target.location, player.location) * cfg.homing);
-    // Mark the victim: Infinity ring and a pinning stun so it cannot run away
-    particle(player.dimension, P.nullGround, up(target.location, 0.08), withRadius(3));
-    stun(target, cfg.diveAt + 0.5);
-  }
+  const dimension = player.dimension;
+  const origin = { ...player.location };
+  const view = player.getViewDirection();
+  const targets = rampageTargets(player, origin, cfg.halfSize);
+  const total = cfg.cuts * cfg.cutInterval;
   state.plungeUsed = true;
   state.plunging = true;
-  const diveTick = ticks(cfg.diveAt);
-  const maxTick = diveTick + ticks(cfg.maxFall);
-  state.busyUntil = now() + maxTick;
-  playAnim(player, "plunge");
-  // Full damage immunity while leaping/falling (no fall damage on landing)
-  addEffect(player, "resistance", maxTick + 10, 4);
-  const dimension = player.dimension;
-  sound(dimension, "item.trident.riptide_3", player.location, 0.9);
-  particle(dimension, P.dust, up(player.location, 0.1));
-  shockRing(dimension, player.location, 2.5);
+  state.busyUntil = now() + total + 30;
+  // Untouchable while rampaging (also no fall damage from the jumping cuts)
+  addEffect(player, "resistance", total + 40, 4);
+  for (const target of targets) stun(target, total / TPS + cfg.stun);
 
-  system.runTimeout(() => {
-    if (!player.isValid) return;
-    knockback(player, { x: direction.x * push, z: direction.z * push }, cfg.leap);
-    particle(dimension, P.afterimage, up(player.location, 0.9));
-  }, 2);
+  // Take-off: crouch, dust kick and a flash where he starts
+  playAnim(player, "cut_a");
+  particle(dimension, P.vanish, up(origin, 1));
+  particle(dimension, P.dust, up(origin, 0.1));
+  shockRing(dimension, origin, 3);
+  flashScreen(player, 0.8, 0.8, 1);
+  sound(dimension, "mob.phantom.swoop", origin, 0.7);
+  sound(dimension, "item.trident.riptide_3", origin, 1.2);
+  shake(player, 0.3, 0.3);
 
-  let elapsed = 0;
+  const tally = new Map(); // mob id -> cuts landed
+  let previous = { ...origin };
+  let cut = 0;
   const run = system.runInterval(() => {
-    elapsed++;
     if (!player.isValid) {
       state.plunging = false;
       return system.clearRun(run);
     }
-    if (elapsed < diveTick) {
-      if (elapsed % 3 === 0) particle(dimension, P.aura, player.location);
-      if (elapsed === diveTick - 5) {
-        particle(dimension, P.charge, spearTip(player, 0.6));
-        sound(dimension, "item.trident.return", player.location, 0.6);
-      }
+    if (cut >= cfg.cuts) {
+      system.clearRun(run);
+      finishRampage(player, state, origin, view, targets, tally);
       return;
     }
-    if (elapsed === diveTick) {
-      // Dive straight at the victim's current position
-      const aim = target?.isValid ? flatUnit({ x: target.location.x - player.location.x, z: target.location.z - player.location.z }) : undefined;
-      const left = target?.isValid ? Math.min(1.5, horizontalDistance(target.location, player.location) * 0.3) : 0.3;
-      const d = aim ?? direction;
-      knockback(player, { x: d.x * left, z: d.z * left }, -cfg.diveSpeed);
-      sound(dimension, "mob.phantom.swoop", player.location, 0.6);
-      flashScreen(player, 0.7, 0.6, 0.95);
+    const alive = targets.filter((e) => e.isValid && (getHealth(e)?.currentValue ?? 0) > 0);
+    const leap = (cut + 1) % cfg.leapEvery === 0;
+    let spot;
+    let victim;
+    if (alive.length) {
+      victim = alive[cut % alive.length];
+      spot = cutSpot(dimension, victim, cut);
+    } else {
+      // Nobody left (or nobody at all): sprint through the area cutting the air
+      const angle = cut * 2.4;
+      const r = cfg.halfSize * (0.3 + 0.6 * ((cut * 7) % 10) / 10);
+      spot = { x: origin.x + Math.cos(angle) * r, y: origin.y, z: origin.z + Math.sin(angle) * r };
+      if (!isFree(dimension, spot)) spot = { ...origin };
     }
-    particle(dimension, P.afterimage, up(player.location, 0.9));
-    particle(dimension, P.thrust, up(player.location, 0.2), withDirection({ x: 0, y: -1, z: 0 }));
-    if ((elapsed > diveTick + 1 && player.isOnGround) || elapsed >= maxTick) {
-      system.clearRun(run);
-      plungeImpact(player, state, direction);
+    if (leap) spot = up(spot, 1.6);
+    const facing = victim ? up(victim.location, 1) : add(up(spot, 1), { x: spot.x - previous.x, y: 0, z: spot.z - previous.z }, 1);
+
+    // Run there: afterimages along the path, dust at the feet
+    particleLine(dimension, P.afterimage, up(previous, 0.9), up(spot, 0.9), 2.5);
+    if (cut % 2 === 0) particle(dimension, P.dust, up(previous, 0.1));
+    moveTo(player, spot, facing);
+    playAnim(player, leap ? "leap_cut" : cut % 2 ? "cut_b" : "cut_a");
+    previous = spot;
+
+    if (victim) {
+      const at = up(victim.location, 1 + ((cut % 3) - 1) * 0.3);
+      particle(dimension, cut % 4 === 3 ? P.xSlash : P.slash, at, withRadius(1.8));
+      particle(dimension, P.spark, at);
+      if (cut % 3 === 0) particle(dimension, P.blood, at);
+      if (leap) {
+        crater(dimension, victim.location, 1.8);
+        shake(victim, 0.3, 0.2);
+      }
+      tally.set(victim.id, (tally.get(victim.id) ?? 0) + 1);
+      sound(dimension, "item.trident.hit", victim.location, 1 + (cut % 5) * 0.12, 0.7);
+    } else {
+      particle(dimension, P.slash, up(spot, 1));
     }
-  }, 1);
+    if (cut % 3 === 0) sound(dimension, "mob.phantom.swoop", spot, 1.4 + (cut % 4) * 0.1, 0.6);
+    cut++;
+  }, cfg.cutInterval);
 }
 
-function plungeImpact(player, state, direction) {
+// Every cut lands at once: back at the starting spot, the whole area bursts
+function finishRampage(player, state, origin, view, targets, tally) {
   const cfg = CONFIG.plunge;
-  state.plunging = false;
-  state.busyUntil = now() + 8;
   const dimension = player.dimension;
-  const center = player.location;
+  particleLine(dimension, P.afterimage, up(player.location, 0.9), up(origin, 0.9), 2.5);
+  moveTo(player, origin, add(up(origin, 1.6), view, 5));
+  playAnim(player, "rampage_end");
+  particle(dimension, P.dust, up(origin, 0.1));
+  crater(dimension, origin, 2.5);
+  sound(dimension, "item.trident.return", origin, 0.8);
 
-  crater(dimension, center, cfg.radius * 0.9);
-  particle(dimension, P.nullGround, up(center, 0.1), withRadius(cfg.radius * 1.6));
-  particle(dimension, P.xSlash, up(center, 1.2), withRadius(4.5));
-  particle(dimension, P.shard, up(center, 1));
-  particle(dimension, P.shardBlue, up(center, 1));
-  // A second crack wave and debris pillars around the rim
-  system.runTimeout(() => crater(dimension, center, cfg.radius * 1.4), 4);
-  for (let i = 0; i < 6; i++) {
-    const angle = (i / 6) * Math.PI * 2 + 0.5;
-    const at = { x: center.x + Math.cos(angle) * cfg.radius, y: center.y, z: center.z + Math.sin(angle) * cfg.radius };
-    system.runTimeout(() => {
-      particle(dimension, P.debris, up(at, 0.2));
-      particle(dimension, P.dust, up(at, 0.3));
-    }, 5 + i);
-  }
-  particle(dimension, P.flash, up(center, 0.8));
-  particle(dimension, P.debris, up(center, 0.2));
-  for (let i = 0; i < 3; i++) system.runTimeout(() => shockRing(dimension, center, cfg.radius * (0.5 + i * 0.35)), i * 3);
-  for (let i = 0; i < 8; i++) {
-    const angle = (i / 8) * Math.PI * 2;
-    const at = { x: center.x + Math.cos(angle) * cfg.radius * 0.6, y: center.y, z: center.z + Math.sin(angle) * cfg.radius * 0.6 };
-    system.runTimeout(() => {
-      particle(dimension, P.debris, up(at, 0.2));
-      particle(dimension, P.slash, up(at, 0.8));
-    }, 1 + i);
-  }
-  sound(dimension, "random.explode", center, 0.7);
-  sound(dimension, "item.trident.thunder", center, 1.2, 0.6);
-  sound(dimension, "random.anvil_land", center, 0.5);
-  shake(player, 0.6, 0.6);
-  flashScreen(player, 1, 1, 1);
-
-  for (const target of getTargetsNear(player, center, cfg.radius)) {
-    const away = flatUnit({ x: target.location.x - center.x, z: target.location.z - center.z }) ?? direction;
-    nullify(target, true);
-    dealDamage(player, target, cfg.damage);
-    knockback(target, { x: away.x * 0.5, z: away.z * 0.5 }, cfg.knockup);
-    system.runTimeout(() => stun(target, cfg.stun), 8);
-    particle(dimension, P.blood, up(target.location, 1));
-    shake(target, 0.5, 0.45);
-  }
-
-  // Take the plunge immunity off, keep the awakening resistance if it is still running
-  // (if the spear was let go mid-air, the awakening ended: clear its buffs now that we landed)
+  // A heartbeat of silence, then every mob that was cut explodes in slashes
   system.runTimeout(() => {
+    if (!player.isValid) return;
+    flashScreen(player, 1, 1, 1);
+    shake(player, 0.5, 0.5);
+    sound(dimension, "random.explode", origin, 0.9);
+    sound(dimension, "item.trident.thunder", origin, 1.3, 0.5);
+    for (let i = 0; i < 3; i++) system.runTimeout(() => shockRing(dimension, origin, 4 + i * 4), i * 3);
+    for (const target of targets) {
+      const count = tally.get(target.id) ?? 0;
+      if (!count || !target.isValid) continue;
+      const at = up(target.location, 1);
+      particle(dimension, P.xSlash, at, withRadius(3));
+      particle(dimension, P.blood, at);
+      particle(dimension, P.shard, at);
+      particle(dimension, P.flash, at);
+      for (let k = 0; k < Math.min(6, count); k++) system.runTimeout(() => target.isValid && particle(dimension, P.slash, up(target.location, 0.6 + k * 0.2)), k);
+      nullify(target, true);
+      dealDamage(player, target, count * cfg.damagePerCut);
+      knockback(target, { x: 0, z: 0 }, cfg.finalKnockup);
+      shake(target, 0.5, 0.4);
+    }
+  }, 12);
+
+  system.runTimeout(() => {
+    state.plunging = false;
+    state.busyUntil = now() + 4;
     if (!player.isValid) return;
     removeEffect(player, "resistance");
     const left = state.awakeUntil - now();
     if (left > 0) addEffect(player, "resistance", left, CONFIG.awaken.resistanceAmplifier);
     else for (const id of AWAKEN_EFFECTS) removeEffect(player, id);
-  }, 10);
+  }, 24);
 }
 
 // ---------------------------------------------------------------------------

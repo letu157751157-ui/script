@@ -86,20 +86,15 @@ export const CONFIG = {
     cooldownMultiplier: 0.5, // skill cooldowns while awakened
   },
 
-  // Hold 20 s + jump (while awakened) — Heaven-Splitting Plunge: leap onto the nearest enemy in front
-  // and drive the spear down through it into the ground
+  // Hold 20 s + jump (while awakened) — Heavenly Rampage: Toji sprints all over a 20x20 area around you,
+  // cuts every mob in it 40 times in total (spread over all of them), then runs back to where he started
   plunge: {
-    leap: 1.3, // upward launch
-    forward: 0.8, // forward push when there is no target
-    lockRange: 12, // enemies this close in front are targeted
-    homing: 0.2, // forward push per block of distance to the target
-    maxHoming: 2.4,
-    diveAt: 0.7, // seconds after the leap, matches the "plunge" animation
-    diveSpeed: 3.2,
-    maxFall: 2.5, // impact at the latest after this many seconds
-    radius: 6,
-    damage: 18,
-    knockup: 0.9,
+    halfSize: 10, // 20x20 blocks
+    cuts: 40,
+    cutInterval: 2, // ticks between cuts (40 cuts = 4 s)
+    leapEvery: 5, // every 5th cut is a jumping cut from above
+    damagePerCut: 2.5, // a mob's cuts land as one big hit at the end (mobs ignore hits for 0.5 s after each one)
+    finalKnockup: 0.7,
     stun: 1.5,
   },
 };
