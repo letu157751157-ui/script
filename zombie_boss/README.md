@@ -113,3 +113,9 @@ mật phun, vũng axit sủi bọt, cục axit, lưỡi thịt, con mắt quỷ 
 - Đầu búa là nguyên đầu zombie khối vuông (mặt ở trước và sau, mắt đỏ, răng), đai sắt gỉ quanh trán,
   đinh gỉ đóng tua tủa trên đỉnh và hai bên, xương thò sau gáy, mụn mủ xanh phát sáng, 2 sợi xích gỉ.
 - Animation: đầu búa lắc nhẹ, mụn mủ phập phồng, xích đung đưa. Icon vẽ lại khớp model.
+
+## v1.12 — Zombie Hammer: quay lại mẫu v1.10 + thêm chi tiết
+- Rune xanh phát sáng khắc trên mặt ngoài 2 đầu bịt sắt; 8 gai sắt ở các góc đầu bịt.
+- Hàm dưới cho 2 mặt đầu lâu; vương miện sắt giữ cụm pha lê; máu chảy trên khối thịt.
+- Gai xương trên các đốt cán, vành sắt dưới cổ búa, tua rua vải + xương treo ở chuôi (đung đưa).
+- Icon cập nhật: thêm gai ở đầu bịt và rune.
