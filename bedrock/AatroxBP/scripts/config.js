@@ -18,7 +18,7 @@ export const CONFIG = {
     delay: 0.5, // the wound explodes after this delay (avoids the post-hit invulnerability)
   },
 
-  // Q — The Darkin Blade: 3 slashes; hitting with the blade edge (sweet spot) deals x1.6 damage + knock-up + stun
+  // Q — The Darkin Blade: 3 slashes; the sweet spot (Q1/Q2 blade tip, Q3 center) deals x1.6 damage + knock-up + stun
   Q: {
     cooldown: 7,
     recastWindow: 4,
@@ -27,9 +27,9 @@ export const CONFIG = {
     knockup: 0.8,
     stun: 0.6,
     casts: [
-      { shape: "box", length: 6, width: 3, sweet: 1.5, damage: 8 }, // long slash
-      { shape: "box", length: 5, width: 5, sweet: 1.5, damage: 9 }, // wide slash
-      { shape: "circle", offset: 2.5, radius: 3, sweet: 1, damage: 12 }, // ground slam
+      { shape: "box", length: 6.5, width: 3.5, sweet: 1.8, damage: 8 }, // long slash
+      { shape: "box", length: 5.5, width: 5.5, sweet: 1.8, damage: 9 }, // wide slash
+      { shape: "circle", offset: 3, radius: 3.5, sweet: 1.5, damage: 12 }, // ground slam
     ],
   },
 
