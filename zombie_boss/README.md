@@ -35,3 +35,9 @@ title trên màn hình và vụ nổ đẩy lùi.
 
 ### Animation (`tools/gen_animations.py` thêm vào `ytaun_giant_zombie.animation.json`)
 `slam`, `throw`, `summon`, `stomp`, `enrage`, `breath` — thời điểm va chạm trong animation khớp với tick gây sát thương trong script.
+
+### Dọn dẹp
+- Xoá script/file thừa từ addon khác (candy scythe, enbriger, frozen sword, harvester scythe, tutorial scroll,
+  structure summon, item trigger, shield manager, `player.json` ghi đè người chơi, `giantzombie.mcfunction` lỗi).
+  Một file lỗi lúc load là toàn bộ script chết → boss không có skill.
+- Script API hạ xuống `@minecraft/server` 2.0.0 (chạy trên Minecraft 1.21.90+), bỏ `@minecraft/server-ui`.

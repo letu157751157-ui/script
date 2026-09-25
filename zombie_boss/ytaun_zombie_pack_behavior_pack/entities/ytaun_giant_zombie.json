@@ -420,7 +420,7 @@
       },
       "minecraft:boss": {
         "hud_range": 125,
-        "name": "§l§2Giant Zombie",
+        "name": "\u00a7l\u00a72Giant Zombie",
         "should_darken_sky": false
       },
       "minecraft:on_hurt": {
@@ -482,9 +482,7 @@
       },
       "on:hurt": {
         "queue_command": {
-          "command": [
-            "function giantzombie"
-          ]
+          "command": []
         }
       },
       "on:death": {

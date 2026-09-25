@@ -24,15 +24,12 @@ const CREATIVE = GameMode.Creative ?? GameMode.creative;
 const SPECTATOR = GameMode.Spectator ?? GameMode.spectator;
 
 // Loại trừ khi tìm mục tiêu: đồng minh zombie, vật vô tri, item, đạn...
-const ENEMY_QUERY = {
-  excludeFamilies: ["zombie", "inanimate"],
-  excludeTypes: [
-    "minecraft:item", "minecraft:xp_orb", "minecraft:arrow", "minecraft:snowball",
-    "minecraft:lightning_bolt", "minecraft:area_effect_cloud", "minecraft:falling_block",
-    "minecraft:tnt", "minecraft:fireball", "minecraft:small_fireball", "minecraft:thrown_trident",
-  ],
-  excludeTags: [MINION_TAG],
-};
+const IGNORE_TYPES = new Set([
+  "minecraft:item", "minecraft:xp_orb", "minecraft:arrow", "minecraft:snowball",
+  "minecraft:lightning_bolt", "minecraft:area_effect_cloud", "minecraft:falling_block",
+  "minecraft:tnt", "minecraft:fireball", "minecraft:small_fireball", "minecraft:thrown_trident",
+  "minecraft:armor_stand", BOSS_TYPE_ID,
+]);
 
 // ====== CẤU HÌNH GIAI ĐOẠN ======
 const PHASES = [
@@ -135,9 +132,17 @@ function isValidEnemy(e) {
 function enemiesNear(boss, center, radius) {
   let list = [];
   try {
-    list = boss.dimension.getEntities({ ...ENEMY_QUERY, location: center, maxDistance: radius });
+    list = boss.dimension.getEntities({ location: center, maxDistance: radius });
   } catch { }
-  return list.filter((e) => e.id !== boss.id && isValidEnemy(e));
+  return list.filter((e) => {
+    if (e.id === boss.id || IGNORE_TYPES.has(e.typeId) || !isValidEnemy(e)) return false;
+    try {
+      if (e.hasTag(MINION_TAG)) return false;
+      const fam = e.getComponent("minecraft:type_family");
+      if (fam && (fam.hasTypeFamily("zombie") || fam.hasTypeFamily("inanimate"))) return false;
+      return !!e.getComponent("minecraft:health");
+    } catch { return false; }
+  });
 }
 
 /**
