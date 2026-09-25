@@ -1,205 +1,208 @@
-# Quỷ Kiếm Darkin — Addon Aatrox cho Minecraft Bedrock
+# The Darkin Blade — Aatrox Addon for Minecraft Bedrock
 
-Addon thêm thanh kiếm **Quỷ Kiếm Darkin** (`aatrox:darkin_blade`) với bộ chiêu mô phỏng Aatrox (LMHT),
-viết bằng Script API `@minecraft/server` 2.0.0. **Không cần bật Beta APIs / thử nghiệm.**
+This addon adds **The Darkin Blade** (`aatrox:darkin_blade`), a sword with a skill kit inspired by Aatrox (League of Legends),
+written with the Script API `@minecraft/server` 2.0.0. **No Beta APIs / experiments required.**
 
-Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, console đều được).
+Requirements: Minecraft Bedrock **1.21.90 or newer** (PC, mobile and console).
 
-![Model 3D Quỷ Kiếm Darkin](preview.png)
+![The Darkin Blade 3D model](preview.png)
 
-Khi cầm trên tay, kiếm hiển thị bằng **model 3D** (164 khối) với **texture pixel art kiểu Minecraft**
-(bảng màu giới hạn, sáng trên-trái, tối dưới-phải, nhiễu dither như texture gốc của game).
+When held, the blade is shown as a **3D model** with a **Minecraft-style pixel art texture**
+(limited palette, lit top-left, shaded bottom-right, dither noise like vanilla textures).
 
-### Thiết kế bám theo bản gốc
+### Design based on the original
 
-Hình dáng được dựng theo thanh kiếm của Aatrox sau bản làm lại năm 2018, đối chiếu từ nhiều nguồn:
-- **Splash art gốc** (Victor Maury vẽ): dòng dung nham sáng chảy dọc giữa lưỡi và phân nhánh, lõi sáng ở gốc lưỡi, cụm sừng đen cong vươn lên hai bên.
-- **Splash Sea Hunter và Justicar** (được vẽ lại theo mẫu kiếm mới trong đợt làm lại): mắt Darkin nằm ở chắn kiếm với móng vuốt ôm quanh, lưỡi rộng dần về phía mũi, mũi vát chéo, sống lưỡi răng cưa lớn và một ngạnh móc gần mũi.
-- **Icon chiêu Q và nội tại**: khung kim loại tối màu viền ngoài lưỡi, lõi thịt đỏ thẫm bên trong.
-- **Wiki và các bài giới thiệu bản làm lại** (Nexus, Polygon, Rift Herald): Aatrox là "chiến binh cầm đại kiếm", thanh kiếm là nhà tù sống chứa linh hồn hắn.
+The shape follows Aatrox's blade after the 2018 rework, cross-checked against several sources:
+- **Base splash art** (by Victor Maury): a bright lava vein running down the middle of the blade and branching out, a glowing core at the blade base, black curved horns rising on both sides.
+- **Sea Hunter and Justicar splashes** (redrawn with the new blade during the rework): the Darkin eye in the guard with claws wrapped around it, a blade that widens toward the tip, an angled tip, a big serrated spine and a hook near the tip.
+- **Q and passive icons**: a dark metal frame around the blade, a dark red flesh core inside.
+- **Wiki and rework articles** (Nexus, Polygon, Rift Herald): Aatrox is a "greatsword warrior" and the blade is a living prison holding his soul.
 
-Từ đó model gồm:
-- lưỡi rộng dần, **mũi vát chéo**, sống lưỡi có **4 răng cưa lớn** và **ngạnh móc** gần mũi, lưỡi bén có khía nhỏ
-- **khung kim loại tối** viền ngoài (dày hơn lõi), **lõi thịt đỏ thẫm** lõm vào giữa
-- **dòng dung nham phân nhánh như cây** chảy từ mắt lên gần mũi, hắt ánh cam lên phần thịt xung quanh
-- **mắt Darkin đồng tử dọc** trong hốc thịt ở chắn kiếm (có **mí mắt chớp** mỗi 4 giây), **cặp sừng đen** cong ôm hai bên gốc lưỡi, gai ngang và **móng vuốt** quặp phía dưới
-- tay cầm dài quấn da (cầm hai tay) với 3 vòng kim loại, núm chuôi có gai
+So the model has:
+- a widening blade with an **angled tip**, **4 big serrated teeth** and a **hook** on the spine, small notches on the edge
+- a **dark metal frame** (thicker than the core) and a recessed **dark red flesh core**
+- a **tree-like branching lava vein** running from the eye up toward the tip, casting orange light on the surrounding flesh
+- a **slit-pupil Darkin eye** in a flesh socket in the guard (with an **eyelid that blinks** every 4 seconds), **black horns** curving around the blade base, side spikes and **claws** curling underneath
+- a long leather-wrapped two-handed grip with 3 metal bands and a spiked pommel
 
-Dung nham và mắt là một lớp riêng vẽ bằng material `entity_emissive` với texture `.tga`
-(kênh alpha thấp = phát sáng, giống texture blaze gốc) nên vẫn rực lên ban đêm.
-Đây là model tự dựng theo phong cách Minecraft, mô phỏng thiết kế kiếm của Aatrox, không phải model hay texture gốc của Riot
-(addon không chứa bất kỳ hình ảnh nào của Riot).
+The lava and the eye are a separate layer drawn with the `entity_emissive` material and a `.tga` texture
+(low alpha = glowing, like the vanilla blaze texture), so they still glow at night.
+This is an original Minecraft-style model inspired by Aatrox's blade, not a Riot model or texture
+(the addon contains no Riot images).
 
-### Cầm kiếm và animation
+### Holding the blade and animations
 
-![Cầm kiếm và animation chiêu](preview_animation.png)
+![Holding the blade and skill animations](preview_animation.png)
 
-- **Cầm kiếm:** tay nắm đúng chuôi kiếm, kiếm vuông góc với cánh tay, lưỡi chĩa ngang về trước, dài xấp xỉ chiều cao nhân vật.
-  Góc nhìn thứ nhất: kiếm dựng dọc bên phải màn hình, xoay ngang 135° cho mặt kiếm hướng vào giữa.
-- **Animation khi dùng chiêu** (cả người xung quanh lẫn chính bạn đều thấy):
-  - **Q1** giơ kiếm qua vai rồi chém chéo xuống, **Q2** quét ngang từ phải sang trái, **Q3** nhảy lên hai tay giơ kiếm rồi nện xuống đất
-  - **E** lao người về trước, kiếm kéo lê phía sau
-  - **W** tay trái vung phóng xích (xích bay ra đúng lúc vung tay)
-  - **R** khom người rồi gầm lên, dang tay giơ kiếm lên trời
-- **Mắt Darkin trên kiếm chớp mắt** định kỳ.
+- **Holding:** the hand grips the handle, the blade is perpendicular to the arm and points forward, about as long as the character is tall.
+  First person: the blade stands upright on the right side of the screen, turned 135° horizontally so its face points toward the center.
+- **Skill animations** (seen by you and by everyone around you):
+  - **Q1** raises the blade over the shoulder then slashes diagonally down, **Q2** sweeps horizontally from right to left, **Q3** leaps up with both hands overhead and slams the ground
+  - **E** lunges forward with the blade dragging behind
+  - **W** swings the left arm to throw the chain (the chain leaves exactly on the swing)
+  - **R** crouches, then roars with the arms spread and the blade raised to the sky
+- **The Darkin eye on the blade blinks** periodically.
 
-### Dạng Kẻ Diệt Thế (R)
+### World Ender form (R)
 
-Khi biến hình, kiếm trên tay được đổi sang bản **Diệt Thế** (hết biến hình tự đổi lại, giữ nguyên độ bền, phù phép, tên):
-- **Cặp cánh quỷ 3D** kiểu cánh dơi gắn sau lưng (xương cánh tay, vuốt ở khớp cổ tay, 4 nan ngón, màng đỏ thẫm lõm giữa các ngón, gân và mép rực dung nham) vỗ liên tục, **cặp sừng 3D** trên đầu, kiếm to hơn.
-  Cánh và sừng ẩn ở góc nhìn thứ nhất để không che màn hình.
-- **Vùng Diệt Thế** bán kính 6 block bám theo người: vòng rune có gai xoay dưới chân, rune và lửa chạy quanh mép, linh hồn bay lên;
-  kẻ địch trong vùng mất 1.5 máu mỗi giây và bị làm chậm.
-- **Chiêu được cường hoá:**
-  - **Q** vùng chém to hơn 30%, cột lửa phun dọc đường chém
-  - **E** lướt xa hơn 40%, hồi chiêu còn một nửa, để lại vệt lửa đốt kẻ địch đi qua
-  - **W** phóng **3 sợi xích** hình quạt, mỗi sợi trói một mục tiêu, hồi chiêu nhanh hơn
-  - **Nội tại** hồi nhanh gấp đôi (như trước)
+While transformed, the blade in your hand is swapped for the **World Ender** version (swapped back when the form ends, keeping durability, enchantments and name):
+- **3D bat-like demon wings** on the back (arm bone, a claw on the wrist, 4 finger bones, dark red membrane scalloped between the fingers, glowing lava veins and edges) that flap constantly, **3D horns** on the head, and a bigger blade.
+  The wings and horns are hidden in first person so they don't block the view.
+- **World Ender zone** with a 6-block radius that follows you: a spiked rune circle spinning under your feet, runes and fire running around the rim, souls rising;
+  enemies inside lose 1.5 health per second and are slowed.
+- **Empowered skills:**
+  - **Q** 30% bigger slash area, fire pillars erupting along the slash
+  - **E** 40% longer dash, half cooldown, leaves a fire trail that burns enemies it passes
+  - **W** throws **3 chains** in a fan, each binding one target, shorter cooldown
+  - **Passive** recharges twice as fast (as before)
 
-Animation chiêu có đủ nhịp lấy đà → vung → chạm → quá đà → hồi về, đường cong Catmull-Rom được tính sẵn và lấy mẫu mỗi 0,04 giây nên chuyển động cong và mượt.
+Skill animations have the full rhythm anticipation → swing → impact → overshoot → recover. The Catmull-Rom curve is precomputed and sampled every 0.04 seconds, so the motion is curved and smooth.
 
-## Cài đặt
+## Installation
 
-- **Nhanh nhất:** tải file [`dist/AatroxDarkinBlade.mcaddon`](dist/AatroxDarkinBlade.mcaddon) rồi mở nó, Minecraft sẽ tự nhập cả 2 pack.
-- **Thủ công:** chép `AatroxBP` vào `development_behavior_packs` và `AatroxRP` vào `development_resource_packs` trong thư mục `com.mojang`.
+- **Quickest:** download [`dist/AatroxDarkinBlade.mcaddon`](dist/AatroxDarkinBlade.mcaddon) and open it; Minecraft imports both packs automatically.
+- **Manual:** copy `AatroxBP` into `development_behavior_packs` and `AatroxRP` into `development_resource_packs` inside the `com.mojang` folder.
 
-Sau đó tạo/sửa thế giới → **Behavior Packs** → bật *Aatrox - Quỷ Kiếm Darkin (BP)* (Resource Pack sẽ tự bật theo).
+Then create/edit a world → **Behavior Packs** → activate *Aatrox - The Darkin Blade (BP)* (the Resource Pack is activated with it).
 
-> **Đã cài bản cũ?** Bản này là **v1.6.4**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.6.4.
-> Nếu vẫn thấy kiếm cầm như cây thương hoặc không có animation, vào **Cài đặt → Bộ nhớ** xoá hết pack Aatrox cũ rồi nhập lại file `.mcaddon`.
+> **Upgrading from an older version?** This is **v1.7.0**. In your world, remove the old packs and activate version 1.7.0.
+> If the blade is still held like a lance or has no animations, go to **Settings → Storage**, delete every old Aatrox pack and import the `.mcaddon` again.
 
-Lấy kiếm:
-- Lệnh: `/give @s aatrox:darkin_blade`
-- Chế tạo (bàn chế tạo, không cần xếp hình): **Kiếm Netherite + Ngôi sao Nether + Khối Redstone**
-- Hoặc tìm trong túi đồ Sáng Tạo, mục Trang bị → Kiếm.
+Getting the blade:
+- Command: `/give @s aatrox:darkin_blade`
+- Crafting (crafting table, shapeless): **Netherite Sword + Nether Star + Block of Redstone** (unlocks once you have a Nether Star)
+- Or find it in the Creative inventory under Equipment → Swords.
 
-## Cách dùng chiêu
+## Controls
 
-Bedrock không cho addon gán phím riêng, nên chiêu dùng các nút sẵn có: **chuột phải** (điện thoại: **chạm màn hình** hoặc nút Dùng/Đặt; tay cầm: **LT/L2**),
-**khụy** (Shift / nút ngồi), **nhảy** và **chạy nhanh**:
+Bedrock doesn't let addons bind their own keys, so the skills use existing buttons: **right-click** (mobile: **tap the screen** or the Use/Place button; controller: **LT/L2**),
+**sneak** (Shift / sneak button), **jump** and **sprint**:
 
-| Thao tác | Chiêu | Hiệu ứng |
+| Input | Skill | Effect |
 |---|---|---|
-| **Chuột phải** | **Q — Quỷ Kiếm Darkin** | Bấm 3 lần liên tiếp (mỗi lần có 4 giây để bấm tiếp). Vùng chém hiện bằng ô rune dưới đất; **ô màu cam là điểm ngọt**: x1.6 sát thương, hất tung, choáng, giảm hồi chiêu nội tại. Lần 3 nện xuống vùng tròn |
-| **Chạy nhanh + chém** (đánh trúng mob/block lúc đang chạy nhanh, hoặc chạy nhanh + chuột phải) | **E — Bước Nhảy Hắc Ám** | Lướt nhanh theo hướng nhìn |
-| **Khụy + chuột phải** | **W — Xiềng Xích Địa Ngục** | Phóng xích lửa. Trúng thì gây sát thương, làm chậm, tạo vòng trói; sau 1.5 giây mục tiêu chưa chạy ra khỏi vòng thì bị kéo về, chịu thêm sát thương và bị choáng |
-| **Khụy + nhảy** | **R — Kẻ Diệt Thế** | Sóng xung kích hất văng + làm chậm xung quanh, rồi biến hình 10 giây: +30% sát thương chiêu, +50% hồi máu, Tốc Độ II, Sức Mạnh I, nội tại hồi nhanh gấp đôi |
-| **Đánh thường** (chuột trái / chạm vào mob) | **Nội tại — Tư Thế Tử Thần** | Khi sẵn sàng (8 giây): vết chém phát nổ thêm 8% máu tối đa của mục tiêu và hồi máu bằng lượng đó |
+| **Right-click** | **Q — The Darkin Blade** | Press 3 times in a row (4 seconds to recast each time). The slash area is shown as rune tiles on the ground; **the orange tiles are the sweet spot**: x1.6 damage, knock-up, stun, reduces the passive cooldown. The 3rd cast slams a circular area |
+| **Sprint + attack** (hit a mob/block while sprinting, or sprint + right-click) | **E — Umbral Dash** | Dash quickly where you look |
+| **Sneak + right-click** | **W — Infernal Chains** | Throw a fiery chain. On hit it deals damage, slows and creates a binding circle; if the target hasn't left the circle after 1.5 seconds it is pulled back, takes more damage and is stunned |
+| **Sneak + jump** | **R — World Ender** | A shockwave knocks back and slows everything around, then you transform for 10 seconds: +30% skill damage, +50% healing, Speed II, Strength I, the passive recharges twice as fast |
+| **Normal attack** (left-click / tap a mob) | **Passive — Deathbringer Stance** | When ready (8 seconds): the wound explodes for an extra 8% of the target's max health and heals you by the same amount |
 
-Mọi sát thương gây ra khi cầm kiếm đều **hút máu 15%**.
+All damage dealt while holding the blade has **15% lifesteal**.
 
-Bấm lúc tâm ngắm đang chỉ vào **khoảng không, mặt đất, tường hay mob** đều ra chiêu.
-Riêng block/mob có thao tác riêng (rương, cửa, bàn chế tạo, giường, dân làng, ngựa, thuyền...) thì vẫn mở/dùng như thường.
+Pressing while aiming at **the air, the ground, a wall or a mob** all cast skills.
+Blocks/mobs with their own interaction (chests, doors, crafting tables, beds, villagers, horses, boats...) still open/work as usual.
 
-**Để biết đang dùng được chiêu gì:**
-- Lần đầu cầm kiếm sẽ hiện tiêu đề và hướng dẫn trong khung chat. Gõ `/scriptevent aatrox:help` để xem lại.
-- Mô tả của kiếm (giữ chuột lên kiếm / chọn kiếm trong túi đồ) ghi sẵn cách dùng từng chiêu.
-- **Thanh phía trên hotbar** hiện:
-  `Nội tại ✔  Bấm: Q  Q ✔  E ✔  W 3.2s  R ✔`, trong đó **"Bấm: …"** là chiêu sẽ ra nếu bấm chuột phải ngay lúc này (đổi theo tư thế: `E (chạy nhanh)`, `W (khụy)  Nhảy: R`),
-  phía sau là thời gian hồi chiêu. Bấm khi chiêu đang hồi sẽ nghe tiếng "cạch" và thanh hiện `W đang hồi chiêu: 3.2s`.
+**Knowing which skill you can use:**
+- The first time you hold the blade a title and a guide appear in chat. Type `/scriptevent aatrox:help` to see it again.
+- The blade's tooltip (hover/select the blade in the inventory) lists how to use each skill.
+- **The bar above the hotbar** shows:
+  `Passive ✔  Press: Q  Q ✔  E ✔  W 3.2s  R ✔`, where **"Press: …"** is the skill that right-click would cast right now (it changes with your stance: `E (sprinting)`, `W (sneaking)  Jump: R`),
+  followed by the cooldowns. Pressing while a skill is on cooldown plays a "clunk" and the bar shows `W on cooldown: 3.2s`.
 
-### Hiệu ứng particle
+### Particle effects
 
-![Texture particle](preview_particles.png)
+![Particle textures](preview_particles.png)
 
-Addon có 29 particle riêng, texture pixel art tự vẽ. Phần lớn là **flipbook nhiều khung hình**:
-hiệu ứng chạy hết các khung trong thời gian sống của particle.
+The addon has 29 custom particles with hand-made pixel art textures. Most are **multi-frame flipbooks**
+that play through all their frames over the particle lifetime.
 
-| Particle | Hình | Dùng ở đâu |
+| Particle | Look | Used for |
 |---|---|---|
-| `aatrox:slash` | Lưỡi liềm lửa 4 khung: loé lên → rực nhất → rạn → vỡ thành tia lửa | Nhát chém Q |
-| `aatrox:shock_ring` | Vòng lửa 3 khung: dày → mỏng → vỡ vụn | Sóng xung kích Q3, R |
-| `aatrox:ground_mark` / `ground_mark_sweet` | Ô rune 3 khung hiện dần (khung → hình thoi → lõi), tô đỏ / cam | Báo trước vùng chém Q và điểm ngọt |
-| `aatrox:ult_aura` | Ngọn lửa 4 khung bập bùng | Hào quang khi biến hình R |
-| `aatrox:ember` | Tàn lửa 4 khung: cháy sáng → tàn thành đốm đỏ | Lửa bốc lên từ lưỡi kiếm, vệt lướt E |
-| `aatrox:flash` | Chớp sáng hình sao 3 khung | Nổ điểm ngọt, nội tại, kéo xích |
-| `aatrox:hit_spark` | Tia lửa dài bay theo hướng văng | Mỗi khi chiêu trúng |
-| `aatrox:blood_burst` | Giọt máu pixel đặc, rơi xuống đất | Trúng điểm ngọt, nội tại, kéo xích |
-| `aatrox:chain_link` | Mắt xích sắt nung đỏ | Sợi xích W và vòng trói |
-| `aatrox:lifesteal` | Giọt máu phát sáng bay lên | Khi hút máu |
-| `aatrox:blood_orb` | Cầu máu bay từ mục tiêu về người dùng | Khi hút máu |
-| `aatrox:x_slash` | Vết chém chữ X 3 khung | Nội tại phát nổ, trúng điểm ngọt Q |
-| `aatrox:ground_crack` + `aatrox:debris` + `aatrox:smoke` | Đất nứt rực dung nham, đá văng nảy trên mặt đất, khói đỏ đen 4 khung | Điểm chém Q, nện Q3, kéo xích W, biến hình R |
-| `aatrox:fire_pillar` | Cột lửa phun thẳng lên | Vành điểm ngọt Q3, 8 cột quanh người khi biến hình R |
-| `aatrox:charge` | Tàn lửa tụ về lưỡi kiếm | Lúc vung Q, lúc bắt đầu R |
-| `aatrox:afterimage` | Bóng mờ đỏ thẫm | Để lại phía sau khi lướt E |
-| `aatrox:chain_head` | Đầu móc sắt nung đỏ | Mũi sợi xích W |
-| `aatrox:bind_circle` | Vòng rune ngôi sao sáu cánh xoay chậm | Dưới chân mục tiêu trúng W (đúng bằng vòng trói) |
-| `aatrox:domain` | Vòng Diệt Thế lớn có gai, rune, xoay chậm | Dưới chân suốt thời gian biến hình R |
-| `aatrox:soul` | Linh hồn Darkin gào thét bay lên | Nội tại, Q3, biến hình, vùng Diệt Thế |
-| `aatrox:lightning` | Sét đỏ gấp khúc | Nện Q3, 4 tia quanh người khi biến hình |
-| `aatrox:glyph` | Ký tự rune bay lên (4 loại) | Vòng trói W, mép vùng Diệt Thế |
-| `aatrox:lava_drip` | Dung nham nhỏ giọt | Từ lưỡi kiếm khi cầm |
-| `aatrox:fear` | Đầu lâu sợ hãi | Trên đầu mục tiêu bị R dọa |
-| `aatrox:blood_mist` | Sương máu loang | Trúng điểm ngọt, nội tại, trong vùng Diệt Thế |
-| `aatrox:fire_trail` | Vệt lửa cháy trên đất | Lướt E khi biến hình, mép vùng Diệt Thế |
+| `aatrox:slash` | 4-frame fiery crescent: flare → brightest → cracking → breaks into sparks | Q slashes |
+| `aatrox:shock_ring` | 3-frame fire ring: thick → thin → shattered | Q3 and R shockwaves |
+| `aatrox:ground_mark` / `ground_mark_sweet` | 3-frame rune tiles appearing (frame → diamond → core), tinted red / orange | Q area and sweet spot warning |
+| `aatrox:ult_aura` | 4-frame flickering flame | Aura while transformed |
+| `aatrox:ember` | 4-frame ember: burns bright → fades to red specks | Fire rising from the blade, E dash trail |
+| `aatrox:flash` | 3-frame star flash | Sweet spot explosions, passive, chain pull |
+| `aatrox:hit_spark` | Long sparks flying along their velocity | Every skill hit |
+| `aatrox:blood_burst` | Solid pixel blood drops falling to the ground | Sweet spot hits, passive, chain pull |
+| `aatrox:chain_link` | Red-hot iron chain link | W chain and binding circle |
+| `aatrox:lifesteal` | Glowing blood drops rising | Lifesteal |
+| `aatrox:blood_orb` | Blood orbs flying from the target to you | Lifesteal |
+| `aatrox:x_slash` | 3-frame X slash | Passive explosion, Q sweet spot hits |
+| `aatrox:ground_crack` + `aatrox:debris` + `aatrox:smoke` | Lava-glowing cracked ground, bouncing debris, 4-frame red-black smoke | Q impacts, Q3 slam, W pull, R transform |
+| `aatrox:fire_pillar` | Fire pillar erupting upward | Q3 sweet spot rim, 8 pillars around you on R |
+| `aatrox:charge` | Embers gathering into the blade | When swinging Q, when starting R |
+| `aatrox:afterimage` | Dark red afterimage | Left behind when dashing with E |
+| `aatrox:chain_head` | Red-hot iron hook | Tip of the W chain |
+| `aatrox:bind_circle` | Slowly spinning hexagram rune circle | Under a target hit by W (same size as the binding circle) |
+| `aatrox:domain` | Large spiked World Ender circle with runes, spinning slowly | Under your feet for the whole R transformation |
+| `aatrox:soul` | Screaming Darkin souls rising | Passive, Q3, transform, World Ender zone |
+| `aatrox:lightning` | Jagged red lightning | Q3 slam, 4 bolts around you on R |
+| `aatrox:glyph` | Rising rune glyphs (4 kinds) | W binding circle, World Ender zone rim |
+| `aatrox:lava_drip` | Dripping lava | From the held blade |
+| `aatrox:fear` | Fear skull | Above targets feared by R |
+| `aatrox:blood_mist` | Spreading blood mist | Sweet spot hits, passive, inside the World Ender zone |
+| `aatrox:fire_trail` | Fire burning on the ground | E dash while transformed, World Ender zone rim |
 
-Ngoài particle, chiêu còn **rung màn hình** (Q3, trúng điểm ngọt, nội tại, kéo xích, R) và **chớp đỏ màn hình** khi biến hình R,
-kèm thêm tiếng gầm (rồng + ravager) khi biến hình.
+Besides particles, skills also **shake the screen** (Q3, sweet spot hits, passive, chain pull, R) and **flash the screen red** when transforming with R,
+together with a roar (ender dragon + ravager) on transformation.
 
-## Tuỳ chỉnh
+## Customization
 
-Mọi thông số chiêu nằm trong [`AatroxBP/scripts/config.js`](AatroxBP/scripts/config.js): sát thương, hồi chiêu, tầm, bật/tắt đánh người chơi (`pvp`)...
-Sát thương đánh thường của kiếm (9) nằm ở `minecraft:damage` trong [`AatroxBP/items/darkin_blade.json`](AatroxBP/items/darkin_blade.json).
+All skill values live in [`AatroxBP/scripts/config.js`](AatroxBP/scripts/config.js): damage, cooldowns, range, PvP on/off (`pvp`)...
+The blade's normal attack damage (9) is `minecraft:damage` in [`AatroxBP/items/darkin_blade.json`](AatroxBP/items/darkin_blade.json).
 
-Sửa xong thì chạy `python3 build.py` để tạo lại texture, model, animation, particle và file `.mcaddon`.
-Nếu sửa rồi nhập lại vào game, nhớ tăng `version` trong 2 file `manifest.json` (nếu không Minecraft sẽ giữ bản cũ).
+After editing, run `python3 build.py` to regenerate the textures, model, animations, particles and the `.mcaddon` file.
+If you re-import into the game, bump `version` in both `manifest.json` files (otherwise Minecraft keeps the old version).
 
-**Model 3D:** hình dáng kiếm là bản vẽ mặt trước dạng pixel trong [`sword_art.py`](sword_art.py)
-(đường viền lưỡi, răng cưa, sừng, mắt, tay cầm; mỗi vật liệu có độ dày riêng trong `MATERIALS`).
-[`model.py`](model.py) đùn bản vẽ thành khối 3D, gộp pixel cùng vật liệu thành khối lớn, vẽ texture pixel art (bảng màu trong `PALETTES`)
-và xuất 2 geometry: `darkin_blade.geo.json` (phần thường + bone `eyelid` cho mí mắt) và `darkin_blade_glow.geo.json` (phần phát sáng, texture `darkin_blade_glow.tga`).
-Có thể mở các file `.geo.json` bằng Blockbench để chỉnh tay.
+**3D model:** the blade shape is a front-view pixel drawing in [`sword_art.py`](sword_art.py)
+(blade outline, teeth, horns, eye, grip; each material has its own depth in `MATERIALS`).
+[`model.py`](model.py) extrudes the drawing into 3D cubes, merges same-material pixels into bigger cubes, paints the pixel art texture (palettes in `PALETTES`)
+and exports the geometries: `darkin_blade.geo.json` (regular parts + the `eyelid` bone) and `darkin_blade_glow.geo.json` (glowing parts, texture `darkin_blade_glow.tga`),
+plus the World Ender versions `darkin_blade_ult.geo.json` / `darkin_blade_ult_glow.geo.json` with the wings and horns from [`ult_parts.py`](ult_parts.py).
+The `.geo.json` files can be opened in Blockbench for manual edits.
 
-**Tư thế cầm kiếm** nằm trong [`AatroxRP/animations/darkin_blade.animation.json`](AatroxRP/animations/darkin_blade.animation.json).
-Model attachable được gắn sao cho điểm `(0, 24, 0)` của model nằm ở bàn tay (đã kiểm chứng bằng model đinh ba, khiên, ống nhòm gốc),
-và tâm tay cầm của kiếm đặt đúng điểm này, nên `position` chỉ dịch nhẹ vào lòng bàn tay, `rotation` là hướng kiếm, `scale` là độ lớn
-(góc nhìn thứ 3: 0.5, góc nhìn thứ nhất: 0.3; khi biến hình 0.62 / 0.34).
+**Holding pose** is in [`AatroxRP/animations/darkin_blade.animation.json`](AatroxRP/animations/darkin_blade.animation.json).
+Attachables are placed so that model point `(0, 24, 0)` sits in the hand (verified against the vanilla trident, shield and spyglass models),
+and the blade's grip center is exactly there, so `position` only nudges it into the palm, `rotation` is the blade direction and `scale` its size
+(third person: 0.5, first person: 0.3; transformed 0.62 / 0.34).
+The wings and horns use the same rule with bones bound to the player's `'body'` and `'head'`.
 
-**Animation chiêu** sinh từ [`player_anims.py`](player_anims.py) ra `AatroxRP/animations/aatrox_player.animation.json`, script phát bằng `playAnimation`:
-- góc nhìn thứ 3: độ xoay/dịch cộng thêm cho các bone của người chơi, cộng với hướng lưỡi kiếm mong muốn (cổ tay được giải ngược cho đúng hướng)
-- góc nhìn thứ nhất: vị trí nắm tay và hướng lưỡi kiếm trên màn hình, script tự tính ra chuyển động của tay
-- keyframe chém của Q ở 0.45 giây khớp với `Q.windup` trong `config.js`; đổi `windup` thì dời keyframe theo
+**Skill animations** are generated by [`player_anims.py`](player_anims.py) into `AatroxRP/animations/aatrox_player.animation.json`, and the script plays them with `playAnimation`:
+- third person: extra rotation/offset for the player bones, plus the desired blade direction (the wrist is solved to match)
+- first person: the hand position and blade direction on screen; the script works out the arm motion
+- the Q strike keyframe at 0.45 seconds matches `Q.windup` in `config.js`; if you change `windup`, move the keyframe too
 
-**Particle:** chỉnh trong [`particles.py`](particles.py) (hình sprite, bảng màu, số khung, tốc độ, thời gian sống), chạy lại `build.py`.
+**Particles:** edit [`particles.py`](particles.py) (sprite shapes, palettes, frame count, speed, lifetime) and run `build.py` again.
 
-**Icon:** `art/item_icon.png` (túi đồ, 64×64) và `art/pack_icon.png` được render từ model 3D; thay 2 file này nếu muốn icon khác.
+**Icons:** `art/item_icon.png` (inventory, 64×64) and `art/pack_icon.png` are rendered from the 3D model; replace them for different icons.
 
-## Cấu trúc
+## Structure
 
 ```
 bedrock/
 ├── AatroxBP/                  Behavior pack
 │   ├── manifest.json
-│   ├── items/darkin_blade.json
+│   ├── items/                 darkin_blade.json + darkin_blade_ult.json (World Ender form)
 │   ├── recipes/darkin_blade.json
 │   └── scripts/
-│       ├── main.js            toàn bộ logic chiêu, nhận thao tác, hướng dẫn
-│       └── config.js          thông số
+│       ├── main.js            all skill logic, input handling, guide
+│       └── config.js          tuning values
 ├── AatroxRP/                  Resource pack
-│   ├── attachables/           thay model cầm tay bằng model 3D
-│   ├── animations/            tư thế cầm kiếm, chớp mắt, animation chiêu của người chơi
-│   ├── render_controllers/    vẽ lớp phát sáng
-│   ├── models/entity/         model 3D (.geo.json) + lớp phát sáng
-│   ├── particles/             29 particle riêng
-│   └── textures/              icon, texture model (.png + .tga phát sáng), texture particle
-├── art/                       icon render từ model 3D
-├── sword_art.py               bản vẽ pixel mặt trước của kiếm (hình dáng)
-├── model.py                   đùn bản vẽ thành model 3D + vẽ texture pixel art
-├── player_anims.py            thiết kế + giải ngược animation chiêu của người chơi
-├── particles.py               định nghĩa particle + vẽ texture particle
-├── build.py                   tạo texture, model, animation, particle + đóng gói .mcaddon
+│   ├── attachables/           replace the held item with the 3D model
+│   ├── animations/            holding pose, blinking, wings, player skill animations
+│   ├── render_controllers/    draws the glowing layer
+│   ├── models/entity/         3D models (.geo.json) + glowing layers
+│   ├── particles/             29 custom particles
+│   └── textures/              icon, model textures (.png + glowing .tga), particle texture
+├── art/                       icons rendered from the 3D model
+├── sword_art.py               front-view pixel drawing of the blade (shape)
+├── ult_parts.py               World Ender wings and horns
+├── model.py                   extrudes the drawings into 3D models + paints the pixel art texture
+├── player_anims.py            designs + inverse-solves the player skill animations
+├── particles.py               particle definitions + particle texture painting
+├── build.py                   builds textures, models, animations, particles + packages the .mcaddon
 └── dist/AatroxDarkinBlade.mcaddon
 ```
 
-## Lưu ý
+## Notes
 
-- Choáng = hiệu ứng Chậm Chạp cấp tối đa; mục tiêu bị choáng vẫn nhảy được. Người chơi bị choáng thì không dùng được chiêu của kiếm.
-- Mob vừa trúng đòn có khoảng bất tử ngắn (0.5 giây), nên dùng Q ngay sau một đòn đánh thường có thể bị giảm sát thương.
+- Stun = maximum-level Slowness; stunned targets can still jump. A stunned player cannot cast the blade's skills.
+- Mobs that were just hit have a short invulnerability window (0.5 seconds), so casting Q right after a normal attack may deal reduced damage.
 
-## Khắc phục sự cố
+## Troubleshooting
 
-- **Bấm không ra chiêu, không có thanh hồi chiêu phía trên hotbar:** script chưa chạy. Kiểm tra đã bật **Behavior Pack** (không chỉ Resource Pack) và game từ **1.21.90** trở lên.
-- **Có thanh hồi chiêu nhưng bấm không ra chiêu:** xem chữ **"Bấm: …"** trên thanh để biết chiêu sẽ ra; nếu chiêu đang hồi sẽ có thông báo thời gian. Đang bị choáng thì không dùng được chiêu.
-- **Kiếm hiện dạng hình phẳng 2D, không có model 3D:** Resource Pack chưa bật hoặc đang dùng bản cũ, xem mục *Đã cài bản cũ?* ở trên.
-- **Muốn đổi độ to / cách cầm kiếm:** sửa `scale`, `rotation` trong `AatroxRP/animations/darkin_blade.animation.json`.
+- **Pressing does nothing and there is no cooldown bar above the hotbar:** the script isn't running. Make sure the **Behavior Pack** is active (not just the Resource Pack) and the game is **1.21.90** or newer.
+- **The cooldown bar is there but nothing casts:** check **"Press: …"** on the bar to see which skill will cast; if it is on cooldown the remaining time is shown. You can't cast while stunned.
+- **The blade shows as a flat 2D sprite instead of the 3D model:** the Resource Pack isn't active or an old version is in use, see *Upgrading from an older version?* above.
+- **To change the blade size / holding pose:** edit `scale` and `rotation` in `AatroxRP/animations/darkin_blade.animation.json`.

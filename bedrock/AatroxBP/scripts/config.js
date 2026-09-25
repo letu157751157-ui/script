@@ -1,24 +1,24 @@
-// Thông số của Quỷ Kiếm Darkin. Sửa ở đây để cân bằng lại chiêu.
-// Đơn vị: máu (20 = 10 tim), block, giây.
+// The Darkin Blade tuning. Edit here to rebalance the skills.
+// Units: health (20 = 10 hearts), blocks, seconds.
 
 export const CONFIG = {
-  // Chiêu có đánh trúng người chơi khác không (false = chỉ đánh mob)
+  // Whether skills can hit other players (false = mobs only)
   pvp: true,
-  // Hút máu: hồi % sát thương gây ra (cả đánh thường lẫn chiêu)
+  // Lifesteal: heal this fraction of damage dealt (normal attacks and skills)
   lifesteal: 0.15,
 
-  // Nội tại — Tư Thế Tử Thần: đòn đánh thường kế tiếp gây nổ thêm % máu tối đa của mục tiêu và hồi máu
+  // Passive — Deathbringer Stance: the next normal attack explodes for % of the target's max health and heals
   passive: {
     cooldown: 8,
     maxHealthPct: 0.08,
     minBonus: 3,
     maxBonus: 12,
     healRatio: 1,
-    sweetSpotReduction: 2, // Q trúng điểm ngọt giảm hồi chiêu nội tại (giây)
-    delay: 0.5, // vết chém phát nổ sau khoảng này (tránh thời gian bất tử sau đòn đánh)
+    sweetSpotReduction: 2, // Q sweet-spot hit reduces the passive cooldown (seconds)
+    delay: 0.5, // the wound explodes after this delay (avoids the post-hit invulnerability)
   },
 
-  // Q — Quỷ Kiếm Darkin: chém 3 lần, trúng mép kiếm (điểm ngọt) thì x1.6 sát thương + hất tung + choáng
+  // Q — The Darkin Blade: 3 slashes; hitting with the blade edge (sweet spot) deals x1.6 damage + knock-up + stun
   Q: {
     cooldown: 7,
     recastWindow: 4,
@@ -27,24 +27,24 @@ export const CONFIG = {
     knockup: 0.8,
     stun: 0.6,
     casts: [
-      { shape: "box", length: 6, width: 2.5, sweet: 1.5, damage: 6 }, // nhát chém dài
-      { shape: "box", length: 5, width: 4.5, sweet: 1.5, damage: 7 }, // nhát chém ngang
-      { shape: "circle", offset: 2.5, radius: 2.5, sweet: 1, damage: 9 }, // nện xuống đất
+      { shape: "box", length: 6, width: 2.5, sweet: 1.5, damage: 6 }, // long slash
+      { shape: "box", length: 5, width: 4.5, sweet: 1.5, damage: 7 }, // wide slash
+      { shape: "circle", offset: 2.5, radius: 2.5, sweet: 1, damage: 9 }, // ground slam
     ],
   },
 
-  // E — Bước Nhảy Hắc Ám: lướt theo hướng nhìn
+  // E — Umbral Dash: dash where you look
   E: {
     cooldown: 4,
     strength: 2.2,
     vertical: 0.15,
   },
 
-  // W — Xiềng Xích Địa Ngục: trói mục tiêu, không chạy khỏi vòng kịp thì bị kéo về + choáng
+  // W — Infernal Chains: bind a target; if it doesn't leave the circle in time it is pulled back + stunned
   W: {
     cooldown: 12,
     range: 14,
-    speed: 1.5, // block mỗi tick
+    speed: 1.5, // blocks per tick
     hitRadius: 1.2,
     damage: 4,
     slowAmplifier: 1,
@@ -56,7 +56,7 @@ export const CONFIG = {
     stun: 0.75,
   },
 
-  // R — Kẻ Diệt Thế: biến hình, hất văng + làm chậm xung quanh, tăng sát thương/hồi máu/tốc chạy
+  // R — World Ender: transform, knock back + slow nearby enemies, bonus damage/healing/speed
   R: {
     cooldown: 60,
     duration: 10,
@@ -66,22 +66,22 @@ export const CONFIG = {
     knockback: 1.6,
     fearSlowAmplifier: 2,
     fearDuration: 2,
-    damageMultiplier: 1.3, // áp dụng cho sát thương chiêu
+    damageMultiplier: 1.3, // applies to skill damage
     healMultiplier: 1.5,
     speedAmplifier: 1,
-    strengthAmplifier: 0, // tăng sát thương đánh thường qua hiệu ứng Sức Mạnh
+    strengthAmplifier: 0, // boosts normal attack damage via the Strength effect
     passiveCooldownMultiplier: 0.5,
-    // Vùng Diệt Thế bám theo người khi biến hình: kẻ địch trong vùng mất máu mỗi giây và bị làm chậm
+    // World Ender zone that follows you while transformed: enemies inside lose health every second and are slowed
     zoneRadius: 6,
     zoneDamage: 1.5,
-    // Chiêu được cường hoá khi đang biến hình
+    // Skills are empowered while transformed
     empowered: {
-      qScale: 1.3, // Q: vùng chém to hơn, thêm cột lửa dọc đường chém
-      eStrength: 1.4, // E: lướt xa hơn
-      eCooldown: 0.5, // E: hồi chiêu còn một nửa
-      eTrailDamage: 3, // E: vệt lửa gây sát thương kẻ địch đi qua
-      wChains: 3, // W: phóng 3 sợi xích hình quạt
-      wSpread: 20, // W: góc lệch giữa các sợi (độ)
+      qScale: 1.3, // Q: bigger slash area, fire pillars along the slash
+      eStrength: 1.4, // E: longer dash
+      eCooldown: 0.5, // E: half cooldown
+      eTrailDamage: 3, // E: fire trail damages enemies it passes
+      wChains: 3, // W: fire 3 chains in a fan
+      wSpread: 20, // W: angle between chains (degrees)
       wCooldown: 0.6,
     },
   },

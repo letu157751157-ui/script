@@ -1,26 +1,26 @@
-"""Phần 3D chỉ hiện khi biến hình Kẻ Diệt Thế (R): cặp cánh quỷ sau lưng và cặp sừng trên đầu.
+"""3D parts shown only in the World Ender form (R): demon wings on the back and horns on the head.
 
-Các khối gắn vào bone body/head của người chơi qua attachable của kiếm phiên bản Diệt Thế.
-Attachable gắn điểm (0, 24, 0) của model vào điểm xoay của bone được gắn; body và head của
-người chơi đều có điểm xoay (0, 24, 0), nên toạ độ ở đây trùng toạ độ model người chơi.
+The cubes are bound to the player's body/head bones through the World Ender blade's attachable.
+An attachable puts model point (0, 24, 0) at the pivot of the bone it binds to; the player's body
+and head both pivot at (0, 24, 0), so coordinates here match the player model coordinates.
 
-Cánh được vẽ như sword_art: một bản vẽ pixel (u = khoảng cách ra ngoài, v = độ cao so với gốc
-cánh) rồi đùn thành khối. Xương cánh dày 2, màng cánh dày 1, mép màng phát sáng.
+Wings are drawn like sword_art: a pixel drawing (u = distance outward, v = height above the wing
+root) extruded into cubes. Wing bones are 2 thick, the membrane 1, the membrane edge glows.
 """
 import math
 
-WING_PIVOT = (-2, 20, 2.5)  # gốc cánh phải (bên phải người chơi là -X trong Bedrock)
+WING_PIVOT = (-2, 20, 2.5)  # right wing root (the player's right side is -X in Bedrock)
 WING_MATERIALS = {
     "wbone": {"depth": 2, "glow": False},
     "membrane": {"depth": 1, "glow": False},
     "wedge": {"depth": 1, "glow": True},
 }
 
-# Khung cánh kiểu cánh dơi/rồng (toạ độ u ra ngoài, v lên trên, gốc cánh ở (0, 0))
-WRIST = (10.0, 15.0)  # khớp cổ tay: xương cánh tay đi từ gốc lên đây
-FINGER_TIPS = [(27.0, 17.0), (27.0, 5.0), (22.0, -6.0), (13.0, -12.0)]  # 4 nan ngón xoè ra
-LOWER_TIP = (2.0, -13.0)  # mép màng sát thân
-CLAW = [(10.0, 15.0), (8.5, 18.5), (10.5, 20.0)]  # vuốt móc ở khớp cổ tay
+# Bat/dragon wing frame (u outward, v up, wing root at (0, 0))
+WRIST = (10.0, 15.0)  # wrist joint: the arm bone runs from the root up to here
+FINGER_TIPS = [(27.0, 17.0), (27.0, 5.0), (22.0, -6.0), (13.0, -12.0)]  # 4 fanned finger bones
+LOWER_TIP = (2.0, -13.0)  # membrane edge next to the body
+CLAW = [(10.0, 15.0), (8.5, 18.5), (10.5, 20.0)]  # hooked claw at the wrist
 
 
 def _seg_dist(p, a, b):
@@ -38,19 +38,19 @@ def _in_triangle(p, a, b, c):
 
 
 def wing_art():
-    """Màng căng giữa các nan (mép sau lõm vào như cánh dơi), xương tay + ngón thuôn dần,
-    gân dung nham phát sáng toả từ cổ tay, mép lõm phát sáng."""
+    """Membrane stretched between fingers (scalloped trailing edge like a bat), tapering arm + finger bones,
+    glowing lava veins spreading from the wrist, glowing scalloped edge."""
     root = (0.0, 0.0)
-    # Các ô màng: giữa 2 nan liền kề (đỉnh là cổ tay), và giữa nan cuối với thân
+    # Membrane panels: between adjacent fingers (apex at the wrist), and between the last finger and the body
     panels = [(WRIST, FINGER_TIPS[i], FINGER_TIPS[i + 1]) for i in range(len(FINGER_TIPS) - 1)]
     panels += [(WRIST, FINGER_TIPS[-1], root), (root, FINGER_TIPS[-1], LOWER_TIP)]
-    # Mép lõm: mỗi mép ngoài bị khoét bởi một hình tròn đặt lệch ra ngoài
+    # Scalloped edge: each outer edge is cut by a circle offset outward
     edges = [(FINGER_TIPS[i], FINGER_TIPS[i + 1]) for i in range(len(FINGER_TIPS) - 1)] + [(FINGER_TIPS[-1], LOWER_TIP)]
     cuts = []
     for (ax, ay), (bx, by) in edges:
         mx, my = (ax + bx) / 2, (ay + by) / 2
         length = math.hypot(bx - ax, by - ay)
-        nx, ny = (by - ay) / length, -(bx - ax) / length  # pháp tuyến hướng ra ngoài (ra xa cổ tay)
+        nx, ny = (by - ay) / length, -(bx - ax) / length  # outward normal (away from the wrist)
         if (mx - WRIST[0]) * nx + (my - WRIST[1]) * ny < 0:
             nx, ny = -nx, -ny
         depth = length * 0.22
@@ -89,7 +89,7 @@ def wing_art():
 
 WING_ART = wing_art()
 
-# Sừng phải (x âm); sừng trái đối xứng. (origin, size) trong toạ độ model người chơi
+# Right horn (negative x); the left horn is mirrored. (origin, size) in player model coordinates
 HORN_CUBES = [
     ((-5, 29, -2), (2, 3, 3)),
     ((-6, 31, -1), (2, 3, 2)),
@@ -119,7 +119,7 @@ def rectangles(pixels):
 
 
 def ult_cubes(wing_color, horn_color):
-    """Khối của cánh và sừng. wing_color(material, u, v) / horn_color(x, y) trả màu mặt trước."""
+    """Wing and horn cubes. wing_color(material, u, v) / horn_color(x, y) return the front-face color."""
     cubes = []
     px, py, pz = WING_PIVOT
     for material, info in WING_MATERIALS.items():
@@ -142,7 +142,7 @@ def ult_cubes(wing_color, horn_color):
     return cubes
 
 
-# bone của phần biến hình: (tên, cha, binding, pivot)
+# Transformation bones: (name, parent, binding, pivot)
 ULT_BONES = [
     ("ult_body", None, "'body'", (0, 24, 0)),
     ("wing_r", "ult_body", None, WING_PIVOT),

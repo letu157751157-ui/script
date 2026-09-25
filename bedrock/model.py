@@ -1,21 +1,21 @@
-"""Model 3D Quỷ Kiếm Darkin + texture pixel art kiểu Minecraft.
+"""The Darkin Blade 3D model + Minecraft-style pixel art texture.
 
-Hình dáng lấy từ bản vẽ mặt trước trong sword_art.py: mỗi pixel được đùn thành
-khối theo độ dày của vật liệu, rồi các pixel cùng vật liệu được gộp thành khối
-chữ nhật lớn nhất có thể để giảm số khối.
+The shape comes from the front-view drawing in sword_art.py: each pixel is extruded into
+a cube using its material depth, then pixels of the same material are merged into the
+largest possible rectangles to reduce the cube count.
 
-Texture vẽ 1 texel cho mỗi đơn vị model (16 px = 1 block) giống texture gốc
-của Minecraft: bảng màu giới hạn theo từng vật liệu, sáng ở mép trên-trái,
-tối ở mép dưới-phải, nhiễu dither theo vị trí để bề mặt không bị phẳng lì.
-Mặt trước và mặt sau cùng lấy màu theo toạ độ thật trên thanh kiếm nên hoa
-văn liền mạch qua các khối.
+The texture uses 1 texel per model unit (16 px = 1 block) like vanilla Minecraft
+textures: a limited palette per material, lit top-left edges, shaded bottom-right
+edges, and positional dither so surfaces are not flat.
+Front and back faces are colored by their true position on the blade, so patterns
+stay continuous across cubes.
 
-Các vật liệu phát sáng (dung nham, mắt) được xuất sang geometry riêng, vẽ bằng
-material entity_emissive với texture .tga riêng: entity_emissive lấy kênh alpha
-làm mức phát sáng (alpha càng thấp càng sáng, giống texture blaze gốc).
+Glowing materials (lava, eye) are exported to a separate geometry drawn with the
+entity_emissive material and its own .tga texture: entity_emissive uses the alpha channel
+as emissive strength (lower alpha = brighter, like the vanilla blaze texture).
 
-Mí mắt Darkin là bone riêng (eyelid) phủ lên mắt, animation co giãn theo trục Y
-để mắt chớp.
+The Darkin eyelid is its own bone (eyelid) covering the eye; an animation scales it on Y
+so the eye blinks.
 """
 import json
 import os
@@ -24,16 +24,16 @@ import struct
 from sword_art import ART, MATERIALS
 from ult_parts import ULT_BONES, ult_cubes
 
-# Điểm (0, 24, 0) của model attachable nằm đúng bàn tay (điểm xoay bone rightItem),
-# nên đặt tâm tay cầm tại đây thì animation chỉ cần xoay kiếm quanh nắm tay.
+# Point (0, 24, 0) of an attachable model sits exactly in the hand (the rightItem pivot),
+# so putting the grip center there means animations only rotate the blade around the fist.
 GRIP_Y = 24
-GLOW_ALPHA = 24  # alpha của lớp phát sáng: 0 = sáng hoàn toàn, 255 = không phát sáng
+GLOW_ALPHA = 24  # alpha of the glow layer: 0 = fully bright, 255 = not glowing
 EYE_PIXELS = sorted(p for p, m in ART.items() if m == "eye")
 EYE_TOP = max(y for _, y in EYE_PIXELS) + 1
 LID_DEPTH = MATERIALS["eye"]["depth"]
-LID_INFLATE = 0.2  # mí mắt phủ trùm ra ngoài mắt một chút
+LID_INFLATE = 0.2  # eyelid slightly overlaps the eye
 
-# Bảng màu từ tối tới sáng
+# Palettes from dark to light
 PALETTES = {
     "frame": [(26, 26, 33), (40, 41, 51), (56, 58, 71), (78, 81, 98), (110, 115, 136)],
     "horn": [(16, 15, 20), (28, 27, 35), (42, 42, 53), (64, 66, 81), (98, 102, 124)],
@@ -62,7 +62,7 @@ DITHER = {"frame": 0.18, "horn": 0.14, "core": 0.22, "socket": 0.2, "guard": 0.1
 
 
 def hash01(x, y, salt=0):
-    """Nhiễu cố định theo vị trí (0..1) để texture không đổi giữa các lần build."""
+    """Fixed positional noise (0..1) so the texture is identical between builds."""
     n = (x * 374761393 + y * 668265263 + salt * 2147483647) & 0xFFFFFFFF
     n = ((n ^ (n >> 13)) * 1274126177) & 0xFFFFFFFF
     return ((n ^ (n >> 16)) & 0xFFFF) / 0xFFFF
@@ -74,13 +74,13 @@ def depth_at(x, y):
 
 
 def front_color(x, y):
-    """Màu pixel mặt trước tại (x, y) theo phong cách pixel art Minecraft."""
+    """Front-face pixel color at (x, y), Minecraft pixel art style."""
     material = ART[(x, y)]
     palette = PALETTES[material]
     depth = depth_at(x, y)
 
     if material == "eye":
-        # Đồng tử dọc 2 px ở giữa, mống mắt cam đỏ bao quanh, lòng mắt vàng rực
+        # 2 px vertical pupil in the middle, red-orange iris around it, glowing yellow sclera
         if x in (-1, 0) and 11 <= y <= 14:
             return PUPIL
         if x in (-2, 1) and 11 <= y <= 14:
@@ -90,7 +90,7 @@ def front_color(x, y):
         return palette[4] if (x, y) in ((-3, 13), (-2, 14)) else palette[3]
 
     shade = BASE_SHADE[material]
-    # Mép trên-trái nhô ra được chiếu sáng, mép dưới-phải khuất tối
+    # Raised top-left edges are lit, bottom-right edges are shaded
     if depth_at(x - 1, y) < depth or depth_at(x, y + 1) < depth:
         shade += 2 if material in ("horn", "frame") else 1
     if depth_at(x + 1, y) < depth or depth_at(x, y - 1) < depth:
@@ -99,18 +99,18 @@ def front_color(x, y):
     if material == "core":
         neighbors = [ART.get((x + dx, y + dy)) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))]
         if "lava" in neighbors:
-            shade = 4  # ánh dung nham hắt lên thịt xung quanh
+            shade = 4  # lava glow reflected on the surrounding flesh
         elif "frame" in neighbors:
-            shade = min(shade, 1)  # thịt sẫm lại sát khung
+            shade = min(shade, 1)  # flesh darkens next to the frame
         elif hash01(x, y, 7) < 0.12:
-            shade = 0  # thớ gân sẫm
+            shade = 0  # dark sinew streaks
     elif material == "lava":
         run = sum(ART.get((x + dx, y)) == "lava" for dx in (-1, 1))
         shade = 4 if run and y < 32 else 3 if run or y < 36 else 2
     elif material == "grip":
-        shade = 0 if (x + y) % 3 == 0 else (3 if x == -1 else 2)  # dây da quấn chéo
+        shade = 0 if (x + y) % 3 == 0 else (3 if x == -1 else 2)  # cross-wrapped leather strap
     elif material == "horn" and hash01(x, y, 3) < 0.1:
-        shade += 1  # ánh bóng loáng trên sừng
+        shade += 1  # glossy highlight on the horns
 
     dither = DITHER[material]
     if dither:
@@ -123,7 +123,7 @@ def front_color(x, y):
 
 
 def lid_color(x, y):
-    """Mí mắt: viền mi tối ở mép dưới, gờ sáng ngay trên, phần còn lại là thịt sẫm."""
+    """Eyelid: dark lash line at the bottom, bright ridge above it, dark flesh elsewhere."""
     palette = PALETTES["lid"]
     bottom = min(yy for xx, yy in EYE_PIXELS if xx == x)
     if y == bottom:
@@ -135,7 +135,7 @@ def lid_color(x, y):
 
 
 def wing_color(material, u, v):
-    """Cánh: màng sẫm dần về phía mép, gân sáng dọc theo xương, mép rực lửa."""
+    """Wings: membrane darkens toward the edge, bright highlights along the bones, fiery edge."""
     palette = PALETTES[material]
     shade = BASE_SHADE[material]
     if material == "membrane":
@@ -152,7 +152,7 @@ def wing_color(material, u, v):
 
 
 def ult_horn_color(x, y):
-    """Sừng biến hình: gốc tối, sáng dần lên đỉnh, có vệt bóng."""
+    """Transformation horns: dark base, lighter toward the tip, with glossy streaks."""
     palette = PALETTES["uhorn"]
     shade = 1 + (1 if y >= 33 else 0) + (1 if y >= 36 else 0)
     if hash01(x, y, 31) < 0.15:
@@ -161,7 +161,7 @@ def ult_horn_color(x, y):
 
 
 def side_color(material, x, y, face):
-    """Màu các mặt bên (độ dày): tối hơn mặt trước, mặt trên sáng hơn."""
+    """Side faces (thickness): darker than the front, the top face is lighter."""
     palette = PALETTES[material]
     if material == "eye":
         return palette[1]
@@ -174,12 +174,12 @@ def side_color(material, x, y, face):
 
 
 # ---------------------------------------------------------------------------
-# Gộp pixel thành khối
+# Merge pixels into cubes
 # ---------------------------------------------------------------------------
 
 
 def rectangles(pixels):
-    """Gộp tập pixel thành các hình chữ nhật (quét từng hàng rồi kéo lên trên)."""
+    """Merge a pixel set into rectangles (scan each row, then extend upward)."""
     remaining = set(pixels)
     rects = []
     for x, y in sorted(pixels, key=lambda p: (p[1], p[0])):
@@ -213,7 +213,7 @@ def build_cubes():
 
 
 def pack_uvs(cubes):
-    """Xếp ô box-UV theo hàng (khối cao xếp trước) vào texture nhỏ nhất vừa đủ."""
+    """Pack box-UV regions in rows (tallest cubes first) into the smallest texture that fits."""
     order = sorted(range(len(cubes)), key=lambda i: -(cubes[i]["size"][2] + cubes[i]["size"][1]))
     for width in (64, 128, 256, 512):
         x = y = row_height = 0
@@ -232,7 +232,7 @@ def pack_uvs(cubes):
             row_height = max(row_height, region_h)
         if fits and y + row_height <= width:
             return uvs, (width, width)
-    raise ValueError("Model quá lớn cho texture 512x512")
+    raise ValueError("Model too large for a 512x512 texture")
 
 
 def build_texture(cubes, uvs, size):
@@ -248,10 +248,10 @@ def build_texture(cubes, uvs, size):
         material = cube["material"]
         face = cube.get("face") or (lid_color if material == "lid" else front_color)
         for j in range(h):
-            y = oy + h - 1 - j  # hàng trên cùng của mặt = đỉnh khối
+            y = oy + h - 1 - j  # top row of the face = top of the cube
             for i in range(w):
-                put(u + d + i, v + d + j, face(ox + i, y))  # mặt bắc: trái -> phải = x tăng
-                put(u + 2 * d + w + i, v + d + j, face(ox + w - 1 - i, y))  # mặt nam: x giảm
+                put(u + d + i, v + d + j, face(ox + i, y))  # north face: left -> right = increasing x
+                put(u + 2 * d + w + i, v + d + j, face(ox + w - 1 - i, y))  # south face: decreasing x
             for k in range(d):
                 put(u + k, v + d + j, side_color(material, ox, y, "east"))
                 put(u + d + w + k, v + d + j, side_color(material, ox + w - 1, y, "west"))
@@ -263,8 +263,8 @@ def build_texture(cubes, uvs, size):
 
 
 def build_geometry(identifier, cubes, uvs, size, glow, ult=False):
-    """glow=False: phần thường + mí mắt; glow=True: chỉ các khối phát sáng.
-    ult=True: thêm cánh và sừng của dạng biến hình (gắn vào body/head người chơi)."""
+    """glow=False: regular parts + eyelid; glow=True: glowing cubes only.
+    ult=True: add the transformation wings and horns (bound to the player body/head)."""
     entries = {}
     for cube, uv in zip(cubes, uvs):
         if cube["glow"] != glow:
@@ -277,7 +277,7 @@ def build_geometry(identifier, cubes, uvs, size, glow, ult=False):
     bones = [
         {
             "name": "darkin_blade",
-            # Gắn vào xương tay đang cầm (rightitem / leftitem)
+            # Bind to the bone of the hand holding the item (rightitem / leftitem)
             "binding": "q.item_slot_to_bone_name(c.item_slot)",
             "pivot": [0, GRIP_Y, 0],
         },
@@ -321,7 +321,7 @@ def write_json(path, data):
 
 
 def write_tga(path, grid, alpha):
-    """TGA 32-bit không nén, gốc dưới-trái như texture gốc; pixel có màu nhận alpha cho trước."""
+    """Uncompressed 32-bit TGA, bottom-left origin like vanilla textures; colored pixels get the given alpha."""
     height, width = len(grid), len(grid[0])
     header = struct.pack("<BBBHHBHHHHBB", 0, 0, 2, 0, 0, 0, 0, 0, width, height, 32, 8)
     body = bytearray()
@@ -348,4 +348,4 @@ def write_model(root, write_png):
                build_geometry("geometry.aatrox.darkin_blade_ult", cubes, uvs, size, glow=False, ult=True))
     write_json(os.path.join(models, "darkin_blade_ult_glow.geo.json"),
                build_geometry("geometry.aatrox.darkin_blade_ult_glow", cubes, uvs, size, glow=True, ult=True))
-    print(f"Model: {len(ART)} pixel -> {len(cubes)} khối, texture {size[0]}x{size[1]}")
+    print(f"Model: {len(ART)} pixels -> {len(cubes)} cubes, texture {size[0]}x{size[1]}")

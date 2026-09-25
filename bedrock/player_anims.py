@@ -1,24 +1,24 @@
-"""Animation của người chơi khi dùng chiêu (phát bằng Entity.playAnimation trong script).
+"""Player animations when casting skills (played with Entity.playAnimation from the script).
 
-Mỗi keyframe có hai phần:
-- Góc nhìn thứ 3: độ xoay/dịch cộng thêm cho các bone của người chơi (rightarm, leftarm,
-  body, head, rightleg, leftleg, root), đơn vị Bedrock (độ, pixel).
-- Góc nhìn thứ nhất: mô tả kiếm trên màn hình (dịch nắm tay so với lúc cầm bình thường,
-  hướng lưỡi kiếm). Hàm solve_first_person() tính ngược ra độ xoay/dịch của rightarm,
-  vì tay ở góc nhìn thứ nhất đã bị xoay sẵn [95, -45, 115] nên khó chỉnh tay trực tiếp.
+Each keyframe has two parts:
+- Third person: extra rotation/offset for the player bones (rightarm, leftarm,
+  body, head, rightleg, leftleg, root), in Bedrock units (degrees, pixels).
+- First person: describes the blade on screen (hand offset from the normal hold,
+  blade direction). solve_first_person() inverts that into rightarm rotation/offset,
+  because the first-person arm is already rotated [95, -45, 115] and hard to pose directly.
 
-Trong game, mỗi giá trị là biểu thức Molang "v.is_first_person ? <thứ nhất> : <thứ 3>":
-người dùng chiêu thấy animation góc nhìn thứ nhất, người xung quanh thấy góc nhìn thứ 3.
+In game every value is the Molang expression "v.is_first_person ? <first> : <third>":
+the caster sees the first-person animation, everyone else sees the third-person one.
 
-Toạ độ góc nhìn thứ nhất (không gian model đã lật trục X như Blockbench):
-camera ở mắt nhìn theo +Z, +X là bên TRÁI màn hình, +Y là phía trên.
+First-person coordinates (model space with X flipped, like Blockbench):
+camera at the eye looking along +Z, +X is the LEFT of the screen, +Y is up.
 """
 import json
 import math
 import os
 
 HOLD_FP_FILE = "AatroxRP/animations/darkin_blade.animation.json"
-PLAYER_SCALE = 0.9375  # scale của model người chơi (player.entity.json)
+PLAYER_SCALE = 0.9375  # player model scale (player.entity.json)
 EYE = (0.0, 1.62 * 16, 0.0)
 FP_ARM_POS = (13.5, -10.0, 12.0)  # animation.player.first_person.empty_hand
 FP_ARM_ROT = (95.0, -45.0, 115.0)
@@ -27,7 +27,7 @@ ARM_PIVOT = (-5.0, 22.0, 0.0)
 ITEM_PIVOT = (-6.0, 15.0, 1.0)
 
 # ---------------------------------------------------------------------------
-# Toán ma trận nhỏ (quy ước Bedrock -> three.js giống Blockbench: lật X, xoay thứ tự ZYX)
+# Small matrix math (Bedrock -> three.js convention like Blockbench: flip X, ZYX rotation order)
 # ---------------------------------------------------------------------------
 
 
@@ -76,7 +76,7 @@ def add(a, b, s=1.0):
 
 
 # ---------------------------------------------------------------------------
-# Giải ngược tay phải ở góc nhìn thứ nhất
+# Inverse solve for the right arm in first person
 # ---------------------------------------------------------------------------
 
 
@@ -87,7 +87,7 @@ def load_hold(root, view="first_person"):
 
 
 def grip_point(hold_pos):
-    """Điểm nắm (tâm tay cầm) trong toạ độ tuyệt đối của bone rightarm."""
+    """Grip point (grip center) in the absolute coordinates of the rightarm bone."""
     return add(add(v3(FP_ITEM_POS), v3(ITEM_PIVOT)), v3(hold_pos))
 
 
@@ -106,7 +106,7 @@ def axis_angle(axis, angle):
 
 
 def swing(d0, d):
-    """Phép quay nhỏ nhất đưa hướng d0 về d (kiếm vung theo cung tròn, không bị vặn mặt)."""
+    """Smallest rotation taking direction d0 to d (the blade swings along an arc without twisting)."""
     d0, d = norm(d0), norm(d)
     axis = cross(d0, d)
     sin = math.sqrt(sum(a * a for a in axis))
@@ -117,19 +117,19 @@ def swing(d0, d):
 
 
 def solve_first_person(hold, offset, blade, roll=0.0):
-    """Kiếm nằm ở (vị trí nắm lúc nghỉ + offset), lưỡi theo hướng `blade` (vung từ tư thế nghỉ theo
-    cung ngắn nhất, rồi lật mặt kiếm thêm `roll` độ quanh lưỡi).
+    """The blade sits at (rest grip position + offset), pointing along `blade` (swung from the rest pose along
+    the shortest arc, then rolled by `roll` degrees around the blade).
 
-    Tay giữ nguyên độ xoay gốc (chỉ dịch chuyển), kiếm xoay quanh nắm tay bằng bone rightitem.
-    Trả về (độ xoay rightitem, độ dịch cộng thêm cho rightarm)."""
+    The arm keeps its base rotation (only moves); the blade turns around the fist via the rightitem bone.
+    Returns (rightitem rotation, extra rightarm offset)."""
     hold_pos, hold_rot = hold
     rest = grip_world(FP_ARM_POS, FP_ARM_ROT, hold_pos)
     target = add(rest, offset)
     arm = rotation(FP_ARM_ROT)
     rest_blade = tuple(mat_mul(arm, rotation(hold_rot))[i][1] for i in range(3))
     turn = mat_mul(axis_angle(blade, math.radians(roll)), swing(rest_blade, blade))
-    item = mat_mul(transpose(arm), mat_mul(turn, arm))  # phép quay thế giới đổi sang khung của tay
-    # Điểm nắm khi rightitem xoay quanh pivot của nó
+    item = mat_mul(transpose(arm), mat_mul(turn, arm))  # world rotation converted to the arm frame
+    # Grip point when rightitem rotates around its pivot
     grip = add(add(v3(FP_ITEM_POS), v3(ITEM_PIVOT)), mat_vec(item, v3(hold_pos)))
     pivot = v3(ARM_PIVOT)
     local = mat_vec(arm, add(grip, pivot, -1))
@@ -139,11 +139,11 @@ def solve_first_person(hold, offset, blade, roll=0.0):
     return euler(item), tuple(p - b for p, b in zip(pos, FP_ARM_POS))
 
 
-TP_ARM_REST = (-18.0, 0.0, 0.0)  # animation.player.holding: tay cầm đồ nâng ra trước 18 độ
+TP_ARM_REST = (-18.0, 0.0, 0.0)  # animation.player.holding: arms holding an item raised 18 degrees forward
 
 
 def solve_third_person(hold, tp, blade, roll=0.0):
-    """Độ xoay cổ tay (rightitem) để lưỡi kiếm chĩa theo `blade` khi thân/tay ở tư thế `tp`."""
+    """Wrist (rightitem) rotation so the blade points along `blade` with the body/arm in pose `tp`."""
     _, hold_rot = hold
     rest = rotation(TP_ARM_REST)
     rest_blade = tuple(mat_mul(rest, rotation(hold_rot))[i][1] for i in range(3))
@@ -154,8 +154,8 @@ def solve_third_person(hold, tp, blade, roll=0.0):
 
 
 def closest_euler(rot, previous):
-    """Hai bộ góc ZYX (x, y, z) và (x+180, 180-y, z+180) cho cùng một hướng: chọn bộ (đã cộng/trừ 360)
-    gần keyframe trước nhất để nội suy không xoay vòng."""
+    """The ZYX sets (x, y, z) and (x+180, 180-y, z+180) give the same orientation: pick the one (+/-360)
+    closest to the previous keyframe so interpolation does not spin around."""
     best = None
     for cand in (list(rot), [rot[0] + 180, 180 - rot[1], rot[2] + 180]):
         for i in range(3):
@@ -170,16 +170,16 @@ def closest_euler(rot, previous):
 
 
 # ---------------------------------------------------------------------------
-# Thiết kế animation
+# Animation design
 # ---------------------------------------------------------------------------
-# Mỗi keyframe:
-#   "tp": {bone: {"rot": [...], "pos": [...]}} cộng thêm vào tư thế hiện có (góc nhìn thứ 3)
-#   "tp_blade": hướng lưỡi kiếm trong thế giới ở góc nhìn thứ 3 (+X phải, +Y lên, -Z phía trước
-#               nhân vật); cổ tay (rightitem) được giải ngược để lưỡi chĩa đúng hướng này
-#   "fp": (dịch nắm tay [x trái, y lên, z xa camera], hướng lưỡi [x trái, y lên, z tới])
-# Keyframe thiếu "tp_blade"/"fp" thì kiếm ở tư thế cầm bình thường.
+# Each keyframe:
+#   "tp": {bone: {"rot": [...], "pos": [...]}} added on top of the current pose (third person)
+#   "tp_blade": world blade direction in third person (+X right, +Y up, -Z in front of
+#               the character); the wrist (rightitem) is solved so the blade points this way
+#   "fp": (hand offset [x left, y up, z away from camera], blade direction [x left, y up, z forward])
+# Keyframes without "tp_blade"/"fp" keep the blade in the normal hold.
 
-ARM_UP = -150  # giơ tay qua đầu
+ARM_UP = -150  # arm raised overhead
 
 
 def key(tp=None, tp_blade=None, fp=None):
@@ -197,10 +197,10 @@ def pose(right=None, left=None, body=None, head=None, rleg=None, lleg=None, root
     return out
 
 
-# Mỗi chiêu có đủ nhịp: lấy đà -> vung -> giữa nhát -> chạm -> quá đà -> giữ -> hồi về.
-# Nội suy Catmull-Rom giữa các keyframe nên chuyển động cong và mượt.
+# Every skill has the full rhythm: anticipation -> swing -> mid-swing -> impact -> overshoot -> hold -> recover.
+# Catmull-Rom interpolation between keyframes makes the motion curved and smooth.
 ANIMATIONS = {
-    # Q lần 1: giơ kiếm qua vai phải rồi chém chéo xuống bên trái
+    # Q cast 1: raise the blade over the right shoulder, then slash diagonally down to the left
     "q1": {"length": 0.85, "keys": {
         0.0: key(),
         0.1: key(pose(right=(12, 0, 8), body=(6, 8, 0), rleg=(8, 0, 0), lleg=(-6, 0, 0)),
@@ -221,7 +221,7 @@ ANIMATIONS = {
                   (-0.55, -0.5, -0.7), ((9, 0, 6), (0.9, -0.3, 0.4))),
         0.85: key(),
     }},
-    # Q lần 2: quét ngang từ phải sang trái
+    # Q cast 2: horizontal sweep from right to left
     "q2": {"length": 0.85, "keys": {
         0.0: key(),
         0.1: key(pose(right=(-20, 20, 10), body=(0, 12, 0)), (0.4, 0.1, -0.9), ((-1, 0, 0), (-0.2, 0.9, 0.35))),
@@ -240,7 +240,7 @@ ANIMATIONS = {
                   (-0.9, 0.0, -0.4), ((10, -1, 5), (0.95, 0.0, 0.3))),
         0.85: key(),
     }},
-    # Q lần 3: nhún, nhảy lên, hai tay giơ kiếm qua đầu rồi nện xuống đất
+    # Q cast 3: crouch, leap, raise the blade overhead with both hands, then slam the ground
     "q3": {"length": 0.95, "keys": {
         0.0: key(),
         0.1: key(pose(right=(10, 0, 5), left=(10, 0, -5), body=(12, 0, 0), rleg=(-20, 0, 0), lleg=(-20, 0, 0),
@@ -263,7 +263,7 @@ ANIMATIONS = {
                   (0.0, -0.65, -0.75), ((8, 6, 8), (0.5, -0.82, 0.3))),
         0.95: key(),
     }},
-    # E: thu người lấy đà, lao về trước, kiếm kéo lê phía sau
+    # E: gather, lunge forward, blade dragging behind
     "e": {"length": 0.6, "keys": {
         0.0: key(),
         0.05: key(pose(body=(-8, 0, 0), right=(-10, 0, 5), rleg=(8, 0, 0), lleg=(-8, 0, 0), root=(0, -0.5, 0)),
@@ -278,7 +278,7 @@ ANIMATIONS = {
                   None, ((0, -1, 0), (0.2, 0.9, 0.35))),
         0.6: key(),
     }},
-    # W: kéo tay trái ra sau rồi phóng xích về phía trước
+    # W: pull the left arm back, then throw the chain forward
     "w": {"length": 0.75, "keys": {
         0.0: key(),
         0.12: key(pose(left=(35, 0, -25), body=(0, -18, 0), right=(10, 0, 0), head=(0, 8, 0)),
@@ -291,7 +291,7 @@ ANIMATIONS = {
                  None, ((-2, -5, -3), (0.2, 0.9, 0.3))),
         0.75: key(),
     }},
-    # R: khom người tụ lực rồi gầm lên, dang tay giơ kiếm lên trời
+    # R: crouch to gather power, then roar, spreading the arms with the blade raised to the sky
     "r": {"length": 1.25, "keys": {
         0.0: key(),
         0.15: key(pose(body=(22, 0, 0), head=(15, 0, 0), right=(-15, 0, 12), left=(-15, 0, -12),
@@ -310,7 +310,7 @@ BONES = ["root", "body", "head", "rightarm", "rightitem", "leftarm", "rightleg",
 
 
 def euler_candidates(rot):
-    """Mọi bộ góc ZYX tương đương (2 nhánh, cộng/trừ 360 mỗi trục)."""
+    """Every equivalent ZYX set (2 branches, +/-360 on each axis)."""
     out = []
     for base in (list(rot), [rot[0] + 180, 180 - rot[1], rot[2] + 180]):
         for dx in (-360, 0, 360):
@@ -321,8 +321,8 @@ def euler_candidates(rot):
 
 
 def smooth_path(rotations):
-    """Chọn bộ góc cho từng keyframe sao cho tổng quãng xoay nhỏ nhất, đầu và cuối đúng bằng 0
-    (tránh tay/kiếm quay vòng khi nội suy hoặc khi animation mờ dần)."""
+    """Pick an angle set for each keyframe minimizing the total rotation, with the first and last exactly 0
+    (prevents the arm/blade from spinning during interpolation or while the animation blends out)."""
     zero = [[0.0, 0.0, 0.0]]
     layers = [zero] + [euler_candidates(r) for r in rotations[1:-1]] + [zero]
     cost = [0.0]
@@ -344,9 +344,9 @@ def smooth_path(rotations):
 
 
 def sample_keys(root):
-    """Toàn bộ keyframe đã giải: {anim: {time: {"tp": {bone: {rot,pos}}, "fp": {"rot","pos"}}}}.
-    tp có thêm rightitem.rot (cổ tay); fp.rot là độ xoay rightitem, fp.pos là độ dịch cộng thêm
-    của rightarm ở góc nhìn thứ nhất."""
+    """All solved keyframes: {anim: {time: {"tp": {bone: {rot,pos}}, "fp": {"rot","pos"}}}}.
+    tp also has rightitem.rot (wrist); fp.rot is the rightitem rotation, fp.pos the extra rightarm
+    offset in first person."""
     hold_fp, hold_tp = load_hold(root, "first_person"), load_hold(root, "third_person")
     result = {}
     for name, anim in ANIMATIONS.items():
@@ -360,7 +360,7 @@ def sample_keys(root):
             tp_rot.append(solve_third_person(hold_tp, k["tp"], k["tp_blade"]) if k["tp_blade"] else (0.0, 0.0, 0.0))
         for t, k in ((times[0], anim["keys"][times[0]]), (times[-1], anim["keys"][times[-1]])):
             if k["fp"] or k["tp_blade"]:
-                raise ValueError(f"{name}: keyframe đầu/cuối phải là tư thế nghỉ")
+                raise ValueError(f"{name}: first/last keyframe must be the rest pose")
         fp_rot, tp_rot = smooth_path(fp_rot), smooth_path(tp_rot)
         frames = {}
         for i, t in enumerate(times):
@@ -382,11 +382,11 @@ def molang(fp, tp):
     return f"v.is_first_person ? {fp} : {tp}"
 
 
-SAMPLE_STEP = 0.04  # giây giữa hai keyframe tuyến tính khi lấy mẫu đường cong
+SAMPLE_STEP = 0.04  # seconds between two linear keyframes when sampling the curve
 
 
 def catmull(values, times, t):
-    """Nội suy Catmull-Rom (đường cong đi qua mọi keyframe) cho một kênh số."""
+    """Catmull-Rom interpolation (a curve through every keyframe) for one numeric channel."""
     i = max(k for k in range(len(times) - 1) if times[k] <= t) if t < times[-1] else len(times) - 2
     t0, t1 = times[i], times[i + 1]
     u = (t - t0) / (t1 - t0)
@@ -397,9 +397,9 @@ def catmull(values, times, t):
 
 
 def build_animations(root):
-    """Minecraft chỉ cho nội suy cong khi keyframe là số cố định, nhưng ở đây mỗi giá trị là biểu thức
-    chọn góc nhìn thứ nhất/thứ 3. Nên đường cong Catmull-Rom được tính sẵn, lấy mẫu dày
-    mỗi SAMPLE_STEP giây và xuất ra keyframe tuyến tính."""
+    """Minecraft only allows curved interpolation when keyframes are constant numbers, but here every value
+    is an expression choosing first/third person. So the Catmull-Rom curve is computed up front, sampled
+    every SAMPLE_STEP seconds and exported as linear keyframes."""
     keys = sample_keys(root)
     animations = {}
     for name, anim in ANIMATIONS.items():
@@ -418,7 +418,7 @@ def build_animations(root):
                     elif (bone, key) == ("rightitem", "rot"):
                         fp_keys.append(list(frame["fp"]["rot"]))
                     else:
-                        fp_keys.append([0, 0, 0])  # góc nhìn thứ nhất chỉ thấy tay phải
+                        fp_keys.append([0, 0, 0])  # first person only shows the right arm
                 if not any(abs(v) > 1e-6 for row in tp_keys + fp_keys for v in row):
                     continue
                 track = {}
@@ -437,4 +437,4 @@ def write_player_animations(root):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=1)
         f.write("\n")
-    print(f"Animation người chơi: {len(data['animations'])} chiêu")
+    print(f"Player animations: {len(data['animations'])} skills")

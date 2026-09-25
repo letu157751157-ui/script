@@ -1,22 +1,22 @@
-// Quỷ Kiếm Darkin — bộ chiêu Aatrox cho Minecraft Bedrock (Script API @minecraft/server 2.x)
+// The Darkin Blade — Aatrox skill kit for Minecraft Bedrock (Script API @minecraft/server 2.x)
 //
-// Cầm kiếm rồi:
-//   Đánh thường          Nội tại Tư Thế Tử Thần (khi sẵn sàng)
-//   Chuột phải              Q  Quỷ Kiếm Darkin (3 lần chém)
-//   Chạy nhanh + chém       E  Bước Nhảy Hắc Ám (chạy nhanh + chuột phải cũng được)
-//   Khụy + chuột phải       W  Xiềng Xích Địa Ngục
-//   Khụy + nhảy             R  Kẻ Diệt Thế
+// While holding the blade:
+//   Normal attack           Passive  Deathbringer Stance (when ready)
+//   Right-click             Q  The Darkin Blade (3 casts)
+//   Sprint + attack         E  Umbral Dash (sprint + right-click also works)
+//   Sneak + right-click     W  Infernal Chains
+//   Sneak + jump            R  World Ender
 
 import { world, system, ItemStack, EquipmentSlot, InputButton, ButtonState, EntityDamageCause, MolangVariableMap } from "@minecraft/server";
 import { CONFIG } from "./config.js";
 
 const ITEM_ID = "aatrox:darkin_blade";
-const ULT_ITEM_ID = "aatrox:darkin_blade_ult"; // kiếm dạng Diệt Thế: attachable có thêm cánh và sừng 3D
+const ULT_ITEM_ID = "aatrox:darkin_blade_ult"; // World Ender blade: its attachable adds 3D wings and horns
 const isBladeId = (id) => id === ITEM_ID || id === ULT_ITEM_ID;
 const TPS = 20;
 const SKILLS = ["Q", "E", "W", "R"];
 
-// Particle riêng nằm trong resource pack (AatroxRP/particles)
+// Custom particles live in the resource pack (AatroxRP/particles)
 const P = {
   ember: "aatrox:ember",
   spark: "aatrox:hit_spark",
@@ -54,7 +54,7 @@ const ticks = (seconds) => Math.max(1, Math.round(seconds * TPS));
 const now = () => system.currentTick;
 
 // ---------------------------------------------------------------------------
-// Trạng thái từng người chơi
+// Per-player state
 // ---------------------------------------------------------------------------
 
 const states = new Map(); // player.id -> state
@@ -87,7 +87,7 @@ const isUltActive = (state) => now() < state.ultUntil;
 const isStunned = (entity) => (stunnedUntil.get(entity.id) ?? 0) > now();
 
 // ---------------------------------------------------------------------------
-// Tiện ích
+// Helpers
 // ---------------------------------------------------------------------------
 
 function flatUnit(v) {
@@ -127,7 +127,7 @@ function particle(dimension, id, location, molang) {
   try {
     dimension.spawnParticle(id, location, molang);
   } catch {
-    // chunk chưa tải hoặc particle không tồn tại: bỏ qua
+    // chunk not loaded or particle missing: ignore
   }
 }
 
@@ -135,7 +135,7 @@ function sound(dimension, id, location, pitch = 1) {
   try {
     dimension.playSound(id, location, { pitch, volume: 1 });
   } catch {
-    // bỏ qua
+    // ignore
   }
 }
 
@@ -152,12 +152,12 @@ function particleLine(dimension, id, from, to, spacing = 0.7) {
   }
 }
 
-// Vòng sóng xung kích phẳng trên mặt đất, lan tới bán kính `radius`
+// Flat shockwave ring on the ground, expanding to `radius`
 function shockRing(dimension, center, radius) {
   particle(dimension, P.ring, add(center, { x: 0, y: 0.15, z: 0 }), withRadius(radius));
 }
 
-// Nổ máu: chớp sáng + máu văng
+// Blood burst: flash + blood spray
 function bloodBurst(dimension, location) {
   particle(dimension, P.flash, location);
   particle(dimension, P.blood, location);
@@ -169,33 +169,33 @@ function withRadius(radius) {
   return molang;
 }
 
-// Hố va chạm: đất nứt + đá văng + khói
+// Impact crater: cracked ground + debris + smoke
 function crater(dimension, center, radius) {
   particle(dimension, P.crack, add(center, { x: 0, y: 0.06, z: 0 }), withRadius(radius));
   particle(dimension, P.debris, add(center, { x: 0, y: 0.2, z: 0 }));
   particle(dimension, P.smoke, add(center, { x: 0, y: 0.4, z: 0 }));
 }
 
-// Rung màn hình người chơi (mob thì bỏ qua)
+// Camera shake for players (mobs are skipped)
 function shake(entity, intensity, seconds) {
   if (entity?.typeId !== "minecraft:player") return;
   try {
     entity.runCommand(`camerashake add @s ${intensity} ${seconds} positional`);
   } catch {
-    // bỏ qua
+    // ignore
   }
 }
 
-// Chớp màn hình một màu (đỏ khi biến hình)
+// Tint the screen with a color flash (red when transforming)
 function flashScreen(player, red, green, blue) {
   try {
     player.camera.fade({ fadeColor: { red, green, blue }, fadeTime: { fadeInTime: 0.05, holdTime: 0.05, fadeOutTime: 0.45 } });
   } catch {
-    // bỏ qua
+    // ignore
   }
 }
 
-// Cầu máu bay từ `from` về người chơi
+// Blood orbs flying from `from` to the player
 function bloodOrbs(player, from) {
   const to = add(player.location, { x: 0, y: 1, z: 0 });
   const dx = to.x - from.x;
@@ -219,7 +219,7 @@ function particleRing(dimension, id, center, radius, count = Math.ceil(radius * 
 }
 
 // ---------------------------------------------------------------------------
-// Mục tiêu, sát thương, khống chế
+// Targets, damage, crowd control
 // ---------------------------------------------------------------------------
 
 function isTarget(player, entity) {
@@ -228,10 +228,10 @@ function isTarget(player, entity) {
   const health = getHealth(entity);
   if (!health || health.currentValue <= 0) return false;
   try {
-    // Không đánh thú cưng của chính mình
+    // Never hit your own pets
     if (entity.getComponent("minecraft:tameable")?.tamedToPlayerId === player.id) return false;
   } catch {
-    // bỏ qua
+    // ignore
   }
   return true;
 }
@@ -247,7 +247,7 @@ function getTargetsNear(player, center, radius) {
     .filter((entity) => isTarget(player, entity));
 }
 
-// Mục tiêu trong hình hộp phía trước: dài `length`, rộng `width`
+// Targets inside the box in front: `length` long, `width` wide
 function getTargetsInBox(player, origin, direction, length, width) {
   const right = { x: -direction.z, z: direction.x };
   return getTargetsNear(player, origin, Math.hypot(length, width / 2) + 1.5).filter((entity) => {
@@ -287,17 +287,17 @@ function stun(entity, seconds) {
   try {
     entity.addEffect("slowness", duration, { amplifier: 255, showParticles: false });
   } catch {
-    // bỏ qua
+    // ignore
   }
   particleRing(entity.dimension, P.stun, add(entity.location, { x: 0, y: 2.2, z: 0 }), 0.5, 4);
 }
 
-// Animation người chơi khi ra chiêu (AatroxRP/animations/aatrox_player.animation.json)
+// Player animation when casting (AatroxRP/animations/aatrox_player.animation.json)
 function playAnim(player, name) {
   try {
     player.playAnimation(`animation.aatrox.${name}`, { blendOutTime: 0.12 });
   } catch {
-    // bỏ qua
+    // ignore
   }
 }
 
@@ -305,12 +305,12 @@ function knockback(entity, direction, strength, vertical) {
   try {
     entity.applyKnockback({ x: direction.x * strength, z: direction.z * strength }, vertical);
   } catch {
-    // một số entity không bị đẩy được
+    // some entities cannot be knocked back
   }
 }
 
 // ---------------------------------------------------------------------------
-// Nội tại — Tư Thế Tử Thần
+// Passive — Deathbringer Stance
 // ---------------------------------------------------------------------------
 
 function isPassiveReady(state) {
@@ -334,7 +334,7 @@ world.afterEvents.entityHitEntity.subscribe(({ damagingEntity: player, hitEntity
   const bonus = Math.min(cfg.maxBonus, Math.max(cfg.minBonus, maxHealth * cfg.maxHealthPct));
   particle(target.dimension, P.ember, add(target.location, { x: 0, y: 1, z: 0 }));
 
-  // Nổ sau khi hết thời gian bất tử của đòn đánh thường
+  // Explode after the normal attack's invulnerability window
   system.runTimeout(() => {
     if (!player.isValid || !target.isValid) return;
     dealDamage(player, target, bonus);
@@ -350,7 +350,7 @@ world.afterEvents.entityHitEntity.subscribe(({ damagingEntity: player, hitEntity
   }, ticks(cfg.delay));
 });
 
-// Hút máu cho mọi sát thương gây ra khi đang cầm kiếm
+// Lifesteal on all damage dealt while holding the blade
 world.afterEvents.entityHurt.subscribe(({ damageSource, damage, hurtEntity }) => {
   const player = damageSource.damagingEntity;
   if (!player || player.typeId !== "minecraft:player" || player.id === hurtEntity.id) return;
@@ -364,7 +364,7 @@ world.afterEvents.entityHurt.subscribe(({ damageSource, damage, hurtEntity }) =>
 });
 
 // ---------------------------------------------------------------------------
-// Q — Quỷ Kiếm Darkin
+// Q — The Darkin Blade
 // ---------------------------------------------------------------------------
 
 function drawQTelegraph(player, cast, direction) {
@@ -373,7 +373,7 @@ function drawQTelegraph(player, cast, direction) {
 
   if (cast.shape === "circle") {
     const center = add(ground, direction, cast.offset);
-    // Đĩa tròn: vành ngoài là điểm ngọt
+    // Disc: the outer rim is the sweet spot
     for (let dx = -cast.radius; dx <= cast.radius; dx += 0.8) {
       for (let dz = -cast.radius; dz <= cast.radius; dz += 0.8) {
         const distance = Math.hypot(dx, dz);
@@ -417,7 +417,7 @@ function castQ(player, state, direction) {
     const window = windup + ticks(cfg.recastWindow);
     state.qStage = stage + 1;
     state.qWindowEnd = t + window;
-    // Hết thời gian mà không chém tiếp thì bắt đầu hồi chiêu
+    // If the next cast is not used in time, start the cooldown
     system.runTimeout(() => {
       if (state.qToken === token) {
         state.qStage = 1;
@@ -432,7 +432,7 @@ function castQ(player, state, direction) {
   try {
     player.addEffect("slowness", windup, { amplifier: 1, showParticles: false });
   } catch {
-    // bỏ qua
+    // ignore
   }
   sound(player.dimension, "item.trident.throw", player.location, 0.6);
   playAnim(player, `q${stage}`);
@@ -457,7 +457,7 @@ function slamQ(player, cast, direction) {
     shockRing(dimension, center, cast.radius + 0.5);
     bloodBurst(dimension, add(center, { x: 0, y: 0.5, z: 0 }));
     crater(dimension, center, cast.radius);
-    // Cột lửa phun lên quanh vành (điểm ngọt)
+    // Fire pillars erupt around the rim (sweet spot)
     for (let i = 0; i < 6; i++) {
       const angle = (i / 6) * Math.PI * 2;
       const at = { x: center.x + Math.cos(angle) * cast.radius, y: center.y, z: center.z + Math.sin(angle) * cast.radius };
@@ -481,13 +481,13 @@ function slamQ(player, cast, direction) {
     particle(dimension, P.flash, add(sweetCenter, { x: 0, y: 0.5, z: 0 }));
     crater(dimension, sweetCenter, 1.1);
     if (cast.empowered) {
-      // Biến hình: cột lửa phun dọc đường chém
+      // Transformed: fire pillars erupt along the slash
       for (let along = 1; along <= cast.length; along += 1.3) {
         const at = add(origin, direction, along);
         system.runTimeout(() => particle(dimension, P.pillar, at), Math.round(along));
       }
     }
-    // Vệt chém thứ hai lệch lên cao cho nhát chém dày hơn
+    // A second, higher slash streak for a thicker swing
     for (let along = 2.25; along <= cast.length; along += 1.5) {
       particle(dimension, P.slash, add(add(origin, direction, along), { x: 0, y: 1.6, z: 0 }));
     }
@@ -522,7 +522,7 @@ function slamQ(player, cast, direction) {
 }
 
 // ---------------------------------------------------------------------------
-// E — Bước Nhảy Hắc Ám
+// E — Umbral Dash
 // ---------------------------------------------------------------------------
 
 function castE(player, state, direction) {
@@ -546,7 +546,7 @@ function castE(player, state, direction) {
     particle(player.dimension, P.ember, add(player.location, { x: 0, y: 1.1, z: 0 }));
     if (count === 7) particle(player.dimension, P.smoke, add(player.location, { x: 0, y: 0.3, z: 0 }));
     if (empowered) {
-      // Biến hình: để lại vệt lửa, kẻ địch đứng trên vệt bị đốt
+      // Transformed: leave a fire trail that burns enemies standing on it
       const at = player.location;
       particle(player.dimension, P.fireTrail, add(at, { x: 0, y: 0.1, z: 0 }));
       for (const target of getTargetsNear(player, at, 1.4)) {
@@ -556,7 +556,7 @@ function castE(player, state, direction) {
         try {
           target.setOnFire(3, true);
         } catch {
-          // bỏ qua
+          // ignore
         }
       }
     }
@@ -564,7 +564,7 @@ function castE(player, state, direction) {
 }
 
 // ---------------------------------------------------------------------------
-// W — Xiềng Xích Địa Ngục
+// W — Infernal Chains
 // ---------------------------------------------------------------------------
 
 function isBlocked(dimension, location) {
@@ -585,7 +585,7 @@ function castW(player, state, direction) {
   const emp = CONFIG.R.empowered;
   const directions = [direction];
   if (isUltActive(state)) {
-    // Biến hình: phóng nhiều sợi xích hình quạt, hồi chiêu nhanh hơn
+    // Transformed: fire several chains in a fan, shorter cooldown
     state.cd.W = t + ticks(CONFIG.W.cooldown * emp.wCooldown);
     for (let i = 1; i < emp.wChains; i++) {
       const angle = ((i % 2 ? 1 : -1) * Math.ceil(i / 2) * emp.wSpread * Math.PI) / 180;
@@ -597,7 +597,7 @@ function castW(player, state, direction) {
     }
   }
   const tethered = new Set();
-  // Xích bay ra đúng lúc tay trái vung tới trong animation (0.25 giây)
+  // The chain leaves exactly when the left arm swings forward in the animation (0.25 s)
   system.runTimeout(() => directions.forEach((d) => launchChain(player, d, tethered)), 5);
 }
 
@@ -612,7 +612,7 @@ function launchChain(player, direction, tethered = new Set()) {
 
   const flight = system.runInterval(() => {
     if (!player.isValid) return system.clearRun(flight);
-    // Chia nhỏ bước để không xuyên qua mục tiêu / tường
+    // Sub-steps so the chain never tunnels through targets or walls
     for (let step = 0; step < 3; step++) {
       head = add(head, direction, cfg.speed / 3);
       travelled += cfg.speed / 3;
@@ -651,7 +651,7 @@ function tether(player, target) {
   try {
     target.addEffect("slowness", pullTick, { amplifier: cfg.slowAmplifier, showParticles: false });
   } catch {
-    // bỏ qua
+    // ignore
   }
 
   let elapsed = 0;
@@ -660,7 +660,7 @@ function tether(player, target) {
     if (!player.isValid || !target.isValid || (getHealth(target)?.currentValue ?? 0) <= 0) {
       return system.clearRun(run);
     }
-    // Mục tiêu chạy ra khỏi vòng trói: xích đứt
+    // Target ran out of the binding circle: the chain breaks
     if (horizontalDistance(target.location, anchor) > cfg.escapeRadius) {
       particle(dimension, P.smoke, add(target.location, { x: 0, y: 1, z: 0 }));
       particle(dimension, P.spark, add(target.location, { x: 0, y: 1, z: 0 }));
@@ -695,7 +695,7 @@ function tether(player, target) {
 }
 
 // ---------------------------------------------------------------------------
-// R — Kẻ Diệt Thế
+// R — World Ender
 // ---------------------------------------------------------------------------
 
 function castR(player, state) {
@@ -710,7 +710,7 @@ function castR(player, state) {
   try {
     player.addEffect("slowness", castTicks, { amplifier: 3, showParticles: false });
   } catch {
-    // bỏ qua
+    // ignore
   }
   sound(player.dimension, "mob.wither.spawn", player.location, 1.3);
   particle(player.dimension, P.aura, player.location);
@@ -724,23 +724,23 @@ function castR(player, state) {
     const dimension = player.dimension;
     const duration = ticks(cfg.duration);
 
-    // Biến hình trước để sát thương sóng xung kích được cộng hệ số
+    // Transform first so the shockwave damage gets the bonus
     state.ultUntil = now() + duration;
     try {
       player.addEffect("speed", duration, { amplifier: cfg.speedAmplifier, showParticles: false });
       player.addEffect("strength", duration, { amplifier: cfg.strengthAmplifier, showParticles: false });
     } catch {
-      // bỏ qua
+      // ignore
     }
     if (!isPassiveReady(state)) {
       const remaining = state.passiveReadyAt - now();
       state.passiveReadyAt = now() + Math.floor(remaining * cfg.passiveCooldownMultiplier);
     }
 
-    // Hiện hình Kẻ Diệt Thế: đổi sang kiếm có cánh + sừng 3D
+    // Reveal the World Ender form: swap to the blade with 3D wings + horns
     swapMainhand(player, ITEM_ID, ULT_ITEM_ID);
 
-    // Chớp đỏ màn hình, rung, cột lửa phun lên quanh người, đất nứt, sét, linh hồn
+    // Red screen flash, shake, fire pillars around, cracked ground, lightning, souls
     flashScreen(player, 0.55, 0.02, 0.02);
     for (let i = 0; i < 4; i++) {
       const angle = (i / 4) * Math.PI * 2 + 0.4;
@@ -763,7 +763,7 @@ function castR(player, state) {
       }, 2 + i);
     }
 
-    // Sóng xung kích lan ra
+    // Expanding shockwave
     bloodBurst(dimension, add(origin, { x: 0, y: 1, z: 0 }));
     for (let i = 0; i < 3; i++) {
       system.runTimeout(() => shockRing(dimension, origin, cfg.radius * (0.6 + i * 0.25)), i * 3);
@@ -776,11 +776,11 @@ function castR(player, state) {
       try {
         target.addEffect("slowness", ticks(cfg.fearDuration), { amplifier: cfg.fearSlowAmplifier });
       } catch {
-        // bỏ qua
+        // ignore
       }
       dealDamage(player, target, cfg.castDamage);
       shake(target, 0.35, 0.35);
-      // Biểu tượng sợ hãi trên đầu trong thời gian bị dọa
+      // Fear icon above the head while feared
       for (let k = 0; k < cfg.fearDuration * 2; k++) {
         system.runTimeout(() => target.isValid && particle(dimension, P.fear, add(target.location, { x: 0, y: 2.4, z: 0 })), k * 10);
       }
@@ -789,25 +789,25 @@ function castR(player, state) {
 }
 
 // ---------------------------------------------------------------------------
-// Nhận thao tác
+// Input
 // ---------------------------------------------------------------------------
 
-const SKILL_NAMES = { Q: "Quỷ Kiếm Darkin", E: "Bước Nhảy Hắc Ám", W: "Xiềng Xích Địa Ngục", R: "Kẻ Diệt Thế" };
-const STANCE_HINT = { Q: "", E: " (chạy nhanh)", W: " (khụy)  §7Nhảy: §eR" };
-// Hiện trong mô tả của kiếm (giữ chuột lên kiếm trong túi đồ)
+const SKILL_NAMES = { Q: "The Darkin Blade", E: "Umbral Dash", W: "Infernal Chains", R: "World Ender" };
+const STANCE_HINT = { Q: "", E: " (sprinting)", W: " (sneaking)  §7Jump: §eR" };
+// Shown in the blade's tooltip (hover the blade in the inventory)
 const LORE = [
-  "§7Chuột phải/chạm: §cQ §7Quỷ Kiếm",
-  "§7Chạy nhanh + chém: §cE §7Lướt",
-  "§7Khụy + chuột phải: §cW §7Xiềng Xích",
-  "§7Khụy + nhảy: §cR §7Diệt Thế",
-  "§7Đánh thường: §cNội tại",
+  "§7Right-click/tap: §cQ §7Darkin Blade",
+  "§7Sprint + attack: §cE §7Umbral Dash",
+  "§7Sneak + right-click: §cW §7Chains",
+  "§7Sneak + jump: §cR §7World Ender",
+  "§7Normal attack: §cPassive",
 ];
-// Bấm vào những block/mob có thao tác riêng thì dùng chúng như thường, không ra chiêu
+// Clicking blocks/mobs that have their own interaction uses them normally instead of casting
 const INTERACTIVE_BLOCK =
   /door|gate|button|lever|chest|barrel|shulker|furnace|smoker|crafting|crafter|anvil|table|:bed$|bell|hopper|dispenser|dropper|loom|grindstone|stonecutter|beacon|lectern|repeater|comparator|noteblock|jukebox|cake|campfire|anchor|lodestone|composter|cauldron|brewing|sign|frame|vault|chiseled_bookshelf|decorated_pot/;
 const INTERACTIVE_ENTITY = new Set(["minecraft:villager", "minecraft:villager_v2", "minecraft:wandering_trader", "minecraft:armor_stand"]);
 
-// Chiêu ra khi bấm chuột phải (R dùng khụy + nhảy, xem playerButtonInput bên dưới)
+// Skill cast by right-click (R is sneak + jump, see playerButtonInput below)
 function chooseSkill(player) {
   if (player.isSneaking) return "W";
   if (player.isSprinting) return "E";
@@ -820,19 +820,19 @@ function notify(state, text, seconds = 1.2) {
 }
 
 function cooldownLeft(state, skill) {
-  if (skill === "Q" && state.qStage > 1) return 0; // đang trong thời gian chém tiếp
+  if (skill === "Q" && state.qStage > 1) return 0; // still inside the recast window
   return state.cd[skill] - now();
 }
 
-// skill: chiêu cố định (E khi chạy nhanh chém, R khi khụy nhảy); bỏ trống = chọn theo tư thế.
-// quiet: không báo hồi chiêu (dùng cho đòn đánh thường lúc chạy, tránh kêu liên tục)
+// skill: fixed skill (E on sprint-attack, R on sneak-jump); omitted = chosen by stance.
+// quiet: no cooldown message (used for normal hits while sprinting, avoids constant beeps)
 function trySkill(player, forced, quiet = false) {
   if (!canAct(player)) return;
   const state = getState(player);
-  // Một lần bấm có thể bắn nhiều sự kiện (dùng vật phẩm + chạm block)
+  // One press can fire several events (item use + block interaction)
   if (now() - state.lastUse < 4) return;
   state.lastUse = now();
-  if (isStunned(player)) return notify(state, "§cĐang bị choáng, không dùng được chiêu!");
+  if (isStunned(player)) return notify(state, "§cYou are stunned and cannot cast!");
   if (now() < state.busyUntil) return;
 
   const skill = forced ?? chooseSkill(player);
@@ -842,9 +842,9 @@ function trySkill(player, forced, quiet = false) {
     try {
       player.playSound("note.bass", { pitch: 0.6, volume: 0.7 });
     } catch {
-      // bỏ qua
+      // ignore
     }
-    return notify(state, `§c${skill} đang hồi chiêu: ${(left / TPS).toFixed(1)}s`);
+    return notify(state, `§c${skill} on cooldown: ${(left / TPS).toFixed(1)}s`);
   }
 
   const direction = aimDirection(player);
@@ -857,12 +857,12 @@ function trySkill(player, forced, quiet = false) {
   notify(state, `§6▶ ${label}: ${SKILL_NAMES[skill]}`);
 }
 
-// Chuột phải / chạm vào khoảng không
+// Right-click / tap into the air
 world.afterEvents.itemUse.subscribe(({ source, itemStack }) => {
   if (isBladeId(itemStack?.typeId)) trySkill(source);
 });
 
-// Chuột phải / chạm khi tâm ngắm đang chỉ vào block (mặt đất, tường...)
+// Right-click / tap while aiming at a block (ground, wall...)
 world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
   if (!isBladeId(event.itemStack?.typeId) || event.isFirstEvent === false) return;
   if (INTERACTIVE_BLOCK.test(event.block.typeId)) return;
@@ -870,27 +870,27 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
   system.run(() => trySkill(player));
 });
 
-// Chuột phải / chạm giữ vào mob
+// Right-click / hold on a mob
 world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
   if (!isBladeId(event.itemStack?.typeId)) return;
   const target = event.target;
   if (INTERACTIVE_ENTITY.has(target.typeId)) return;
   try {
-    if (target.getComponent("minecraft:rideable")) return; // ngựa, thuyền... để cưỡi như thường
+    if (target.getComponent("minecraft:rideable")) return; // horses, boats... ride them as usual
   } catch {
-    // bỏ qua
+    // ignore
   }
   const player = event.player;
   system.run(() => trySkill(player));
 });
 
-// Khụy + nhảy: R
+// Sneak + jump: R
 world.afterEvents.playerButtonInput.subscribe(({ player, button, newButtonState }) => {
   if (button !== InputButton.Jump || newButtonState !== ButtonState.Pressed) return;
   if (player.isSneaking && holdsBlade(player)) trySkill(player, "R");
 });
 
-// Chạy nhanh + chém (đánh trúng mob hoặc block): E
+// Sprint + attack (hitting a mob or block): E
 function sprintSlash(player) {
   if (player?.typeId === "minecraft:player" && player.isSprinting && holdsBlade(player)) trySkill(player, "E", true);
 }
@@ -903,18 +903,18 @@ world.afterEvents.playerLeave.subscribe(({ playerId }) => {
 });
 
 // ---------------------------------------------------------------------------
-// Hướng dẫn: tiêu đề + chat khi cầm kiếm lần đầu, mô tả trên kiếm, /scriptevent aatrox:help
+// Guide: title + chat on first hold, blade tooltip, /scriptevent aatrox:help
 // ---------------------------------------------------------------------------
 
 function sendGuide(player) {
-  player.sendMessage("§4━━━━━━━━ Quỷ Kiếm Darkin ━━━━━━━━");
-  player.sendMessage("§7Cầm kiếm rồi dùng các thao tác sau (điện thoại: chuột phải = §fchạm màn hình§7 / nút §fDùng§7):");
-  player.sendMessage("§c Q §f— chuột phải: §7chém 3 lần, ô rune cam là điểm ngọt");
-  player.sendMessage("§c E §f— chạy nhanh + chém (hoặc chạy nhanh + chuột phải): §7lướt theo hướng nhìn");
-  player.sendMessage("§c W §f— khụy (Shift / nút ngồi) + chuột phải: §7phóng xích lửa");
-  player.sendMessage("§c R §f— khụy + nhảy: §7biến hình Kẻ Diệt Thế");
-  player.sendMessage("§c Nội tại §f— đánh thường: §7vết chém phát nổ, hồi máu");
-  player.sendMessage("§7Thanh trên hotbar hiện chiêu sắp dùng và thời gian hồi chiêu. Gõ §f/scriptevent aatrox:help §7để xem lại.");
+  player.sendMessage("§4━━━━━━━━ The Darkin Blade ━━━━━━━━");
+  player.sendMessage("§7Hold the blade and use these controls (mobile: right-click = §ftap the screen§7 / §fUse§7 button):");
+  player.sendMessage("§c Q §f— right-click: §7slash 3 times, the orange rune tiles are the sweet spot");
+  player.sendMessage("§c E §f— sprint + attack (or sprint + right-click): §7dash where you look");
+  player.sendMessage("§c W §f— sneak (Shift / sneak button) + right-click: §7launch fiery chains");
+  player.sendMessage("§c R §f— sneak + jump: §7transform into the World Ender");
+  player.sendMessage("§c Passive §f— normal attack: §7the wound explodes and heals you");
+  player.sendMessage("§7The bar above the hotbar shows the next skill and cooldowns. Type §f/scriptevent aatrox:help §7to see this again.");
 }
 
 function ensureLore(player) {
@@ -925,7 +925,7 @@ function ensureLore(player) {
     item.setLore(LORE);
     equippable.setEquipment(EquipmentSlot.Mainhand, item);
   } catch {
-    // bỏ qua
+    // ignore
   }
 }
 
@@ -934,7 +934,7 @@ system.afterEvents.scriptEventReceive.subscribe(({ id, sourceEntity }) => {
 });
 
 // ---------------------------------------------------------------------------
-// Dạng Diệt Thế: đổi kiếm thường <-> kiếm có cánh + sừng 3D, vùng Diệt Thế
+// World Ender form: swap normal blade <-> blade with 3D wings + horns, World Ender zone
 // ---------------------------------------------------------------------------
 
 function convertBlade(stack, typeId) {
@@ -942,26 +942,26 @@ function convertBlade(stack, typeId) {
   try {
     if (stack.nameTag) out.nameTag = stack.nameTag;
   } catch {
-    // bỏ qua
+    // ignore
   }
   try {
     out.setLore(stack.getLore());
   } catch {
-    // bỏ qua
+    // ignore
   }
   try {
     const from = stack.getComponent("minecraft:durability");
     const to = out.getComponent("minecraft:durability");
     if (from && to) to.damage = from.damage;
   } catch {
-    // bỏ qua
+    // ignore
   }
   try {
     const from = stack.getComponent("minecraft:enchantable");
     const to = out.getComponent("minecraft:enchantable");
     if (from && to) to.addEnchantments(from.getEnchantments());
   } catch {
-    // bỏ qua
+    // ignore
   }
   return out;
 }
@@ -972,11 +972,11 @@ function swapMainhand(player, fromId, toId) {
     const item = equippable?.getEquipment(EquipmentSlot.Mainhand);
     if (item?.typeId === fromId) equippable.setEquipment(EquipmentSlot.Mainhand, convertBlade(item, toId));
   } catch {
-    // bỏ qua
+    // ignore
   }
 }
 
-// Hết biến hình: trả mọi kiếm Diệt Thế trong túi đồ về kiếm thường
+// Form ended: turn every World Ender blade in the inventory back into the normal blade
 function revertUltItems(player) {
   try {
     const container = player.getComponent("minecraft:inventory")?.container;
@@ -986,7 +986,7 @@ function revertUltItems(player) {
       if (item?.typeId === ULT_ITEM_ID) container.setItem(i, convertBlade(item, ITEM_ID));
     }
   } catch {
-    // bỏ qua
+    // ignore
   }
 }
 
@@ -1001,7 +1001,7 @@ system.runInterval(() => {
     const cfg = CONFIG.R;
     const center = player.location;
     const dimension = player.dimension;
-    // Vòng Diệt Thế dưới chân, xoay liền mạch giữa các lần sinh lại (20 độ/giây)
+    // World Ender circle under the feet, spinning seamlessly across respawns (20 degrees/second)
     const molang = withRadius(cfg.zoneRadius);
     molang.setFloat("variable.spin", t);
     particle(dimension, P.domain, add(center, { x: 0, y: 0.07, z: 0 }), molang);
@@ -1016,7 +1016,7 @@ system.runInterval(() => {
         try {
           target.addEffect("slowness", 25, { amplifier: 0, showParticles: false });
         } catch {
-          // bỏ qua
+          // ignore
         }
       }
     }
@@ -1025,10 +1025,10 @@ system.runInterval(() => {
 
 
 // ---------------------------------------------------------------------------
-// Thanh hồi chiêu (action bar) + hào quang khi biến hình
+// Cooldown bar (action bar) + aura while transformed
 // ---------------------------------------------------------------------------
 
-// Vị trí gần đúng của lưỡi kiếm: kiếm cầm tay phải, lưỡi chếch lên phía trước
+// Approximate blade location: held in the right hand, blade pointing forward
 function bladeLocation(player) {
   const forward = aimDirection(player);
   const right = { x: -forward.z, y: 0, z: forward.x };
@@ -1051,26 +1051,26 @@ system.runInterval(() => {
       greeted.add(player.id);
       sendGuide(player);
       try {
-        player.onScreenDisplay.setTitle("§4Quỷ Kiếm Darkin", {
-          subtitle: "§7Bấm chuột phải / chạm màn hình để dùng chiêu §cQ",
+        player.onScreenDisplay.setTitle("§4The Darkin Blade", {
+          subtitle: "§7Right-click / tap the screen to cast §cQ",
           fadeInDuration: 10,
           stayDuration: 60,
           fadeOutDuration: 20,
         });
       } catch {
-        // bỏ qua
+        // ignore
       }
       particle(player.dimension, P.aura, player.location);
       sound(player.dimension, "mob.wither.ambient", player.location, 1.4);
     }
     ensureLore(player);
 
-    const parts = [`§4Nội tại ${formatCooldown(state.passiveReadyAt - t)}`];
+    const parts = [`§4Passive ${formatCooldown(state.passiveReadyAt - t)}`];
     if (t < (state.noticeUntil ?? 0)) {
       parts.push(state.notice);
     } else {
       const next = chooseSkill(player);
-      parts.push(`§fBấm: §e${next}${STANCE_HINT[next]}`);
+      parts.push(`§fPress: §e${next}${STANCE_HINT[next]}`);
     }
     for (const skill of SKILLS) {
       if (skill === "Q" && state.qStage > 1 && t < state.qWindowEnd) {
@@ -1080,10 +1080,10 @@ system.runInterval(() => {
       }
     }
     if (isUltActive(state)) {
-      parts.push(`§6§lDIỆT THẾ ${Math.ceil((state.ultUntil - t) / TPS)}s`);
+      parts.push(`§6§lWORLD ENDER ${Math.ceil((state.ultUntil - t) / TPS)}s`);
       particle(player.dimension, P.aura, player.location);
     } else if (t % 10 === 0) {
-      // Tàn lửa bốc lên và dung nham nhỏ giọt từ lưỡi kiếm đang cầm
+      // Embers rise and lava drips from the held blade
       particle(player.dimension, P.ember, bladeLocation(player));
       if (t % 20 === 0) particle(player.dimension, P.lavaDrip, bladeLocation(player));
     }

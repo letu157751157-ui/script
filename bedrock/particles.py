@@ -1,11 +1,11 @@
-"""Particle riêng của Quỷ Kiếm Darkin: texture atlas pixel art + file JSON cho resource pack.
+"""Custom particles of The Darkin Blade: pixel art texture atlas + resource pack JSON files.
 
-Sprite vẽ theo kiểu particle gốc của Minecraft: pixel cạnh cứng, bảng màu lửa giới hạn
-(trắng vàng -> vàng -> cam -> đỏ -> đỏ thẫm). Phần lớn hiệu ứng là flipbook nhiều khung hình
-(nhát chém loé lên rồi tan thành tia lửa, vòng xung kích mỏng dần rồi vỡ, ngọn lửa bập bùng...),
-khung hình chạy hết trong đúng thời gian sống của particle (stretch_to_lifetime).
+Sprites follow the vanilla Minecraft particle style: hard-edged pixels, a limited fire palette
+(white-yellow -> yellow -> orange -> red -> dark red). Most effects are multi-frame flipbooks
+(the slash flares up then breaks into sparks, the shockwave thins out then shatters, flames flicker...),
+with frames stretched over the particle lifetime (stretch_to_lifetime).
 
-Ô rune dưới đất vẽ bằng thang xám để tô màu bằng tinting (đỏ = vùng chém, cam = điểm ngọt).
+Ground rune tiles are drawn in grayscale and colored by tinting (red = slash area, orange = sweet spot).
 """
 import json
 import math
@@ -33,7 +33,7 @@ def hash01(x, y, salt=0):
 
 
 def fire_char(heat):
-    """Mức nhiệt -> màu lửa, cạnh cứng như pixel art."""
+    """Heat level -> fire color, hard edges like pixel art."""
     for limit, char in ((0.82, "W"), (0.62, "Y"), (0.42, "O"), (0.24, "R"), (0.1, "D")):
         if heat > limit:
             return char
@@ -50,7 +50,7 @@ def grid(w, h, fn):
 
 
 def slash_frame(frame):
-    """Nhát chém lưỡi liềm 32x32: mép ngoài trắng rực, trong đỏ; loé lên rồi tan thành tia lửa."""
+    """32x32 crescent slash: white-hot outer edge, red inside; flares up then breaks into sparks."""
     c1, r1 = (16.0, 17.0), 14.5
     c2, r2 = (20.5, 12.5), 12.5
     fade = (1.0, 1.0, 0.8, 0.55)[frame]
@@ -64,7 +64,7 @@ def slash_frame(frame):
             return "."
         outer, inner = r1 - d1, d2 - r2
         heat = (1 - 0.95 * outer / (outer + inner + 1e-6)) * fade
-        angle = math.atan2(py - c1[1], px - c1[0])  # quét từ trên phải vòng qua trái xuống dưới
+        angle = math.atan2(py - c1[1], px - c1[0])  # sweeps from top right around the left to the bottom
         sweep = ((angle - 0.3) % (2 * math.pi)) / (2 * math.pi)
         if frame == 0 and sweep > 0.55:
             return "."
@@ -78,14 +78,14 @@ def slash_frame(frame):
 
 
 def ring_frame(frame):
-    """Vòng sóng xung kích 32x32: dày và rực, mỏng dần rồi vỡ vụn."""
+    """32x32 shockwave ring: thick and bright, thinning out, then shattering."""
     radius, thick, heat_max, holes = ((10.5, 4.5, 1.0, 0.0), (13.0, 3.0, 0.8, 0.12), (14.5, 2.0, 0.55, 0.45))[frame]
 
     def pixel(x, y):
         d = math.hypot(x + 0.5 - 16, y + 0.5 - 16)
         off = abs(d - radius)
         if off > thick / 2:
-            # vài mảnh vụn văng ra ngoài vòng
+            # a few fragments flying outside the ring
             if frame and radius + thick / 2 < d < radius + thick / 2 + 2 and hash01(x, y, 40 + frame) < 0.06:
                 return "R"
             return "."
@@ -97,7 +97,7 @@ def ring_frame(frame):
 
 
 def shade_mask(mask, w, h, bias):
-    """Tô nhiệt cho một hình: càng sâu vào trong càng nóng (khoảng cách tới mép), cộng thêm bias(x, y)."""
+    """Heat for a shape: hotter the deeper inside (distance to the edge), plus bias(x, y)."""
     depth = {}
     frontier = [(x, y) for y in range(h) for x in range(w) if mask(x, y) and any(
         not mask(x + dx, y + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))]
@@ -119,7 +119,7 @@ def shade_mask(mask, w, h, bias):
 
 
 def flame_frame(frame):
-    """Ngọn lửa 16x16 bập bùng: đáy tròn, lưỡi lửa lắc qua lại, lõi vàng trắng."""
+    """Flickering 16x16 flame: round base, swaying tongue, white-yellow core."""
     sway = (0.0, 1.2, 0.3, -1.0)[frame]
 
     def inside(x, y):
@@ -129,7 +129,7 @@ def flame_frame(frame):
         if math.hypot(px - 8, py - 11.2) <= 4.3:
             return True
         if 1.5 <= py <= 11.2:
-            t = (11.2 - py) / 9.7  # 0 ở đáy lưỡi lửa, 1 ở đỉnh
+            t = (11.2 - py) / 9.7  # 0 at the base of the tongue, 1 at the tip
             center = 8 + sway * t * t * 2
             width = 4.3 * (1 - t) ** 0.8
             return abs(px - center) <= width and hash01(x, y, 60 + frame) > 0.12 * t
@@ -197,7 +197,7 @@ RUNE = [
 
 
 def rune_frame(frame):
-    """Ô rune báo trước vùng chém: hiện khung -> hình thoi -> lõi, như thanh nạp."""
+    """Rune tile warning of the slash area: frame -> diamond -> core, like a charge bar."""
     def pixel(x, y):
         c = RUNE[y][x]
         if c == ".":
@@ -214,7 +214,7 @@ def rune_frame(frame):
 
 
 def chain_link():
-    """Mắt xích nung đỏ 16x16: viền sắt tối, trong lòng rực cam."""
+    """Red-hot 16x16 chain link: dark iron rim, glowing orange inside."""
     def pixel(x, y):
         nx, ny = (x + 0.5 - 8) / 5.4, (y + 0.5 - 8) / 7.4
         d = math.hypot(nx, ny)
@@ -230,7 +230,7 @@ def chain_link():
 
 
 def flash_frame(frame):
-    """Chớp sáng hình sao 16x16: sao nhỏ -> sao lớn -> vòng tan."""
+    """16x16 star flash: small star -> big star -> fading ring."""
     arm, diag, core, ring = ((4.5, 0, 2.2, 0), (7.5, 3.5, 2.8, 0), (0, 0, 1.2, 6.3))[frame]
 
     def pixel(x, y):
@@ -258,7 +258,7 @@ WING = {"K": (22, 8, 10), "D": (92, 10, 18), "R": (168, 24, 30), "O": (255, 110,
 
 
 def smoke_frame(frame):
-    """Cụm khói đỏ đen 16x16: nở ra rồi tan thành lỗ chỗ."""
+    """16x16 red-black smoke puff: expands then breaks apart."""
     radius, holes = ((3.6, 0.0), (5.0, 0.08), (6.2, 0.3), (7.0, 0.58))[frame]
     blobs = ((8, 9, 1.0), (5.5, 7, 0.75), (10.5, 6.5, 0.7), (8, 5, 0.6))
 
@@ -268,7 +268,7 @@ def smoke_frame(frame):
             return "."
         if best > 0.82:
             return "C"
-        light = (x - 8) + (y - 8)  # sáng trên-trái, tối dưới-phải
+        light = (x - 8) + (y - 8)  # lit top-left, shaded bottom-right
         return "H" if light < -5 and best < 0.6 else "B" if light > 4 else "A"
 
     return grid(16, 16, pixel)
@@ -336,7 +336,7 @@ AFTERIMAGE = [
 
 
 def x_slash_frame(frame):
-    """Vết chém chữ X 32x32 của nội tại: nhát thứ nhất -> đủ hai nhát -> tan."""
+    """32x32 X slash for the passive: first stroke -> both strokes -> fade."""
     fade, holes = ((1.0, 0.0), (1.0, 0.0), (0.7, 0.4))[frame]
 
     def stroke(dx, dy, sign):
@@ -360,7 +360,7 @@ def x_slash_frame(frame):
 
 
 def ground_crack():
-    """Đất nứt 32x32: các vết nứt ngoằn ngoèo toả ra từ tâm, gần tâm còn rực dung nham."""
+    """32x32 cracked ground: jagged cracks spreading from the center, still glowing with lava near it."""
     cells = {}
     for ray in range(7):
         angle = ray / 7 * 2 * math.pi + hash01(ray, 1, 5) * 0.6
@@ -388,7 +388,7 @@ def ground_crack():
 
 
 def bind_circle():
-    """Vòng rune trói 32x32 (thang xám, tô đỏ bằng tinting): hai vòng tròn, 6 ký tự, ngôi sao sáu cánh."""
+    """32x32 binding rune circle (grayscale, tinted red): two rings, 6 glyphs, a hexagram."""
     marks = [(16 + 12.7 * math.cos(k * math.pi / 3), 16 + 12.7 * math.sin(k * math.pi / 3)) for k in range(6)]
     star = [(16 + 10 * math.cos(k * math.pi / 3 + math.pi / 6), 16 + 10 * math.sin(k * math.pi / 3 + math.pi / 6)) for k in range(6)]
 
@@ -415,17 +415,17 @@ def bind_circle():
 
 
 def wings():
-    """Cặp cánh quỷ 48x24 đối xứng: xương đen, màng đỏ thẫm, mép rực lửa."""
-    bones = [-28, -8, 12, 32]  # góc (độ) của các nan xương, âm = chếch lên
+    """Symmetric 48x24 demon wings: black bones, dark red membrane, fiery edge."""
+    bones = [-28, -8, 12, 32]  # angle (degrees) of the wing bones, negative = raised
 
     def half(x, y):
-        rx, ry = x + 0.5, y + 0.5 - 12  # gốc cánh ở giữa mép trái của nửa phải
+        rx, ry = x + 0.5, y + 0.5 - 12  # wing root at the middle of the left edge of the right half
         r = math.hypot(rx, ry)
         theta = math.degrees(math.atan2(ry, rx))
         if r < 1.5 or not -34 <= theta <= 40:
             return "."
         reach = 23 - (theta + 34) * 0.16
-        # mép sau lượn sóng giữa các nan xương
+        # scalloped trailing edge between the wing bones
         gap = min(abs(theta - b) for b in bones)
         reach -= 0.18 * gap * (1 if theta > bones[0] else 0)
         if r > reach:
@@ -445,21 +445,21 @@ def wings():
     return rows
 
 
-# (tên, x, y, danh sách khung, bảng màu); các khung xếp liền nhau theo chiều ngang
+# (name, x, y, frame list, palette); frames are laid out side by side horizontally
 SOUL = {"W": (255, 236, 226), "P": (255, 170, 160), "R": (220, 60, 60), "K": (60, 6, 12)}
 MIST = {"A": (170, 20, 30), "B": (120, 10, 20), "C": (80, 6, 14)}
 FEAR = {"W": (255, 230, 220), "R": (220, 30, 40), "K": (40, 4, 8)}
 
 
 def domain():
-    """Vùng Diệt Thế 64x64 (thang xám, tô đỏ): vành gai ngoài, vòng rune, vòng trong, tia toả ra."""
+    """64x64 World Ender zone (grayscale, tinted red): spiked outer rim, rune ring, inner ring, rays."""
     def pixel(x, y):
         px, py = x + 0.5 - 32, y + 0.5 - 32
         d = math.hypot(px, py)
         a = math.degrees(math.atan2(py, px)) % 360
         if d > 31.5:
             return "."
-        spike = 29.5 + 2 * max(0.0, 1 - abs((a % 15) - 7.5) / 3)  # răng cưa quanh vành
+        spike = 29.5 + 2 * max(0.0, 1 - abs((a % 15) - 7.5) / 3)  # jagged teeth around the rim
         if abs(d - 29.5) < 0.8 or (29.5 < d < spike):
             return "#"
         if abs(d - 25.5) < 0.6:
@@ -476,7 +476,7 @@ def domain():
 
 
 def soul_frame(frame):
-    """Linh hồn Darkin 16x16: ngọn khói hình mặt gào thét, uốn lượn khi bay lên."""
+    """16x16 Darkin soul: a screaming smoky face that sways as it rises."""
     sway = (0, 1, 0, -1)[frame]
 
     def pixel(x, y):
@@ -486,9 +486,9 @@ def soul_frame(frame):
         if not (head or tail):
             return "."
         if head and (abs(px + 1.8) < 0.8 or abs(px - 1.8) < 0.8) and 5 <= py <= 6.5:
-            return "K"  # hốc mắt
+            return "K"  # eye socket
         if head and abs(px) < 1.2 and 7.5 <= py <= 9 + frame % 2:
-            return "K"  # miệng gào
+            return "K"  # screaming mouth
         edge = (head and math.hypot(px, py - 6) > 3.2) or (tail and py > 12)
         return "R" if edge and tail else "P" if edge else "W"
 
@@ -496,7 +496,7 @@ def soul_frame(frame):
 
 
 def lightning_frame(frame):
-    """Sét đỏ 16x48: tia gấp khúc với nhánh phụ, loé -> rực -> tàn."""
+    """16x48 red lightning: jagged bolt with a side branch, flash -> bright -> fade."""
     heat_max = (0.8, 1.0, 0.5)[frame]
     points, x = [], 8.0
     for y in range(48):
@@ -507,7 +507,7 @@ def lightning_frame(frame):
     def pixel(xx, yy):
         dx = abs(xx + 0.5 - points[yy])
         heat = max(0.0, 1 - dx / 1.4) * heat_max
-        if 18 <= yy <= 30:  # nhánh phụ
+        if 18 <= yy <= 30:  # side branch
             bx = points[18] + (yy - 18) * 0.6
             heat = max(heat, max(0.0, 1 - abs(xx + 0.5 - bx) / 0.9) * heat_max * 0.7)
         return fire_char(heat)
@@ -545,7 +545,7 @@ FEAR_ICON = [
 
 
 def mist_frame(frame):
-    """Sương máu 16x16: đám mờ loang ra rồi tan."""
+    """16x16 blood mist: a haze that spreads then fades."""
     radius, holes = ((4.0, 0.2), (5.5, 0.35), (6.8, 0.5), (7.5, 0.7))[frame]
 
     def pixel(x, y):
@@ -597,14 +597,14 @@ def build_atlas():
 
 
 # ---------------------------------------------------------------------------
-# Định nghĩa particle
+# Particle definitions
 # ---------------------------------------------------------------------------
 
 AGE = "v.particle_age / v.particle_lifetime"
 
 
 def uv(sprite, fps=12):
-    """UV một khung, hoặc flipbook chạy hết các khung trong thời gian sống của particle."""
+    """UV of a single frame, or a flipbook running through all frames over the particle lifetime."""
     ox, oy, frames, _ = SPRITES[sprite]
     w, h = len(frames[0][0]), len(frames[0])
     base = {"texture_width": ATLAS, "texture_height": ATLAS}
@@ -644,7 +644,7 @@ def burst(count, active=0.05):
 
 
 PARTICLES = {
-    # Tàn lửa bay lên (quanh kiếm, vệt lướt, hút máu): cháy sáng rồi tàn thành đốm đỏ
+    # Embers rising (around the blade, dash trail, lifesteal): burn bright then fade to red specks
     "ember": particle("aatrox:ember", "particles_add", {
         **burst(3),
         "minecraft:emitter_shape_sphere": {"radius": 0.25, "direction": "outwards"},
@@ -656,7 +656,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": FADE,
     }),
-    # Tia lửa bắn ra khi chém trúng
+    # Sparks when a hit lands
     "hit_spark": particle("aatrox:hit_spark", "particles_add", {
         **burst(14),
         "minecraft:emitter_shape_sphere": {"radius": 0.2, "direction": "outwards"},
@@ -671,7 +671,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": FADE,
     }),
-    # Máu văng (điểm ngọt Q, nội tại, kéo xích): giọt máu pixel đặc như particle gốc
+    # Blood spray (Q sweet spot, passive, chain pull): solid pixel blood drops like vanilla particles
     "blood_burst": particle("aatrox:blood_burst", "particles_alpha", {
         **burst(18),
         "minecraft:emitter_shape_sphere": {"radius": 0.3, "direction": "outwards"},
@@ -686,7 +686,7 @@ PARTICLES = {
             "uv": uv("drop"),
         },
     }),
-    # Chớp sáng hình sao tại điểm nổ
+    # Star flash at the explosion point
     "flash": particle("aatrox:flash", "particles_add", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
@@ -698,7 +698,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": FADE,
     }),
-    # Nhát chém lưỡi liềm: loé lên rồi vỡ thành tia lửa
+    # Crescent slash: flares up then breaks into sparks
     "slash": particle("aatrox:slash", "particles_add", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
@@ -711,7 +711,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": FADE,
     }),
-    # Ô rune báo trước vùng chém Q (đỏ) và điểm ngọt (cam): hiện dần khung -> hình thoi -> lõi
+    # Rune tiles warning of the Q area (red) and sweet spot (orange): frame -> diamond -> core
     "ground_mark": particle("aatrox:ground_mark", "particles_add", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
@@ -730,7 +730,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#66FF8C28", "0.3": "#EEFF8C28", "0.85": "#FFFFD25A", "1.0": "#00FFD25A"}),
     }),
-    # Vòng sóng xung kích lan trên mặt đất; bán kính truyền từ script qua variable.radius
+    # Shockwave ring spreading on the ground; the script passes the radius via variable.radius
     "shock_ring": particle("aatrox:shock_ring", "particles_add", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
@@ -742,7 +742,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": FADE,
     }),
-    # Mắt xích nung đỏ của W
+    # Red-hot chain link for W
     "chain_link": particle("aatrox:chain_link", "particles_alpha", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
@@ -752,7 +752,7 @@ PARTICLES = {
             "size": [0.13, 0.13], "facing_camera_mode": "rotate_xyz", "uv": uv("chain"),
         },
     }),
-    # Hào quang lửa khi biến hình: ngọn lửa bập bùng bốc lên quanh người
+    # Fire aura while transformed: flickering flames rising around the player
     "ult_aura": particle("aatrox:ult_aura", "particles_add", {
         **burst(6),
         "minecraft:emitter_shape_disc": {"radius": 0.7, "plane_normal": "y", "direction": [0, 1, 0]},
@@ -766,7 +766,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#FFFFFFFF", "0.5": "#FFFF9A8A", "1.0": "#00A0302A"}),
     }),
-    # Khói đỏ đen (lướt E, biến hình R, xích đứt)
+    # Red-black smoke (E dash, R transform, chain break)
     "smoke": particle("aatrox:smoke", "particles_blend", {
         **burst(5),
         "minecraft:emitter_shape_sphere": {"radius": 0.35, "direction": "outwards"},
@@ -779,7 +779,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#E6FFFFFF", "0.6": "#B3FFFFFF", "1.0": "#00FFFFFF"}),
     }),
-    # Đất nứt dưới chân (điểm chém Q, Q3, R); bán kính truyền qua variable.radius
+    # Cracked ground (Q impact, Q3, R); radius passed via variable.radius
     "ground_crack": particle("aatrox:ground_crack", "particles_blend", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
@@ -790,7 +790,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#FFFFFFFF", "0.6": "#FFFFFFFF", "1.0": "#00FFFFFF"}),
     }),
-    # Đá văng lên rồi rơi, nảy trên mặt đất
+    # Debris thrown up, then falling and bouncing on the ground
     "debris": particle("aatrox:debris", "particles_alpha", {
         **burst(12),
         "minecraft:emitter_shape_disc": {"radius": 0.6, "plane_normal": "y", "direction": "outwards"},
@@ -807,7 +807,7 @@ PARTICLES = {
                    "uv": ["192 + math.floor(v.particle_random_1 * 2.99) * 8", 0], "uv_size": [8, 8]},
         },
     }),
-    # Cột lửa phun thẳng lên (điểm nện Q3, biến hình R)
+    # Fire pillar erupting upward (Q3 slam, R transform)
     "fire_pillar": particle("aatrox:fire_pillar", "particles_add", {
         **burst(18, 0.15),
         "minecraft:emitter_shape_disc": {"radius": 0.3, "plane_normal": "y", "direction": [0, 1, 0]},
@@ -819,7 +819,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": FADE,
     }),
-    # Năng lượng tụ về lưỡi kiếm khi vung Q
+    # Energy gathering into the blade when swinging Q
     "charge": particle("aatrox:charge", "particles_add", {
         **burst(10),
         "minecraft:emitter_shape_sphere": {"radius": 1.3, "surface_only": True, "direction": "inwards"},
@@ -830,7 +830,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#00FFFFFF", "0.3": "#FFFFFFFF", "1.0": "#FFFFFFFF"}),
     }),
-    # Bóng mờ đỏ thẫm để lại phía sau khi lướt E
+    # Dark red afterimage left behind when dashing with E
     "afterimage": particle("aatrox:afterimage", "particles_blend", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
@@ -840,7 +840,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#B3FFFFFF", "1.0": "#00FFFFFF"}),
     }),
-    # Đầu móc rực lửa ở mũi sợi xích W
+    # Fiery hook at the tip of the W chain
     "chain_head": particle("aatrox:chain_head", "particles_add", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
@@ -849,7 +849,7 @@ PARTICLES = {
             "size": [0.22, 0.22], "facing_camera_mode": "rotate_xyz", "uv": uv("chain_head"),
         },
     }),
-    # Vòng rune trói dưới chân mục tiêu trúng W, xoay chậm; bán kính qua variable.radius
+    # Binding rune circle under a target hit by W, spinning slowly; radius via variable.radius
     "bind_circle": particle("aatrox:bind_circle", "particles_add", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
@@ -860,7 +860,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#00FF281E", "0.15": "#FFFF281E", "0.85": "#FFFF6428", "1.0": "#00FFB450"}),
     }),
-    # Vết chém chữ X khi nội tại phát nổ
+    # X slash when the passive explodes
     "x_slash": particle("aatrox:x_slash", "particles_add", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
@@ -871,7 +871,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": FADE,
     }),
-    # Cầu máu bay từ mục tiêu về người dùng khi hút máu; hướng và tốc độ do script truyền vào
+    # Blood orbs flying from the target to the player on lifesteal; direction and speed come from the script
     "blood_orb": particle("aatrox:blood_orb", "particles_add", {
         **burst(5),
         "minecraft:emitter_shape_sphere": {"radius": 0.25, "direction": ["v.dir_x", "v.dir_y", "v.dir_z"]},
@@ -882,7 +882,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#FFFF8C8C", "0.8": "#FFFF4646", "1.0": "#00FF4646"}),
     }),
-    # Vùng Diệt Thế dưới chân khi biến hình: script sinh lại mỗi 10 tick, v.spin giữ góc xoay liền mạch
+    # World Ender zone under the feet: respawned by the script every 10 ticks, v.spin keeps the rotation seamless
     "domain": particle("aatrox:domain", "particles_add", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
@@ -893,7 +893,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#99D2141E", "0.2": "#CCD2141E", "0.8": "#CCD2141E", "1.0": "#00D2141E"}),
     }),
-    # Linh hồn Darkin gào thét bay lên (nội tại, biến hình, vùng Diệt Thế)
+    # Screaming Darkin souls rising (passive, transform, World Ender zone)
     "soul": particle("aatrox:soul", "particles_add", {
         **burst(3),
         "minecraft:emitter_shape_sphere": {"radius": 0.4, "direction": [0, 1, 0]},
@@ -908,7 +908,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#00FFFFFF", "0.15": "#DDFFFFFF", "0.7": "#AAFFC8C8", "1.0": "#00FF8080"}),
     }),
-    # Sét đỏ giáng xuống (nện Q3, biến hình R)
+    # Red lightning striking (Q3 slam, R transform)
     "lightning": particle("aatrox:lightning", "particles_add", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
@@ -918,7 +918,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": FADE,
     }),
-    # Ký tự rune Darkin bay lên rồi tan (vòng trói W, vùng Diệt Thế); chọn ngẫu nhiên 1 trong 4 ký tự
+    # Darkin rune glyphs rising then fading (W bind, World Ender zone); randomly one of 4 glyphs
     "glyph": particle("aatrox:glyph", "particles_add", {
         **burst(4),
         "minecraft:emitter_shape_disc": {"radius": 0.8, "plane_normal": "y", "direction": [0, 1, 0]},
@@ -932,7 +932,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#00FF3C28", "0.2": "#FFFF3C28", "0.7": "#FFFF9650", "1.0": "#00FF9650"}),
     }),
-    # Dung nham nhỏ giọt từ lưỡi kiếm
+    # Lava dripping from the blade
     "lava_drip": particle("aatrox:lava_drip", "particles_add", {
         **burst(1),
         "minecraft:emitter_shape_sphere": {"radius": 0.2, "direction": [0, -1, 0]},
@@ -945,7 +945,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": FADE,
     }),
-    # Biểu tượng sợ hãi trên đầu mục tiêu bị R dọa
+    # Fear icon above targets feared by R
     "fear": particle("aatrox:fear", "particles_alpha", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
@@ -956,7 +956,7 @@ PARTICLES = {
             "facing_camera_mode": "rotate_xyz", "uv": uv("fear"),
         },
     }),
-    # Sương máu loang (trúng điểm ngọt, nội tại)
+    # Spreading blood mist (sweet spot hits, passive)
     "blood_mist": particle("aatrox:blood_mist", "particles_blend", {
         **burst(3),
         "minecraft:emitter_shape_sphere": {"radius": 0.4, "direction": "outwards"},
@@ -968,7 +968,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#CCFFFFFF", "1.0": "#00FFFFFF"}),
     }),
-    # Vệt lửa cháy trên mặt đất khi lướt E trong lúc biến hình
+    # Fire trail burning on the ground when dashing with E while transformed
     "fire_trail": particle("aatrox:fire_trail", "particles_add", {
         **burst(2),
         "minecraft:emitter_shape_disc": {"radius": 0.4, "plane_normal": "y", "direction": [0, 1, 0]},
@@ -980,7 +980,7 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": FADE,
     }),
-    # Hút máu: giọt máu phát sáng bay lên quanh người
+    # Lifesteal: glowing blood drops rising around the player
     "lifesteal": particle("aatrox:lifesteal", "particles_add", {
         **burst(5),
         "minecraft:emitter_shape_disc": {"radius": 0.45, "plane_normal": "y", "direction": [0, 1, 0]},
@@ -1003,4 +1003,4 @@ def write_particles(root, write_png):
         with open(os.path.join(folder, f"{name}.json"), "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
             f.write("\n")
-    print(f"Particle: {len(PARTICLES)} hiệu ứng")
+    print(f"Particles: {len(PARTICLES)} effects")

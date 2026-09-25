@@ -1,6 +1,6 @@
-"""Tạo texture/icon, model 3D và đóng gói addon thành dist/AatroxDarkinBlade.mcaddon.
+"""Generate textures/icons, the 3D model and package the addon into dist/AatroxDarkinBlade.mcaddon.
 
-Chạy: python3 build.py
+Run: python3 build.py
 """
 import os
 import shutil
@@ -31,7 +31,7 @@ def write_png(path, grid):
 
 
 def make_images():
-    """Icon túi đồ và icon pack được render sẵn từ model 3D (thư mục art/)."""
+    """Inventory and pack icons are pre-rendered from the 3D model (art/ folder)."""
     art = os.path.join(ROOT, "art")
     targets = {
         "item_icon.png": ["AatroxRP/textures/items/darkin_blade.png"],
@@ -53,7 +53,7 @@ def build_addon():
                 for name in sorted(files):
                     full = os.path.join(folder, name)
                     zf.write(full, os.path.relpath(full, ROOT))
-    print("Đã tạo", os.path.relpath(out, ROOT))
+    print("Built", os.path.relpath(out, ROOT))
 
 
 if __name__ == "__main__":
