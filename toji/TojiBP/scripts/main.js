@@ -12,7 +12,7 @@
 //   Normal attacks                 4-hit combo, the 4th hit is a spinning finisher
 //   Every hit                      Passive: Nullification (strips the target's positive effects)
 //
-// Texts are translation keys (TojiRP/texts/*.lang): each player sees them in their game language.
+// Texts are translation keys (TojiRP/texts/en_US.lang).
 
 import { world, system, ItemStack, EquipmentSlot, InputButton, ButtonState, EntityDamageCause, MolangVariableMap } from "@minecraft/server";
 import { CONFIG } from "./config.js";
@@ -76,32 +76,19 @@ function tr(key, ...args) {
 const skillName = (skill) => tr(`toji.skill.${skill}`);
 const shortName = (skill) => tr(`toji.short.${skill}`);
 
-// Item lore (tooltip) cannot be translated per player: CONFIG.loreLanguage picks it
-const LORE = {
-  en: [
-    "§7Right-click/tap: §fPierce Infinity",
-    "§7Sneak + right-click: §fChain whirl + hurl",
-    "§7Sprint + attack: §fHeavenly Ambush",
-    "§7Hold 20s: §fHeavenly Restriction",
-    "§7Hold 20s + jump: §dHeaven's Execution",
-    "§7Jump + attack: §fSky Splitter",
-    "§7Crouch + attack: §fLow Sweep",
-    "§7Attack x4: §fcombo finisher",
-    "§7Every hit: §5nullifies effects",
-  ],
-  vi: [
-    "§7Chuột phải/chạm: §fĐâm Xuyên Vô Hạn",
-    "§7Khuỵu + chuột phải: §fXích Vạn Lý (quay + ném)",
-    "§7Chạy + chém: §fÁm Sát Sau Lưng",
-    "§7Cầm 20s: §fThiên Dữ Chú Phược",
-    "§7Cầm 20s + nhảy: §dThiên Phạt Xử Quyết",
-    "§7Nhảy + đánh: §fBổ Trời",
-    "§7Khuỵu + đánh: §fQuét Chân",
-    "§7Đánh 4 lần: §fđòn kết liễu",
-    "§7Mọi đòn: §5vô hiệu buff",
-  ],
-};
-const loreLines = () => LORE[CONFIG.loreLanguage] ?? LORE.en;
+// Item lore (tooltip)
+const LORE = [
+  "§7Right-click/tap: §fPierce Infinity",
+  "§7Sneak + right-click: §fChain whirl + hurl",
+  "§7Sprint + attack: §fHeavenly Ambush",
+  "§7Hold 20s: §fHeavenly Restriction",
+  "§7Hold 20s + jump: §dHeaven's Execution",
+  "§7Jump + attack: §fSky Splitter",
+  "§7Crouch + attack: §fLow Sweep",
+  "§7Attack x4: §fcombo finisher",
+  "§7Every hit: §5nullifies effects",
+];
+const loreLines = () => LORE;
 
 // ---------------------------------------------------------------------------
 // Per-player state

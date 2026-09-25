@@ -2,7 +2,7 @@
 
 - **Roblox**: hướng dẫn ngay bên dưới (thư mục `AatroxSword/`).
 - **Minecraft Bedrock (addon)**: xem [`bedrock/README.md`](bedrock/README.md).
-- **Minecraft Bedrock — Thiên Nghịch Mâu (Toji, JJS)**: xem [`toji/README.md`](toji/README.md).
+- **Minecraft Bedrock — Inverted Spear of Heaven (Toji, JJS)**: see [`toji/README.md`](toji/README.md).
 
 ## Roblox
 

@@ -5,9 +5,6 @@ export const CONFIG = {
   // Whether skills hit other players (false = mobs only). When on, skills hurt players even if the world's
   // PvP setting is off (their health is lowered directly); players in Creative/Spectator are never hurt.
   pvp: true,
-  // Language of the spear's tooltip (item lore): "vi" or "en".
-  // Chat, titles and the bar above the hotbar follow each player's game language automatically.
-  loreLanguage: "vi",
 
   // Passive — Nullification: every hit with the spear strips the target's positive effects
   // (the Inverted Spear of Heaven cancels cursed techniques)

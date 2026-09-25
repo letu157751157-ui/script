@@ -1,144 +1,142 @@
-# Thiên Nghịch Mâu (Inverted Spear of Heaven) — Addon Toji cho Minecraft Bedrock
+# Inverted Spear of Heaven — Toji Addon for Minecraft Bedrock
 
-Addon thêm **Thiên Nghịch Mâu** (`toji:inverted_spear`) của Toji Fushiguro (Jujutsu Kaisen), bộ chiêu theo kiểu JJS.
-Viết bằng Script API `@minecraft/server` 2.0.0, **không cần bật Beta APIs / experiments**.
-Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, console). Phiên bản hiện tại: **v1.6.0**.
+This addon adds the **Inverted Spear of Heaven** (`toji:inverted_spear`) of Toji Fushiguro (Jujutsu Kaisen), with a JJS-style skill kit.
+Written with the Script API `@minecraft/server` 2.0.0, **no Beta APIs / experiments required**.
+Requirements: Minecraft Bedrock **1.21.90 or newer** (PC, mobile, console). Current version: **v1.7.0**.
 
-![Mô hình 3D](preview.png)
+![3D model](preview.png)
 
-## Cài đặt
+## Installation
 
-1. Tải [`dist/TojiInvertedSpear.mcaddon`](dist/TojiInvertedSpear.mcaddon) và mở nó, Minecraft tự nhập cả 2 pack.
-2. Tạo/sửa world → **Behavior Packs** → bật *Toji - Inverted Spear of Heaven (BP)* (Resource Pack tự bật theo).
-3. Lấy mâu:
-   - Lệnh: `/give @s toji:inverted_spear`
-   - Chế tạo (bàn chế tạo, không cần xếp hình): **Trident + Echo Shard + Chain + Amethyst Shard**
+1. Download [`dist/TojiInvertedSpear.mcaddon`](dist/TojiInvertedSpear.mcaddon) and open it; Minecraft imports both packs.
+2. Create/edit a world → **Behavior Packs** → activate *Toji - Inverted Spear of Heaven (BP)* (the Resource Pack is activated with it).
+3. Get the spear:
+   - Command: `/give @s toji:inverted_spear`
+   - Crafting (crafting table, shapeless): **Trident + Echo Shard + Chain + Amethyst Shard**
    - Creative: Equipment → Swords.
 
-> **Đã cài bản cũ?** Vào **Settings → Storage**, xoá hết pack Toji cũ rồi nhập lại file `.mcaddon`.
-> Bản 1.0.0 có lỗi: mâu không nằm trong tay (thiếu gắn vào xương tay) và mâu quá to.
+> **Upgrading from an older version?** Go to **Settings → Storage**, delete every old Toji pack, then import the `.mcaddon` again.
+> Version 1.0.0 had a bug: the spear was not held in the hand (missing hand bone binding) and was too big.
 
-## Cách kích hoạt chiêu
+## Controls
 
-| Thao tác | Chiêu | Tác dụng |
+| Input | Skill | Effect |
 |---|---|---|
-| **Chuột phải** (điện thoại: chạm màn hình / nút Dùng) | **Đâm Xuyên Vô Hạn** | Cảnh Toji đâm xuyên Vô Hạn của Gojo: lướt tới và đâm thẳng 6 ô. Trước mặt mỗi mục tiêu hiện **lớp kết giới lục giác xanh (Vô Hạn) rồi vỡ vụn**; mục tiêu bị xuyên, choáng ngắn và **mất sạch hiệu ứng có lợi**. Hồi 5s |
-| **Khuỵu (Shift) + chuột phải** | **Xích Vạn Lý** | Mâu rời tay, **quay vòng quanh người theo sợi xích** (2 vòng, bán kính 4.5 ô), mỗi vòng quét trúng mọi kẻ địch xung quanh và hất văng ra; sau đó **ném mâu thẳng tới trước** (24 ô): trúng địch thì **lôi địch theo xích về tận trước mặt**, trúng tường/đất thì **đu người tới đó** theo đường vòng cung. Hồi 10s |
-| **Chạy + chém** (chạy nhanh rồi đánh, hoặc chạy + chuột phải) | **Ám Sát Sau Lưng** | Toji không có chú lực nên không ai cảm nhận được: **biến mất trong làn khói, hiện ra sau lưng kẻ địch bạn đang nhìn** (tới 14 ô) và **chém chữ X** vào lưng nó. Không có mục tiêu thì lướt đi. Hồi 7s |
-| **Cầm mâu 20 giây** | **Thiên Dữ Chú Phược: Thức Tỉnh** | Tự kích hoạt khi cầm liên tục đủ 20s: **chú linh kho chứa (con sâu, model 3D) mọc ra quấn 2 vòng quanh người** suốt 15s: thân trườn uốn lượn, đầu ở vai phải há miệng nhai (ẩn khi nhìn góc thứ nhất). Được Speed II, Strength II, Jump Boost II, Resistance I; sát thương chiêu x1.3, hồi chiêu giảm một nửa |
-| **Cầm 20 giây + nhảy** (khi đang Thức Tỉnh) | **Thiên Phạt Xử Quyết** | Chú linh kho chứa há miệng, **xích bắn ra móc mọi mob trong 12 ô** (tối đa 12 con), **lôi chúng lên trời treo thành vòng tròn** lơ lửng quanh bạn. Toji bay lên, **lao qua lại đâm xuyên từng con 3 vòng** (kết giới Vô Hạn vỡ, vết chém X, máu), rồi bay cao hơn và **đập tất cả xuống đất cùng lúc**: nứt đất 2 đợt, 4 sóng xung kích, chữ X khổng lồ, toàn bộ sát thương nổ ra một lần (**8 mỗi nhát đâm + 20 cú đập, x1.3 khi Thức Tỉnh ≈ 57 máu mỗi con**). Bất tử trong lúc dùng. 1 lần mỗi lần Thức Tỉnh |
-| **Nhảy + đánh** (đang trên không đánh trúng mob) | **Bổ Trời** | Giơ mâu hai tay rồi bổ thẳng xuống: địch bị đập xuống đất, nứt đất, lan sát thương xung quanh 2.5 ô. Hồi 3s |
-| **Khuỵu + đánh** (đang khuỵu đánh trúng mob) | **Quét Chân** | Hạ thấp người quét mâu hình cung ngang mắt cá, rồi hất ngược lên tung kẻ địch lên trời. Hồi 3s |
-| **Đánh thường 4 lần liên tiếp** | **Combo M1 + Đòn Kết Liễu** | Đòn thứ 4 là cú xoay chém hình cung trước mặt, hất văng kẻ địch (như M1 trong JJS) |
-| **Mọi đòn đánh** | **Nội tại: Vô Hiệu Hoá** | Đòn đánh thường cũng xoá hiệu ứng có lợi của mục tiêu |
+| **Right-click** (mobile: tap the screen / Use button) | **Pierce Infinity** | The scene where Toji stabs through Gojo's Infinity: blink forward and stab 6 blocks straight ahead. In front of each target a **blue hexagonal barrier (Infinity) appears and shatters**; the target is pierced, briefly stunned and **loses every positive effect**. 5 s cooldown |
+| **Sneak (Shift) + right-click** | **Chain of a Thousand Miles** | The spear leaves your hand and **whirls around you on its chain** (2 laps, 4.5-block radius), hitting and knocking back every enemy in the ring on each lap; then it is **hurled straight ahead** (24 blocks): hitting an enemy **drags it along the chain right in front of you**, sticking in a wall/ground **swings you there** along an arc. 10 s cooldown |
+| **Sprint + attack** (sprint then hit, or sprint + right-click) | **Heavenly Ambush** | Toji has no cursed energy, so nobody senses him: he **vanishes in smoke, reappears behind the enemy you look at** (up to 14 blocks) and **cuts an X** into its back. With no target, he dashes instead. 7 s cooldown |
+| **Hold the spear 20 s** | **Heavenly Restriction: Awakened** | Triggers by itself after holding the spear for 20 s: the **Inventory Curse (the worm, a 3D model) grows out and coils twice around your body** for 15 s, slithering, its head on your right shoulder gnashing its jaws (hidden in first person). Grants Speed II, Strength II, Jump Boost II, Resistance I; x1.3 skill damage, half cooldowns |
+| **Hold 20 s + jump** (while awakened) | **Heaven's Execution** | The Inventory Curse opens its mouth, **chains shoot out and hook every mob within 12 blocks** (up to 12), **drag them into the sky and hang them in a ring** around you. Toji flies up, **darts back and forth piercing each of them 3 rounds** (Infinity shattering, X cuts, blood), rises higher and **slams them all into the ground at once**: two crack waves, 4 shockwaves, a giant X, and all the damage lands in one go (**8 per pierce + 20 slam, x1.3 while awakened ≈ 57 health per mob**). Invulnerable while casting. Once per awakening |
+| **Jump + attack** (hit a mob while in the air) | **Sky Splitter** | Raise the spear with both hands and smash straight down: the enemy is driven into the ground, the ground cracks, splash damage within 2.5 blocks. 3 s cooldown |
+| **Crouch + attack** (hit a mob while sneaking) | **Low Sweep** | Drop low and sweep the spear in an arc at ankle height, then flick it up to launch enemies into the air. 3 s cooldown |
+| **4 normal hits in a row** | **M1 Combo + Finisher** | The 4th hit is a spinning arc slash in front that knocks enemies away (like JJS M1s) |
+| **Every hit** | **Passive: Nullification** | Normal attacks also strip the target's positive effects |
 
-### Thức Tỉnh nâng cấp mọi chiêu khác
+### Awakening upgrades every other skill
 
-Trong 15s Thức Tỉnh (cầm mâu 20s), mọi chiêu khác đổi sang bản mạnh hơn (có quầng sáng tím và vòng rune dưới chân khi dùng):
+During the 15 s awakening (hold the spear 20 s), every other skill turns into a stronger version (with a violet glow and a rune ring under your feet when cast):
 
-| Chiêu | Bản nâng cấp |
+| Skill | Upgraded version |
 |---|---|
-| Đâm Xuyên Vô Hạn | Tầm xa hơn 70%, sát thương x1.6, **đâm 3 nhát liên tiếp**, sóng xung kích chạy dọc đường đâm |
-| Xích Vạn Lý | Quay **3 vòng** rộng hơn 35%; mâu ném trúng địch thì **xích tách ra móc thêm 2 kẻ địch** gần đó và lôi cả 3 về |
-| Ám Sát Sau Lưng | Chém xong **nhảy sang sau lưng kẻ địch tiếp theo**, liên hoàn tối đa 3 con |
-| Bổ Trời (nhảy + đánh) | Vùng sóng xung kích **rộng gấp đôi**, mọi kẻ địch trong vùng nhận đủ sát thương, 3 lớp sóng |
-| Quét Chân (khuỵu + đánh) | Quét **trọn vòng 360°**, rộng hơn, hất cao hơn 50% |
-| Combo | Đòn kết liễu ra ở **đòn thứ 3** thay vì thứ 4, xoay trọn vòng, sát thương x1.5 |
+| Pierce Infinity | 70% longer reach, x1.6 damage, **3 stabs in a row**, shockwaves running along the stab |
+| Chain of a Thousand Miles | **3 laps**, 35% wider; when the hurled spear hits an enemy **the chain splits and hooks 2 more enemies** nearby, dragging all 3 back |
+| Heavenly Ambush | After the cut, **jumps to the next enemy's back**, chaining through up to 3 enemies |
+| Sky Splitter (jump + attack) | Shockwave **twice as wide**, every enemy in it takes full damage, 3 shockwave rings |
+| Low Sweep (crouch + attack) | **Full 360° sweep**, wider, launches 50% higher |
+| Combo | The finisher comes on the **3rd hit** instead of the 4th, a full spin, x1.5 damage |
 
-Cộng thêm các buff sẵn có của Thức Tỉnh: sát thương chiêu x1.3, hồi chiêu giảm một nửa.
+On top of the awakening's own buffs: x1.3 skill damage, half cooldowns.
 
-- Thanh phía trên hotbar hiện tiến độ cầm `▮▮▮▮▯▯ 12/20s`, chiêu mà chuột phải sẽ dùng (`Bấm: Đâm / Xích / Trảm`), số combo và thời gian hồi chiêu.
-- **Buông mâu (đổi sang ô khác) sẽ reset bộ đếm 20s và kết thúc Thức Tỉnh** (mất luôn buff). Hết Thức Tỉnh thì phải cầm lại 20s.
-- Chữ trong game (chat, tiêu đề, thanh hồi chiêu, tên mâu) **tự theo ngôn ngữ game**: tiếng Việt nếu game để tiếng Việt, còn lại là tiếng Anh.
-  Riêng dòng mô tả khi rê chuột vào mâu thì chọn bằng `loreLanguage` trong `config.js` (`"vi"` hoặc `"en"`).
-- Gõ `/scriptevent toji:help` để xem lại hướng dẫn.
-- **Người chơi khác cũng dính chiêu**, kể cả khi world tắt PvP (máu bị trừ trực tiếp); người chơi ở Creative/Spectator không bị ảnh hưởng. Muốn chiêu chỉ đánh mob thì để `pvp: false` trong `config.js`.
-- Chuột phải vào rương, cửa, bàn chế tạo, dân làng, ngựa... vẫn dùng bình thường, không ra chiêu.
+- The bar above the hotbar shows the hold progress `▮▮▮▮▯▯ 12/20s`, the skill right-click will cast (`Press: Pierce / Chain / Ambush`), the combo count and the cooldowns.
+- **Letting go of the spear (switching slot) resets the 20 s timer and ends the awakening** (buffs included). When the awakening ends you have to hold the spear 20 s again.
+- Type `/scriptevent toji:help` to see the guide again.
+- **Other players are hit by the skills too**, even when the world's PvP setting is off (their health is lowered directly); players in Creative/Spectator are never affected. Set `pvp: false` in `config.js` to only hit mobs.
+- Right-clicking chests, doors, crafting tables, villagers, horses... still works as usual, no skill is cast.
 
-## Hiệu ứng: particle custom + animation
+## Effects: custom particles + animations
 
-![Particle](preview_particles.png)
+![Particles](preview_particles.png)
 
-23 particle tự vẽ bằng pixel art (`TojiRP/particles`), phần lớn là flipbook nhiều khung:
+23 hand-drawn pixel art particles (`TojiRP/particles`), most of them multi-frame flipbooks:
 
-| Particle | Dùng cho |
+| Particle | Used for |
 |---|---|
-| `toji:thrust` | Vệt đâm bắn theo hướng nhìn (Đâm Xuyên Vô Hạn) |
-| `toji:null_ring` / `toji:null_ground` | Vòng rune tím nứt vỡ, gai hướng vào tâm, trên mục tiêu / dưới đất khi bị vô hiệu |
-| `toji:shard` | Mảnh kính tím vỡ tung (hiệu ứng của mục tiêu bị phá) |
-| `toji:spear` + `toji:chain_link` | Mâu bay (mũi luôn hướng theo đường bay) và sợi xích nối về tay |
-| `toji:slash` | Vết chém thép trắng-tím (Xích Vạn Lý, đòn kết liễu, Xử Quyết) |
-| `toji:afterimage` | Bóng mờ Toji để lại khi lướt |
-| `toji:aura` / `toji:charge` | Gió trắng bốc lên khi Thức Tỉnh / gió tụ vào mâu trước khi Thức Tỉnh và khi đâm |
-| `toji:shock_ring`, `toji:crack`, `toji:dust`, `toji:debris` | Sóng xung kích, nứt đất, bụi, đá văng |
-| `toji:flash`, `toji:spark`, `toji:blood` | Chớp sáng, tia lửa thép, máu |
-| `toji:infinity` + `toji:shard_blue` | Kết giới Vô Hạn lục giác xanh nứt rồi vỡ thành mảnh kính xanh |
-| `toji:x_slash` | Vết chém chữ X khổng lồ (Ám Sát, Xử Quyết) |
-| `toji:glow` | Quầng sáng mềm đi kèm mọi chớp sáng |
-| `toji:impact` | Tia tốc độ kiểu anime bung ra ở mọi vết chém chữ X |
-| `toji:vanish` | Khói tối khi Toji biến mất |
+| `toji:thrust` | Stab streaks shooting where you look (Pierce Infinity) |
+| `toji:null_ring` / `toji:null_ground` | Cracked violet rune ring with spikes pointing inward, on the target / on the ground when nullified |
+| `toji:shard` | Violet glass shards bursting out (the target's effects breaking) |
+| `toji:spear` + `toji:chain_link` | The flying spear (tip always along its path) and the chain back to your hand |
+| `toji:slash` | White-violet steel slash (Chain, finisher, Execution) |
+| `toji:afterimage` | Afterimage Toji leaves behind when dashing |
+| `toji:aura` / `toji:charge` | White wind rising while awakened / wind gathering into the spear before awakening and when stabbing |
+| `toji:shock_ring`, `toji:crack`, `toji:dust`, `toji:debris` | Shockwave, cracked ground, dust, flying rocks |
+| `toji:flash`, `toji:spark`, `toji:blood` | Flash, steel sparks, blood |
+| `toji:infinity` + `toji:shard_blue` | Blue hexagonal Infinity barrier cracking and shattering into blue glass |
+| `toji:x_slash` | Giant X cut (Ambush, Execution) |
+| `toji:glow` | Soft glow halo that comes with every flash |
+| `toji:impact` | Anime speed lines bursting out of every X cut |
+| `toji:vanish` | Dark smoke where Toji vanishes |
 
-**Animation người chơi** (`TojiRP/animations/toji_player.animation.json`, tạo bởi `player_anims.py`), bản thân thấy góc nhìn thứ nhất, người khác thấy góc nhìn thứ ba:
+**Player animations** (`TojiRP/animations/toji_player.animation.json`, generated by `player_anims.py`); you see the first-person version, everyone else sees the third-person one:
 
-| Animation | Chuyển động |
+| Animation | Motion |
 |---|---|
-| `thrust` | Lùi mâu về hông → lao người đâm thẳng → giữ → thu về |
-| `whirl` | Giơ tay quay xích trên đầu 2 vòng, xoay người theo mâu → vung ném về trước |
-| `ambush` | Hiện ra sau lưng → chém chéo phải xuống trái → chém chéo trái xuống phải (chữ X) |
-| `finisher` | Xoay người lấy đà → quét mâu một vòng cung sang trái |
-| `awaken` | Khuỵu gối tụ lực → đứng dậy vào thế cầm ngược mâu |
-| `cut_a` / `cut_b` | Chém chạy: chân đang sải bước, người đổ về trước, chém chéo phải/trái xen kẽ |
-| `leap_cut` | Nhảy lên co chân, giơ mâu qua đầu rồi bổ xuống |
-| `rampage_end` | Tiếp đất: hạ thấp người, mâu chìa sang bên, rồi đứng dậy |
-| `chain_summon` | Dang rộng hai tay, giơ mâu lên trời khi xích bắn ra |
-| `aerial_slam` | Trên không giơ mâu hai tay rồi bổ thẳng xuống (Bổ Trời, cú đập cuối của Xử Quyết) |
-| `low_sweep` | Khuỵu sâu quét mâu ngang thấp rồi hất ngược lên |
+| `thrust` | Pull the spear back to the hip → lunge and stab straight ahead → hold → recover |
+| `whirl` | Raise the arm and swing the chain overhead twice, body turning with the spear → hurl it forward |
+| `ambush` | Reappear behind → cut from high right to low left → cut from high left to low right (an X) |
+| `finisher` | Wind up the body → sweep the spear in an arc to the left |
+| `awaken` | Crouch to gather power → rise into a reverse-grip stance |
+| `cut_a` / `cut_b` | Running cuts: legs mid-stride, body leaning in, alternating diagonal slashes |
+| `leap_cut` | Jump with the legs tucked, spear overhead, then chop down |
+| `rampage_end` | Landing: low crouch, spear held out to the side, then stand up |
+| `chain_summon` | Arms flung wide, spear raised to the sky as the chains shoot out |
+| `aerial_slam` | In the air, spear raised with both hands, then smash straight down (Sky Splitter, Execution's final slam) |
+| `low_sweep` | Deep crouch, low spear sweep, then flick up |
 
-Ngoài ra còn rung màn hình, chớp màn hình khi Thức Tỉnh / Xử Quyết, và âm thanh cho từng chiêu.
+There is also screen shake, a screen flash when awakening / during the Execution, and sounds for every skill.
 
-**Mô hình 3D**: lưỡi thẳng hai cạnh với sống tím, móc phụ bên cạnh lưỡi (kiểu jitte), chắn kiếm tối màu, chuôi quấn vải tím với đai đồng,
-vòng đồng ở đuôi nối các mắt xích. Có 3 dạng: thường, **Thức Tỉnh** (thêm lớp phát sáng `entity_emissive` dọc cạnh lưỡi, sáng cả ban đêm)
-và **Đã ném** (trên tay chỉ còn sợi xích). Script tự đổi dạng và giữ nguyên độ bền, phù phép, tên của mâu.
+**3D model**: straight double-edged blade with a violet ridge, a hooked side prong next to the blade (jitte-like), a dark guard, a violet cloth-wrapped grip with brass bands,
+and a brass ring at the pommel holding the chain links. There are 3 forms: normal, **Awakened** (an extra `entity_emissive` glowing layer along the blade edges, lit even at night, plus the 3D worm)
+and **Thrown** (only the chain stays in the hand). The script swaps forms and keeps the spear's durability, enchantments and name.
 
-## Tuỳ chỉnh
+## Customization
 
-- Mọi thông số (sát thương, hồi chiêu, tầm, thời gian cầm 20s, combo, PvP...) nằm trong [`TojiBP/scripts/config.js`](TojiBP/scripts/config.js).
-- Tư thế cầm và kích thước mâu: `HOLD` trong [`packs.py`](packs.py). Chữ trong game: `LANG` trong `packs.py`.
-- Sau khi sửa, chạy `python3 build.py` để tạo lại mọi file và `.mcaddon` (`python3 preview.py` để vẽ lại ảnh xem trước, cần Pillow).
-- Nếu nhập lại vào game, tăng `VERSION` trong `packs.py` (Minecraft giữ bản cũ nếu trùng số phiên bản).
+- Every value (damage, cooldowns, range, the 20 s hold time, combo, PvP...) lives in [`TojiBP/scripts/config.js`](TojiBP/scripts/config.js).
+- Holding pose and spear size: `HOLD` in [`packs.py`](packs.py). In-game texts: `LANG` in `packs.py`.
+- After editing, run `python3 build.py` to regenerate every file and the `.mcaddon` (`python3 preview.py` redraws the preview images, needs Pillow).
+- If you re-import into the game, bump `VERSION` in `packs.py` (Minecraft keeps the old version if the version number is unchanged).
 
-## Kiểm tra
+## Testing
 
-Không cần mở game, [`test/sim.mjs`](test/sim.mjs) chạy chính `main.js` với một bản giả lập của `@minecraft/server`
-và thử lần lượt: chuột phải, khuỵu + chuột phải (quay xích, ném trúng địch, móc vào tường), chạy + chém (hiện sau lưng / lướt khi không có mục tiêu), combo 4 đòn, cầm 20s, cầm 20s + nhảy,
-đổi ô khi đang Thức Tỉnh / đang lao xuống, và bị choáng thì không ra chiêu được (72 bước kiểm tra, có cả đánh người chơi khác và các bản nâng cấp khi Thức Tỉnh):
+Without opening the game, [`test/sim.mjs`](test/sim.mjs) runs the real `main.js` against a mocked `@minecraft/server`
+and tries in turn: right-click, sneak + right-click (whirl, hurl into an enemy, hook into a wall), sprint + attack (reappear behind / dash with no target), 4-hit combo, hold 20 s, hold 20 s + jump,
+jump + attack, crouch + attack, switching slot while awakened / mid-Execution, stunned players not being able to cast, hitting other players, and the awakened upgrades (72 checks):
 
 ```
 node test/sim.mjs
 ```
 
-Bản giả lập không có vật lý thật (hất văng, rơi chỉ được ghi lại), nên cảm giác trong game vẫn cần thử trực tiếp.
+The mock has no real physics (knockback and falling are only recorded), so the in-game feel still needs to be tried directly.
 
-## Cấu trúc
+## Structure
 
 ```
 toji/
-├── TojiBP/             Behavior pack: items (3 dạng mâu), recipe, scripts/main.js + config.js
-├── TojiRP/             Resource pack: attachables, animations, model .geo.json, 23 particle, textures, texts (vi_VN, en_US)
-├── packs.py            manifest, items, recipe, attachables, tư thế cầm, file ngôn ngữ
-├── model.py            dựng model 3D từ các khối + vẽ texture pixel art + icon
-├── particles.py        vẽ atlas particle + file JSON particle
-├── player_anims.py     thiết kế + giải ngược animation người chơi
-├── build.py            chạy tất cả và đóng gói dist/TojiInvertedSpear.mcaddon
-├── preview.py          vẽ preview.png / preview_particles.png
-├── test/               giả lập @minecraft/server + kịch bản thử mọi chiêu
+├── TojiBP/             Behavior pack: items (3 spear forms), recipe, scripts/main.js + config.js
+├── TojiRP/             Resource pack: attachables, animations, .geo.json models, 23 particles, textures, texts (en_US)
+├── packs.py            manifests, items, recipe, attachables, holding pose, language file
+├── model.py            builds the 3D models from cubes + paints the pixel art texture + icons
+├── particles.py        paints the particle atlas + particle JSON files
+├── player_anims.py     designs + inverse-solves the player animations
+├── build.py            runs everything and packages dist/TojiInvertedSpear.mcaddon
+├── preview.py          draws preview.png / preview_particles.png
+├── test/               mocked @minecraft/server + a script trying every skill
 └── dist/TojiInvertedSpear.mcaddon
 ```
 
-## Sửa lỗi
+## Troubleshooting
 
-- **Bấm không ra chiêu, không có thanh hồi chiêu trên hotbar:** script chưa chạy. Kiểm tra đã bật **Behavior Pack** (không chỉ Resource Pack) và game từ **1.21.90** trở lên.
-- **Mâu hiện thành hình phẳng 2D hoặc không nằm trong tay:** Resource Pack chưa bật hoặc còn bản cũ, xem mục *Đã cài bản 1.0.0?*.
-- **Xử Quyết không ra khi nhảy:** chỉ dùng được khi đang Thức Tỉnh (thanh hotbar hiện `THỨC TỈNH`), 1 lần mỗi lần Thức Tỉnh, và không dùng được ngay trong lúc đang ra chiêu khác.
+- **Pressing does nothing and there is no cooldown bar above the hotbar:** the script isn't running. Make sure the **Behavior Pack** is active (not just the Resource Pack) and the game is **1.21.90** or newer.
+- **The spear shows as a flat 2D sprite or is not in the hand:** the Resource Pack isn't active or an old version is still installed, see *Upgrading from an older version?*.
+- **Execution doesn't trigger on jump:** it only works while awakened (the bar shows `AWAKENED`), once per awakening, and not in the middle of another skill.
 
-Đây là mô hình/texture tự làm lấy cảm hứng từ Thiên Nghịch Mâu, không chứa hình ảnh gốc của Jujutsu Kaisen.
+This is an original model/texture inspired by the Inverted Spear of Heaven and contains no official Jujutsu Kaisen artwork.
