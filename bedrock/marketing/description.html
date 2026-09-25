@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Darkin Blade – Aatrox Addon</title>
+<style>
+  :root { --bg: #140306; --panel: #22070b; --line: #4a1016; --text: #f3e2da; --muted: #c9a79c; --fire: #ff7a28; --gold: #ffd66e; --blood: #c8141e; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 "Segoe UI", Roboto, Arial, sans-serif; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px 16px 48px; }
+  header { display: flex; gap: 20px; align-items: center; margin-bottom: 20px; }
+  header img { width: 112px; height: 112px; image-rendering: pixelated; border-radius: 12px; border: 2px solid var(--line); }
+  h1 { margin: 0; font-size: 34px; color: var(--gold); letter-spacing: 1px; }
+  h1 span { color: var(--fire); }
+  .tag { display: inline-block; margin: 6px 6px 0 0; padding: 2px 10px; border-radius: 999px; background: var(--blood); font-size: 13px; font-weight: 600; }
+  .hero { width: 100%; border-radius: 12px; border: 2px solid var(--line); display: block; }
+  h2 { color: var(--fire); border-bottom: 2px solid var(--line); padding-bottom: 6px; margin-top: 36px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: #3a0c12; color: var(--gold); }
+  kbd { background: #3a0c12; border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; font-size: 13px; color: var(--gold); white-space: nowrap; }
+  ul { padding-left: 22px; }
+  li { margin: 4px 0; }
+  code { background: #3a0c12; padding: 1px 6px; border-radius: 4px; color: var(--gold); }
+  .muted { color: var(--muted); font-size: 14px; }
+  @media (max-width: 600px) { header { flex-direction: column; text-align: center; } h1 { font-size: 28px; } th, td { padding: 6px; font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <img src="logo.png" alt="The Darkin Blade logo">
+  <div>
+    <h1>THE DARKIN <span>BLADE</span></h1>
+    <div>Wield Aatrox's living greatsword in Minecraft Bedrock.</div>
+    <span class="tag">Bedrock 1.21.90+</span><span class="tag">No experiments</span><span class="tag">Mobile · PC · Console</span>
+  </div>
+</header>
+
+<img class="hero" src="thumbnail.png" alt="Aatrox in the World Ender form with 3D wings and the World Ender zone">
+
+<h2>About</h2>
+<p>The Darkin Blade adds a fully animated 3D greatsword with a complete skill kit inspired by Aatrox from League of Legends:
+three-part Q, dash, chains, a passive and the <b>World Ender</b> transformation with 3D demon wings, horns and a zone of destruction.
+Everything is made in a Minecraft pixel art style: 29 custom particles, glowing lava veins, and a Darkin eye on the blade that blinks.</p>
+
+<h2>Features</h2>
+<ul>
+  <li><b>3D blade</b> with a glowing lava core and a blinking Darkin eye, held correctly in first and third person.</li>
+  <li><b>Smooth player animations</b> for every skill: wind-up, swing, impact, follow-through and recovery.</li>
+  <li><b>World Ender form</b>: 3D flapping bat-like wings, horns and a bigger blade, plus a burning zone that follows you.</li>
+  <li><b>29 pixel art particles</b>: crescent slashes, shockwaves, cracked ground, fire pillars, red lightning, screaming souls, blood orbs and more.</li>
+  <li><b>Screen shake</b> and a red flash on big hits and on transformation.</li>
+  <li>Controls work on <b>mobile, PC and console</b>, with an on-screen guide and cooldown bar.</li>
+</ul>
+
+<h2>Controls &amp; Skills</h2>
+<table>
+  <tr><th>Input</th><th>Skill</th><th>Effect</th></tr>
+  <tr><td><kbd>Right-click</kbd> / tap</td><td><b>Q – The Darkin Blade</b></td><td>Three slashes (4 s to recast). Rune tiles show the area; the <b>orange edge is the sweet spot</b>: ×1.6 damage, knock-up and stun. The third cast slams the ground.</td></tr>
+  <tr><td><kbd>Sprint</kbd> + attack</td><td><b>E – Umbral Dash</b></td><td>Dash where you look, leaving afterimages.</td></tr>
+  <tr><td><kbd>Sneak</kbd> + right-click</td><td><b>W – Infernal Chains</b></td><td>Throw a fiery chain. If the target doesn't escape the binding circle in 1.5 s, it is pulled back and stunned.</td></tr>
+  <tr><td><kbd>Sneak</kbd> + <kbd>Jump</kbd></td><td><b>R – World Ender</b></td><td>Shockwave that knocks back and fears enemies, then transform for 10 s: +30% skill damage, +50% healing, Speed II, Strength I.</td></tr>
+  <tr><td>Normal attack</td><td><b>Passive – Deathbringer Stance</b></td><td>Every 8 s, your hit explodes for 8% of the target's max health and heals you.</td></tr>
+</table>
+<p class="muted">All damage dealt with the blade has 15% lifesteal. The bar above the hotbar shows which skill your next right-click will cast and every cooldown.
+Type <code>/scriptevent aatrox:help</code> to show the guide again.</p>
+
+<h2>World Ender Empowerment</h2>
+<div class="panel">
+<ul>
+  <li><b>World Ender zone</b> (6-block radius) follows you: enemies inside take damage every second and are slowed.</li>
+  <li><b>Q</b>: 30% bigger area with fire pillars along the slash.</li>
+  <li><b>E</b>: 40% longer dash, half cooldown, and a burning trail.</li>
+  <li><b>W</b>: throws <b>3 chains</b> in a fan.</li>
+  <li><b>Passive</b> recharges twice as fast.</li>
+</ul>
+</div>
+
+<h2>How to Get the Blade</h2>
+<ul>
+  <li>Command: <code>/give @s aatrox:darkin_blade</code></li>
+  <li>Crafting (shapeless): <b>Netherite Sword + Nether Star + Block of Redstone</b></li>
+  <li>Creative inventory: Equipment → Swords</li>
+</ul>
+
+<h2>Installation</h2>
+<ol>
+  <li>Download <b>AatroxDarkinBlade.mcaddon</b> and open it. Minecraft imports everything automatically.</li>
+  <li>Create or edit a world → <b>Behavior Packs</b> → activate <i>Aatrox - The Darkin Blade (BP)</i> (the resource pack is added automatically).</li>
+  <li>No experimental toggles are needed.</li>
+</ol>
+<p class="muted">Updating? Remove the old version from your world first, then activate the new one.</p>
+
+<h2>Customization</h2>
+<p>Every value (damage, cooldowns, ranges, PvP on/off, World Ender bonuses) lives in <code>scripts/config.js</code> in the behavior pack.</p>
+
+<h2>Credits</h2>
+<p class="muted">Fan-made addon inspired by Aatrox from League of Legends. All models, textures and particles are original Minecraft-style pixel art;
+no Riot Games assets are included. League of Legends and Aatrox are trademarks of Riot Games, Inc.</p>
+
+</div>
+</body>
+</html>
