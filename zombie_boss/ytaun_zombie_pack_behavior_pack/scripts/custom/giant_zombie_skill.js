@@ -34,8 +34,8 @@ const IGNORE_TYPES = new Set([
 // ====== CẤU HÌNH GIAI ĐOẠN ======
 const PHASES = [
   { name: "normal", cdMult: 1.0, dmgMult: 1.0, gap: 50 },
-  { name: "rage", cdMult: 0.8, dmgMult: 1.25, gap: 35, hp: 0.5 },
-  { name: "fury", cdMult: 0.6, dmgMult: 1.5, gap: 24, hp: 0.2 },
+  { name: "rage", cdMult: 0.9, dmgMult: 1.1, gap: 45, hp: 0.5 },
+  { name: "fury", cdMult: 0.8, dmgMult: 1.2, gap: 38, hp: 0.2 },
 ];
 
 /** @type {Map<string, any>} */
@@ -672,6 +672,12 @@ function countMinions(boss) {
   } catch { return 0; }
 }
 
+function countGenerals(boss) {
+  try {
+    return boss.dimension.getEntities({ location: boss.location, maxDistance: 40, type: "ytaun:zombie_geneal", tags: [MINION_TAG] }).length;
+  } catch { return 0; }
+}
+
 function summonHordeSkill(boss, data, target) {
   const dim = boss.dimension;
   rootBoss(boss, 44, target);
@@ -702,12 +708,20 @@ function summonHordeSkill(boss, data, target) {
       particle(dim, "ytaun:zombie_hands", p, 1.2);
       particle(dim, "ytaun:skull_rise", p);
       sound(dim, "dig.gravel", p, 1, 0.6);
-      const type = i % 2 === 0 ? "minecraft:zombie" : "minecraft:husk";
+      // Mỗi đợt triệu hồi có 1 Zombie General (tướng) dẫn quân, tối đa 2 tướng cùng lúc
+      const leader = i === 0 && countGenerals(boss) < 2;
+      const type = leader ? "ytaun:zombie_geneal" : i % 2 === 0 ? "minecraft:zombie" : "minecraft:husk";
+      if (leader) {
+        particle(dim, "ytaun:evil_eye", { x: p.x, y: p.y - 3, z: p.z });
+        sound(dim, "ytaun.general_shout", p, 2, 1);
+      }
       const m = dim.spawnEntity(type, p);
       m.addTag(MINION_TAG);
-      m.addEffect("speed", 20000000, { amplifier: 1, showParticles: false });
-      m.addEffect("strength", 20000000, { amplifier: data.phase >= 2 ? 1 : 0, showParticles: false });
-      if (data.phase >= 2) m.addEffect("fire_resistance", 20000000, { showParticles: false });
+      if (!leader) {
+        m.addEffect("speed", 20000000, { amplifier: 0, showParticles: false });
+        if (data.phase >= 2) m.addEffect("strength", 20000000, { amplifier: 0, showParticles: false });
+      }
+      m.addEffect("fire_resistance", 20000000, { showParticles: false });
     }));
   });
   if (n > 0) debugMsg("§c[Boss] Summoning a horde of zombies & husks!");
@@ -729,8 +743,8 @@ function enterPhase(boss, data, phase) {
   particle(dim, "ytaun:evil_eye", boss.location);
   particle(dim, "ytaun:skull_rise", boss.location);
 
-  if (phase === 1) titleNear(dim, boss.location, "§c§lENRAGED", "§6Bigger, tougher: 600 HP, -25% damage taken");
-  else titleNear(dim, boss.location, "§4§l☠ FINAL FURY ☠", "§c800 HP, -45% damage taken, wither punches!");
+  if (phase === 1) titleNear(dim, boss.location, "§c§lENRAGED", "§6Bigger & tougher: 500 HP, -10% damage taken");
+  else titleNear(dim, boss.location, "§4§l☠ FINAL FURY ☠", "§c550 HP, -20% damage taken, stronger punches!");
 
   later(ENRAGE_BURST, () => {
     if (!boss.isValid) return;
@@ -746,8 +760,8 @@ function enterPhase(boss, data, phase) {
       system.run(() => {
         try {
           const h = boss.getComponent("minecraft:health");
-          h.setCurrentValue(h.effectiveMax * (phase === 1 ? 0.65 : 0.45));
-          boss.addEffect("absorption", 20000000, { amplifier: phase === 1 ? 4 : 9, showParticles: false });
+          // chỉ hồi thêm chút ít (không "hồi đầy" giữa trận)
+          h.setCurrentValue(h.effectiveMax * (phase === 1 ? 0.45 : 0.22));
         } catch { }
       });
     } catch { }
@@ -759,14 +773,7 @@ function enterPhase(boss, data, phase) {
     shake(dim, loc, 32, 0.9, 1.2);
     hitArea(boss, data, loc, 8, 4, { knock: 3.0, up: 0.8 });
     try {
-      if (phase === 1) {
-        boss.addEffect("speed", 20000000, { amplifier: 1, showParticles: false });
-        boss.addEffect("resistance", 20000000, { amplifier: 0, showParticles: false });
-      } else {
-        boss.addEffect("speed", 20000000, { amplifier: 2, showParticles: false });
-        boss.addEffect("resistance", 20000000, { amplifier: 1, showParticles: false });
-        boss.addEffect("strength", 20000000, { amplifier: 1, showParticles: false });
-      }
+      boss.addEffect("speed", 20000000, { amplifier: phase === 1 ? 0 : 1, showParticles: false });
     } catch { }
   });
   world.sendMessage(phase === 1 ? "§c§l⚠ GIANT ZOMBIE IS ENRAGED! ⚠" : "§4§l☠ GIANT ZOMBIE ENTERS FINAL FURY! ☠");
@@ -775,7 +782,7 @@ function enterPhase(boss, data, phase) {
 
 function healSkill(boss, data) {
   const dim = boss.dimension;
-  try { boss.addEffect("regeneration", 80, { amplifier: data.phase >= 2 ? 3 : 2 }); } catch { }
+  try { boss.addEffect("regeneration", 60, { amplifier: 1 }); } catch { }
   particle(dim, "ytaun:heal_spiral", boss.location);
   sound(dim, "random.levelup", boss.location, 0.6, 0.5);
 }

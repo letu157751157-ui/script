@@ -1,57 +1,12 @@
 {
-  "id": "1714385647308",
-  "name": "giantzombie",
   "pools": [
     {
-      "rolls": 15,
-      "entries": [
-        {
-          "type": "item",
-          "weight": 1,
-          "name": "minecraft:rotten_flesh",
-          "functions": [
-            {
-              "function": "set_count",
-              "count": {
-                "min": 1,
-                "max": 1
-              }
-            },
-            {
-              "function": "set_data",
-              "data": "0"
-            }
-          ],
-          "data": "0"
-        },
-        {
-          "type": "item",
-          "weight": 1,
-          "name": "minecraft:spider_eye",
-          "functions": [
-            {
-              "function": "set_count",
-              "count": {
-                "min": 1,
-                "max": 1
-              }
-            },
-            {
-              "function": "set_data",
-              "data": "0"
-            }
-          ],
-          "data": "0"
-        }
-      ]
-    },
-    {
       "rolls": 1,
       "entries": [
         {
           "type": "item",
-          "weight": 1,
           "name": "ytaun:handgiantzombie",
+          "weight": 1,
           "functions": [
             {
               "function": "set_count",
@@ -59,31 +14,8 @@
                 "min": 1,
                 "max": 1
               }
-            },
-            {
-              "function": "set_data",
-              "data": 0
             }
           ]
-        },
-        {
-          "type": "item",
-          "weight": 1,
-          "name": "minecraft:zombie_head",
-          "functions": [
-            {
-              "function": "set_count",
-              "count": {
-                "min": 1,
-                "max": 1
-              }
-            },
-            {
-              "function": "set_data",
-              "data": "0"
-            }
-          ],
-          "data": "0"
         }
       ]
     },
@@ -92,8 +24,8 @@
       "entries": [
         {
           "type": "item",
+          "name": "ytaun:zombie_heart",
           "weight": 1,
-          "name": "ytaun:frozen_heart_piece",
           "functions": [
             {
               "function": "set_count",
@@ -101,168 +33,75 @@
                 "min": 1,
                 "max": 1
               }
-            },
-            {
-              "function": "set_data",
-              "data": 0
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
         {
           "type": "item",
+          "name": "ytaun:waterofzombie",
           "weight": 1,
-          "name": "ytaun:core",
           "functions": [
             {
               "function": "set_count",
               "count": {
                 "min": 1,
-                "max": 1
+                "max": 2
               }
-            },
-            {
-              "function": "set_data",
-              "data": 0
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
         {
           "type": "item",
-          "weight": 1,
-          "name": "minecraft:carrot",
-          "functions": [
-            {
-              "function": "set_count",
-              "count": {
-                "min": 1,
-                "max": 1
-              }
-            },
-            {
-              "function": "set_data",
-              "data": "0"
-            }
-          ],
-          "data": "0"
-        },
-        {
-          "type": "item",
-          "weight": 1,
-          "name": "minecraft:diamond",
-          "functions": [
-            {
-              "function": "set_count",
-              "count": {
-                "min": 1,
-                "max": 1
-              }
-            },
-            {
-              "function": "set_data",
-              "data": "0"
-            }
-          ],
-          "data": "0"
-        },
-        {
-          "type": "item",
-          "weight": 1,
-          "name": "minecraft:diamond_block",
-          "functions": [
-            {
-              "function": "set_count",
-              "count": {
-                "min": 1,
-                "max": 1
-              }
-            },
-            {
-              "function": "set_data",
-              "data": "0"
-            }
-          ],
-          "data": "0"
-        },
-        {
-          "type": "item",
-          "weight": 1,
-          "name": "minecraft:gold_ingot",
-          "functions": [
-            {
-              "function": "set_count",
-              "count": {
-                "min": 1,
-                "max": 1
-              }
-            },
-            {
-              "function": "set_data",
-              "data": "0"
-            }
-          ],
-          "data": "0"
-        },
-        {
-          "type": "item",
-          "weight": 1,
-          "name": "minecraft:iron_block",
-          "functions": [
-            {
-              "function": "set_count",
-              "count": {
-                "min": 1,
-                "max": 1
-              }
-            },
-            {
-              "function": "set_data",
-              "data": "0"
-            }
-          ],
-          "data": "0"
-        },
-        {
-          "type": "item",
-          "weight": 1,
-          "name": "minecraft:iron_ingot",
-          "functions": [
-            {
-              "function": "set_count",
-              "count": {
-                "min": 1,
-                "max": 1
-              }
-            },
-            {
-              "function": "set_data",
-              "data": "0"
-            }
-          ],
-          "data": "0"
-        },
-        {
-          "type": "item",
-          "weight": 1,
-          "name": "minecraft:iron_nugget",
-          "functions": [
-            {
-              "function": "set_count",
-              "count": {
-                "min": 1,
-                "max": 1
-              }
-            },
-            {
-              "function": "set_data",
-              "data": "0"
-            }
-          ],
-          "data": "0"
-        },
-        {
-          "type": "item",
-          "weight": 1,
           "name": "minecraft:rotten_flesh",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 8,
+                "max": 16
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "ytaun:thitthoiran",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 2,
+                "max": 4
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:zombie_head",
+          "weight": 1,
           "functions": [
             {
               "function": "set_count",
@@ -270,37 +109,77 @@
                 "min": 1,
                 "max": 1
               }
-            },
-            {
-              "function": "set_data",
-              "data": "0"
             }
-          ],
-          "data": "0"
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": {
+        "min": 2,
+        "max": 3
+      },
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:diamond",
+          "weight": 3,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 2,
+                "max": 4
+              }
+            }
+          ]
         },
         {
           "type": "item",
-          "weight": 1,
-          "name": "minecraft:wheat",
+          "name": "minecraft:iron_block",
+          "weight": 3,
           "functions": [
             {
               "function": "set_count",
               "count": {
                 "min": 1,
-                "max": 1
+                "max": 2
               }
-            },
-            {
-              "function": "set_data",
-              "data": "0"
             }
-          ],
-          "data": "0"
+          ]
         },
         {
           "type": "item",
+          "name": "minecraft:gold_ingot",
+          "weight": 3,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 3,
+                "max": 6
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:emerald",
+          "weight": 2,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 2,
+                "max": 5
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:diamond_block",
           "weight": 1,
-          "name": "minecraft:wheat_seeds",
           "functions": [
             {
               "function": "set_count",
@@ -308,16 +187,38 @@
                 "min": 1,
                 "max": 1
               }
-            },
-            {
-              "function": "set_data",
-              "data": "0"
             }
-          ],
-          "data": "0"
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:golden_apple",
+          "weight": 2,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:enchanted_golden_apple",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            }
+          ]
         }
       ]
     }
-  ],
-  "type": "custom"
+  ]
 }

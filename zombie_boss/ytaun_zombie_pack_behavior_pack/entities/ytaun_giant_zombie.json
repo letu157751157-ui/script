@@ -101,11 +101,11 @@
       },
       "ytaun:form_rage": {
         "minecraft:health": {
-          "value": 600,
-          "max": 600
+          "value": 500,
+          "max": 500
         },
         "minecraft:scale": {
-          "value": 1.75
+          "value": 1.7
         },
         "minecraft:knockback_resistance": {
           "value": 1.0
@@ -119,23 +119,23 @@
             {
               "cause": "all",
               "deals_damage": "yes",
-              "damage_multiplier": 0.75
+              "damage_multiplier": 0.9
             }
           ]
         },
         "minecraft:attack": {
-          "damage": 9,
+          "damage": 8,
           "effect_name": "hunger",
           "effect_duration": 30
         }
       },
       "ytaun:form_fury": {
         "minecraft:health": {
-          "value": 800,
-          "max": 800
+          "value": 550,
+          "max": 550
         },
         "minecraft:scale": {
-          "value": 1.9
+          "value": 1.8
         },
         "minecraft:knockback_resistance": {
           "value": 1.0
@@ -149,14 +149,14 @@
             {
               "cause": "all",
               "deals_damage": "yes",
-              "damage_multiplier": 0.55
+              "damage_multiplier": 0.8
             }
           ]
         },
         "minecraft:attack": {
-          "damage": 13,
-          "effect_name": "wither",
-          "effect_duration": 4
+          "damage": 10,
+          "effect_name": "hunger",
+          "effect_duration": 30
         }
       }
     },

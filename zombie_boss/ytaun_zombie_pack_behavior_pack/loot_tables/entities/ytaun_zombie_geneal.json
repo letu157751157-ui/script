@@ -8,7 +8,7 @@
         {
           "type": "item",
           "weight": 1,
-          "name": "pa:zombie_heart",
+          "name": "ytaun:zombie_heart",
           "functions": [
             {
               "function": "set_count",
@@ -26,7 +26,7 @@
         {
           "type": "item",
           "weight": 1,
-          "name": "pa:thitthoiran",
+          "name": "ytaun:thitthoiran",
           "functions": [
             {
               "function": "set_count",
