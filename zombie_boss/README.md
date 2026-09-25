@@ -90,12 +90,11 @@ mật phun, vũng axit sủi bọt, cục axit, lưỡi thịt, con mắt quỷ 
 `general_shout`, `transform`, `flies`, `axe_smash`, `soul_drain`, `imp_scream`. Dùng cho boss, Zombie General và Zombie Axe.
 
 ## v1.7
-- **Sửa boss không rơi đồ**: loot table cũ trỏ tới item không tồn tại (`ytaun:frozen_heart_piece`, `ytaun:core`) nên hỏng cả bảng.
-  Giờ luôn rơi: Tay Giant Zombie, Tim Zombie, 1–2 Nước Zombie, thịt thối, gạch thịt, đầu zombie + 2–3 món quý
-  (kim cương, khối sắt, vàng, ngọc lục bảo, táo vàng, táo vàng phù phép…). Loot của Zombie General cũng sửa (`pa:` → `ytaun:`).
+- **Sửa boss không rơi đồ**: loot table cũ trỏ tới item không tồn tại nên hỏng cả bảng. Boss giờ rơi: Tay Giant Zombie (luôn),
+  Tim Zombie (33%), thịt thối, mắt nhện. Zombie General rơi Tim Zombie 17% (loot cũ còn lại giữ nguyên).
 - **Giảm độ trâu giữa trận**: Cuồng Nộ 500 máu (hồi về 45%), nhận 90% sát thương, đánh 8; Final Fury 550 máu (hồi về 22%),
   nhận 80% sát thương, đánh 10. Bỏ hiệu ứng Hấp Thụ / Kháng Cự / Sức Mạnh khi lên form; sát thương chiêu +10% / +20%;
   hồi máu yếu hơn; nghỉ giữa các chiêu lâu hơn. Lính triệu hồi không còn buff sức mạnh (trừ Final Fury).
 - **Triệu hồi có Zombie General**: mỗi đợt triệu hồi có 1 tướng dẫn quân (tối đa 2 tướng cùng lúc).
 - **Vẽ lại model 3D + icon**: búa Zombie Hammer mới (cán gỗ quấn vải, đầu búa thịt thối đai sắt, mặt đầu lâu, pha lê xanh),
-  và icon pixel art 32x32 cho cả 5 item (`tools/gen_items.py`).
+  và icon búa mới khớp model (`tools/gen_items.py`). Các item khác giữ icon gốc.

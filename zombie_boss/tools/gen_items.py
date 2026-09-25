@@ -139,8 +139,8 @@ def meat_icon():
     for x, y in ((22, 2), (26, 4)): p[x, y] = hx("#141414"); p[x - 1, y - 1] = (220, 220, 255, 160); p[x + 1, y - 1] = (220, 220, 255, 160)
     img = outline(stack(top, side_l, side_r, marb, mold)); img.alpha_composite(fly); return img
 
-ICONS = {"ytaun_zombieaxe": hammer_icon, "ytaun_handgiantzombie": hand_icon, "ytaun_waterofzombie": potion_icon,
-         "ytaun_zombie_heart": heart_icon, "ytaun_thitthoiran": meat_icon}
+# Chỉ vẽ icon búa (khớp model 3D); các item khác giữ icon gốc
+ICONS = {"ytaun_zombieaxe": hammer_icon}
 for name, fn in ICONS.items():
     fn().save(os.path.join(ITEMS, f"{name}.png"))
 
