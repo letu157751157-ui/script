@@ -2,7 +2,7 @@
 
 Addon thêm **Thiên Nghịch Mâu** (`toji:inverted_spear`) của Toji Fushiguro (Jujutsu Kaisen), bộ chiêu theo kiểu JJS.
 Viết bằng Script API `@minecraft/server` 2.0.0, **không cần bật Beta APIs / experiments**.
-Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, console). Phiên bản hiện tại: **v1.3.0**.
+Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, console). Phiên bản hiện tại: **v1.4.0**.
 
 ![Mô hình 3D](preview.png)
 
@@ -23,10 +23,12 @@ Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, conso
 | Thao tác | Chiêu | Tác dụng |
 |---|---|---|
 | **Chuột phải** (điện thoại: chạm màn hình / nút Dùng) | **Đâm Xuyên Vô Hạn** | Cảnh Toji đâm xuyên Vô Hạn của Gojo: lướt tới và đâm thẳng 6 ô. Trước mặt mỗi mục tiêu hiện **lớp kết giới lục giác xanh (Vô Hạn) rồi vỡ vụn**; mục tiêu bị xuyên, choáng ngắn và **mất sạch hiệu ứng có lợi**. Hồi 5s |
-| **Khuỵu (Shift) + chuột phải** | **Xích Vạn Lý** | Mâu rời tay, **quay vòng quanh người theo sợi xích** (2 vòng, bán kính 4.5 ô), mỗi vòng quét trúng mọi kẻ địch xung quanh và hất văng ra; sau đó **ném mâu thẳng tới trước** (24 ô): trúng địch thì giật về + choáng, trúng tường/đất thì kéo mình tới (móc câu). Hồi 10s |
+| **Khuỵu (Shift) + chuột phải** | **Xích Vạn Lý** | Mâu rời tay, **quay vòng quanh người theo sợi xích** (2 vòng, bán kính 4.5 ô), mỗi vòng quét trúng mọi kẻ địch xung quanh và hất văng ra; sau đó **ném mâu thẳng tới trước** (24 ô): trúng địch thì **lôi địch theo xích về tận trước mặt**, trúng tường/đất thì **đu người tới đó** theo đường vòng cung. Hồi 10s |
 | **Chạy + chém** (chạy nhanh rồi đánh, hoặc chạy + chuột phải) | **Ám Sát Sau Lưng** | Toji không có chú lực nên không ai cảm nhận được: **biến mất trong làn khói, hiện ra sau lưng kẻ địch bạn đang nhìn** (tới 14 ô) và **chém chữ X** vào lưng nó. Không có mục tiêu thì lướt đi. Hồi 7s |
 | **Cầm mâu 20 giây** | **Thiên Dữ Chú Phược: Thức Tỉnh** | Tự kích hoạt khi cầm liên tục đủ 20s: **chú linh kho chứa (con sâu) trồi lên và quấn quanh người** suốt 15s. Được Speed II, Strength II, Jump Boost II, Resistance I; sát thương chiêu x1.3, hồi chiêu giảm một nửa |
-| **Cầm 20 giây + nhảy** (khi đang Thức Tỉnh) | **Thiên Dữ Loạn Trảm** | Mọi mob trong **vùng 20×20 block** quanh bạn bị ghim lại. Toji **chạy khắp khu vực, lao tới từng con, chém tổng cộng 40 nhát** (vòng quanh mục tiêu, cứ 5 nhát có 1 nhát **nhảy lên chém bổ xuống**), để lại bóng mờ trên đường chạy. Xong thì **chạy về đúng chỗ cũ**, trượt dừng, im một nhịp rồi **tất cả vết chém trên mọi con mob nổ cùng lúc** (mỗi nhát 2.5 sát thương, x1.3). Bất tử trong lúc chém. 1 lần mỗi lần Thức Tỉnh |
+| **Cầm 20 giây + nhảy** (khi đang Thức Tỉnh) | **Thiên Phạt Xử Quyết** | Chú linh kho chứa há miệng, **xích bắn ra móc mọi mob trong 12 ô** (tối đa 12 con), **lôi chúng lên trời treo thành vòng tròn** lơ lửng quanh bạn. Toji bay lên, **lao qua lại đâm xuyên từng con 3 vòng** (kết giới Vô Hạn vỡ, vết chém X, máu), rồi bay cao hơn và **đập tất cả xuống đất cùng lúc**: nứt đất 2 đợt, 4 sóng xung kích, chữ X khổng lồ, toàn bộ sát thương nổ ra một lần. Bất tử trong lúc dùng. 1 lần mỗi lần Thức Tỉnh |
+| **Nhảy + đánh** (đang trên không đánh trúng mob) | **Bổ Trời** | Giơ mâu hai tay rồi bổ thẳng xuống: địch bị đập xuống đất, nứt đất, lan sát thương xung quanh 2.5 ô. Hồi 3s |
+| **Khuỵu + đánh** (đang khuỵu đánh trúng mob) | **Quét Chân** | Hạ thấp người quét mâu hình cung ngang mắt cá, rồi hất ngược lên tung kẻ địch lên trời. Hồi 3s |
 | **Đánh thường 4 lần liên tiếp** | **Combo M1 + Đòn Kết Liễu** | Đòn thứ 4 là cú xoay chém hình cung trước mặt, hất văng kẻ địch (như M1 trong JJS) |
 | **Mọi đòn đánh** | **Nội tại: Vô Hiệu Hoá** | Đòn đánh thường cũng xoá hiệu ứng có lợi của mục tiêu |
 
@@ -49,13 +51,13 @@ Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, conso
 | `toji:null_ring` / `toji:null_ground` | Vòng rune tím nứt vỡ, gai hướng vào tâm, trên mục tiêu / dưới đất khi bị vô hiệu |
 | `toji:shard` | Mảnh kính tím vỡ tung (hiệu ứng của mục tiêu bị phá) |
 | `toji:spear` + `toji:chain_link` | Mâu bay (mũi luôn hướng theo đường bay) và sợi xích nối về tay |
-| `toji:slash` | Vết chém thép trắng-tím (Xích Vạn Lý, đòn kết liễu, Loạn Trảm) |
+| `toji:slash` | Vết chém thép trắng-tím (Xích Vạn Lý, đòn kết liễu, Xử Quyết) |
 | `toji:afterimage` | Bóng mờ Toji để lại khi lướt |
 | `toji:aura` / `toji:charge` | Gió trắng bốc lên khi Thức Tỉnh / gió tụ vào mâu trước khi Thức Tỉnh và khi đâm |
 | `toji:shock_ring`, `toji:crack`, `toji:dust`, `toji:debris` | Sóng xung kích, nứt đất, bụi, đá văng |
 | `toji:flash`, `toji:spark`, `toji:blood` | Chớp sáng, tia lửa thép, máu |
 | `toji:infinity` + `toji:shard_blue` | Kết giới Vô Hạn lục giác xanh nứt rồi vỡ thành mảnh kính xanh |
-| `toji:x_slash` | Vết chém chữ X khổng lồ (Ám Sát, Loạn Trảm) |
+| `toji:x_slash` | Vết chém chữ X khổng lồ (Ám Sát, Xử Quyết) |
 | `toji:worm_head` / `toji:worm_body` | Chú linh kho chứa quấn quanh người khi Thức Tỉnh |
 | `toji:vanish` | Khói tối khi Toji biến mất |
 
@@ -70,9 +72,12 @@ Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, conso
 | `awaken` | Khuỵu gối tụ lực → đứng dậy vào thế cầm ngược mâu |
 | `cut_a` / `cut_b` | Chém chạy: chân đang sải bước, người đổ về trước, chém chéo phải/trái xen kẽ |
 | `leap_cut` | Nhảy lên co chân, giơ mâu qua đầu rồi bổ xuống |
-| `rampage_end` | Về chỗ cũ: trượt dừng hạ thấp người, mâu chìa sang bên, rồi đứng dậy |
+| `rampage_end` | Tiếp đất: hạ thấp người, mâu chìa sang bên, rồi đứng dậy |
+| `chain_summon` | Dang rộng hai tay, giơ mâu lên trời khi xích bắn ra |
+| `aerial_slam` | Trên không giơ mâu hai tay rồi bổ thẳng xuống (Bổ Trời, cú đập cuối của Xử Quyết) |
+| `low_sweep` | Khuỵu sâu quét mâu ngang thấp rồi hất ngược lên |
 
-Ngoài ra còn rung màn hình, chớp màn hình khi Thức Tỉnh / Loạn Trảm, và âm thanh cho từng chiêu.
+Ngoài ra còn rung màn hình, chớp màn hình khi Thức Tỉnh / Xử Quyết, và âm thanh cho từng chiêu.
 
 **Mô hình 3D**: lưỡi thẳng hai cạnh với sống tím, móc phụ bên cạnh lưỡi (kiểu jitte), chắn kiếm tối màu, chuôi quấn vải tím với đai đồng,
 vòng đồng ở đuôi nối các mắt xích. Có 3 dạng: thường, **Thức Tỉnh** (thêm lớp phát sáng `entity_emissive` dọc cạnh lưỡi, sáng cả ban đêm)
@@ -89,7 +94,7 @@ và **Đã ném** (trên tay chỉ còn sợi xích). Script tự đổi dạng 
 
 Không cần mở game, [`test/sim.mjs`](test/sim.mjs) chạy chính `main.js` với một bản giả lập của `@minecraft/server`
 và thử lần lượt: chuột phải, khuỵu + chuột phải (quay xích, ném trúng địch, móc vào tường), chạy + chém (hiện sau lưng / lướt khi không có mục tiêu), combo 4 đòn, cầm 20s, cầm 20s + nhảy,
-đổi ô khi đang Thức Tỉnh / đang lao xuống, và bị choáng thì không ra chiêu được (61 bước kiểm tra):
+đổi ô khi đang Thức Tỉnh / đang lao xuống, và bị choáng thì không ra chiêu được (66 bước kiểm tra):
 
 ```
 node test/sim.mjs
@@ -117,6 +122,6 @@ toji/
 
 - **Bấm không ra chiêu, không có thanh hồi chiêu trên hotbar:** script chưa chạy. Kiểm tra đã bật **Behavior Pack** (không chỉ Resource Pack) và game từ **1.21.90** trở lên.
 - **Mâu hiện thành hình phẳng 2D hoặc không nằm trong tay:** Resource Pack chưa bật hoặc còn bản cũ, xem mục *Đã cài bản 1.0.0?*.
-- **Loạn Trảm không ra khi nhảy:** chỉ dùng được khi đang Thức Tỉnh (thanh hotbar hiện `THỨC TỈNH`), 1 lần mỗi lần Thức Tỉnh, và không dùng được ngay trong lúc đang ra chiêu khác.
+- **Xử Quyết không ra khi nhảy:** chỉ dùng được khi đang Thức Tỉnh (thanh hotbar hiện `THỨC TỈNH`), 1 lần mỗi lần Thức Tỉnh, và không dùng được ngay trong lúc đang ra chiêu khác.
 
 Đây là mô hình/texture tự làm lấy cảm hứng từ Thiên Nghịch Mâu, không chứa hình ảnh gốc của Jujutsu Kaisen.

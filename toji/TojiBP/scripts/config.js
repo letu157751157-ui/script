@@ -40,7 +40,7 @@ export const CONFIG = {
 
   // Sneak + right-click — Thousand-Mile Chain whirl: swing the spear on its chain in circles around you
   // (hits everything in the ring on each lap), then hurl it forward.
-  // The hurled spear: hits a target = damage, stun and yank it back; hits a wall/ground = grapple yourself there.
+  // The hurled spear: hits an enemy = drag it all the way back to you; sticks in a wall/ground = swing yourself there.
   chain: {
     cooldown: 10,
     spinTime: 0.9, // seconds of whirling, the release matches the "whirl" animation (1.05 s)
@@ -54,10 +54,8 @@ export const CONFIG = {
     hitRadius: 1.5,
     damage: 8,
     stun: 1,
-    pullPerBlock: 0.32,
-    maxPull: 3.2,
-    grapplePerBlock: 0.3,
-    maxGrapple: 3.5,
+    reelTime: 0.5, // seconds to drag a hooked enemy all the way to you
+    swingTime: 0.7, // seconds to swing yourself to where the spear stuck
   },
 
   // Sprint + attack (or sprint + right-click) — Heavenly Ambush: Toji has no cursed energy, nobody senses him.
@@ -86,15 +84,39 @@ export const CONFIG = {
     cooldownMultiplier: 0.5, // skill cooldowns while awakened
   },
 
-  // Hold 20 s + jump (while awakened) — Heavenly Rampage: Toji sprints all over a 20x20 area around you,
-  // cuts every mob in it 40 times in total (spread over all of them), then runs back to where he started
+  // Hold 20 s + jump (while awakened) — Sorcerer Killer: Heaven's Execution.
+  // Chains burst out of the Inventory Curse and hook every mob around you, drag them into the sky and
+  // hold them in a ring; Toji flies up and pierces through each of them over and over, then slams them all
+  // into the ground at once.
   plunge: {
-    halfSize: 10, // 20x20 blocks
-    cuts: 40,
-    cutInterval: 2, // ticks between cuts (40 cuts = 4 s)
-    leapEvery: 5, // every 5th cut is a jumping cut from above
-    damagePerCut: 2.5, // a mob's cuts land as one big hit at the end (mobs ignore hits for 0.5 s after each one)
-    finalKnockup: 0.7,
+    radius: 12, // mobs this close are hooked
+    maxTargets: 12,
+    ringRadius: 4,
+    ringHeight: 5, // blocks above you
+    liftTime: 1.0, // seconds to drag them up
+    pierceRounds: 3, // Toji goes around the ring this many times
+    pierceInterval: 3, // ticks between two pierces
+    damagePerPierce: 3, // a mob's pierces land as one hit at the end (mobs ignore hits for 0.5 s after each one)
+    slamDamage: 8,
     stun: 1.5,
+  },
+
+  // Jump + attack (hit a mob while in the air) — Sky Splitter: smash the target down into the ground
+  jumpAttack: {
+    cooldown: 3,
+    damage: 7,
+    radius: 2.5, // splash around the target
+    splashDamage: 3,
+    dive: 1.6, // downward push on you
+  },
+
+  // Crouch + attack (hit a mob while sneaking) — Low Sweep: sweep the legs in an arc, then launch them up
+  crouchAttack: {
+    cooldown: 3,
+    radius: 3.5,
+    arc: 160,
+    damage: 6,
+    launch: 0.9, // knock-up
+    stun: 0.6,
   },
 };

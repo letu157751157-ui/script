@@ -36,7 +36,7 @@ player.slots[0] = new ItemStack("toji:inverted_spear");
 tick(5);
 check("guide sent on first hold", log.messages.length === 9, `${log.messages.length} messages`);
 check("title shown on first hold", log.titles.length === 1);
-check("lore written to the spear", player.slots[0].getLore().length === 7);
+check("lore written to the spear", player.slots[0].getLore().length === 9);
 check("action bar uses translation keys", JSON.stringify(log.actionBars.at(-1)).includes("toji.bar.hold"));
 
 // --- Right-click: Nullifying Thrust
@@ -77,7 +77,8 @@ check("the far target is not hit by the whirl", damageTo(target) === 0);
 tick(8);
 check("hurled spear hits the target", near(damageTo(target), CONFIG.chain.damage), `${damageTo(target)}`);
 check("target stunned", target.getEffect("slowness")?.amplifier === 255);
-check("target yanked toward the player", knockbacksOf(target).some((k) => k.horizontal.z < 0));
+tick(CONFIG.chain.reelTime * 20);
+check("hooked enemy dragged all the way to the player", Math.abs(target.location.z - (player.location.z + 1.5)) < 0.01, JSON.stringify(target.location));
 check("skills blocked while the spear is out", (useItem(player), !anims().includes("animation.toji.thrust")));
 tick(15);
 check("spear comes back to the hand", held(player) === "toji:inverted_spear", held(player));
@@ -90,8 +91,11 @@ away(target);
 dimension.solid.add("0,65,6");
 useItem(player);
 tick(CONFIG.chain.release * 20 + 8);
-check("chain grapples to the wall", knockbacksOf(player).some((k) => k.horizontal.z > 0 && k.vertical >= 0.35));
-tick(12);
+tick(CONFIG.chain.swingTime * 20);
+check("swings to where the spear stuck", player.location.z > 4 && player.location.z < 6, JSON.stringify(player.location));
+check("swing arcs through the air", log.teleports.some((t) => t.entity === player.id && t.location.y > 65));
+player.location = { x: 0.5, y: 64, z: 0.5 };
+tick(4);
 check("spear back after grapple", held(player) === "toji:inverted_spear", held(player));
 dimension.solid.clear();
 player.isSneaking = false;
@@ -154,44 +158,68 @@ tick(CONFIG.thrust.windup * 20 + 1);
 check("awakened thrust deals x1.3", near(damageTo(victim), CONFIG.thrust.damage * CONFIG.awaken.damageMultiplier), `${damageTo(victim)}`);
 away(victim);
 
-// --- Hold 20 s + jump: Heavenly Rampage (40 cuts across a 20x20 area, then back to the start)
+// --- Hold 20 s + jump: Heaven's Execution
 tick(5); // wait for the thrust to finish
 clear();
 const cfgR = CONFIG.plunge;
 const start = { ...player.location };
-const crowd = [[6, 6], [-8, 3], [2, -9], [9, -9]].map(([dx, dz]) => new Entity("minecraft:zombie", { x: start.x + dx, y: 64, z: start.z + dz }, 200));
-const outside = new Entity("minecraft:zombie", { x: start.x + 14, y: 64, z: start.z }, 200);
+const crowd = [[6, 6], [-8, 3], [2, -9]].map(([dx, dz]) => new Entity("minecraft:zombie", { x: start.x + dx, y: 64, z: start.z + dz }, 300));
+const outside = new Entity("minecraft:zombie", { x: start.x + 20, y: 64, z: start.z }, 300);
 fire("playerButtonInput", { player, button: "Jump", newButtonState: "Pressed" });
-check("rampage immunity", player.getEffect("resistance")?.amplifier === 4);
-check("mobs in the area are pinned", crowd.every((z) => z.getEffect("slowness")?.amplifier === 255));
-tick(cfgR.cuts * cfgR.cutInterval + 2);
+check("execution: chain summon animation", anims().includes("animation.toji.chain_summon"));
+check("execution immunity", player.getEffect("resistance")?.amplifier === 4);
+tick(cfgR.liftTime * 20);
+check("every mob dragged up into the sky ring", crowd.every((z) => near(z.location.y, start.y + cfgR.ringHeight) && near(Math.hypot(z.location.x - start.x, z.location.z - start.z), cfgR.ringRadius)), crowd.map((z) => JSON.stringify(z.location)).join());
+check("mob out of range untouched", near(outside.location.x, start.x + 20) && outside.location.y === 64);
+const pierceTicks = 6 + crowd.length * cfgR.pierceRounds * cfgR.pierceInterval;
+tick(pierceTicks);
 const hops = log.teleports.filter((t) => t.entity === player.id);
-check("runs to every mob", crowd.every((z) => hops.some((t) => Math.hypot(t.location.x - z.location.x, t.location.z - z.location.z) < 2)));
-check("40 cuts", hops.length >= cfgR.cuts, `${hops.length}`);
-check("jumping cuts from above", hops.some((t) => t.location.y > 65));
-check("running + jumping animations", ["cut_a", "cut_b", "leap_cut"].every((n) => anims().includes(`animation.toji.${n}`)));
-check("mob outside the 20x20 area untouched", !hops.some((t) => Math.abs(t.location.x - outside.location.x) < 2));
-check("back to the starting spot", near(hops.at(-1).location.x, start.x) && near(hops.at(-1).location.z, start.z));
-check("landing animation", anims().includes("animation.toji.rampage_end"));
-check("no damage before the finale", crowd.every((z) => damageTo(z) === 0));
-tick(14);
-const perMob = (cfgR.cuts / crowd.length) * cfgR.damagePerCut * CONFIG.awaken.damageMultiplier;
-check("every cut lands at once", crowd.every((z) => near(damageTo(z), perMob)), crowd.map(damageTo).join());
+check("Toji pierces each of them", crowd.every((z) => hops.some((t) => Math.hypot(t.location.x - z.location.x, t.location.z - z.location.z) < 2 && t.location.y > start.y + 3)));
+check("infinity shatters on the pierces", log.particles.some((p) => p.id === "toji:infinity"));
+check("no damage before the slam", crowd.every((z) => damageTo(z) === 0));
+tick(16);
+check("everyone slammed back to the ground", crowd.every((z) => z.location.y === start.y));
+check("Toji lands at the center", near(player.location.x, start.x) && near(player.location.z, start.z));
+const execDamage = (cfgR.pierceRounds * cfgR.damagePerPierce + cfgR.slamDamage) * CONFIG.awaken.damageMultiplier;
+check("all pierces + slam land at once", crowd.every((z) => near(damageTo(z), execDamage)), crowd.map(damageTo).join());
 check("outside mob not damaged", damageTo(outside) === 0);
-tick(12);
+tick(26);
 check("immunity removed, awakening resistance kept", player.getEffect("resistance")?.amplifier === CONFIG.awaken.resistanceAmplifier);
 clear();
 fire("playerButtonInput", { player, button: "Jump", newButtonState: "Pressed" });
 tick(4);
-check("rampage only once per awakening", !anims().includes("animation.toji.cut_a"));
+check("execution only once per awakening", !anims().includes("animation.toji.chain_summon"));
 [...crowd, outside].forEach(away);
+
+// --- Jump + attack: Sky Splitter
+tick(10);
+clear();
+const flyer = new Entity("minecraft:zombie", { x: 0.5, y: 64, z: 2.5 }, 100);
+player.isOnGround = false;
+fire("entityHitEntity", { damagingEntity: player, hitEntity: flyer });
+tick(4);
+player.isOnGround = true;
+check("aerial slam animation", anims().includes("animation.toji.aerial_slam"));
+check("smashes the enemy down", knockbacksOf(flyer).some((k) => k.vertical < 0) && damageTo(flyer) > 0);
+check("crater under it", log.particles.some((p) => p.id === "toji:crack"));
+
+// --- Crouch + attack: Low Sweep
+tick(CONFIG.jumpAttack.cooldown * 20);
+clear();
+player.isSneaking = true;
+fire("entityHitEntity", { damagingEntity: player, hitEntity: flyer });
+tick(6);
+player.isSneaking = false;
+check("low sweep animation", anims().includes("animation.toji.low_sweep"));
+check("sweep launches the enemy", knockbacksOf(flyer).some((k) => k.vertical === CONFIG.crouchAttack.launch));
+away(flyer);
 
 // --- Letting go of the spear ends the awakening
 player.selectedSlotIndex = 3;
 tick(5);
 check("awakening buffs removed when switching slot", !player.getEffect("speed") && !player.getEffect("strength"));
 check("spear in the other slot reverted", player.slots[0].typeId === "toji:inverted_spear", player.slots[0].typeId);
-check("lore/durability kept through swaps", player.slots[0].getLore().length === 7);
+check("lore/durability kept through swaps", player.slots[0].getLore().length === 9);
 
 // --- Letting go mid-rampage: buffs are cleared once it ends (immunity kept meanwhile)
 player.selectedSlotIndex = 0;
@@ -205,8 +233,8 @@ player.isOnGround = false;
 tick(4);
 player.selectedSlotIndex = 3;
 tick(5);
-check("immunity kept mid-rampage after letting go", player.getEffect("resistance")?.amplifier === 4);
-tick(CONFIG.plunge.cuts * CONFIG.plunge.cutInterval + 30);
+check("immunity kept mid-execution after letting go", player.getEffect("resistance")?.amplifier === 4);
+tick(80);
 check("buffs cleared after landing", !player.getEffect("speed") && !player.getEffect("resistance"));
 
 // --- Stunned players cannot cast

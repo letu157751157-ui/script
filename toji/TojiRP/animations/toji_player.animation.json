@@ -7193,6 +7193,3096 @@
     }
    }
   },
+  "animation.toji.low_sweep": {
+   "loop": false,
+   "animation_length": 0.6,
+   "bones": {
+    "root": {
+     "position": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       0.0,
+       "v.is_first_person ? 0.0 : -3.36",
+       0.0
+      ],
+      "0.05": [
+       0.0,
+       "v.is_first_person ? 0.0 : -4.0",
+       0.0
+      ],
+      "0.08": [
+       0.0,
+       "v.is_first_person ? 0.0 : -4.64",
+       0.0
+      ],
+      "0.12": [
+       0.0,
+       "v.is_first_person ? 0.0 : -4.5",
+       0.0
+      ],
+      "0.16": [
+       0.0,
+       "v.is_first_person ? 0.0 : -3.43",
+       0.0
+      ],
+      "0.20": [
+       0.0,
+       "v.is_first_person ? 0.0 : -2.0",
+       0.0
+      ],
+      "0.22": [
+       0.0,
+       "v.is_first_person ? 0.0 : -1.5",
+       0.0
+      ],
+      "0.24": [
+       0.0,
+       "v.is_first_person ? 0.0 : -1.34",
+       0.0
+      ],
+      "0.28": [
+       0.0,
+       "v.is_first_person ? 0.0 : -1.17",
+       0.0
+      ],
+      "0.32": [
+       0.0,
+       "v.is_first_person ? 0.0 : -1.12",
+       0.0
+      ],
+      "0.36": [
+       0.0,
+       "v.is_first_person ? 0.0 : -1.1",
+       0.0
+      ],
+      "0.40": [
+       0.0,
+       "v.is_first_person ? 0.0 : -1.0",
+       0.0
+      ],
+      "0.44": [
+       0.0,
+       "v.is_first_person ? 0.0 : -0.82",
+       0.0
+      ],
+      "0.48": [
+       0.0,
+       "v.is_first_person ? 0.0 : -0.59",
+       0.0
+      ],
+      "0.52": [
+       0.0,
+       "v.is_first_person ? 0.0 : -0.35",
+       0.0
+      ],
+      "0.56": [
+       0.0,
+       "v.is_first_person ? 0.0 : -0.14",
+       0.0
+      ],
+      "0.60": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "body": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : 25.31",
+       "v.is_first_person ? 0.0 : 34.16",
+       0.0
+      ],
+      "0.05": [
+       "v.is_first_person ? 0.0 : 30.0",
+       "v.is_first_person ? 0.0 : 35.0",
+       0.0
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : 34.34",
+       "v.is_first_person ? 0.0 : 7.89",
+       0.0
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : 32.0",
+       "v.is_first_person ? 0.0 : -35.0",
+       0.0
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : 22.09",
+       "v.is_first_person ? 0.0 : -34.64",
+       0.0
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : 9.26",
+       "v.is_first_person ? 0.0 : -23.72",
+       0.0
+      ],
+      "0.22": [
+       "v.is_first_person ? 0.0 : 5.0",
+       "v.is_first_person ? 0.0 : -20.0",
+       0.0
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : 3.69",
+       "v.is_first_person ? 0.0 : -19.06",
+       0.0
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : 2.52",
+       "v.is_first_person ? 0.0 : -17.96",
+       0.0
+      ],
+      "0.32": [
+       "v.is_first_person ? 0.0 : 2.59",
+       "v.is_first_person ? 0.0 : -17.36",
+       0.0
+      ],
+      "0.36": [
+       "v.is_first_person ? 0.0 : 3.03",
+       "v.is_first_person ? 0.0 : -16.59",
+       0.0
+      ],
+      "0.40": [
+       "v.is_first_person ? 0.0 : 3.0",
+       "v.is_first_person ? 0.0 : -15.0",
+       0.0
+      ],
+      "0.44": [
+       "v.is_first_person ? 0.0 : 2.42",
+       "v.is_first_person ? 0.0 : -12.4",
+       0.0
+      ],
+      "0.48": [
+       "v.is_first_person ? 0.0 : 1.73",
+       "v.is_first_person ? 0.0 : -9.0",
+       0.0
+      ],
+      "0.52": [
+       "v.is_first_person ? 0.0 : 1.03",
+       "v.is_first_person ? 0.0 : -5.4",
+       0.0
+      ],
+      "0.56": [
+       "v.is_first_person ? 0.0 : 0.42",
+       "v.is_first_person ? 0.0 : -2.2",
+       0.0
+      ],
+      "0.60": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "head": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : -16.96",
+       "v.is_first_person ? 0.0 : -19.52",
+       0.0
+      ],
+      "0.05": [
+       "v.is_first_person ? 0.0 : -20.0",
+       "v.is_first_person ? 0.0 : -20.0",
+       0.0
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : -21.66",
+       "v.is_first_person ? 0.0 : -4.43",
+       0.0
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : -20.0",
+       "v.is_first_person ? 0.0 : 20.0",
+       0.0
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : -18.84",
+       "v.is_first_person ? 0.0 : 19.6",
+       0.0
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : -16.72",
+       "v.is_first_person ? 0.0 : 12.8",
+       0.0
+      ],
+      "0.22": [
+       "v.is_first_person ? 0.0 : -15.0",
+       "v.is_first_person ? 0.0 : 10.0",
+       0.0
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : -13.69",
+       "v.is_first_person ? 0.0 : 8.83",
+       0.0
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : -10.19",
+       "v.is_first_person ? 0.0 : 6.3",
+       0.0
+      ],
+      "0.32": [
+       "v.is_first_person ? 0.0 : -6.19",
+       "v.is_first_person ? 0.0 : 3.76",
+       0.0
+      ],
+      "0.36": [
+       "v.is_first_person ? 0.0 : -2.52",
+       "v.is_first_person ? 0.0 : 1.55",
+       0.0
+      ],
+      "0.40": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.44": [
+       "v.is_first_person ? 0.0 : 0.96",
+       "v.is_first_person ? 0.0 : -0.64",
+       0.0
+      ],
+      "0.48": [
+       "v.is_first_person ? 0.0 : 1.08",
+       "v.is_first_person ? 0.0 : -0.72",
+       0.0
+      ],
+      "0.52": [
+       "v.is_first_person ? 0.0 : 0.72",
+       "v.is_first_person ? 0.0 : -0.48",
+       0.0
+      ],
+      "0.56": [
+       "v.is_first_person ? 0.0 : 0.24",
+       "v.is_first_person ? 0.0 : -0.16",
+       0.0
+      ],
+      "0.60": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "rightarm": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : -24.8",
+       "v.is_first_person ? 0.0 : 58.24",
+       "v.is_first_person ? 0.0 : 28.0"
+      ],
+      "0.05": [
+       "v.is_first_person ? 0.0 : -30.0",
+       "v.is_first_person ? 0.0 : 60.0",
+       "v.is_first_person ? 0.0 : 30.0"
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : -30.44",
+       "v.is_first_person ? 0.0 : 15.61",
+       "v.is_first_person ? 0.0 : 15.66"
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : -40.0",
+       "v.is_first_person ? 0.0 : -55.0",
+       "v.is_first_person ? 0.0 : -10.0"
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : -82.56",
+       "v.is_first_person ? 0.0 : -54.12",
+       "v.is_first_person ? 0.0 : -12.98"
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : -134.08",
+       "v.is_first_person ? 0.0 : -35.96",
+       "v.is_first_person ? 0.0 : -10.77"
+      ],
+      "0.22": [
+       "v.is_first_person ? 0.0 : -150.0",
+       "v.is_first_person ? 0.0 : -30.0",
+       "v.is_first_person ? 0.0 : -10.0"
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : -154.87",
+       "v.is_first_person ? 0.0 : -28.68",
+       "v.is_first_person ? 0.0 : -9.9"
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : -160.37",
+       "v.is_first_person ? 0.0 : -27.59",
+       "v.is_first_person ? 0.0 : -9.7"
+      ],
+      "0.32": [
+       "v.is_first_person ? 0.0 : -159.95",
+       "v.is_first_person ? 0.0 : -27.5",
+       "v.is_first_person ? 0.0 : -9.41"
+      ],
+      "0.36": [
+       "v.is_first_person ? 0.0 : -153.26",
+       "v.is_first_person ? 0.0 : -27.07",
+       "v.is_first_person ? 0.0 : -8.89"
+      ],
+      "0.40": [
+       "v.is_first_person ? 0.0 : -140.0",
+       "v.is_first_person ? 0.0 : -25.0",
+       "v.is_first_person ? 0.0 : -8.0"
+      ],
+      "0.44": [
+       "v.is_first_person ? 0.0 : -118.08",
+       "v.is_first_person ? 0.0 : -20.88",
+       "v.is_first_person ? 0.0 : -6.66"
+      ],
+      "0.48": [
+       "v.is_first_person ? 0.0 : -86.64",
+       "v.is_first_person ? 0.0 : -15.24",
+       "v.is_first_person ? 0.0 : -4.85"
+      ],
+      "0.52": [
+       "v.is_first_person ? 0.0 : -52.16",
+       "v.is_first_person ? 0.0 : -9.16",
+       "v.is_first_person ? 0.0 : -2.91"
+      ],
+      "0.56": [
+       "v.is_first_person ? 0.0 : -21.12",
+       "v.is_first_person ? 0.0 : -3.72",
+       "v.is_first_person ? 0.0 : -1.18"
+      ],
+      "0.60": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "position": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 4.63 : 0.0",
+       "v.is_first_person ? -3.2 : 0.0",
+       "v.is_first_person ? 2.02 : 0.0"
+      ],
+      "0.05": [
+       "v.is_first_person ? 4.41 : 0.0",
+       "v.is_first_person ? -3.81 : 0.0",
+       "v.is_first_person ? 2.63 : 0.0"
+      ],
+      "0.08": [
+       "v.is_first_person ? -1.2 : 0.0",
+       "v.is_first_person ? -5.05 : 0.0",
+       "v.is_first_person ? 4.25 : 0.0"
+      ],
+      "0.12": [
+       "v.is_first_person ? -9.44 : 0.0",
+       "v.is_first_person ? -4.44 : 0.0",
+       "v.is_first_person ? 5.88 : 0.0"
+      ],
+      "0.16": [
+       "v.is_first_person ? -8.83 : 0.0",
+       "v.is_first_person ? 0.64 : 0.0",
+       "v.is_first_person ? 5.36 : 0.0"
+      ],
+      "0.20": [
+       "v.is_first_person ? -6.03 : 0.0",
+       "v.is_first_person ? 7.07 : 0.0",
+       "v.is_first_person ? 4.23 : 0.0"
+      ],
+      "0.22": [
+       "v.is_first_person ? -5.16 : 0.0",
+       "v.is_first_person ? 9.06 : 0.0",
+       "v.is_first_person ? 3.87 : 0.0"
+      ],
+      "0.24": [
+       "v.is_first_person ? -5.0 : 0.0",
+       "v.is_first_person ? 9.62 : 0.0",
+       "v.is_first_person ? 3.81 : 0.0"
+      ],
+      "0.28": [
+       "v.is_first_person ? -5.03 : 0.0",
+       "v.is_first_person ? 10.04 : 0.0",
+       "v.is_first_person ? 3.87 : 0.0"
+      ],
+      "0.32": [
+       "v.is_first_person ? -5.28 : 0.0",
+       "v.is_first_person ? 9.74 : 0.0",
+       "v.is_first_person ? 4.03 : 0.0"
+      ],
+      "0.36": [
+       "v.is_first_person ? -5.42 : 0.0",
+       "v.is_first_person ? 8.98 : 0.0",
+       "v.is_first_person ? 4.09 : 0.0"
+      ],
+      "0.40": [
+       "v.is_first_person ? -5.16 : 0.0",
+       "v.is_first_person ? 7.99 : 0.0",
+       "v.is_first_person ? 3.87 : 0.0"
+      ],
+      "0.44": [
+       "v.is_first_person ? -4.37 : 0.0",
+       "v.is_first_person ? 6.71 : 0.0",
+       "v.is_first_person ? 3.28 : 0.0"
+      ],
+      "0.48": [
+       "v.is_first_person ? -3.22 : 0.0",
+       "v.is_first_person ? 4.91 : 0.0",
+       "v.is_first_person ? 2.42 : 0.0"
+      ],
+      "0.52": [
+       "v.is_first_person ? -1.94 : 0.0",
+       "v.is_first_person ? 2.95 : 0.0",
+       "v.is_first_person ? 1.46 : 0.0"
+      ],
+      "0.56": [
+       "v.is_first_person ? -0.78 : 0.0",
+       "v.is_first_person ? 1.2 : 0.0",
+       "v.is_first_person ? 0.59 : 0.0"
+      ],
+      "0.60": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "rightitem": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? -40.56 : 64.53",
+       "v.is_first_person ? 105.09 : 32.64",
+       "v.is_first_person ? -98.4 : -5.3"
+      ],
+      "0.05": [
+       "v.is_first_person ? -41.11 : 74.7",
+       "v.is_first_person ? 106.69 : 35.63",
+       "v.is_first_person ? -113.63 : -3.72"
+      ],
+      "0.08": [
+       "v.is_first_person ? -4.89 : 69.92",
+       "v.is_first_person ? 14.9 : 24.41",
+       "v.is_first_person ? -112.02 : 12.38"
+      ],
+      "0.12": [
+       "v.is_first_person ? 47.96 : 56.18",
+       "v.is_first_person ? -121.7 : -2.26",
+       "v.is_first_person ? -81.66 : 29.79"
+      ],
+      "0.16": [
+       "v.is_first_person ? 36.59 : 72.79",
+       "v.is_first_person ? -99.68 : -18.62",
+       "v.is_first_person ? -53.71 : 13.46"
+      ],
+      "0.20": [
+       "v.is_first_person ? 9.28 : 95.59",
+       "v.is_first_person ? -38.59 : -33.3",
+       "v.is_first_person ? -23.29 : -11.7"
+      ],
+      "0.22": [
+       "v.is_first_person ? 0.67 : 101.68",
+       "v.is_first_person ? -19.39 : -37.61",
+       "v.is_first_person ? -13.43 : -19.37"
+      ],
+      "0.24": [
+       "v.is_first_person ? -1.4 : 102.88",
+       "v.is_first_person ? -15.0 : -38.81",
+       "v.is_first_person ? -10.51 : -21.23"
+      ],
+      "0.28": [
+       "v.is_first_person ? -2.81 : 103.01",
+       "v.is_first_person ? -12.53 : -39.22",
+       "v.is_first_person ? -8.87 : -21.98"
+      ],
+      "0.32": [
+       "v.is_first_person ? -1.88 : 100.03",
+       "v.is_first_person ? -15.11 : -37.54",
+       "v.is_first_person ? -10.61 : -20.05"
+      ],
+      "0.36": [
+       "v.is_first_person ? -0.19 : 93.82",
+       "v.is_first_person ? -18.73 : -34.39",
+       "v.is_first_person ? -13.02 : -16.92"
+      ],
+      "0.40": [
+       "v.is_first_person ? 0.67 : 84.25",
+       "v.is_first_person ? -19.39 : -30.41",
+       "v.is_first_person ? -13.43 : -14.11"
+      ],
+      "0.44": [
+       "v.is_first_person ? 0.57 : 70.32",
+       "v.is_first_person ? -16.44 : -25.33",
+       "v.is_first_person ? -11.39 : -11.63"
+      ],
+      "0.48": [
+       "v.is_first_person ? 0.42 : 51.31",
+       "v.is_first_person ? -12.1 : -18.46",
+       "v.is_first_person ? -8.38 : -8.43"
+      ],
+      "0.52": [
+       "v.is_first_person ? 0.25 : 30.84",
+       "v.is_first_person ? -7.29 : -11.09",
+       -5.05
+      ],
+      "0.56": [
+       "v.is_first_person ? 0.1 : 12.53",
+       "v.is_first_person ? -2.95 : -4.51",
+       "v.is_first_person ? -2.04 : -2.06"
+      ],
+      "0.60": [
+       -0.0,
+       -0.0,
+       0.0
+      ]
+     }
+    },
+    "leftarm": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : -9.76",
+       0.0,
+       "v.is_first_person ? 0.0 : -21.2"
+      ],
+      "0.05": [
+       "v.is_first_person ? 0.0 : -10.0",
+       0.0,
+       "v.is_first_person ? 0.0 : -25.0"
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : -0.38",
+       0.0,
+       "v.is_first_person ? 0.0 : -27.01"
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : 10.0",
+       0.0,
+       "v.is_first_person ? 0.0 : -25.0"
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : -3.84",
+       0.0,
+       "v.is_first_person ? 0.0 : -23.12"
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : -23.92",
+       0.0,
+       "v.is_first_person ? 0.0 : -20.76"
+      ],
+      "0.22": [
+       "v.is_first_person ? 0.0 : -30.0",
+       0.0,
+       "v.is_first_person ? 0.0 : -20.0"
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : -31.53",
+       0.0,
+       "v.is_first_person ? 0.0 : -19.89"
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : -32.41",
+       0.0,
+       "v.is_first_person ? 0.0 : -20.37"
+      ],
+      "0.32": [
+       "v.is_first_person ? 0.0 : -31.06",
+       0.0,
+       "v.is_first_person ? 0.0 : -21.1"
+      ],
+      "0.36": [
+       "v.is_first_person ? 0.0 : -28.32",
+       0.0,
+       "v.is_first_person ? 0.0 : -21.25"
+      ],
+      "0.40": [
+       "v.is_first_person ? 0.0 : -25.0",
+       0.0,
+       "v.is_first_person ? 0.0 : -20.0"
+      ],
+      "0.44": [
+       "v.is_first_person ? 0.0 : -20.88",
+       0.0,
+       "v.is_first_person ? 0.0 : -16.96"
+      ],
+      "0.48": [
+       "v.is_first_person ? 0.0 : -15.24",
+       0.0,
+       "v.is_first_person ? 0.0 : -12.48"
+      ],
+      "0.52": [
+       "v.is_first_person ? 0.0 : -9.16",
+       0.0,
+       "v.is_first_person ? 0.0 : -7.52"
+      ],
+      "0.56": [
+       "v.is_first_person ? 0.0 : -3.72",
+       0.0,
+       "v.is_first_person ? 0.0 : -3.04"
+      ],
+      "0.60": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "rightleg": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : -50.88",
+       0.0,
+       "v.is_first_person ? 0.0 : 8.48"
+      ],
+      "0.05": [
+       "v.is_first_person ? 0.0 : -60.0",
+       0.0,
+       "v.is_first_person ? 0.0 : 10.0"
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : -65.77",
+       0.0,
+       "v.is_first_person ? 0.0 : 11.22"
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : -60.0",
+       0.0,
+       "v.is_first_person ? 0.0 : 10.0"
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : -49.2",
+       0.0,
+       "v.is_first_person ? 0.0 : 6.24"
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : -35.2",
+       0.0,
+       "v.is_first_person ? 0.0 : 1.52"
+      ],
+      "0.22": [
+       "v.is_first_person ? 0.0 : -30.0",
+       0.0,
+       0.0
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : -28.07",
+       0.0,
+       "v.is_first_person ? 0.0 : -0.44"
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : -25.56",
+       0.0,
+       "v.is_first_person ? 0.0 : -0.74"
+      ],
+      "0.32": [
+       "v.is_first_person ? 0.0 : -24.03",
+       0.0,
+       "v.is_first_person ? 0.0 : -0.55"
+      ],
+      "0.36": [
+       "v.is_first_person ? 0.0 : -22.51",
+       0.0,
+       "v.is_first_person ? 0.0 : -0.19"
+      ],
+      "0.40": [
+       "v.is_first_person ? 0.0 : -20.0",
+       0.0,
+       0.0
+      ],
+      "0.44": [
+       "v.is_first_person ? 0.0 : -16.32",
+       0.0,
+       0.0
+      ],
+      "0.48": [
+       "v.is_first_person ? 0.0 : -11.76",
+       0.0,
+       0.0
+      ],
+      "0.52": [
+       "v.is_first_person ? 0.0 : -7.04",
+       0.0,
+       0.0
+      ],
+      "0.56": [
+       "v.is_first_person ? 0.0 : -2.88",
+       0.0,
+       0.0
+      ],
+      "0.60": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "leftleg": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : 33.92",
+       0.0,
+       "v.is_first_person ? 0.0 : -4.24"
+      ],
+      "0.05": [
+       "v.is_first_person ? 0.0 : 40.0",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.0"
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : 43.85",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.61"
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : 40.0",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.0"
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : 32.72",
+       0.0,
+       "v.is_first_person ? 0.0 : -3.12"
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : 23.36",
+       0.0,
+       "v.is_first_person ? 0.0 : -0.76"
+      ],
+      "0.22": [
+       "v.is_first_person ? 0.0 : 20.0",
+       0.0,
+       0.0
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : 18.84",
+       0.0,
+       "v.is_first_person ? 0.0 : 0.22"
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : 17.59",
+       0.0,
+       "v.is_first_person ? 0.0 : 0.37"
+      ],
+      "0.32": [
+       "v.is_first_person ? 0.0 : 17.09",
+       0.0,
+       "v.is_first_person ? 0.0 : 0.27"
+      ],
+      "0.36": [
+       "v.is_first_person ? 0.0 : 16.5",
+       0.0,
+       "v.is_first_person ? 0.0 : 0.1"
+      ],
+      "0.40": [
+       "v.is_first_person ? 0.0 : 15.0",
+       0.0,
+       0.0
+      ],
+      "0.44": [
+       "v.is_first_person ? 0.0 : 12.4",
+       0.0,
+       0.0
+      ],
+      "0.48": [
+       "v.is_first_person ? 0.0 : 9.0",
+       0.0,
+       0.0
+      ],
+      "0.52": [
+       "v.is_first_person ? 0.0 : 5.4",
+       0.0,
+       0.0
+      ],
+      "0.56": [
+       "v.is_first_person ? 0.0 : 2.2",
+       0.0,
+       0.0
+      ],
+      "0.60": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    }
+   }
+  },
+  "animation.toji.aerial_slam": {
+   "loop": false,
+   "animation_length": 0.55,
+   "bones": {
+    "root": {
+     "position": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       0.0,
+       "v.is_first_person ? 0.0 : 1.7",
+       0.0
+      ],
+      "0.06": [
+       0.0,
+       "v.is_first_person ? 0.0 : 2.0",
+       0.0
+      ],
+      "0.08": [
+       0.0,
+       "v.is_first_person ? 0.0 : 1.39",
+       0.0
+      ],
+      "0.12": [
+       0.0,
+       "v.is_first_person ? 0.0 : -0.98",
+       0.0
+      ],
+      "0.15": [
+       0.0,
+       "v.is_first_person ? 0.0 : -2.5",
+       0.0
+      ],
+      "0.16": [
+       0.0,
+       "v.is_first_person ? 0.0 : -2.57",
+       0.0
+      ],
+      "0.20": [
+       0.0,
+       "v.is_first_person ? 0.0 : -2.82",
+       0.0
+      ],
+      "0.24": [
+       0.0,
+       "v.is_first_person ? 0.0 : -2.85",
+       0.0
+      ],
+      "0.28": [
+       0.0,
+       "v.is_first_person ? 0.0 : -2.74",
+       0.0
+      ],
+      "0.31": [
+       0.0,
+       "v.is_first_person ? 0.0 : -2.53",
+       0.0
+      ],
+      "0.35": [
+       0.0,
+       "v.is_first_person ? 0.0 : -2.27",
+       0.0
+      ],
+      "0.39": [
+       0.0,
+       "v.is_first_person ? 0.0 : -1.9",
+       0.0
+      ],
+      "0.43": [
+       0.0,
+       "v.is_first_person ? 0.0 : -1.39",
+       0.0
+      ],
+      "0.47": [
+       0.0,
+       "v.is_first_person ? 0.0 : -0.84",
+       0.0
+      ],
+      "0.51": [
+       0.0,
+       "v.is_first_person ? 0.0 : -0.34",
+       0.0
+      ],
+      "0.55": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "body": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : -14.33",
+       0.0,
+       0.0
+      ],
+      "0.06": [
+       "v.is_first_person ? 0.0 : -15.0",
+       0.0,
+       0.0
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : -6.95",
+       0.0,
+       0.0
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : 21.95",
+       0.0,
+       0.0
+      ],
+      "0.15": [
+       "v.is_first_person ? 0.0 : 40.0",
+       0.0,
+       0.0
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : 40.84",
+       0.0,
+       0.0
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : 43.75",
+       0.0,
+       0.0
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : 44.09",
+       0.0,
+       0.0
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : 42.44",
+       0.0,
+       0.0
+      ],
+      "0.31": [
+       "v.is_first_person ? 0.0 : 39.44",
+       0.0,
+       0.0
+      ],
+      "0.35": [
+       "v.is_first_person ? 0.0 : 35.58",
+       0.0,
+       0.0
+      ],
+      "0.39": [
+       "v.is_first_person ? 0.0 : 29.73",
+       0.0,
+       0.0
+      ],
+      "0.43": [
+       "v.is_first_person ? 0.0 : 21.74",
+       0.0,
+       0.0
+      ],
+      "0.47": [
+       "v.is_first_person ? 0.0 : 13.13",
+       0.0,
+       0.0
+      ],
+      "0.51": [
+       "v.is_first_person ? 0.0 : 5.24",
+       0.0,
+       0.0
+      ],
+      "0.55": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "head": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : -12.85",
+       0.0,
+       0.0
+      ],
+      "0.06": [
+       "v.is_first_person ? 0.0 : -15.0",
+       0.0,
+       0.0
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : -10.21",
+       0.0,
+       0.0
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : 8.4",
+       0.0,
+       0.0
+      ],
+      "0.15": [
+       "v.is_first_person ? 0.0 : 20.0",
+       0.0,
+       0.0
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : 20.5",
+       0.0,
+       0.0
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : 21.98",
+       0.0,
+       0.0
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : 21.64",
+       0.0,
+       0.0
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : 20.09",
+       0.0,
+       0.0
+      ],
+      "0.31": [
+       "v.is_first_person ? 0.0 : 17.96",
+       0.0,
+       0.0
+      ],
+      "0.35": [
+       "v.is_first_person ? 0.0 : 15.79",
+       0.0,
+       0.0
+      ],
+      "0.39": [
+       "v.is_first_person ? 0.0 : 13.06",
+       0.0,
+       0.0
+      ],
+      "0.43": [
+       "v.is_first_person ? 0.0 : 9.5",
+       0.0,
+       0.0
+      ],
+      "0.47": [
+       "v.is_first_person ? 0.0 : 5.73",
+       0.0,
+       0.0
+      ],
+      "0.51": [
+       "v.is_first_person ? 0.0 : 2.29",
+       0.0,
+       0.0
+      ],
+      "0.55": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "rightarm": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : -130.07",
+       0.0,
+       "v.is_first_person ? 0.0 : 9.1"
+      ],
+      "0.06": [
+       "v.is_first_person ? 0.0 : -175.0",
+       0.0,
+       "v.is_first_person ? 0.0 : 12.0"
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : -163.62",
+       0.0,
+       "v.is_first_person ? 0.0 : 10.83"
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : -87.05",
+       0.0,
+       "v.is_first_person ? 0.0 : 4.36"
+      ],
+      "0.15": [
+       "v.is_first_person ? 0.0 : -35.0",
+       0.0,
+       0.0
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : -32.8",
+       0.0,
+       "v.is_first_person ? 0.0 : -0.2"
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : -26.77",
+       0.0,
+       "v.is_first_person ? 0.0 : -0.82"
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : -28.46",
+       0.0,
+       "v.is_first_person ? 0.0 : -0.84"
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : -33.59",
+       0.0,
+       "v.is_first_person ? 0.0 : -0.53"
+      ],
+      "0.31": [
+       "v.is_first_person ? 0.0 : -38.04",
+       0.0,
+       "v.is_first_person ? 0.0 : -0.16"
+      ],
+      "0.35": [
+       "v.is_first_person ? 0.0 : -37.63",
+       0.0,
+       0.0
+      ],
+      "0.39": [
+       "v.is_first_person ? 0.0 : -31.86",
+       0.0,
+       0.0
+      ],
+      "0.43": [
+       "v.is_first_person ? 0.0 : -23.46",
+       0.0,
+       0.0
+      ],
+      "0.47": [
+       "v.is_first_person ? 0.0 : -14.2",
+       0.0,
+       0.0
+      ],
+      "0.51": [
+       "v.is_first_person ? 0.0 : -5.64",
+       0.0,
+       0.0
+      ],
+      "0.55": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "position": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? -1.09 : 0.0",
+       "v.is_first_person ? 7.66 : 0.0",
+       "v.is_first_person ? 1.41 : 0.0"
+      ],
+      "0.06": [
+       "v.is_first_person ? -2.21 : 0.0",
+       "v.is_first_person ? 10.02 : 0.0",
+       "v.is_first_person ? 2.81 : 0.0"
+      ],
+      "0.08": [
+       "v.is_first_person ? -3.28 : 0.0",
+       "v.is_first_person ? 8.91 : 0.0",
+       "v.is_first_person ? 4.12 : 0.0"
+      ],
+      "0.12": [
+       "v.is_first_person ? -6.13 : 0.0",
+       "v.is_first_person ? 3.06 : 0.0",
+       "v.is_first_person ? 7.61 : 0.0"
+      ],
+      "0.15": [
+       "v.is_first_person ? -7.86 : 0.0",
+       "v.is_first_person ? -0.85 : 0.0",
+       "v.is_first_person ? 9.72 : 0.0"
+      ],
+      "0.16": [
+       "v.is_first_person ? -7.95 : 0.0",
+       "v.is_first_person ? -1.03 : 0.0",
+       "v.is_first_person ? 9.84 : 0.0"
+      ],
+      "0.20": [
+       "v.is_first_person ? -8.4 : 0.0",
+       "v.is_first_person ? -1.61 : 0.0",
+       "v.is_first_person ? 10.39 : 0.0"
+      ],
+      "0.24": [
+       "v.is_first_person ? -8.67 : 0.0",
+       "v.is_first_person ? -1.65 : 0.0",
+       "v.is_first_person ? 10.72 : 0.0"
+      ],
+      "0.28": [
+       "v.is_first_person ? -8.68 : 0.0",
+       "v.is_first_person ? -1.39 : 0.0",
+       "v.is_first_person ? 10.74 : 0.0"
+      ],
+      "0.31": [
+       "v.is_first_person ? -8.41 : 0.0",
+       "v.is_first_person ? -1.05 : 0.0",
+       "v.is_first_person ? 10.4 : 0.0"
+      ],
+      "0.35": [
+       "v.is_first_person ? -7.77 : 0.0",
+       "v.is_first_person ? -0.84 : 0.0",
+       "v.is_first_person ? 9.62 : 0.0"
+      ],
+      "0.39": [
+       "v.is_first_person ? -6.55 : 0.0",
+       "v.is_first_person ? -0.71 : 0.0",
+       "v.is_first_person ? 8.1 : 0.0"
+      ],
+      "0.43": [
+       "v.is_first_person ? -4.81 : 0.0",
+       "v.is_first_person ? -0.52 : 0.0",
+       "v.is_first_person ? 5.95 : 0.0"
+      ],
+      "0.47": [
+       "v.is_first_person ? -2.91 : 0.0",
+       "v.is_first_person ? -0.31 : 0.0",
+       "v.is_first_person ? 3.6 : 0.0"
+      ],
+      "0.51": [
+       "v.is_first_person ? -1.16 : 0.0",
+       "v.is_first_person ? -0.13 : 0.0",
+       "v.is_first_person ? 1.43 : 0.0"
+      ],
+      "0.55": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "rightitem": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 8.24 : 70.72",
+       "v.is_first_person ? 9.19 : -2.03",
+       "v.is_first_person ? -10.04 : 8.87"
+      ],
+      "0.06": [
+       "v.is_first_person ? 8.78 : 100.42",
+       "v.is_first_person ? -3.69 : -2.68",
+       "v.is_first_person ? -16.85 : 11.7"
+      ],
+      "0.08": [
+       "v.is_first_person ? 4.45 : 102.43",
+       "v.is_first_person ? -29.74 : -2.42",
+       "v.is_first_person ? -21.24 : 10.56"
+      ],
+      "0.12": [
+       "v.is_first_person ? -11.28 : 85.44",
+       "v.is_first_person ? -111.12 : -0.97",
+       "v.is_first_person ? -31.2 : 4.25"
+      ],
+      "0.15": [
+       "v.is_first_person ? -21.36 : 73.04",
+       "v.is_first_person ? -162.03 : 0.0",
+       "v.is_first_person ? -37.01 : -0.0"
+      ],
+      "0.16": [
+       "v.is_first_person ? -21.86 : 72.77",
+       "v.is_first_person ? -164.71 : 0.04",
+       "v.is_first_person ? -37.36 : -0.19"
+      ],
+      "0.20": [
+       "v.is_first_person ? -23.85 : 74.08",
+       "v.is_first_person ? -176.13 : 0.18",
+       "v.is_first_person ? -39.14 : -0.8"
+      ],
+      "0.24": [
+       "v.is_first_person ? -24.59 : 78.23",
+       "v.is_first_person ? -181.63 : 0.19",
+       "v.is_first_person ? -40.37 : -0.82"
+      ],
+      "0.28": [
+       "v.is_first_person ? -24.24 : 82.28",
+       "v.is_first_person ? -180.86 : 0.12",
+       "v.is_first_person ? -40.61 : -0.51"
+      ],
+      "0.31": [
+       "v.is_first_person ? -23.05 : 83.59",
+       "v.is_first_person ? -173.94 : 0.04",
+       "v.is_first_person ? -39.52 : -0.16"
+      ],
+      "0.35": [
+       "v.is_first_person ? -21.13 : 79.26",
+       "v.is_first_person ? -160.32 : 0.0",
+       "v.is_first_person ? -36.62 : -0.0"
+      ],
+      "0.39": [
+       "v.is_first_person ? -17.79 : 67.14",
+       "v.is_first_person ? -134.99 : 0.0",
+       "v.is_first_person ? -30.83 : -0.0"
+      ],
+      "0.43": [
+       "v.is_first_person ? -13.06 : 49.46",
+       "v.is_first_person ? -99.13 : 0.0",
+       "v.is_first_person ? -22.64 : -0.0"
+      ],
+      "0.47": [
+       "v.is_first_person ? -7.9 : 29.94",
+       "v.is_first_person ? -59.94 : 0.0",
+       "v.is_first_person ? -13.69 : -0.0"
+      ],
+      "0.51": [
+       "v.is_first_person ? -3.14 : 11.88",
+       "v.is_first_person ? -23.84 : 0.0",
+       "v.is_first_person ? -5.45 : -0.0"
+      ],
+      "0.55": [
+       -0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "leftarm": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : -122.86",
+       0.0,
+       "v.is_first_person ? 0.0 : -9.1"
+      ],
+      "0.06": [
+       "v.is_first_person ? 0.0 : -165.0",
+       0.0,
+       "v.is_first_person ? 0.0 : -12.0"
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : -153.8",
+       0.0,
+       "v.is_first_person ? 0.0 : -10.83"
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : -80.11",
+       0.0,
+       "v.is_first_person ? 0.0 : -4.36"
+      ],
+      "0.15": [
+       "v.is_first_person ? 0.0 : -30.0",
+       0.0,
+       0.0
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : -27.86",
+       0.0,
+       "v.is_first_person ? 0.0 : 0.2"
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : -21.81",
+       0.0,
+       "v.is_first_person ? 0.0 : 0.82"
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : -23.08",
+       0.0,
+       "v.is_first_person ? 0.0 : 0.84"
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : -27.72",
+       0.0,
+       "v.is_first_person ? 0.0 : 0.53"
+      ],
+      "0.31": [
+       "v.is_first_person ? 0.0 : -31.88",
+       0.0,
+       "v.is_first_person ? 0.0 : 0.16"
+      ],
+      "0.35": [
+       "v.is_first_person ? 0.0 : -31.68",
+       0.0,
+       0.0
+      ],
+      "0.39": [
+       "v.is_first_person ? 0.0 : -26.79",
+       0.0,
+       0.0
+      ],
+      "0.43": [
+       "v.is_first_person ? 0.0 : -19.72",
+       0.0,
+       0.0
+      ],
+      "0.47": [
+       "v.is_first_person ? 0.0 : -11.93",
+       0.0,
+       0.0
+      ],
+      "0.51": [
+       "v.is_first_person ? 0.0 : -4.74",
+       0.0,
+       0.0
+      ],
+      "0.55": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "rightleg": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : -41.79",
+       0.0,
+       0.0
+      ],
+      "0.06": [
+       "v.is_first_person ? 0.0 : -60.0",
+       0.0,
+       0.0
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : -62.38",
+       0.0,
+       0.0
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : -55.96",
+       0.0,
+       0.0
+      ],
+      "0.15": [
+       "v.is_first_person ? 0.0 : -50.0",
+       0.0,
+       0.0
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : -49.79",
+       0.0,
+       0.0
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : -49.53",
+       0.0,
+       0.0
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : -50.07",
+       0.0,
+       0.0
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : -50.31",
+       0.0,
+       0.0
+      ],
+      "0.31": [
+       "v.is_first_person ? 0.0 : -49.18",
+       0.0,
+       0.0
+      ],
+      "0.35": [
+       "v.is_first_person ? 0.0 : -45.47",
+       0.0,
+       0.0
+      ],
+      "0.39": [
+       "v.is_first_person ? 0.0 : -38.06",
+       0.0,
+       0.0
+      ],
+      "0.43": [
+       "v.is_first_person ? 0.0 : -27.86",
+       0.0,
+       0.0
+      ],
+      "0.47": [
+       "v.is_first_person ? 0.0 : -16.83",
+       0.0,
+       0.0
+      ],
+      "0.51": [
+       "v.is_first_person ? 0.0 : -6.71",
+       0.0,
+       0.0
+      ],
+      "0.55": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "leftleg": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : -32.54",
+       0.0,
+       0.0
+      ],
+      "0.06": [
+       "v.is_first_person ? 0.0 : -40.0",
+       0.0,
+       0.0
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : -31.18",
+       0.0,
+       0.0
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : 5.95",
+       0.0,
+       0.0
+      ],
+      "0.15": [
+       "v.is_first_person ? 0.0 : 30.0",
+       0.0,
+       0.0
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : 31.12",
+       0.0,
+       0.0
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : 34.98",
+       0.0,
+       0.0
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : 35.54",
+       0.0,
+       0.0
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : 33.82",
+       0.0,
+       0.0
+      ],
+      "0.31": [
+       "v.is_first_person ? 0.0 : 30.89",
+       0.0,
+       0.0
+      ],
+      "0.35": [
+       "v.is_first_person ? 0.0 : 27.68",
+       0.0,
+       0.0
+      ],
+      "0.39": [
+       "v.is_first_person ? 0.0 : 23.19",
+       0.0,
+       0.0
+      ],
+      "0.43": [
+       "v.is_first_person ? 0.0 : 16.99",
+       0.0,
+       0.0
+      ],
+      "0.47": [
+       "v.is_first_person ? 0.0 : 10.26",
+       0.0,
+       0.0
+      ],
+      "0.51": [
+       "v.is_first_person ? 0.0 : 4.09",
+       0.0,
+       0.0
+      ],
+      "0.55": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    }
+   }
+  },
+  "animation.toji.chain_summon": {
+   "loop": false,
+   "animation_length": 1.1,
+   "bones": {
+    "root": {
+     "position": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       0.0,
+       "v.is_first_person ? 0.0 : -0.66",
+       0.0
+      ],
+      "0.08": [
+       0.0,
+       "v.is_first_person ? 0.0 : -1.57",
+       0.0
+      ],
+      "0.12": [
+       0.0,
+       "v.is_first_person ? 0.0 : -2.0",
+       0.0
+      ],
+      "0.16": [
+       0.0,
+       "v.is_first_person ? 0.0 : -1.74",
+       0.0
+      ],
+      "0.20": [
+       0.0,
+       "v.is_first_person ? 0.0 : -1.13",
+       0.0
+      ],
+      "0.24": [
+       0.0,
+       "v.is_first_person ? 0.0 : -0.39",
+       0.0
+      ],
+      "0.28": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.24",
+       0.0
+      ],
+      "0.30": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.5",
+       0.0
+      ],
+      "0.31": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.53",
+       0.0
+      ],
+      "0.35": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.6",
+       0.0
+      ],
+      "0.39": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.65",
+       0.0
+      ],
+      "0.43": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.68",
+       0.0
+      ],
+      "0.47": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.7",
+       0.0
+      ],
+      "0.51": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.7",
+       0.0
+      ],
+      "0.55": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.7",
+       0.0
+      ],
+      "0.59": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.68",
+       0.0
+      ],
+      "0.63": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.66",
+       0.0
+      ],
+      "0.67": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.63",
+       0.0
+      ],
+      "0.71": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.6",
+       0.0
+      ],
+      "0.75": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.57",
+       0.0
+      ],
+      "0.79": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.54",
+       0.0
+      ],
+      "0.82": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.51",
+       0.0
+      ],
+      "0.85": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.5",
+       0.0
+      ],
+      "0.86": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.48",
+       0.0
+      ],
+      "0.90": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.42",
+       0.0
+      ],
+      "0.94": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.33",
+       0.0
+      ],
+      "0.98": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.23",
+       0.0
+      ],
+      "1.02": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.14",
+       0.0
+      ],
+      "1.06": [
+       0.0,
+       "v.is_first_person ? 0.0 : 0.06",
+       0.0
+      ],
+      "1.10": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "body": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : 8.48",
+       0.0,
+       0.0
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : 20.09",
+       0.0,
+       0.0
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : 25.0",
+       0.0,
+       0.0
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : 20.76",
+       0.0,
+       0.0
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : 11.74",
+       0.0,
+       0.0
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : 0.8",
+       0.0,
+       0.0
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : -8.35",
+       0.0,
+       0.0
+      ],
+      "0.30": [
+       "v.is_first_person ? 0.0 : -12.0",
+       0.0,
+       0.0
+      ],
+      "0.31": [
+       "v.is_first_person ? 0.0 : -12.42",
+       0.0,
+       0.0
+      ],
+      "0.35": [
+       "v.is_first_person ? 0.0 : -13.4",
+       0.0,
+       0.0
+      ],
+      "0.39": [
+       "v.is_first_person ? 0.0 : -14.03",
+       0.0,
+       0.0
+      ],
+      "0.43": [
+       "v.is_first_person ? 0.0 : -14.4",
+       0.0,
+       0.0
+      ],
+      "0.47": [
+       "v.is_first_person ? 0.0 : -14.52",
+       0.0,
+       0.0
+      ],
+      "0.51": [
+       "v.is_first_person ? 0.0 : -14.44",
+       0.0,
+       0.0
+      ],
+      "0.55": [
+       "v.is_first_person ? 0.0 : -14.18",
+       0.0,
+       0.0
+      ],
+      "0.59": [
+       "v.is_first_person ? 0.0 : -13.78",
+       0.0,
+       0.0
+      ],
+      "0.63": [
+       "v.is_first_person ? 0.0 : -13.26",
+       0.0,
+       0.0
+      ],
+      "0.67": [
+       "v.is_first_person ? 0.0 : -12.68",
+       0.0,
+       0.0
+      ],
+      "0.71": [
+       "v.is_first_person ? 0.0 : -12.06",
+       0.0,
+       0.0
+      ],
+      "0.75": [
+       "v.is_first_person ? 0.0 : -11.44",
+       0.0,
+       0.0
+      ],
+      "0.79": [
+       "v.is_first_person ? 0.0 : -10.83",
+       0.0,
+       0.0
+      ],
+      "0.82": [
+       "v.is_first_person ? 0.0 : -10.3",
+       0.0,
+       0.0
+      ],
+      "0.85": [
+       "v.is_first_person ? 0.0 : -10.0",
+       0.0,
+       0.0
+      ],
+      "0.86": [
+       "v.is_first_person ? 0.0 : -9.62",
+       0.0,
+       0.0
+      ],
+      "0.90": [
+       "v.is_first_person ? 0.0 : -8.19",
+       0.0,
+       0.0
+      ],
+      "0.94": [
+       "v.is_first_person ? 0.0 : -6.43",
+       0.0,
+       0.0
+      ],
+      "0.98": [
+       "v.is_first_person ? 0.0 : -4.53",
+       0.0,
+       0.0
+      ],
+      "1.02": [
+       "v.is_first_person ? 0.0 : -2.69",
+       0.0,
+       0.0
+      ],
+      "1.06": [
+       "v.is_first_person ? 0.0 : -1.09",
+       0.0,
+       0.0
+      ],
+      "1.10": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "head": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : 7.34",
+       0.0,
+       0.0
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : 17.21",
+       0.0,
+       0.0
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : 20.0",
+       0.0,
+       0.0
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : 14.16",
+       0.0,
+       0.0
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : 3.11",
+       0.0,
+       0.0
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : -9.9",
+       0.0,
+       0.0
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : -20.68",
+       0.0,
+       0.0
+      ],
+      "0.30": [
+       "v.is_first_person ? 0.0 : -25.0",
+       0.0,
+       0.0
+      ],
+      "0.31": [
+       "v.is_first_person ? 0.0 : -25.51",
+       0.0,
+       0.0
+      ],
+      "0.35": [
+       "v.is_first_person ? 0.0 : -26.7",
+       0.0,
+       0.0
+      ],
+      "0.39": [
+       "v.is_first_person ? 0.0 : -27.52",
+       0.0,
+       0.0
+      ],
+      "0.43": [
+       "v.is_first_person ? 0.0 : -28.02",
+       0.0,
+       0.0
+      ],
+      "0.47": [
+       "v.is_first_person ? 0.0 : -28.24",
+       0.0,
+       0.0
+      ],
+      "0.51": [
+       "v.is_first_person ? 0.0 : -28.21",
+       0.0,
+       0.0
+      ],
+      "0.55": [
+       "v.is_first_person ? 0.0 : -27.95",
+       0.0,
+       0.0
+      ],
+      "0.59": [
+       "v.is_first_person ? 0.0 : -27.51",
+       0.0,
+       0.0
+      ],
+      "0.63": [
+       "v.is_first_person ? 0.0 : -26.89",
+       0.0,
+       0.0
+      ],
+      "0.67": [
+       "v.is_first_person ? 0.0 : -26.16",
+       0.0,
+       0.0
+      ],
+      "0.71": [
+       "v.is_first_person ? 0.0 : -25.33",
+       0.0,
+       0.0
+      ],
+      "0.75": [
+       "v.is_first_person ? 0.0 : -24.44",
+       0.0,
+       0.0
+      ],
+      "0.79": [
+       "v.is_first_person ? 0.0 : -23.5",
+       0.0,
+       0.0
+      ],
+      "0.82": [
+       "v.is_first_person ? 0.0 : -22.58",
+       0.0,
+       0.0
+      ],
+      "0.85": [
+       "v.is_first_person ? 0.0 : -22.0",
+       0.0,
+       0.0
+      ],
+      "0.86": [
+       "v.is_first_person ? 0.0 : -21.21",
+       0.0,
+       0.0
+      ],
+      "0.90": [
+       "v.is_first_person ? 0.0 : -18.11",
+       0.0,
+       0.0
+      ],
+      "0.94": [
+       "v.is_first_person ? 0.0 : -14.25",
+       0.0,
+       0.0
+      ],
+      "0.98": [
+       "v.is_first_person ? 0.0 : -10.05",
+       0.0,
+       0.0
+      ],
+      "1.02": [
+       "v.is_first_person ? 0.0 : -5.97",
+       0.0,
+       0.0
+      ],
+      "1.06": [
+       "v.is_first_person ? 0.0 : -2.4",
+       0.0,
+       0.0
+      ],
+      "1.10": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "rightarm": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : -0.56",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.2"
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : -3.14",
+       0.0,
+       "v.is_first_person ? 0.0 : 12.77"
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : -20.0",
+       0.0,
+       "v.is_first_person ? 0.0 : 20.0"
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : -44.21",
+       0.0,
+       "v.is_first_person ? 0.0 : 23.71"
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : -80.14",
+       0.0,
+       "v.is_first_person ? 0.0 : 27.61"
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : -119.43",
+       0.0,
+       "v.is_first_person ? 0.0 : 31.2"
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : -151.55",
+       0.0,
+       "v.is_first_person ? 0.0 : 33.89"
+      ],
+      "0.30": [
+       "v.is_first_person ? 0.0 : -165.0",
+       0.0,
+       "v.is_first_person ? 0.0 : 35.0"
+      ],
+      "0.31": [
+       "v.is_first_person ? 0.0 : -166.73",
+       0.0,
+       "v.is_first_person ? 0.0 : 35.15"
+      ],
+      "0.35": [
+       "v.is_first_person ? 0.0 : -171.17",
+       0.0,
+       "v.is_first_person ? 0.0 : 35.55"
+      ],
+      "0.39": [
+       "v.is_first_person ? 0.0 : -174.75",
+       0.0,
+       "v.is_first_person ? 0.0 : 35.89"
+      ],
+      "0.43": [
+       "v.is_first_person ? 0.0 : -177.59",
+       0.0,
+       "v.is_first_person ? 0.0 : 36.16"
+      ],
+      "0.47": [
+       "v.is_first_person ? 0.0 : -179.68",
+       0.0,
+       "v.is_first_person ? 0.0 : 36.36"
+      ],
+      "0.51": [
+       "v.is_first_person ? 0.0 : -181.04",
+       0.0,
+       "v.is_first_person ? 0.0 : 36.48"
+      ],
+      "0.55": [
+       "v.is_first_person ? 0.0 : -181.6",
+       0.0,
+       "v.is_first_person ? 0.0 : 36.49"
+      ],
+      "0.59": [
+       "v.is_first_person ? 0.0 : -181.4",
+       0.0,
+       "v.is_first_person ? 0.0 : 36.39"
+      ],
+      "0.63": [
+       "v.is_first_person ? 0.0 : -180.4",
+       0.0,
+       "v.is_first_person ? 0.0 : 36.16"
+      ],
+      "0.67": [
+       "v.is_first_person ? 0.0 : -178.63",
+       0.0,
+       "v.is_first_person ? 0.0 : 35.8"
+      ],
+      "0.71": [
+       "v.is_first_person ? 0.0 : -176.09",
+       0.0,
+       "v.is_first_person ? 0.0 : 35.29"
+      ],
+      "0.75": [
+       "v.is_first_person ? 0.0 : -172.76",
+       0.0,
+       "v.is_first_person ? 0.0 : 34.63"
+      ],
+      "0.79": [
+       "v.is_first_person ? 0.0 : -168.52",
+       0.0,
+       "v.is_first_person ? 0.0 : 33.77"
+      ],
+      "0.82": [
+       "v.is_first_person ? 0.0 : -163.58",
+       0.0,
+       "v.is_first_person ? 0.0 : 32.75"
+      ],
+      "0.85": [
+       "v.is_first_person ? 0.0 : -160.0",
+       0.0,
+       "v.is_first_person ? 0.0 : 32.0"
+      ],
+      "0.86": [
+       "v.is_first_person ? 0.0 : -154.67",
+       0.0,
+       "v.is_first_person ? 0.0 : 30.88"
+      ],
+      "0.90": [
+       "v.is_first_person ? 0.0 : -132.8",
+       0.0,
+       "v.is_first_person ? 0.0 : 26.43"
+      ],
+      "0.94": [
+       "v.is_first_person ? 0.0 : -104.9",
+       0.0,
+       "v.is_first_person ? 0.0 : 20.83"
+      ],
+      "0.98": [
+       "v.is_first_person ? 0.0 : -74.11",
+       0.0,
+       "v.is_first_person ? 0.0 : 14.7"
+      ],
+      "1.02": [
+       "v.is_first_person ? 0.0 : -44.03",
+       0.0,
+       "v.is_first_person ? 0.0 : 8.74"
+      ],
+      "1.06": [
+       "v.is_first_person ? 0.0 : -17.66",
+       0.0,
+       "v.is_first_person ? 0.0 : 3.51"
+      ],
+      "1.10": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "position": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? -0.25 : 0.0",
+       "v.is_first_person ? -0.64 : 0.0",
+       "v.is_first_person ? -0.16 : 0.0"
+      ],
+      "0.08": [
+       "v.is_first_person ? -0.63 : 0.0",
+       "v.is_first_person ? -1.41 : 0.0",
+       "v.is_first_person ? -0.36 : 0.0"
+      ],
+      "0.12": [
+       "v.is_first_person ? -1.13 : 0.0",
+       "v.is_first_person ? -0.88 : 0.0",
+       "v.is_first_person ? -0.18 : 0.0"
+      ],
+      "0.16": [
+       "v.is_first_person ? -1.54 : 0.0",
+       "v.is_first_person ? 0.76 : 0.0",
+       "v.is_first_person ? 0.29 : 0.0"
+      ],
+      "0.20": [
+       "v.is_first_person ? -2.07 : 0.0",
+       "v.is_first_person ? 3.39 : 0.0",
+       "v.is_first_person ? 1.05 : 0.0"
+      ],
+      "0.24": [
+       "v.is_first_person ? -2.63 : 0.0",
+       "v.is_first_person ? 6.37 : 0.0",
+       "v.is_first_person ? 1.91 : 0.0"
+      ],
+      "0.28": [
+       "v.is_first_person ? -3.08 : 0.0",
+       "v.is_first_person ? 8.84 : 0.0",
+       "v.is_first_person ? 2.62 : 0.0"
+      ],
+      "0.30": [
+       "v.is_first_person ? -3.27 : 0.0",
+       "v.is_first_person ? 9.87 : 0.0",
+       "v.is_first_person ? 2.91 : 0.0"
+      ],
+      "0.31": [
+       "v.is_first_person ? -3.3 : 0.0",
+       "v.is_first_person ? 10.01 : 0.0",
+       "v.is_first_person ? 2.95 : 0.0"
+      ],
+      "0.35": [
+       "v.is_first_person ? -3.37 : 0.0",
+       "v.is_first_person ? 10.35 : 0.0",
+       "v.is_first_person ? 3.05 : 0.0"
+      ],
+      "0.39": [
+       "v.is_first_person ? -3.44 : 0.0",
+       "v.is_first_person ? 10.62 : 0.0",
+       "v.is_first_person ? 3.13 : 0.0"
+      ],
+      "0.43": [
+       "v.is_first_person ? -3.49 : 0.0",
+       "v.is_first_person ? 10.84 : 0.0",
+       "v.is_first_person ? 3.19 : 0.0"
+      ],
+      "0.47": [
+       "v.is_first_person ? -3.54 : 0.0",
+       "v.is_first_person ? 11.0 : 0.0",
+       "v.is_first_person ? 3.24 : 0.0"
+      ],
+      "0.51": [
+       "v.is_first_person ? -3.58 : 0.0",
+       "v.is_first_person ? 11.11 : 0.0",
+       "v.is_first_person ? 3.27 : 0.0"
+      ],
+      "0.55": [
+       "v.is_first_person ? -3.6 : 0.0",
+       "v.is_first_person ? 11.16 : 0.0",
+       "v.is_first_person ? 3.29 : 0.0"
+      ],
+      "0.59": [
+       "v.is_first_person ? -3.61 : 0.0",
+       "v.is_first_person ? 11.16 : 0.0",
+       "v.is_first_person ? 3.29 : 0.0"
+      ],
+      "0.63": [
+       "v.is_first_person ? -3.61 : 0.0",
+       "v.is_first_person ? 11.1 : 0.0",
+       "v.is_first_person ? 3.27 : 0.0"
+      ],
+      "0.67": [
+       "v.is_first_person ? -3.59 : 0.0",
+       "v.is_first_person ? 11.0 : 0.0",
+       "v.is_first_person ? 3.24 : 0.0"
+      ],
+      "0.71": [
+       "v.is_first_person ? -3.56 : 0.0",
+       "v.is_first_person ? 10.85 : 0.0",
+       "v.is_first_person ? 3.2 : 0.0"
+      ],
+      "0.75": [
+       "v.is_first_person ? -3.51 : 0.0",
+       "v.is_first_person ? 10.64 : 0.0",
+       "v.is_first_person ? 3.14 : 0.0"
+      ],
+      "0.79": [
+       "v.is_first_person ? -3.43 : 0.0",
+       "v.is_first_person ? 10.39 : 0.0",
+       "v.is_first_person ? 3.07 : 0.0"
+      ],
+      "0.82": [
+       "v.is_first_person ? -3.34 : 0.0",
+       "v.is_first_person ? 10.09 : 0.0",
+       "v.is_first_person ? 2.98 : 0.0"
+      ],
+      "0.85": [
+       "v.is_first_person ? -3.27 : 0.0",
+       "v.is_first_person ? 9.87 : 0.0",
+       "v.is_first_person ? 2.91 : 0.0"
+      ],
+      "0.86": [
+       "v.is_first_person ? -3.17 : 0.0",
+       "v.is_first_person ? 9.55 : 0.0",
+       "v.is_first_person ? 2.82 : 0.0"
+      ],
+      "0.90": [
+       "v.is_first_person ? -2.72 : 0.0",
+       "v.is_first_person ? 8.22 : 0.0",
+       "v.is_first_person ? 2.43 : 0.0"
+      ],
+      "0.94": [
+       "v.is_first_person ? -2.15 : 0.0",
+       "v.is_first_person ? 6.5 : 0.0",
+       "v.is_first_person ? 1.92 : 0.0"
+      ],
+      "0.98": [
+       "v.is_first_person ? -1.52 : 0.0",
+       "v.is_first_person ? 4.59 : 0.0",
+       "v.is_first_person ? 1.36 : 0.0"
+      ],
+      "1.02": [
+       "v.is_first_person ? -0.9 : 0.0",
+       "v.is_first_person ? 2.73 : 0.0",
+       "v.is_first_person ? 0.81 : 0.0"
+      ],
+      "1.06": [
+       "v.is_first_person ? -0.36 : 0.0",
+       "v.is_first_person ? 1.09 : 0.0",
+       "v.is_first_person ? 0.32 : 0.0"
+      ],
+      "1.10": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "rightitem": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? -2.26 : 33.31",
+       "v.is_first_person ? -51.42 : 9.62",
+       "v.is_first_person ? -14.56 : 3.14"
+      ],
+      "0.08": [
+       "v.is_first_person ? -5.31 : 80.46",
+       "v.is_first_person ? -122.56 : 22.85",
+       "v.is_first_person ? -34.82 : 7.9"
+      ],
+      "0.12": [
+       "v.is_first_person ? -6.29 : 114.25",
+       "v.is_first_person ? -159.77 : 29.02",
+       "v.is_first_person ? -46.48 : 14.09"
+      ],
+      "0.16": [
+       "v.is_first_person ? -4.69 : 119.25",
+       "v.is_first_person ? -145.28 : 25.08",
+       "v.is_first_person ? -44.04 : 19.02"
+      ],
+      "0.20": [
+       "v.is_first_person ? -1.59 : 116.19",
+       "v.is_first_person ? -107.39 : 16.12",
+       "v.is_first_person ? -35.77 : 25.39"
+      ],
+      "0.24": [
+       "v.is_first_person ? 2.1 : 108.56",
+       "v.is_first_person ? -59.35 : 5.14",
+       "v.is_first_person ? -24.88 : 31.96"
+      ],
+      "0.28": [
+       "v.is_first_person ? 5.2 : 101.11",
+       "v.is_first_person ? -18.38 : -4.04",
+       "v.is_first_person ? -15.51 : 37.18"
+      ],
+      "0.30": [
+       "v.is_first_person ? 6.47 : 98.33",
+       "v.is_first_person ? -1.95 : -7.62",
+       "v.is_first_person ? -11.81 : 39.36"
+      ],
+      "0.31": [
+       "v.is_first_person ? 6.63 : 98.09",
+       "v.is_first_person ? -0.04 : -8.02",
+       "v.is_first_person ? -11.39 : 39.64"
+      ],
+      "0.35": [
+       "v.is_first_person ? 7.01 : 97.73",
+       "v.is_first_person ? 4.34 : -8.9",
+       "v.is_first_person ? -10.47 : 40.37"
+      ],
+      "0.39": [
+       "v.is_first_person ? 7.29 : 97.77",
+       "v.is_first_person ? 7.24 : -9.41",
+       "v.is_first_person ? -9.92 : 40.98"
+      ],
+      "0.43": [
+       "v.is_first_person ? 7.5 : 98.11",
+       "v.is_first_person ? 8.95 : -9.62",
+       "v.is_first_person ? -9.66 : 41.45"
+      ],
+      "0.47": [
+       "v.is_first_person ? 7.63 : 98.63",
+       "v.is_first_person ? 9.64 : -9.58",
+       "v.is_first_person ? -9.64 : 41.8"
+      ],
+      "0.51": [
+       "v.is_first_person ? 7.69 : 99.25",
+       "v.is_first_person ? 9.46 : -9.32",
+       "v.is_first_person ? -9.81 : 42.02"
+      ],
+      "0.55": [
+       "v.is_first_person ? 7.7 : 99.83",
+       "v.is_first_person ? 8.61 : -8.89",
+       "v.is_first_person ? -10.13 : 42.09"
+      ],
+      "0.59": [
+       "v.is_first_person ? 7.65 : 100.28",
+       "v.is_first_person ? 7.26 : -8.33",
+       "v.is_first_person ? -10.53 : 42.0"
+      ],
+      "0.63": [
+       "v.is_first_person ? 7.55 : 100.51",
+       "v.is_first_person ? 5.53 : -7.66",
+       "v.is_first_person ? -10.98 : 41.74"
+      ],
+      "0.67": [
+       "v.is_first_person ? 7.42 : 100.4",
+       "v.is_first_person ? 3.69 : -6.97",
+       "v.is_first_person ? -11.41 : 41.33"
+      ],
+      "0.71": [
+       "v.is_first_person ? 7.25 : 99.84",
+       "v.is_first_person ? 1.86 : -6.27",
+       "v.is_first_person ? -11.78 : 40.74"
+      ],
+      "0.75": [
+       "v.is_first_person ? 7.06 : 98.74",
+       "v.is_first_person ? 0.22 : -5.61",
+       "v.is_first_person ? -12.04 : 39.96"
+      ],
+      "0.79": [
+       "v.is_first_person ? 6.84 : 96.95",
+       "v.is_first_person ? -1.09 : -5.01",
+       "v.is_first_person ? -12.14 : 38.97"
+      ],
+      "0.82": [
+       "v.is_first_person ? 6.62 : 94.44",
+       "v.is_first_person ? -1.83 : -4.56",
+       "v.is_first_person ? -12.02 : 37.81"
+      ],
+      "0.85": [
+       "v.is_first_person ? 6.47 : 92.39",
+       "v.is_first_person ? -1.95 : -4.35",
+       "v.is_first_person ? -11.81 : 36.96"
+      ],
+      "0.86": [
+       "v.is_first_person ? 6.26 : 89.24",
+       "v.is_first_person ? -1.88 : -4.12",
+       "v.is_first_person ? -11.42 : 35.7"
+      ],
+      "0.90": [
+       "v.is_first_person ? 5.38 : 76.48",
+       "v.is_first_person ? -1.62 : -3.4",
+       "v.is_first_person ? -9.82 : 30.6"
+      ],
+      "0.94": [
+       "v.is_first_person ? 4.26 : 60.35",
+       "v.is_first_person ? -1.28 : -2.62",
+       "v.is_first_person ? -7.77 : 24.14"
+      ],
+      "0.98": [
+       "v.is_first_person ? 3.01 : 42.61",
+       "v.is_first_person ? -0.91 : -1.83",
+       "v.is_first_person ? -5.49 : 17.05"
+      ],
+      "1.02": [
+       "v.is_first_person ? 1.79 : 25.32",
+       "v.is_first_person ? -0.54 : -1.09",
+       "v.is_first_person ? -3.26 : 10.13"
+      ],
+      "1.06": [
+       "v.is_first_person ? 0.72 : 10.17",
+       "v.is_first_person ? -0.22 : -0.45",
+       "v.is_first_person ? -1.31 : 4.07"
+      ],
+      "1.10": [
+       -0.0,
+       0.0,
+       -0.0
+      ]
+     }
+    },
+    "leftarm": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : -2.88",
+       0.0,
+       "v.is_first_person ? 0.0 : -3.59"
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : -7.96",
+       0.0,
+       "v.is_first_person ? 0.0 : -9.44"
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : -20.0",
+       0.0,
+       "v.is_first_person ? 0.0 : -20.0"
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : -33.9",
+       0.0,
+       "v.is_first_person ? 0.0 : -30.83"
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : -53.67",
+       0.0,
+       "v.is_first_person ? 0.0 : -45.86"
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : -75.02",
+       0.0,
+       "v.is_first_person ? 0.0 : -61.84"
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : -92.51",
+       0.0,
+       "v.is_first_person ? 0.0 : -74.68"
+      ],
+      "0.30": [
+       "v.is_first_person ? 0.0 : -100.0",
+       0.0,
+       "v.is_first_person ? 0.0 : -80.0"
+      ],
+      "0.31": [
+       "v.is_first_person ? 0.0 : -101.0",
+       0.0,
+       "v.is_first_person ? 0.0 : -80.68"
+      ],
+      "0.35": [
+       "v.is_first_person ? 0.0 : -103.63",
+       0.0,
+       "v.is_first_person ? 0.0 : -82.41"
+      ],
+      "0.39": [
+       "v.is_first_person ? 0.0 : -105.86",
+       0.0,
+       "v.is_first_person ? 0.0 : -83.78"
+      ],
+      "0.43": [
+       "v.is_first_person ? 0.0 : -107.73",
+       0.0,
+       "v.is_first_person ? 0.0 : -84.84"
+      ],
+      "0.47": [
+       "v.is_first_person ? 0.0 : -109.24",
+       0.0,
+       "v.is_first_person ? 0.0 : -85.57"
+      ],
+      "0.51": [
+       "v.is_first_person ? 0.0 : -110.37",
+       0.0,
+       "v.is_first_person ? 0.0 : -85.99"
+      ],
+      "0.55": [
+       "v.is_first_person ? 0.0 : -111.04",
+       0.0,
+       "v.is_first_person ? 0.0 : -86.07"
+      ],
+      "0.59": [
+       "v.is_first_person ? 0.0 : -111.28",
+       0.0,
+       "v.is_first_person ? 0.0 : -85.8"
+      ],
+      "0.63": [
+       "v.is_first_person ? 0.0 : -111.05",
+       0.0,
+       "v.is_first_person ? 0.0 : -85.18"
+      ],
+      "0.67": [
+       "v.is_first_person ? 0.0 : -110.34",
+       0.0,
+       "v.is_first_person ? 0.0 : -84.22"
+      ],
+      "0.71": [
+       "v.is_first_person ? 0.0 : -109.12",
+       0.0,
+       "v.is_first_person ? 0.0 : -82.91"
+      ],
+      "0.75": [
+       "v.is_first_person ? 0.0 : -107.38",
+       0.0,
+       "v.is_first_person ? 0.0 : -81.24"
+      ],
+      "0.79": [
+       "v.is_first_person ? 0.0 : -105.02",
+       0.0,
+       "v.is_first_person ? 0.0 : -79.15"
+      ],
+      "0.82": [
+       "v.is_first_person ? 0.0 : -102.15",
+       0.0,
+       "v.is_first_person ? 0.0 : -76.74"
+      ],
+      "0.85": [
+       "v.is_first_person ? 0.0 : -100.0",
+       0.0,
+       "v.is_first_person ? 0.0 : -75.0"
+      ],
+      "0.86": [
+       "v.is_first_person ? 0.0 : -96.75",
+       0.0,
+       "v.is_first_person ? 0.0 : -72.44"
+      ],
+      "0.90": [
+       "v.is_first_person ? 0.0 : -83.21",
+       0.0,
+       "v.is_first_person ? 0.0 : -62.08"
+      ],
+      "0.94": [
+       "v.is_first_person ? 0.0 : -65.79",
+       0.0,
+       "v.is_first_person ? 0.0 : -48.98"
+      ],
+      "0.98": [
+       "v.is_first_person ? 0.0 : -46.5",
+       0.0,
+       "v.is_first_person ? 0.0 : -34.58"
+      ],
+      "1.02": [
+       "v.is_first_person ? 0.0 : -27.62",
+       0.0,
+       "v.is_first_person ? 0.0 : -20.55"
+      ],
+      "1.06": [
+       "v.is_first_person ? 0.0 : -11.07",
+       0.0,
+       "v.is_first_person ? 0.0 : -8.25"
+      ],
+      "1.10": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "rightleg": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : -8.23",
+       0.0,
+       "v.is_first_person ? 0.0 : -0.18"
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : -19.57",
+       0.0,
+       "v.is_first_person ? 0.0 : -0.37"
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : -25.0",
+       0.0,
+       0.0
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : -21.9",
+       0.0,
+       "v.is_first_person ? 0.0 : 0.79"
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : -14.66",
+       0.0,
+       "v.is_first_person ? 0.0 : 2.02"
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : -5.69",
+       0.0,
+       "v.is_first_person ? 0.0 : 3.39"
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : 1.92",
+       0.0,
+       "v.is_first_person ? 0.0 : 4.52"
+      ],
+      "0.30": [
+       "v.is_first_person ? 0.0 : 5.0",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.0"
+      ],
+      "0.31": [
+       "v.is_first_person ? 0.0 : 5.36",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.06"
+      ],
+      "0.35": [
+       "v.is_first_person ? 0.0 : 6.22",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.22"
+      ],
+      "0.39": [
+       "v.is_first_person ? 0.0 : 6.81",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.35"
+      ],
+      "0.43": [
+       "v.is_first_person ? 0.0 : 7.19",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.46"
+      ],
+      "0.47": [
+       "v.is_first_person ? 0.0 : 7.38",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.54"
+      ],
+      "0.51": [
+       "v.is_first_person ? 0.0 : 7.41",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.59"
+      ],
+      "0.55": [
+       "v.is_first_person ? 0.0 : 7.31",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.62"
+      ],
+      "0.59": [
+       "v.is_first_person ? 0.0 : 7.1",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.62"
+      ],
+      "0.63": [
+       "v.is_first_person ? 0.0 : 6.81",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.6"
+      ],
+      "0.67": [
+       "v.is_first_person ? 0.0 : 6.47",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.55"
+      ],
+      "0.71": [
+       "v.is_first_person ? 0.0 : 6.11",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.48"
+      ],
+      "0.75": [
+       "v.is_first_person ? 0.0 : 5.75",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.38"
+      ],
+      "0.79": [
+       "v.is_first_person ? 0.0 : 5.41",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.26"
+      ],
+      "0.82": [
+       "v.is_first_person ? 0.0 : 5.13",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.11"
+      ],
+      "0.85": [
+       "v.is_first_person ? 0.0 : 5.0",
+       0.0,
+       "v.is_first_person ? 0.0 : 5.0"
+      ],
+      "0.86": [
+       "v.is_first_person ? 0.0 : 4.84",
+       0.0,
+       "v.is_first_person ? 0.0 : 4.84"
+      ],
+      "0.90": [
+       "v.is_first_person ? 0.0 : 4.16",
+       0.0,
+       "v.is_first_person ? 0.0 : 4.16"
+      ],
+      "0.94": [
+       "v.is_first_person ? 0.0 : 3.29",
+       0.0,
+       "v.is_first_person ? 0.0 : 3.29"
+      ],
+      "0.98": [
+       "v.is_first_person ? 0.0 : 2.33",
+       0.0,
+       "v.is_first_person ? 0.0 : 2.33"
+      ],
+      "1.02": [
+       "v.is_first_person ? 0.0 : 1.38",
+       0.0,
+       "v.is_first_person ? 0.0 : 1.38"
+      ],
+      "1.06": [
+       "v.is_first_person ? 0.0 : 0.55",
+       0.0,
+       "v.is_first_person ? 0.0 : 0.55"
+      ],
+      "1.10": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    },
+    "leftleg": {
+     "rotation": {
+      "0.00": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "0.04": [
+       "v.is_first_person ? 0.0 : -8.23",
+       0.0,
+       "v.is_first_person ? 0.0 : 0.18"
+      ],
+      "0.08": [
+       "v.is_first_person ? 0.0 : -19.57",
+       0.0,
+       "v.is_first_person ? 0.0 : 0.37"
+      ],
+      "0.12": [
+       "v.is_first_person ? 0.0 : -25.0",
+       0.0,
+       0.0
+      ],
+      "0.16": [
+       "v.is_first_person ? 0.0 : -21.9",
+       0.0,
+       "v.is_first_person ? 0.0 : -0.79"
+      ],
+      "0.20": [
+       "v.is_first_person ? 0.0 : -14.66",
+       0.0,
+       "v.is_first_person ? 0.0 : -2.02"
+      ],
+      "0.24": [
+       "v.is_first_person ? 0.0 : -5.69",
+       0.0,
+       "v.is_first_person ? 0.0 : -3.39"
+      ],
+      "0.28": [
+       "v.is_first_person ? 0.0 : 1.92",
+       0.0,
+       "v.is_first_person ? 0.0 : -4.52"
+      ],
+      "0.30": [
+       "v.is_first_person ? 0.0 : 5.0",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.0"
+      ],
+      "0.31": [
+       "v.is_first_person ? 0.0 : 5.36",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.06"
+      ],
+      "0.35": [
+       "v.is_first_person ? 0.0 : 6.22",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.22"
+      ],
+      "0.39": [
+       "v.is_first_person ? 0.0 : 6.81",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.35"
+      ],
+      "0.43": [
+       "v.is_first_person ? 0.0 : 7.19",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.46"
+      ],
+      "0.47": [
+       "v.is_first_person ? 0.0 : 7.38",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.54"
+      ],
+      "0.51": [
+       "v.is_first_person ? 0.0 : 7.41",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.59"
+      ],
+      "0.55": [
+       "v.is_first_person ? 0.0 : 7.31",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.62"
+      ],
+      "0.59": [
+       "v.is_first_person ? 0.0 : 7.1",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.62"
+      ],
+      "0.63": [
+       "v.is_first_person ? 0.0 : 6.81",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.6"
+      ],
+      "0.67": [
+       "v.is_first_person ? 0.0 : 6.47",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.55"
+      ],
+      "0.71": [
+       "v.is_first_person ? 0.0 : 6.11",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.48"
+      ],
+      "0.75": [
+       "v.is_first_person ? 0.0 : 5.75",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.38"
+      ],
+      "0.79": [
+       "v.is_first_person ? 0.0 : 5.41",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.26"
+      ],
+      "0.82": [
+       "v.is_first_person ? 0.0 : 5.13",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.11"
+      ],
+      "0.85": [
+       "v.is_first_person ? 0.0 : 5.0",
+       0.0,
+       "v.is_first_person ? 0.0 : -5.0"
+      ],
+      "0.86": [
+       "v.is_first_person ? 0.0 : 4.84",
+       0.0,
+       "v.is_first_person ? 0.0 : -4.84"
+      ],
+      "0.90": [
+       "v.is_first_person ? 0.0 : 4.16",
+       0.0,
+       "v.is_first_person ? 0.0 : -4.16"
+      ],
+      "0.94": [
+       "v.is_first_person ? 0.0 : 3.29",
+       0.0,
+       "v.is_first_person ? 0.0 : -3.29"
+      ],
+      "0.98": [
+       "v.is_first_person ? 0.0 : 2.33",
+       0.0,
+       "v.is_first_person ? 0.0 : -2.33"
+      ],
+      "1.02": [
+       "v.is_first_person ? 0.0 : 1.38",
+       0.0,
+       "v.is_first_person ? 0.0 : -1.38"
+      ],
+      "1.06": [
+       "v.is_first_person ? 0.0 : 0.55",
+       0.0,
+       "v.is_first_person ? 0.0 : -0.55"
+      ],
+      "1.10": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     }
+    }
+   }
+  },
   "animation.toji.finisher": {
    "loop": false,
    "animation_length": 0.6,
