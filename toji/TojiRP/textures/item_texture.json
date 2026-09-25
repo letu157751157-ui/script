@@ -1,0 +1,9 @@
+{
+  "resource_pack_name": "toji",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "toji_inverted_spear": {
+      "textures": "textures/items/inverted_spear"
+    }
+  }
+}

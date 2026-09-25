@@ -1,0 +1,49 @@
+{
+  "format_version": "1.10.0",
+  "animations": {
+    "animation.toji.isoh.hold_first_person": {
+      "loop": true,
+      "bones": {
+        "isoh": {
+          "position": [
+            0.0,
+            -1.5,
+            -1.0
+          ],
+          "rotation": [
+            45.8,
+            -45.8,
+            -154.2
+          ],
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.toji.isoh.hold_third_person": {
+      "loop": true,
+      "bones": {
+        "isoh": {
+          "position": [
+            0.0,
+            -1.5,
+            -1.0
+          ],
+          "rotation": [
+            90.0,
+            6.0,
+            -90.0
+          ],
+          "scale": 0.55
+        }
+      }
+    },
+    "animation.toji.isoh.pulse": {
+      "loop": true,
+      "bones": {
+        "spear": {
+          "scale": "1 + math.sin(q.life_time * 540) * 0.015"
+        }
+      }
+    }
+  }
+}
