@@ -382,27 +382,51 @@ def molang(fp, tp):
     return f"v.is_first_person ? {fp} : {tp}"
 
 
+SAMPLE_STEP = 0.04  # giây giữa hai keyframe tuyến tính khi lấy mẫu đường cong
+
+
+def catmull(values, times, t):
+    """Nội suy Catmull-Rom (đường cong đi qua mọi keyframe) cho một kênh số."""
+    i = max(k for k in range(len(times) - 1) if times[k] <= t) if t < times[-1] else len(times) - 2
+    t0, t1 = times[i], times[i + 1]
+    u = (t - t0) / (t1 - t0)
+    p0 = values[max(i - 1, 0)]
+    p1, p2 = values[i], values[i + 1]
+    p3 = values[min(i + 2, len(values) - 1)]
+    return 0.5 * (2 * p1 + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u * u + (-p0 + 3 * p1 - 3 * p2 + p3) * u ** 3)
+
+
 def build_animations(root):
+    """Minecraft chỉ cho nội suy cong khi keyframe là số cố định, nhưng ở đây mỗi giá trị là biểu thức
+    chọn góc nhìn thứ nhất/thứ 3. Nên đường cong Catmull-Rom được tính sẵn, lấy mẫu dày
+    mỗi SAMPLE_STEP giây và xuất ra keyframe tuyến tính."""
     keys = sample_keys(root)
     animations = {}
     for name, anim in ANIMATIONS.items():
+        times = sorted(keys[name])
+        steps = max(1, round(anim["length"] / SAMPLE_STEP))
+        sample_times = sorted(set([round(anim["length"] * i / steps, 3) for i in range(steps + 1)] + times))
         bones = {}
         for bone in BONES:
             for channel, key in (("rotation", "rot"), ("position", "pos")):
-                track = {}
-                used = False
-                for t, frame in keys[name].items():
-                    tp = frame["tp"].get(bone, {}).get(key, [0, 0, 0])
+                tp_keys, fp_keys = [], []
+                for t in times:
+                    frame = keys[name][t]
+                    tp_keys.append(list(frame["tp"].get(bone, {}).get(key, [0, 0, 0])))
                     if (bone, key) == ("rightarm", "pos"):
-                        fp = frame["fp"]["pos"]
+                        fp_keys.append(list(frame["fp"]["pos"]))
                     elif (bone, key) == ("rightitem", "rot"):
-                        fp = frame["fp"]["rot"]
+                        fp_keys.append(list(frame["fp"]["rot"]))
                     else:
-                        fp = [0, 0, 0]  # góc nhìn thứ nhất chỉ thấy tay phải
-                    used = used or any(abs(v) > 1e-6 for v in list(tp) + list(fp))
-                    track[f"{t:.2f}"] = {"post": [molang(f, p) for f, p in zip(fp, tp)], "lerp_mode": "catmullrom"}
-                if used:
-                    bones.setdefault(bone, {})[channel] = track
+                        fp_keys.append([0, 0, 0])  # góc nhìn thứ nhất chỉ thấy tay phải
+                if not any(abs(v) > 1e-6 for row in tp_keys + fp_keys for v in row):
+                    continue
+                track = {}
+                for t in sample_times:
+                    tp = [catmull([k[c] for k in tp_keys], times, t) for c in range(3)]
+                    fp = [catmull([k[c] for k in fp_keys], times, t) for c in range(3)]
+                    track[f"{t:.2f}"] = [molang(f, p) for f, p in zip(fp, tp)]
+                bones.setdefault(bone, {})[channel] = track
         animations[f"animation.aatrox.{name}"] = {"loop": False, "animation_length": anim["length"], "bones": bones}
     return {"format_version": "1.10.0", "animations": animations}
 

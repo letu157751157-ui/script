@@ -56,7 +56,7 @@ Khi biến hình, kiếm trên tay được đổi sang bản **Diệt Thế** (
   - **W** phóng **3 sợi xích** hình quạt, mỗi sợi trói một mục tiêu, hồi chiêu nhanh hơn
   - **Nội tại** hồi nhanh gấp đôi (như trước)
 
-Animation chiêu có đủ nhịp lấy đà → vung → chạm → quá đà → hồi về, nội suy Catmull-Rom cho chuyển động cong và mượt.
+Animation chiêu có đủ nhịp lấy đà → vung → chạm → quá đà → hồi về, đường cong Catmull-Rom được tính sẵn và lấy mẫu mỗi 0,04 giây nên chuyển động cong và mượt.
 
 ## Cài đặt
 
@@ -65,7 +65,7 @@ Animation chiêu có đủ nhịp lấy đà → vung → chạm → quá đà �
 
 Sau đó tạo/sửa thế giới → **Behavior Packs** → bật *Aatrox - Quỷ Kiếm Darkin (BP)* (Resource Pack sẽ tự bật theo).
 
-> **Đã cài bản cũ?** Bản này là **v1.6.1**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.6.1.
+> **Đã cài bản cũ?** Bản này là **v1.6.2**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.6.2.
 > Nếu vẫn thấy kiếm cầm như cây thương hoặc không có animation, vào **Cài đặt → Bộ nhớ** xoá hết pack Aatrox cũ rồi nhập lại file `.mcaddon`.
 
 Lấy kiếm:
