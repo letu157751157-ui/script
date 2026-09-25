@@ -79,7 +79,26 @@ function onGround(dim, pos) {
   return { x: pos.x, y: groundY(dim, pos.x, pos.y, pos.z), z: pos.z };
 }
 
+// Hiệu ứng ghép nhiều lớp: gọi 1 particle chính sẽ tự bắn thêm các lớp phụ
+// [id phụ, hệ số bán kính (null = không truyền bán kính)]
+const FX_LAYERS = {
+  "ytaun:shockwave": [["ytaun:ground_ring", 1.1], ["ytaun:flash", 0.5], ["ytaun:sparks", null], ["ytaun:crack_decal", 0.6]],
+  "ytaun:spike": [["ytaun:crack_decal", 0.35]],
+  "ytaun:summon_rune": [["ytaun:rune_sparks", null]],
+  "ytaun:rage_burst": [["ytaun:flash", 1.5], ["ytaun:ember", null], ["ytaun:sparks", null]],
+  "ytaun:death_burst": [["ytaun:flash", 2], ["ytaun:sparks", null], ["ytaun:ember", null]],
+  "ytaun:roar_wave": [["ytaun:shockwave", 4]],
+};
+
 function particle(dim, id, pos, radius) {
+  spawnOne(dim, id, pos, radius);
+  for (const [extra, k] of FX_LAYERS[id] ?? []) {
+    if (extra === "ytaun:shockwave") spawnOne(dim, extra, { x: pos.x, y: pos.y - 0.2, z: pos.z }, k);
+    else spawnOne(dim, extra, pos, k === null ? undefined : (radius ?? 4) * k);
+  }
+}
+
+function spawnOne(dim, id, pos, radius) {
   try {
     if (radius === undefined) {
       dim.spawnParticle(id, pos);
@@ -818,6 +837,7 @@ function tickBoss(data, now) {
 
   // Hiệu ứng thường trực theo giai đoạn
   if (data.phase >= 1 && now % (data.phase >= 2 ? 5 : 10) === 0) particle(dim, "ytaun:rage_aura", boss.location);
+  if (data.phase >= 2 && now % 12 === 0) particle(dim, "ytaun:ember", boss.location);
   if (now % 16 === 0) {
     try {
       const v = boss.getVelocity();

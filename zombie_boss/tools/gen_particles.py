@@ -1,245 +1,190 @@
-"""Sinh particle tùy chỉnh cho Giant Zombie boss (resource pack).
-Chạy: python3 zombie_boss/tools/gen_particles.py
-Dùng texture vanilla textures/particle/particles (flipbook khói hàng 0) nên không cần ảnh riêng."""
+"""Sinh particle cho Giant Zombie boss (resource pack), dùng atlas riêng textures/particle/ytaun_boss.png
+(vẽ bởi tools/gen_texture.py). Chạy: python3 zombie_boss/tools/gen_particles.py"""
 import json, os
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "ytaun_zombie_pack_resource_pack", "particles")
-TEX = "textures/particle/particles"
+TEX = "textures/particle/ytaun_boss"
 AGE = "v.particle_age / v.particle_lifetime"
+CELLS = {"glow": (0, 0), "smoke": (64, 0), "ring": (128, 0), "star": (192, 0),
+         "spike": (0, 64), "rock": (64, 64), "rune": (128, 64), "bubble": (192, 64),
+         "crack": (0, 128), "flame": (64, 128), "streak": (128, 128), "shard": (192, 128)}
 
-def smoke_uv(size):
-    # flipbook 8 frame khói/bụi của vanilla (x 56 -> 0, hàng 0)
-    return {"texture_width": 128, "texture_height": 128,
-            "flipbook": {"base_UV": [56, 0], "size_UV": [8, 8], "step_UV": [-8, 0],
-                         "frames_per_second": 8, "max_frame": 8, "stretch_to_lifetime": True, "loop": False}}
+def uv(name):
+    return {"texture_width": 256, "texture_height": 256, "uv": list(CELLS[name]), "uv_size": [64, 64]}
 
-def spark_uv():
-    # ô "critical hit"/tia lửa (hàng 4)
-    return {"texture_width": 128, "texture_height": 128, "uv": [8, 32], "uv_size": [8, 8]}
+def bb(size, cell, mode="lookat_xyz", **extra):
+    w, h = size if isinstance(size, (list, tuple)) else (size, size)
+    return {"minecraft:particle_appearance_billboard": {"size": [w, h], "facing_camera_mode": mode, "uv": uv(cell), **extra}}
 
 def tint(stops):
     return {"minecraft:particle_appearance_tinting": {"color": {"interpolant": AGE, "gradient": stops}}}
 
-def effect(name, comps, material="particles_alpha"):
-    return {"format_version": "1.10.0", "particle_effect": {
-        "description": {"identifier": f"ytaun:{name}",
-                        "basic_render_parameters": {"material": material, "texture": TEX}},
-        "components": comps}}
+def life(t):
+    return {"minecraft:particle_lifetime_expression": {"max_lifetime": t}}
 
 def once(n, t=0.05):
-    return {"minecraft:emitter_rate_instant": {"num_particles": n},
-            "minecraft:emitter_lifetime_once": {"active_time": t}}
+    return {"minecraft:emitter_rate_instant": {"num_particles": n}, "minecraft:emitter_lifetime_once": {"active_time": t}}
 
 def steady(rate, maxp, t):
     return {"minecraft:emitter_rate_steady": {"spawn_rate": rate, "max_particles": maxp},
             "minecraft:emitter_lifetime_once": {"active_time": t}}
 
+RADIUS = {"minecraft:emitter_initialization": {"creation_expression": "v.r = v.radius ?? 4;"}}
+SPIN = {"minecraft:particle_initial_spin": {"rotation": "math.random(0, 360)", "rotation_rate": "math.random(-240, 240)"}}
+
+def effect(name, comps, material="particles_alpha"):
+    return {"format_version": "1.10.0", "particle_effect": {
+        "description": {"identifier": f"ytaun:{name}", "basic_render_parameters": {"material": material, "texture": TEX}},
+        "components": comps}}
+
+ADD, BLEND = "particles_add", "particles_blend"
 P = {}
 
-# Vòng sóng xung kích lan ra mặt đất (slam / leap / grab impact). v.radius = bán kính cuối
-P["shockwave"] = effect("shockwave", {
-    **once(90),
-    "minecraft:emitter_initialization": {"creation_expression": "v.r = v.radius ?? 6;"},
-    "minecraft:emitter_shape_disc": {"offset": [0, 0.15, 0], "radius": 0.6, "surface_only": True,
-                                     "direction": "outwards", "plane_normal": "y"},
-    "minecraft:particle_initial_speed": "v.r * 1.6",
+# ---------- Lớp chung dùng ghép hiệu ứng ----------
+P["flash"] = effect("flash", {**once(1), **RADIUS, "minecraft:emitter_shape_point": {"offset": [0, 0.6, 0]}, **life(0.3),
+    **bb(["v.r * (0.6 + v.particle_age * 3)", "v.r * (0.6 + v.particle_age * 3)"], "glow"),
+    **tint({"0.0": "#FFFFF4D0", "0.4": "#AAFFA040", "1.0": "#00FF4010"})}, ADD)
+
+P["ground_ring"] = effect("ground_ring", {**once(1), **RADIUS, "minecraft:emitter_shape_point": {"offset": [0, 0.12, 0]},
+    **life(0.6),
+    **bb(["v.r * math.pow(v.particle_age / v.particle_lifetime, 0.5) * 1.15", "v.r * math.pow(v.particle_age / v.particle_lifetime, 0.5) * 1.15"],
+         "ring", "emitter_transform_xz"),
+    **tint({"0.0": "#FFFFF0C0", "0.5": "#DDFF8A30", "1.0": "#00AA3010"})}, ADD)
+
+P["sparks"] = effect("sparks", {**once(45), "minecraft:emitter_shape_sphere": {"offset": [0, 0.5, 0], "radius": 0.4,
+    "direction": ["math.random(-1,1)", "math.random(0.3,1.5)", "math.random(-1,1)"]},
+    "minecraft:particle_initial_speed": "math.random(6, 13)",
+    "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -14, 0], "linear_drag_coefficient": 1.8},
+    **life("math.random(0.4, 0.9)"),
+    **bb([0.06, "0.25 + v.particle_random_1 * 0.3"], "streak", "lookat_direction"),
+    **tint({"0.0": "#FFFFFFE0", "0.3": "#FFFFB040", "1.0": "#00FF3000"})}, ADD)
+
+P["crack_decal"] = effect("crack_decal", {**once(1), **RADIUS, "minecraft:emitter_shape_point": {"offset": [0, 0.06, 0]},
+    **life(2.5), **bb(["v.r", "v.r"], "crack", "emitter_transform_xz"),
+    "minecraft:particle_initial_spin": {"rotation": "math.random(0, 360)"},
+    **tint({"0.0": "#FFFF7A20", "0.15": "#EE3A2418", "0.8": "#CC1E140E", "1.0": "#001E140E"})}, BLEND)
+
+P["ember"] = effect("ember", {**once(24), "minecraft:emitter_shape_disc": {"offset": [0, 0.3, 0], "radius": 2.2, "direction": [0, 1, 0], "plane_normal": "y"},
+    "minecraft:particle_initial_speed": "math.random(1.5, 4)",
+    "minecraft:particle_motion_dynamic": {"linear_acceleration": ["math.sin(v.particle_age * 400) * 2", 1, 0], "linear_drag_coefficient": 0.8},
+    **life("math.random(0.8, 1.6)"), **bb(["0.12 * (1 - v.particle_age / v.particle_lifetime) + 0.03"] * 2, "glow"),
+    **tint({"0.0": "#FFFFE08A", "0.4": "#FFFF5A14", "1.0": "#00800000"})}, ADD)
+
+# ---------- Hiệu ứng chính (tên giữ nguyên để script dùng) ----------
+P["shockwave"] = effect("shockwave", {**once(160), **RADIUS,
+    "minecraft:emitter_shape_disc": {"offset": [0, 0.2, 0], "radius": 0.8, "surface_only": True, "direction": "outwards", "plane_normal": "y"},
+    "minecraft:particle_initial_speed": "v.r * math.random(1.6, 2.4)",
+    "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, 0.8, 0], "linear_drag_coefficient": 1.6},
+    **life("math.random(0.8, 1.3)"), **SPIN,
+    **bb(["0.5 + v.particle_age * 1.6", "0.5 + v.particle_age * 1.6"], "smoke", "rotate_xyz"),
+    **tint({"0.0": "#F0D8C8A8", "0.4": "#B0907A5E", "1.0": "#004A3E30"})}, BLEND)
+
+P["dust_burst"] = effect("dust_burst", {**once(70),
+    "minecraft:emitter_shape_sphere": {"radius": 1.3, "direction": ["math.random(-1,1)", "math.random(0.5,1.8)", "math.random(-1,1)"]},
+    "minecraft:particle_initial_speed": "math.random(3, 8)",
+    "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -3, 0], "linear_drag_coefficient": 2.2},
+    **life("math.random(1.0, 1.8)"), **SPIN,
+    **bb(["0.5 + v.particle_random_1 * 0.6 + v.particle_age", "0.5 + v.particle_random_1 * 0.6 + v.particle_age"], "smoke", "rotate_xyz"),
+    **tint({"0.0": "#E08C7A62", "1.0": "#004A3F33"})}, BLEND)
+
+P["telegraph"] = effect("telegraph", {**once(1), **RADIUS, "minecraft:emitter_shape_point": {"offset": [0, 0.08, 0]},
+    **life(0.3), **bb(["v.r * 1.08", "v.r * 1.08"], "ring", "emitter_transform_xz"),
+    **tint({"0.0": "#FFFF3A1A", "1.0": "#AAFF2010"})}, ADD)
+
+P["telegraph_fill"] = effect("telegraph_fill", {**once(1), **RADIUS, "minecraft:emitter_shape_point": {"offset": [0, 0.07, 0]},
+    **life(0.3), **bb(["v.r * (0.15 + 0.9 * v.particle_age / v.particle_lifetime)"] * 2, "glow", "emitter_transform_xz"),
+    **tint({"0.0": "#77FF2A10", "1.0": "#44FF2A10"})}, ADD)
+
+P["poison_cloud"] = effect("poison_cloud", {**steady(90, 400, 4), "minecraft:emitter_shape_disc": {"offset": [0, 0.3, 0], "radius": 6, "direction": [0, 1, 0], "plane_normal": "y"},
+    "minecraft:particle_initial_speed": "math.random(0.2, 0.9)",
+    "minecraft:particle_motion_dynamic": {"linear_drag_coefficient": 0.7},
+    **life("math.random(1.4, 2.4)"), **SPIN,
+    **bb(["0.8 + v.particle_age * 1.1", "0.8 + v.particle_age * 1.1"], "smoke", "rotate_xyz"),
+    **tint({"0.0": "#0060E030", "0.2": "#B048B02C", "0.7": "#80407020", "1.0": "#00183008"})}, BLEND)
+
+P["poison_bubble"] = effect("poison_bubble", {**once(26), "minecraft:emitter_shape_sphere": {"radius": 1.0, "direction": [0, 1, 0]},
+    "minecraft:particle_initial_speed": "math.random(0.6, 1.8)",
+    "minecraft:particle_motion_dynamic": {"linear_acceleration": ["math.sin(v.particle_age * 500) * 1.5", 0.5, 0]},
+    **life("math.random(0.8, 1.5)"),
+    **bb(["0.1 + v.particle_random_1 * 0.15"] * 2, "bubble"),
+    **tint({"0.0": "#FFB4FF5A", "0.85": "#FF5ACF30", "1.0": "#005ACF30"})}, BLEND)
+
+P["rage_aura"] = effect("rage_aura", {**once(14), "minecraft:emitter_shape_disc": {"offset": [0, 0.2, 0], "radius": 1.8, "direction": [0, 1, 0], "plane_normal": "y"},
+    "minecraft:particle_initial_speed": "math.random(2, 4.5)",
     "minecraft:particle_motion_dynamic": {"linear_drag_coefficient": 1.2},
-    "minecraft:particle_lifetime_expression": {"max_lifetime": 0.9},
-    "minecraft:particle_appearance_billboard": {"size": ["0.55 + v.particle_age", "0.55 + v.particle_age"],
-                                                "facing_camera_mode": "lookat_xyz", "uv": smoke_uv(8)},
-    **tint({"0.0": "#FFD9C3A0", "0.5": "#CC8A7458", "1.0": "#00574B3A"}),
-})
+    **life("math.random(0.5, 0.9)"),
+    **bb([0.35, "0.55 + v.particle_random_1 * 0.3"], "flame", "rotate_y"),
+    **tint({"0.0": "#FFFFE080", "0.3": "#FFFF4A14", "1.0": "#00500000"})}, ADD)
 
-# Bụi đất + đá văng tung
-P["dust_burst"] = effect("dust_burst", {
-    **once(40),
-    "minecraft:emitter_shape_sphere": {"radius": 1.2, "direction": ["math.random(-1,1)", "math.random(0.6,1.6)", "math.random(-1,1)"]},
-    "minecraft:particle_initial_speed": "math.random(3, 7)",
-    "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -9, 0], "linear_drag_coefficient": 1.5},
-    "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.8, 1.4)"},
-    "minecraft:particle_appearance_billboard": {"size": ["0.3 + v.particle_random_1 * 0.4", "0.3 + v.particle_random_1 * 0.4"],
-                                                "facing_camera_mode": "rotate_xyz", "uv": smoke_uv(8)},
-    "minecraft:particle_motion_collision": {"coefficient_of_restitution": 0.2, "collision_radius": 0.1, "collision_drag": 4},
-    **tint({"0.0": "#FF7A6A55", "1.0": "#004A3F33"}),
-})
+P["rage_burst"] = effect("rage_burst", {**once(160), "minecraft:emitter_shape_sphere": {"offset": [0, 2.2, 0], "radius": 0.6, "direction": "outwards"},
+    "minecraft:particle_initial_speed": "math.random(7, 15)",
+    "minecraft:particle_motion_dynamic": {"linear_drag_coefficient": 2.8},
+    **life("math.random(0.8, 1.6)"),
+    **bb([0.08, "0.4 + v.particle_random_1 * 0.5"], "streak", "lookat_direction"),
+    **tint({"0.0": "#FFFFF6B0", "0.3": "#FFFF4A1A", "1.0": "#00400000"})}, ADD)
 
-# Vòng cảnh báo đỏ trên mặt đất trước khi chiêu nổ (v.radius)
-P["telegraph"] = effect("telegraph", {
-    **once(64),
-    "minecraft:emitter_initialization": {"creation_expression": "v.r = v.radius ?? 3;"},
-    "minecraft:emitter_shape_disc": {"offset": [0, 0.1, 0], "radius": "v.r", "surface_only": True,
-                                     "direction": [0, 1, 0], "plane_normal": "y"},
-    "minecraft:particle_initial_speed": 0.4,
-    "minecraft:particle_lifetime_expression": {"max_lifetime": 0.55},
-    "minecraft:particle_appearance_billboard": {"size": [0.22, 0.22], "facing_camera_mode": "lookat_xyz", "uv": spark_uv()},
-    **tint({"0.0": "#FFFF2A1A", "0.6": "#FFFF7A1A", "1.0": "#00FF2A1A"}),
-}, material="particles_add")
+P["spike"] = effect("spike", {**once(4), "minecraft:emitter_shape_disc": {"radius": 0.45, "direction": [0, 1, 0], "plane_normal": "y"},
+    **life("1.3 + v.particle_random_2 * 0.3"),
+    **bb(["0.35 + v.particle_random_1 * 0.15",
+          "(1.3 + v.particle_random_1 * 0.8) * math.min(v.particle_age * 10, 1) * (1 - math.pow(v.particle_age / v.particle_lifetime, 5))"],
+         "spike", "rotate_y"),
+    "minecraft:particle_appearance_lighting": {},
+    **tint({"0.0": "#FFFFFFFF", "0.9": "#FFE0E0E0", "1.0": "#00E0E0E0"})})
 
-# Điểm cảnh báo lấp đầy vùng (tâm chiêu)
-P["telegraph_fill"] = effect("telegraph_fill", {
-    **once(30),
-    "minecraft:emitter_initialization": {"creation_expression": "v.r = v.radius ?? 3;"},
-    "minecraft:emitter_shape_disc": {"offset": [0, 0.08, 0], "radius": "v.r", "direction": [0, 1, 0], "plane_normal": "y"},
-    "minecraft:particle_initial_speed": 0.15,
-    "minecraft:particle_lifetime_expression": {"max_lifetime": 0.5},
-    "minecraft:particle_appearance_billboard": {"size": [0.35, 0.35], "facing_camera_mode": "direction_y", "uv": smoke_uv(8)},
-    **tint({"0.0": "#88FF3020", "1.0": "#00FF3020"}),
-}, material="particles_add")
+P["rock_debris"] = effect("rock_debris", {**once(22), "minecraft:emitter_shape_point": {"direction": ["math.random(-1,1)", "math.random(1.5,3)", "math.random(-1,1)"]},
+    "minecraft:particle_initial_speed": "math.random(4, 8)",
+    "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -20, 0]},
+    **life("math.random(1.0, 1.6)"), **SPIN,
+    "minecraft:particle_motion_collision": {"coefficient_of_restitution": 0.35, "collision_radius": 0.1, "collision_drag": 5},
+    **bb(["0.12 + v.particle_random_1 * 0.22"] * 2, "rock", "rotate_xyz"),
+    "minecraft:particle_appearance_lighting": {},
+    **tint({"0.0": "#FFFFFFFF", "0.85": "#FFFFFFFF", "1.0": "#00FFFFFF"})})
 
-# Đám mây độc lan ra (poison aura), kéo dài 4 giây
-P["poison_cloud"] = effect("poison_cloud", {
-    **steady(60, 220, 4),
-    "minecraft:emitter_shape_disc": {"offset": [0, 0.4, 0], "radius": 6, "direction": [0, 1, 0], "plane_normal": "y"},
-    "minecraft:particle_initial_speed": "math.random(0.2, 0.8)",
-    "minecraft:particle_motion_dynamic": {"linear_drag_coefficient": 0.6},
-    "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(1.2, 2.2)"},
-    "minecraft:particle_appearance_billboard": {"size": ["0.6 + v.particle_age * 0.8", "0.6 + v.particle_age * 0.8"],
-                                                "facing_camera_mode": "rotate_xyz", "uv": smoke_uv(8)},
-    **tint({"0.0": "#0055D12E", "0.2": "#AA3FA82A", "0.8": "#77406B1C", "1.0": "#00203A10"}),
-})
+P["rock_trail"] = effect("rock_trail", {**once(5), "minecraft:emitter_shape_sphere": {"radius": 0.5, "direction": "outwards"},
+    "minecraft:particle_initial_speed": 0.3, **life("math.random(0.6, 1.0)"), **SPIN,
+    **bb(["0.45 + v.particle_age * 1.2"] * 2, "smoke", "rotate_xyz"),
+    **tint({"0.0": "#C0786A5C", "1.0": "#00342F2A"})}, BLEND)
 
-# Bong bóng độc nhỏ bốc lên
-P["poison_bubble"] = effect("poison_bubble", {
-    **once(20),
-    "minecraft:emitter_shape_sphere": {"radius": 0.8, "direction": [0, 1, 0]},
-    "minecraft:particle_initial_speed": "math.random(0.5, 1.5)",
-    "minecraft:particle_lifetime_expression": {"max_lifetime": 1.0},
-    "minecraft:particle_appearance_billboard": {"size": [0.15, 0.15], "facing_camera_mode": "lookat_xyz",
-                                                "uv": {"texture_width": 128, "texture_height": 128, "uv": [0, 16], "uv_size": [8, 8]}},
-    **tint({"0.0": "#FF9CFF4A", "1.0": "#002F7A18"}),
-}, material="particles_add")
+P["rock_core"] = effect("rock_core", {**once(1), "minecraft:emitter_shape_point": {}, **life(0.07),
+    "minecraft:particle_initial_spin": {"rotation": "math.random(0, 360)", "rotation_rate": 540},
+    **bb([1.1, 1.1], "rock", "rotate_xyz"), "minecraft:particle_appearance_lighting": {}})
 
-# Hào quang cuồng nộ bốc lên quanh boss (script gọi lặp lại)
-P["rage_aura"] = effect("rage_aura", {
-    **once(18),
-    "minecraft:emitter_shape_disc": {"offset": [0, 0.2, 0], "radius": 1.6, "surface_only": True,
-                                     "direction": [0, 1, 0], "plane_normal": "y"},
-    "minecraft:particle_initial_speed": "math.random(2, 4)",
-    "minecraft:particle_motion_dynamic": {"linear_drag_coefficient": 1.0},
-    "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.6, 1.0)"},
-    "minecraft:particle_appearance_billboard": {"size": [0.25, 0.25], "facing_camera_mode": "lookat_xyz", "uv": spark_uv()},
-    **tint({"0.0": "#FFFFCC33", "0.4": "#FFFF3311", "1.0": "#00550000"}),
-}, material="particles_add")
+P["summon_rune"] = effect("summon_rune", {**once(1), "minecraft:emitter_shape_point": {"offset": [0, 0.1, 0]},
+    **life(1.8), "minecraft:particle_initial_spin": {"rotation": 0, "rotation_rate": 120},
+    **bb(["1.6 * math.min(v.particle_age * 4, 1)"] * 2, "rune", "emitter_transform_xz"),
+    **tint({"0.0": "#FFB6FF5A", "0.6": "#FF3FEF4A", "1.0": "#0010AA08"})}, ADD)
 
-# Vụ nổ đỏ lúc chuyển giai đoạn (rage / final fury)
-P["rage_burst"] = effect("rage_burst", {
-    **once(120),
-    "minecraft:emitter_shape_sphere": {"offset": [0, 2, 0], "radius": 0.5, "direction": "outwards"},
-    "minecraft:particle_initial_speed": "math.random(6, 12)",
-    "minecraft:particle_motion_dynamic": {"linear_drag_coefficient": 2.5},
-    "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.8, 1.5)"},
-    "minecraft:particle_appearance_billboard": {"size": [0.35, 0.35], "facing_camera_mode": "lookat_xyz", "uv": spark_uv()},
-    **tint({"0.0": "#FFFFF2A0", "0.3": "#FFFF4A1A", "1.0": "#00400000"}),
-}, material="particles_add")
+P["rune_sparks"] = effect("rune_sparks", {**steady(40, 70, 1.4), "minecraft:emitter_shape_disc": {"radius": 1.5, "surface_only": True, "direction": [0, 1, 0], "plane_normal": "y"},
+    "minecraft:particle_initial_speed": "math.random(1, 3)", "minecraft:particle_motion_dynamic": {"linear_drag_coefficient": 0.8},
+    **life(1.0), **bb([0.18, 0.18], "star"),
+    **tint({"0.0": "#FFD0FF80", "0.5": "#FF3FBF2A", "1.0": "#00104A08"})}, ADD)
 
-# Gai đá trồi lên (ground spikes)
-P["spike"] = effect("spike", {
-    **once(6),
-    "minecraft:emitter_shape_disc": {"radius": 0.5, "direction": [0, 1, 0], "plane_normal": "y"},
-    "minecraft:particle_initial_speed": 0,
-    "minecraft:particle_lifetime_expression": {"max_lifetime": 1.1},
-    "minecraft:particle_appearance_billboard": {
-        "size": ["0.25 * (1 - v.particle_age / v.particle_lifetime * 0.5)",
-                 "math.min(v.particle_age * 12, 1.6) * (1 - math.pow(v.particle_age / v.particle_lifetime, 4))"],
-        "facing_camera_mode": "rotate_y",
-        "uv": {"texture_width": 128, "texture_height": 128, "uv": [0, 0], "uv_size": [8, 8]}},
-    **tint({"0.0": "#FF4B4038", "0.8": "#FF2E2722", "1.0": "#002E2722"}),
-})
+P["ground_crack"] = effect("ground_crack", {**once(30), "minecraft:emitter_shape_disc": {"radius": 0.8, "direction": [0, 1, 0], "plane_normal": "y"},
+    "minecraft:particle_initial_speed": "math.random(2, 4.5)",
+    "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -9, 0], "linear_drag_coefficient": 1},
+    **life("math.random(0.7, 1.1)"), **SPIN,
+    **bb(["0.3 + v.particle_random_1 * 0.3"] * 2, "smoke", "rotate_xyz"),
+    **tint({"0.0": "#F05A4632", "1.0": "#00201810"})}, BLEND)
 
-# Mảnh đá văng khi gai trồi lên
-P["rock_debris"] = effect("rock_debris", {
-    **once(14),
-    "minecraft:emitter_shape_point": {"direction": ["math.random(-1,1)", "math.random(1.5,3)", "math.random(-1,1)"]},
-    "minecraft:particle_initial_speed": "math.random(3, 6)",
-    "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -18, 0]},
-    "minecraft:particle_lifetime_expression": {"max_lifetime": 1.2},
-    "minecraft:particle_motion_collision": {"coefficient_of_restitution": 0.3, "collision_radius": 0.08, "collision_drag": 6},
-    "minecraft:particle_appearance_billboard": {"size": ["0.08 + v.particle_random_1 * 0.12", "0.08 + v.particle_random_1 * 0.12"],
-                                                "facing_camera_mode": "rotate_xyz",
-                                                "uv": {"texture_width": 128, "texture_height": 128, "uv": [0, 0], "uv_size": [8, 8]}},
-    **tint({"0.0": "#FF5E544A", "1.0": "#FF3A332C"}),
-})
+P["roar_wave"] = effect("roar_wave", {**once(1), "minecraft:emitter_shape_point": {"offset": [0, 2.5, 0]},
+    **life(0.7), **bb(["1 + v.particle_age * 22", "1 + v.particle_age * 22"], "ring", "emitter_transform_xz"),
+    **tint({"0.0": "#FFE8FFFF", "1.0": "#0060A0FF"})}, ADD)
 
-# Vệt khói theo tảng đá bị ném
-P["rock_trail"] = effect("rock_trail", {
-    **once(4),
-    "minecraft:emitter_shape_sphere": {"radius": 0.4, "direction": "outwards"},
-    "minecraft:particle_initial_speed": 0.2,
-    "minecraft:particle_lifetime_expression": {"max_lifetime": 0.7},
-    "minecraft:particle_appearance_billboard": {"size": ["0.4 + v.particle_age", "0.4 + v.particle_age"],
-                                                "facing_camera_mode": "rotate_xyz", "uv": smoke_uv(8)},
-    **tint({"0.0": "#CC6B6258", "1.0": "#00342F2A"}),
-})
+P["heal_spiral"] = effect("heal_spiral", {**steady(50, 100, 1.6),
+    "minecraft:emitter_shape_custom": {"offset": ["math.cos(v.emitter_age * 720) * 1.8", "v.emitter_age * 2.8", "math.sin(v.emitter_age * 720) * 1.8"], "direction": [0, 1, 0]},
+    "minecraft:particle_initial_speed": 0.5, **life(1.1), **bb([0.25, 0.25], "star"),
+    **tint({"0.0": "#FFD4FFB0", "0.5": "#FF4AE04A", "1.0": "#0020A020"})}, ADD)
 
-# Tảng đá (lõi) — khối vuông tối màu to, 1 particle, script spawn mỗi tick
-P["rock_core"] = effect("rock_core", {
-    **once(1),
-    "minecraft:emitter_shape_point": {},
-    "minecraft:particle_lifetime_expression": {"max_lifetime": 0.06},
-    "minecraft:particle_appearance_billboard": {"size": [0.9, 0.9], "facing_camera_mode": "rotate_xyz",
-                                                "uv": {"texture_width": 128, "texture_height": 128, "uv": [0, 0], "uv_size": [8, 8]}},
-    "minecraft:particle_appearance_tinting": {"color": [0.3, 0.27, 0.23, 1.0]},
-})
-
-# Trận pháp triệu hồi xanh lục xoáy lên (summon horde)
-P["summon_rune"] = effect("summon_rune", {
-    **steady(40, 80, 1.2),
-    "minecraft:emitter_shape_disc": {"radius": 1.0, "surface_only": True, "direction": [0, 1, 0], "plane_normal": "y"},
-    "minecraft:particle_initial_speed": "math.random(1, 2.5)",
-    "minecraft:particle_motion_dynamic": {"linear_drag_coefficient": 0.8},
-    "minecraft:particle_lifetime_expression": {"max_lifetime": 1.0},
-    "minecraft:particle_appearance_billboard": {"size": [0.2, 0.2], "facing_camera_mode": "lookat_xyz", "uv": spark_uv()},
-    **tint({"0.0": "#FFB6FF5A", "0.5": "#FF3FBF2A", "1.0": "#00104A08"}),
-}, material="particles_add")
-
-# Đất nứt khi zombie chui lên
-P["ground_crack"] = effect("ground_crack", {
-    **once(25),
-    "minecraft:emitter_shape_disc": {"radius": 0.7, "direction": [0, 1, 0], "plane_normal": "y"},
-    "minecraft:particle_initial_speed": "math.random(1.5, 3.5)",
-    "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -6, 0]},
-    "minecraft:particle_lifetime_expression": {"max_lifetime": 0.9},
-    "minecraft:particle_appearance_billboard": {"size": [0.3, 0.3], "facing_camera_mode": "rotate_xyz", "uv": smoke_uv(8)},
-    **tint({"0.0": "#FF4A3A2A", "1.0": "#00201810"}),
-})
-
-# Sóng âm gầm (war roar) — vòng đứng, lan ra
-P["roar_wave"] = effect("roar_wave", {
-    **once(70),
-    "minecraft:emitter_shape_disc": {"offset": [0, 2.5, 0], "radius": 0.5, "surface_only": True,
-                                     "direction": "outwards", "plane_normal": "y"},
-    "minecraft:particle_initial_speed": 14,
-    "minecraft:particle_motion_dynamic": {"linear_drag_coefficient": 2.2},
-    "minecraft:particle_lifetime_expression": {"max_lifetime": 0.8},
-    "minecraft:particle_appearance_billboard": {"size": [0.5, 0.5], "facing_camera_mode": "lookat_xyz", "uv": smoke_uv(8)},
-    **tint({"0.0": "#CCE8FFD8", "1.0": "#0070A060"}),
-}, material="particles_add")
-
-# Hồi máu: vòng xoắn xanh lá bay lên quanh boss
-P["heal_spiral"] = effect("heal_spiral", {
-    **steady(30, 60, 1.5),
-    "minecraft:emitter_shape_custom": {
-        "offset": ["math.cos(v.emitter_age * 720) * 1.8", "v.emitter_age * 2.5", "math.sin(v.emitter_age * 720) * 1.8"],
-        "direction": [0, 1, 0]},
-    "minecraft:particle_initial_speed": 0.6,
-    "minecraft:particle_lifetime_expression": {"max_lifetime": 1.0},
-    "minecraft:particle_appearance_billboard": {"size": [0.2, 0.2], "facing_camera_mode": "lookat_xyz", "uv": spark_uv()},
-    **tint({"0.0": "#FF9CFF9C", "1.0": "#0020A020"}),
-}, material="particles_add")
-
-# Nổ lúc boss chết
-P["death_burst"] = effect("death_burst", {
-    **steady(120, 300, 2.0),
-    "minecraft:emitter_shape_sphere": {"offset": [0, 2.5, 0], "radius": 2.5, "direction": "outwards"},
-    "minecraft:particle_initial_speed": "math.random(2, 6)",
+P["death_burst"] = effect("death_burst", {**steady(160, 400, 2.0), "minecraft:emitter_shape_sphere": {"offset": [0, 2.5, 0], "radius": 2.5, "direction": "outwards"},
+    "minecraft:particle_initial_speed": "math.random(2, 7)",
     "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, 1.5, 0], "linear_drag_coefficient": 1.5},
-    "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(1, 2)"},
-    "minecraft:particle_appearance_billboard": {"size": ["0.4 + v.particle_random_1 * 0.5", "0.4 + v.particle_random_1 * 0.5"],
-                                                "facing_camera_mode": "rotate_xyz", "uv": smoke_uv(8)},
-    **tint({"0.0": "#FFFFE08A", "0.4": "#CC4FB33A", "1.0": "#00203010"}),
-}, material="particles_add")
+    **life("math.random(1, 2)"), **SPIN,
+    **bb(["0.5 + v.particle_random_1 * 0.6"] * 2, "smoke", "rotate_xyz"),
+    **tint({"0.0": "#FFFFE08A", "0.4": "#C04FB33A", "1.0": "#00203010"})}, ADD)
 
 os.makedirs(OUT, exist_ok=True)
+for f in os.listdir(OUT):
+    if f.endswith(".json"): os.remove(os.path.join(OUT, f))
 for name, data in P.items():
     with open(os.path.join(OUT, f"{name}.json"), "w") as f:
         json.dump(data, f, indent=2)

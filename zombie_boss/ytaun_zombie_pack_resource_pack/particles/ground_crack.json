@@ -4,19 +4,19 @@
     "description": {
       "identifier": "ytaun:ground_crack",
       "basic_render_parameters": {
-        "material": "particles_alpha",
-        "texture": "textures/particle/particles"
+        "material": "particles_blend",
+        "texture": "textures/particle/ytaun_boss"
       }
     },
     "components": {
       "minecraft:emitter_rate_instant": {
-        "num_particles": 25
+        "num_particles": 30
       },
       "minecraft:emitter_lifetime_once": {
         "active_time": 0.05
       },
       "minecraft:emitter_shape_disc": {
-        "radius": 0.7,
+        "radius": 0.8,
         "direction": [
           0,
           1,
@@ -24,51 +24,46 @@
         ],
         "plane_normal": "y"
       },
-      "minecraft:particle_initial_speed": "math.random(1.5, 3.5)",
+      "minecraft:particle_initial_speed": "math.random(2, 4.5)",
       "minecraft:particle_motion_dynamic": {
         "linear_acceleration": [
           0,
-          -6,
+          -9,
           0
-        ]
+        ],
+        "linear_drag_coefficient": 1
       },
       "minecraft:particle_lifetime_expression": {
-        "max_lifetime": 0.9
+        "max_lifetime": "math.random(0.7, 1.1)"
+      },
+      "minecraft:particle_initial_spin": {
+        "rotation": "math.random(0, 360)",
+        "rotation_rate": "math.random(-240, 240)"
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          0.3,
-          0.3
+          "0.3 + v.particle_random_1 * 0.3",
+          "0.3 + v.particle_random_1 * 0.3"
         ],
         "facing_camera_mode": "rotate_xyz",
         "uv": {
-          "texture_width": 128,
-          "texture_height": 128,
-          "flipbook": {
-            "base_UV": [
-              56,
-              0
-            ],
-            "size_UV": [
-              8,
-              8
-            ],
-            "step_UV": [
-              -8,
-              0
-            ],
-            "frames_per_second": 8,
-            "max_frame": 8,
-            "stretch_to_lifetime": true,
-            "loop": false
-          }
+          "texture_width": 256,
+          "texture_height": 256,
+          "uv": [
+            64,
+            0
+          ],
+          "uv_size": [
+            64,
+            64
+          ]
         }
       },
       "minecraft:particle_appearance_tinting": {
         "color": {
           "interpolant": "v.particle_age / v.particle_lifetime",
           "gradient": {
-            "0.0": "#FF4A3A2A",
+            "0.0": "#F05A4632",
             "1.0": "#00201810"
           }
         }

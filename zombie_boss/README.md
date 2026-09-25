@@ -29,9 +29,8 @@ File cài đặt: [`dist/ytaun_zombie_addon_v1_4.mcaddon`](dist/ytaun_zombie_add
 title trên màn hình và vụ nổ đẩy lùi.
 
 ### Particle (`resource_pack/particles/`, sinh bởi `tools/gen_particles.py`)
-17 particle `ytaun:*`: `shockwave`, `dust_burst`, `telegraph`, `telegraph_fill`, `poison_cloud`, `poison_bubble`,
+23 particle `ytaun:*` với atlas texture vẽ riêng `textures/particle/ytaun_boss.png` (`tools/gen_texture.py`): vòng sóng phẳng trên mặt đất, gai đá, đá vụn xoay, rune triệu hồi xoay, vết nứt đất, tia lửa, lửa cuồng nộ, bong bóng độc. Mỗi hiệu ứng lớn ghép nhiều lớp (khói + vòng sóng + chớp sáng + tia lửa + vết nứt).
 `rage_aura`, `rage_burst`, `spike`, `rock_debris`, `rock_trail`, `rock_core`, `summon_rune`, `ground_crack`,
-`roar_wave`, `heal_spiral`, `death_burst`. Chỉ dùng texture vanilla, không cần ảnh mới.
 
 ### Animation (`tools/gen_animations.py` thêm vào `ytaun_giant_zombie.animation.json`)
 `slam`, `throw`, `summon`, `stomp`, `enrage`, `breath` — thời điểm va chạm trong animation khớp với tick gây sát thương trong script.

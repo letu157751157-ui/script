@@ -5,13 +5,13 @@
       "identifier": "ytaun:death_burst",
       "basic_render_parameters": {
         "material": "particles_add",
-        "texture": "textures/particle/particles"
+        "texture": "textures/particle/ytaun_boss"
       }
     },
     "components": {
       "minecraft:emitter_rate_steady": {
-        "spawn_rate": 120,
-        "max_particles": 300
+        "spawn_rate": 160,
+        "max_particles": 400
       },
       "minecraft:emitter_lifetime_once": {
         "active_time": 2.0
@@ -25,7 +25,7 @@
         "radius": 2.5,
         "direction": "outwards"
       },
-      "minecraft:particle_initial_speed": "math.random(2, 6)",
+      "minecraft:particle_initial_speed": "math.random(2, 7)",
       "minecraft:particle_motion_dynamic": {
         "linear_acceleration": [
           0,
@@ -37,33 +37,27 @@
       "minecraft:particle_lifetime_expression": {
         "max_lifetime": "math.random(1, 2)"
       },
+      "minecraft:particle_initial_spin": {
+        "rotation": "math.random(0, 360)",
+        "rotation_rate": "math.random(-240, 240)"
+      },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          "0.4 + v.particle_random_1 * 0.5",
-          "0.4 + v.particle_random_1 * 0.5"
+          "0.5 + v.particle_random_1 * 0.6",
+          "0.5 + v.particle_random_1 * 0.6"
         ],
         "facing_camera_mode": "rotate_xyz",
         "uv": {
-          "texture_width": 128,
-          "texture_height": 128,
-          "flipbook": {
-            "base_UV": [
-              56,
-              0
-            ],
-            "size_UV": [
-              8,
-              8
-            ],
-            "step_UV": [
-              -8,
-              0
-            ],
-            "frames_per_second": 8,
-            "max_frame": 8,
-            "stretch_to_lifetime": true,
-            "loop": false
-          }
+          "texture_width": 256,
+          "texture_height": 256,
+          "uv": [
+            64,
+            0
+          ],
+          "uv_size": [
+            64,
+            64
+          ]
         }
       },
       "minecraft:particle_appearance_tinting": {
@@ -71,7 +65,7 @@
           "interpolant": "v.particle_age / v.particle_lifetime",
           "gradient": {
             "0.0": "#FFFFE08A",
-            "0.4": "#CC4FB33A",
+            "0.4": "#C04FB33A",
             "1.0": "#00203010"
           }
         }
