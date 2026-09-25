@@ -45,7 +45,7 @@ Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, conso
 
 | Particle | Dùng cho |
 |---|---|
-| `toji:thrust` | Vệt đâm bắn theo hướng nhìn (Đâm Vô Hiệu, lúc lao xuống của Giáng Thiên) |
+| `toji:thrust` | Vệt đâm bắn theo hướng nhìn (Đâm Xuyên Vô Hạn, lúc lao xuống của Giáng Thiên) |
 | `toji:null_ring` / `toji:null_ground` | Vòng rune tím nứt vỡ, gai hướng vào tâm, trên mục tiêu / dưới đất khi bị vô hiệu |
 | `toji:shard` | Mảnh kính tím vỡ tung (hiệu ứng của mục tiêu bị phá) |
 | `toji:spear` + `toji:chain_link` | Mâu bay (mũi luôn hướng theo đường bay) và sợi xích nối về tay |
