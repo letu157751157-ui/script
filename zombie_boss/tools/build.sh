@@ -7,6 +7,7 @@ python3 tools/gen_texture.py >/dev/null
 python3 tools/gen_particles.py >/dev/null
 python3 tools/gen_sounds.py >/dev/null
 python3 tools/gen_items.py >/dev/null
+python3 tools/gen_models.py >/dev/null
 V=$(python3 -c "import json;v=json.load(open('ytaun_zombie_pack_behavior_pack/manifest.json'))['header']['version'];print(f'{v[0]}_{v[1]}')")
 mkdir -p dist
 rm -f dist/*.mcaddon

@@ -4156,6 +4156,60 @@
         }
       },
       "loop": false
+    },
+    "animation.ytaun_giant_zombie.alive": {
+      "loop": true,
+      "bones": {
+        "bone8": {
+          "rotation": [
+            "math.sin(q.life_time * 80) * 2",
+            0,
+            "math.sin(q.life_time * 40) * 1.2"
+          ]
+        },
+        "head": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 40) * 3",
+            "math.sin(q.life_time * 30) * 5",
+            "math.sin(q.life_time * 55) * 3"
+          ]
+        },
+        "rightArm": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 20) * 2",
+            0,
+            "-math.sin(q.life_time * 80) * 2.5"
+          ]
+        },
+        "leftArm": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 60) * 2",
+            0,
+            "math.sin(q.life_time * 80) * 2.5"
+          ]
+        },
+        "waist": {
+          "position": [
+            0,
+            "-math.abs(math.sin(q.modified_distance_moved * 13.5)) * math.min(q.modified_move_speed, 0.6) * 2.5",
+            0
+          ]
+        },
+        "ytaun_rag_f": {
+          "rotation": [
+            "math.sin(q.life_time * 200) * 5 - math.min(q.modified_move_speed, 0.6) * 40",
+            0,
+            0
+          ]
+        },
+        "ytaun_rag_b": {
+          "rotation": [
+            "math.sin(q.life_time * 180 + 30) * 5 + math.min(q.modified_move_speed, 0.6) * 40",
+            0,
+            0
+          ]
+        }
+      }
     }
   }
 }

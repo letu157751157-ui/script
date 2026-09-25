@@ -34,7 +34,8 @@
         "summon": "animation.ytaun_giant_zombie.summon",
         "stomp": "animation.ytaun_giant_zombie.stomp",
         "enrage": "animation.ytaun_giant_zombie.enrage",
-        "breath": "animation.ytaun_giant_zombie.breath"
+        "breath": "animation.ytaun_giant_zombie.breath",
+        "alive": "animation.ytaun_giant_zombie.alive"
       },
       "render_controllers": [
         "controller.render.iron_golem",
@@ -47,7 +48,8 @@
         "animate": [
           "look_at_target",
           "move_controller",
-          "arm_controller"
+          "arm_controller",
+          "alive"
         ]
       },
       "spawn_egg": {

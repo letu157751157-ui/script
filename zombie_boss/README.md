@@ -98,3 +98,10 @@ mật phun, vũng axit sủi bọt, cục axit, lưỡi thịt, con mắt quỷ 
 - **Triệu hồi có Zombie General**: mỗi đợt triệu hồi có 1 tướng dẫn quân (tối đa 2 tướng cùng lúc).
 - **Vẽ lại model 3D + icon**: búa Zombie Hammer mới (cán gỗ quấn vải, đầu búa thịt thối đai sắt, mặt đầu lâu, pha lê xanh),
   và icon búa mới khớp model (`tools/gen_items.py`). Các item khác giữ icon gốc.
+
+## v1.9 — model, texture, animation
+- **Texture** Giant Zombie & Zombie General tô lại theo từng mặt khối (`tools/gen_models.py`, gốc lưu ở `tools/orig/`):
+  mặt trên sáng, mặt dưới tối, viền tối (AO), da thịt thối nhiều sắc độ + đốm thối, vải rách có đường khâu và mép sờn.
+- **Model boss**: thêm gai xương trên 2 vai, 3 gai xương sau lưng, dải vải rách trước/sau hông (bone mới, giữ nguyên rig cũ nên các chiêu vẫn khớp).
+- **Animation "alive"** chạy liên tục: boss thở, lắc đầu, tay đung đưa, bước đi nặng nề (nhún hông), vải bay theo tốc độ chạy;
+  Zombie General thở và ngó nghiêng.

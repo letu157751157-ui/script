@@ -2140,6 +2140,39 @@
           }
         }
       }
+    },
+    "animation.ytaun_zombie_geneal.alive": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "math.sin(q.life_time * 90) * 3",
+            "math.sin(q.life_time * 35) * 6",
+            0
+          ]
+        },
+        "bone8": {
+          "rotation": [
+            "math.sin(q.life_time * 90 + 30) * 2",
+            0,
+            0
+          ]
+        },
+        "rightArm": {
+          "rotation": [
+            0,
+            0,
+            "-math.sin(q.life_time * 90) * 3"
+          ]
+        },
+        "leftArm": {
+          "rotation": [
+            0,
+            0,
+            "math.sin(q.life_time * 90) * 3"
+          ]
+        }
+      }
     }
   }
 }
