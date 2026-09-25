@@ -25,26 +25,34 @@ export const CONFIG = {
     vertical: 0.45,
   },
 
-  // Right-click — Nullifying Thrust: short lunge + straight stab that pierces every target in a line
+  // Right-click — Pierce Infinity (the stab through Gojo's Infinity): blink forward and stab;
+  // an Infinity barrier appears on each target and shatters, the target is pierced (short stun)
   thrust: {
     cooldown: 5,
     windup: 0.3, // matches the strike keyframe of the "thrust" animation
-    lunge: 1.4,
-    length: 5.5,
+    lunge: 2.0,
+    length: 6,
     width: 1.8,
-    damage: 10,
+    damage: 11,
+    stun: 0.5,
     knockback: 0.9,
   },
 
-  // Sneak + right-click — Thousand-Mile Chain: throw the spear on its chain.
-  // Hits a target: damage, stun and yank it back to you. Hits a wall/ground: grapple yourself there.
+  // Sneak + right-click — Thousand-Mile Chain whirl: swing the spear on its chain in circles around you
+  // (hits everything in the ring on each lap), then hurl it forward.
+  // The hurled spear: hits a target = damage, stun and yank it back; hits a wall/ground = grapple yourself there.
   chain: {
     cooldown: 10,
-    release: 0.3, // matches the release keyframe of the "throw" animation
-    range: 22,
-    speed: 1.8, // blocks per tick
+    spinTime: 0.9, // seconds of whirling, the release matches the "whirl" animation (1.05 s)
+    release: 1.05,
+    spinRadius: 4.5,
+    laps: 2,
+    spinDamage: 5,
+    spinKnockback: 1.1,
+    range: 24,
+    speed: 2, // blocks per tick
     hitRadius: 1.5,
-    damage: 7,
+    damage: 8,
     stun: 1,
     pullPerBlock: 0.32,
     maxPull: 3.2,
@@ -52,15 +60,18 @@ export const CONFIG = {
     maxGrapple: 3.5,
   },
 
-  // Sprint + attack (or sprint + right-click) — Heavenly Rush: dash through enemies with 3 quick slashes
+  // Sprint + attack (or sprint + right-click) — Heavenly Ambush: Toji has no cursed energy, nobody senses him.
+  // He vanishes, reappears behind the target you look at and cuts an X into its back
   rush: {
-    cooldown: 6,
+    cooldown: 7,
+    range: 14, // how far away the target can be
+    behind: 1.6, // blocks behind the target
+    cuts: [0.15, 0.35], // seconds after reappearing, match the "ambush" animation
+    damage: 7, // per cut (the 2 cuts land as one hit, see main.js)
+    stun: 0.8,
+    // no target in sight: a plain vanishing dash instead
     strength: 2.6,
     vertical: 0.12,
-    hitRadius: 1.8,
-    slashes: 3,
-    slashInterval: 4, // ticks between slashes on a caught target
-    damage: 3.5,
   },
 
   // Hold the spear 20 s — Heavenly Restriction: Awakened (triggers by itself)
@@ -75,10 +86,14 @@ export const CONFIG = {
     cooldownMultiplier: 0.5, // skill cooldowns while awakened
   },
 
-  // Hold 20 s + jump (while awakened) — Heaven-Splitting Plunge: leap, then drive the spear into the ground
+  // Hold 20 s + jump (while awakened) — Heaven-Splitting Plunge: leap onto the nearest enemy in front
+  // and drive the spear down through it into the ground
   plunge: {
     leap: 1.3, // upward launch
-    forward: 0.8,
+    forward: 0.8, // forward push when there is no target
+    lockRange: 12, // enemies this close in front are targeted
+    homing: 0.2, // forward push per block of distance to the target
+    maxHoming: 2.4,
     diveAt: 0.7, // seconds after the leap, matches the "plunge" animation
     diveSpeed: 3.2,
     maxFall: 2.5, // impact at the latest after this many seconds

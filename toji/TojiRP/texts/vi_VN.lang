@@ -1,15 +1,15 @@
 item.toji.inverted_spear.name=§fThiên Nghịch Mâu
 item.toji.inverted_spear_awakened.name=§fThiên Nghịch Mâu §d(Thức Tỉnh)
 item.toji.inverted_spear_thrown.name=§fThiên Nghịch Mâu §7(Đã ném)
-toji.skill.thrust=Đâm Vô Hiệu
+toji.skill.thrust=Đâm Xuyên Vô Hạn
 toji.skill.chain=Xích Vạn Lý
-toji.skill.rush=Thiên Dữ Tốc Trảm
+toji.skill.rush=Ám Sát Sau Lưng
 toji.skill.awaken=Thiên Dữ Chú Phược
 toji.skill.plunge=Giáng Thiên Nhất Kích
 toji.skill.finisher=Đòn Kết Liễu
 toji.short.thrust=Đâm
 toji.short.chain=Xích
-toji.short.rush=Trảm
+toji.short.rush=Ám Sát
 toji.bar.hold=§7Cầm %s
 toji.bar.awake=§f§lTHỨC TỈNH %ss
 toji.bar.plunge_ready=§dNhảy: Giáng Thiên
@@ -28,10 +28,10 @@ toji.title.awaken=§f§lTHIÊN DỮ CHÚ PHƯỢC
 toji.title.awaken_hint=§7Đã thức tỉnh — §fnhảy§7 để dùng §dGiáng Thiên Nhất Kích
 toji.guide.0=§5━━━━━━ Thiên Nghịch Mâu ━━━━━━
 toji.guide.1=§7Cầm mâu trên tay (điện thoại: chuột phải = §fchạm màn hình§7 / nút §fDùng§7):
-toji.guide.2=§f Chuột phải §7— §fĐâm Vô Hiệu§7: lao tới đâm xuyên một hàng, xoá sạch buff của mục tiêu
-toji.guide.3=§f Khuỵu + chuột phải §7— §fXích Vạn Lý§7: ném mâu; trúng địch = giật về, trúng tường = kéo mình tới
-toji.guide.4=§f Chạy + chém §7— §fThiên Dữ Tốc Trảm§7: lướt xuyên kẻ địch, chém 3 nhát
-toji.guide.5=§f Cầm 20s §7— §fThiên Dữ Chú Phược§7: thức tỉnh 15s (tốc độ, sức mạnh, hồi chiêu giảm nửa)
-toji.guide.6=§f Cầm 20s + nhảy §7— §dGiáng Thiên Nhất Kích§7: nhảy vọt lên rồi cắm mâu xuống đất
+toji.guide.2=§f Chuột phải §7— §fĐâm Xuyên Vô Hạn§7: lướt tới đâm xuyên mọi lớp phòng thủ, xoá sạch buff
+toji.guide.3=§f Khuỵu + chuột phải §7— §fXích Vạn Lý§7: quay mâu theo xích quanh người rồi ném (trúng địch = giật về, trúng tường = kéo mình tới)
+toji.guide.4=§f Chạy + chém §7— §fÁm Sát Sau Lưng§7: biến mất, hiện ra sau lưng kẻ địch đang nhìn, chém chữ X
+toji.guide.5=§f Cầm 20s §7— §fThiên Dữ Chú Phược§7: thức tỉnh 15s, chú linh kho chứa quấn quanh người (tốc độ, sức mạnh, hồi chiêu giảm nửa)
+toji.guide.6=§f Cầm 20s + nhảy §7— §dGiáng Thiên Nhất Kích§7: lao lên rồi cắm mâu xuống kẻ địch gần nhất
 toji.guide.7=§f Đánh 4 lần §7— đòn thứ 4 là cú xoay chém kết liễu. Mọi đòn đánh đều vô hiệu buff.
 toji.guide.8=§7Gõ §f/scriptevent toji:help §7để xem lại.

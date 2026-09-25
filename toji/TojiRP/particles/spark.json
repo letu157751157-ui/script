@@ -41,8 +41,8 @@
           "mode": "derive_from_velocity"
         },
         "uv": {
-          "texture_width": 128,
-          "texture_height": 128,
+          "texture_width": 256,
+          "texture_height": 256,
           "uv": [
             24,
             96

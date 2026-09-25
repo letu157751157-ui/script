@@ -2,7 +2,7 @@
 // It runs the real script in Node so skill flows can be exercised without the game (see sim.mjs).
 // Physics are not simulated: knockback, particles, sounds and animations are recorded for assertions.
 
-export const log = { particles: [], sounds: [], anims: [], knockbacks: [], damage: [], titles: [], actionBars: [], messages: [] };
+export const log = { particles: [], sounds: [], anims: [], knockbacks: [], damage: [], titles: [], actionBars: [], messages: [], teleports: [] };
 
 const handlers = {};
 function signal(name) {
@@ -147,6 +147,10 @@ export class Entity {
     return this.effects.delete(id);
   }
   setOnFire() {}
+  teleport(location, options) {
+    this.location = { ...location };
+    log.teleports.push({ entity: this.id, location: { ...location }, facing: options?.facingLocation });
+  }
 }
 
 export class Player extends Entity {

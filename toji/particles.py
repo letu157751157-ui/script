@@ -11,7 +11,7 @@ import os
 
 import model
 
-ATLAS = 128
+ATLAS = 256
 TEXTURE = "textures/particle/toji_particles"
 
 STEEL = {"W": (255, 255, 255), "L": (206, 222, 245), "B": (140, 162, 206), "V": (150, 110, 230), "D": (70, 44, 120)}
@@ -238,6 +238,96 @@ def spear_sprite():
     return out
 
 
+INFINITY = {"W": (240, 250, 255), "L": (150, 210, 255), "B": (70, 140, 240), "D": (30, 60, 150)}
+BLUE_SHARD = {"W": (240, 250, 255), "V": (150, 210, 255), "P": (70, 140, 240), "D": (30, 60, 150)}
+WORM = {"K": (30, 20, 30), "D": (86, 62, 84), "M": (132, 100, 124), "L": (184, 150, 170), "R": (190, 40, 60), "W": (240, 230, 220)}
+
+
+def infinity_frame(frame):
+    """32x32 Gojo's Infinity barrier: a hexagon lattice, cracking then shattering as the spear passes."""
+    cracks = (0.0, 0.25, 0.6)[frame]
+
+    def pixel(x, y):
+        px, py = x + 0.5 - 16, y + 0.5 - 16
+        # hexagon outline of the panel
+        hexd = max(abs(px) * 0.866 + abs(py) * 0.5, abs(py))
+        if hexd > 15:
+            return "."
+        if hash01(x // 3, y // 3, 70 + frame) < cracks:
+            return "."
+        if hexd > 13.8:
+            return "W"
+        # inner hex cells
+        q = (px * 0.577 - py / 3) / 4
+        r = (py * 2 / 3) / 4
+        fq, fr = q - math.floor(q), r - math.floor(r)
+        edge = min(fq, 1 - fq, fr, 1 - fr, abs(fq + fr - 1))
+        if edge < 0.09:
+            return "L"
+        # radial crack lines from the impact point in the center
+        a = math.atan2(py, px)
+        if frame and abs(math.sin(a * 5)) < 0.08 and math.hypot(px, py) < 14:
+            return "W"
+        return "B" if hash01(x, y, 90) < 0.5 else "D"
+
+    return grid(32, 32, pixel)
+
+
+def x_slash_frame(frame):
+    """32x32 giant X cut: two thin steel crescents crossing; frays apart."""
+    fade = (1.0, 0.8, 0.5)[frame]
+    holes = (0.0, 0.2, 0.55)[frame]
+
+    def cut(px, py, sign):
+        # distance to the diagonal line, the cut is widest in the middle
+        t = (px + sign * py) / math.sqrt(2)
+        d = abs(px - sign * py) / math.sqrt(2)
+        width = 2.4 * (1 - (t / 15) ** 2)
+        return 1 - d / width if width > 0 and d < width else 0
+
+    def pixel(x, y):
+        px, py = x + 0.5 - 16, y + 0.5 - 16
+        heat = max(cut(px, py, 1), cut(px, py, -1)) * fade
+        if heat <= 0 or hash01(x, y, 110 + frame) < holes:
+            return "."
+        return steel_char(heat + 0.15)
+
+    return grid(32, 32, pixel)
+
+
+def worm_body():
+    """16x16 segment of the Inventory Curse (the worm Toji stores his weapons in): ringed, fleshy."""
+    def pixel(x, y):
+        d = math.hypot(x + 0.5 - 8, y + 0.5 - 8)
+        if d > 7:
+            return "."
+        if d > 6.2:
+            return "K"
+        if (x + 1) % 5 == 0:
+            return "D"
+        return "L" if y < 6 else "M" if y < 11 else "D"
+
+    return grid(16, 16, pixel)
+
+
+def worm_head():
+    """16x16 worm head: round, a wide red mouth with teeth, two small eyes."""
+    def pixel(x, y):
+        px, py = x + 0.5 - 8, y + 0.5 - 8
+        d = math.hypot(px, py)
+        if d > 7.5:
+            return "."
+        if d > 6.7:
+            return "K"
+        if py > 0.5 and abs(px) < 5 and py < 5:
+            return "W" if py < 1.8 and x % 2 == 0 else "R"
+        if py < -2 and py > -4 and abs(abs(px) - 3) < 1:
+            return "K"
+        return "L" if py < -3 else "M"
+
+    return grid(16, 16, pixel)
+
+
 # name: (x, y, frames, palette or None for raw RGBA frames)
 SPRITES = {
     "slash": (0, 0, [slash_frame(i) for i in range(3)], STEEL),
@@ -254,6 +344,11 @@ SPRITES = {
     "spark": (24, 96, [SPARK], STEEL),
     "chain": (28, 96, [CHAIN], STEEL),
     "drop": (34, 96, [DROP], BLOOD),
+    "x_slash": (128, 0, [x_slash_frame(i) for i in range(3)], STEEL),
+    "infinity": (128, 32, [infinity_frame(i) for i in range(3)], INFINITY),
+    "shard_blue": (224, 32, [shard_frame(i) for i in range(3)], BLUE_SHARD),
+    "worm_body": (128, 64, [worm_body()], WORM),
+    "worm_head": (144, 64, [worm_head()], WORM),
 }
 
 
@@ -550,6 +645,69 @@ PARTICLES = {
             "size": [0.18, 0.18], "facing_camera_mode": "rotate_xyz", "uv": uv("dust"),
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#FF9A8A80", "1.0": "#FF6A5E58"}),
+    }),
+    # Pierce: Gojo's Infinity barrier appears in front of the target and shatters
+    "infinity": particle("toji:infinity", "particles_blend", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.45},
+        "minecraft:particle_appearance_billboard": {
+            "size": [f"1.1 + {AGE} * 0.4", f"1.1 + {AGE} * 0.4"], "facing_camera_mode": "rotate_xyz", "uv": uv("infinity"),
+        },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#EEFFFFFF", "0.7": "#CCFFFFFF", "1.0": "#00FFFFFF"}),
+    }),
+    "shard_blue": particle("toji:shard_blue", "particles_add", {
+        **burst(22),
+        "minecraft:emitter_shape_sphere": {"radius": 0.5, "direction": "outwards"},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.5, 1.0)"},
+        "minecraft:particle_initial_speed": "math.random(4, 8)",
+        "minecraft:particle_initial_spin": {"rotation": "math.random(0, 360)", "rotation_rate": "math.random(-500, 500)"},
+        "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -10, 0], "linear_drag_coefficient": 2.5},
+        "minecraft:particle_appearance_billboard": {
+            "size": [0.16, 0.16], "facing_camera_mode": "rotate_xyz", "uv": uv("shard_blue"),
+        },
+        "minecraft:particle_appearance_tinting": FADE,
+    }),
+    # Giant X cut (Heavenly Ambush, plunge impact); size in v.radius
+    "x_slash": particle("toji:x_slash", "particles_add", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.35},
+        "minecraft:particle_initial_spin": {"rotation": "math.random(-15, 15)"},
+        "minecraft:particle_appearance_billboard": {
+            "size": [f"v.radius * (0.8 + {AGE} * 0.3)", f"v.radius * (0.8 + {AGE} * 0.3)"],
+            "facing_camera_mode": "rotate_xyz", "uv": uv("x_slash"),
+        },
+        "minecraft:particle_appearance_tinting": FADE,
+    }),
+    # Inventory Curse worm: segments/head spawned every tick along its path (short-lived so it moves smoothly)
+    "worm_body": particle("toji:worm_body", "particles_alpha", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.12},
+        "minecraft:particle_appearance_billboard": {
+            "size": ["v.radius", "v.radius"], "facing_camera_mode": "rotate_xyz", "uv": uv("worm_body"),
+        },
+    }),
+    "worm_head": particle("toji:worm_head", "particles_alpha", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.12},
+        "minecraft:particle_appearance_billboard": {
+            "size": [0.34, 0.34], "facing_camera_mode": "rotate_xyz", "uv": uv("worm_head"),
+        },
+    }),
+    # Vanishing: dark smoke burst where Toji disappears (no cursed energy: he just vanishes)
+    "vanish": particle("toji:vanish", "particles_alpha", {
+        **burst(16),
+        "minecraft:emitter_shape_sphere": {"radius": 0.6, "direction": "outwards"},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.4, 0.8)"},
+        "minecraft:particle_initial_speed": "math.random(1, 3)",
+        "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, 0.5, 0], "linear_drag_coefficient": 3},
+        "minecraft:particle_appearance_billboard": {
+            "size": [f"0.4 + {AGE} * 0.5", f"0.4 + {AGE} * 0.5"], "facing_camera_mode": "rotate_xyz", "uv": uv("dust"),
+        },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#EE201830", "1.0": "#00100C18"}),
     }),
 }
 

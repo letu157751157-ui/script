@@ -58,23 +58,30 @@ tick(5);
 check("thrust on cooldown: no second cast", !anims().includes("animation.toji.thrust"));
 check("cooldown notice on the bar", JSON.stringify(log.actionBars.at(-1)).includes("toji.notice.cooldown"));
 
-// --- Sneak + right-click: Thousand-Mile Chain hitting a mob
+// --- Sneak + right-click: Chain of a Thousand Miles — whirl, then hurl into a mob
 tick(10);
 clear();
 away(zombie);
+const spun = new Entity("minecraft:zombie", { x: 5.0, y: 64, z: 0.5 }, 40);
 const target = new Entity("minecraft:skeleton", { x: 0.5, y: 64, z: 10.5 }, 40);
 player.isSneaking = true;
 useItem(player);
-tick(CONFIG.chain.release * 20);
-check("throw animation", anims().includes("animation.toji.throw"));
-check("spear leaves the hand (chain-only variant)", held(player) === "toji:inverted_spear_thrown", held(player));
+tick(2);
+check("whirl animation", anims().includes("animation.toji.whirl"));
+check("spear leaves the hand at once (chain-only variant)", held(player) === "toji:inverted_spear_thrown", held(player));
+tick(CONFIG.chain.release * 20 - 2);
+check("whirling spear orbits (spear particles all around)", new Set(log.particles.filter((p) => p.id === "toji:spear").map((p) => Math.sign(Math.round(p.location.x - 0.5)) + "," + Math.sign(Math.round(p.location.z - 0.5)))).size >= 4);
+check("whirl hits enemies in the ring", near(damageTo(spun), CONFIG.chain.spinDamage), `${damageTo(spun)}`);
+check("whirl knocks them outward", knockbacksOf(spun).some((k) => k.horizontal.x > 0));
+check("the far target is not hit by the whirl", damageTo(target) === 0);
 tick(8);
-check("chain hits the target", near(damageTo(target), CONFIG.chain.damage), `${damageTo(target)}`);
+check("hurled spear hits the target", near(damageTo(target), CONFIG.chain.damage), `${damageTo(target)}`);
 check("target stunned", target.getEffect("slowness")?.amplifier === 255);
 check("target yanked toward the player", knockbacksOf(target).some((k) => k.horizontal.z < 0));
 check("skills blocked while the spear is out", (useItem(player), !anims().includes("animation.toji.thrust")));
 tick(15);
 check("spear comes back to the hand", held(player) === "toji:inverted_spear", held(player));
+away(spun);
 
 // --- Chain into a wall: grapple
 tick(CONFIG.chain.cooldown * 20);
@@ -89,18 +96,29 @@ check("spear back after grapple", held(player) === "toji:inverted_spear", held(p
 dimension.solid.clear();
 player.isSneaking = false;
 
-// --- Sprint + attack: Heavenly Rush
+// --- Sprint + attack: Heavenly Ambush
 clear();
-const runner = new Entity("minecraft:zombie", { x: 0.5, y: 64, z: 2.5 }, 60);
+const runner = new Entity("minecraft:zombie", { x: 0.5, y: 64, z: 6.5 }, 60);
 player.isSprinting = true;
-fire("entityHitEntity", { damagingEntity: player, hitEntity: runner });
-tick(12);
-check("rush animation", anims().includes("animation.toji.rush"));
-check("rush dashes forward", knockbacksOf(player).some((k) => k.horizontal.z >= CONFIG.rush.strength - 1e-6));
-check("rush 3 slashes land", near(damageTo(runner), CONFIG.rush.damage * CONFIG.rush.slashes), `${damageTo(runner)}`);
-check("rush slash particles", log.particles.filter((p) => p.id === "toji:slash").length >= CONFIG.rush.slashes);
-player.isSprinting = false;
+fire("entityHitBlock", { damagingEntity: player });
+tick(2);
+check("ambush vanish smoke", log.particles.some((p) => p.id === "toji:vanish"));
+check("reappears behind the target", log.teleports.some((t) => t.entity === player.id && near(t.location.z, 6.5 + CONFIG.rush.behind)), JSON.stringify(log.teleports));
+check("faces the target", log.teleports.at(-1)?.facing?.z === 6.5);
+check("ambush animation", anims().includes("animation.toji.ambush"));
+tick(10);
+check("X cut damage", near(damageTo(runner), CONFIG.rush.damage * CONFIG.rush.cuts.length), `${damageTo(runner)}`);
+check("X cut particle", log.particles.some((p) => p.id === "toji:x_slash"));
+check("knocked away from Toji", knockbacksOf(runner).some((k) => k.horizontal.z > 0));
+// no target in sight: vanishing dash
+player.location = { x: 0.5, y: 64, z: 0.5 };
 away(runner);
+tick(CONFIG.rush.cooldown * 20);
+clear();
+fire("entityHitBlock", { damagingEntity: player });
+tick(3);
+check("no target: vanishing dash", knockbacksOf(player).some((k) => k.horizontal.z >= CONFIG.rush.strength - 1e-6) && log.teleports.length === 0);
+player.isSprinting = false;
 
 // --- 4 normal hits: combo finisher
 clear();
@@ -139,13 +157,14 @@ away(victim);
 // --- Hold 20 s + jump: Heaven-Splitting Plunge
 tick(5); // wait for the thrust to finish
 clear();
-const crowd = [0, 1, 2].map((i) => new Entity("minecraft:zombie", { x: 2 + i, y: 64, z: 1 }, 80));
+const crowd = [0, 1, 2].map((i) => new Entity("minecraft:zombie", { x: 1 + i * 0.8, y: 64, z: 3 }, 80));
 fire("playerButtonInput", { player, button: "Jump", newButtonState: "Pressed" });
 check("plunge animation", anims().includes("animation.toji.plunge"));
 check("plunge immunity", player.getEffect("resistance")?.amplifier === 4);
 tick(3);
 player.isOnGround = false;
 check("plunge leap", knockbacksOf(player).some((k) => k.vertical === CONFIG.plunge.leap));
+check("plunge homes onto the nearest enemy", knockbacksOf(player).some((k) => k.vertical === CONFIG.plunge.leap && k.horizontal.x > 0));
 tick(CONFIG.plunge.diveAt * 20);
 check("plunge dives down", knockbacksOf(player).some((k) => k.vertical === -CONFIG.plunge.diveSpeed));
 check("no damage before landing", crowd.every((z) => damageTo(z) === 0));
@@ -200,7 +219,7 @@ player.location = { x: 0.5, y: 64, z: 5.5 };
 other.location = { x: 8.5, y: 64, z: 5.5 };
 other.isSneaking = true;
 useItem(other);
-tick(12);
+tick(CONFIG.chain.release * 20 + 8);
 clear();
 useItem(player);
 tick(8);

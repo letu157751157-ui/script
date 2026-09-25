@@ -1,15 +1,15 @@
 item.toji.inverted_spear.name=§fInverted Spear of Heaven
 item.toji.inverted_spear_awakened.name=§fInverted Spear of Heaven §d(Awakened)
 item.toji.inverted_spear_thrown.name=§fInverted Spear of Heaven §7(Thrown)
-toji.skill.thrust=Nullifying Thrust
-toji.skill.chain=Thousand-Mile Chain
-toji.skill.rush=Heavenly Rush
+toji.skill.thrust=Pierce Infinity
+toji.skill.chain=Chain of a Thousand Miles
+toji.skill.rush=Heavenly Ambush
 toji.skill.awaken=Heavenly Restriction
 toji.skill.plunge=Heaven-Splitting Plunge
 toji.skill.finisher=Combo Finisher
-toji.short.thrust=Thrust
+toji.short.thrust=Pierce
 toji.short.chain=Chain
-toji.short.rush=Rush
+toji.short.rush=Ambush
 toji.bar.hold=§7Hold %s
 toji.bar.awake=§f§lAWAKENED %ss
 toji.bar.plunge_ready=§dJump: Plunge
@@ -23,15 +23,15 @@ toji.notice.cooldown=§c%s on cooldown: %ss
 toji.notice.stunned=§cYou are stunned!
 toji.notice.nullified=§5Your effects were nullified!
 toji.title.name=§fInverted Spear of Heaven
-toji.title.hint=§7Right-click / tap to §fthrust§7 — hold it §f20s§7 to awaken
+toji.title.hint=§7Right-click / tap to §fpierce§7 — hold it §f20s§7 to awaken
 toji.title.awaken=§f§lHEAVENLY RESTRICTION
 toji.title.awaken_hint=§7Awakened — §fjump§7 for §dHeaven-Splitting Plunge
 toji.guide.0=§5━━━━━━ Inverted Spear of Heaven ━━━━━━
 toji.guide.1=§7Hold the spear (mobile: right-click = §ftap the screen§7 / §fUse§7 button):
-toji.guide.2=§f Right-click §7— §fNullifying Thrust§7: lunge and stab, pierces a line and strips all buffs
-toji.guide.3=§f Sneak + right-click §7— §fThousand-Mile Chain§7: throw the spear; hit = yank the target, wall = grapple
-toji.guide.4=§f Sprint + attack §7— §fHeavenly Rush§7: dash through enemies with 3 slashes
-toji.guide.5=§f Hold 20s §7— §fHeavenly Restriction§7: awaken for 15s (speed, strength, halved cooldowns)
-toji.guide.6=§f Hold 20s + jump §7— §dHeaven-Splitting Plunge§7: leap and drive the spear into the ground
+toji.guide.2=§f Right-click §7— §fPierce Infinity§7: blink and stab through any barrier, strips all buffs
+toji.guide.3=§f Sneak + right-click §7— §fChain of a Thousand Miles§7: whirl the spear around you, then hurl it (hit = yank, wall = grapple)
+toji.guide.4=§f Sprint + attack §7— §fHeavenly Ambush§7: vanish, reappear behind the enemy you look at, X cut
+toji.guide.5=§f Hold 20s §7— §fHeavenly Restriction§7: awaken 15s, the Inventory Curse coils around you (speed, strength, halved cooldowns)
+toji.guide.6=§f Hold 20s + jump §7— §dHeaven-Splitting Plunge§7: leap onto the nearest enemy and drive the spear through it
 toji.guide.7=§f Attack 4 times §7— the 4th hit is a spinning finisher. Every hit nullifies positive effects.
 toji.guide.8=§7Type §f/scriptevent toji:help §7to see this again.

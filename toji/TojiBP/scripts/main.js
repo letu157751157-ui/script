@@ -2,9 +2,9 @@
 // for Minecraft Bedrock, Script API @minecraft/server 2.x
 //
 // While holding the spear:
-//   Right-click                    Nullifying Thrust
-//   Sneak + right-click            Thousand-Mile Chain
-//   Sprint + attack                Heavenly Rush (sprint + right-click also works)
+//   Right-click                    Pierce Infinity (stab through an Infinity barrier)
+//   Sneak + right-click            Thousand-Mile Chain whirl, then hurl
+//   Sprint + attack                Heavenly Ambush: vanish, reappear behind the target, X cut (sprint + right-click too)
 //   Hold the spear 20 s            Heavenly Restriction: Awakened (triggers by itself)
 //   Hold 20 s + jump (awakened)    Heaven-Splitting Plunge
 //   Normal attacks                 4-hit combo, the 4th hit is a spinning finisher
@@ -43,6 +43,12 @@ const P = {
   flash: "toji:flash",
   blood: "toji:blood",
   debris: "toji:debris",
+  infinity: "toji:infinity",
+  shardBlue: "toji:shard_blue",
+  xSlash: "toji:x_slash",
+  wormBody: "toji:worm_body",
+  wormHead: "toji:worm_head",
+  vanish: "toji:vanish",
   stun: "minecraft:villager_angry",
 };
 
@@ -73,18 +79,18 @@ const shortName = (skill) => tr(`toji.short.${skill}`);
 // Item lore (tooltip) cannot be translated per player: CONFIG.loreLanguage picks it
 const LORE = {
   en: [
-    "§7Right-click/tap: §fNullifying Thrust",
-    "§7Sneak + right-click: §fThousand-Mile Chain",
-    "§7Sprint + attack: §fHeavenly Rush",
+    "§7Right-click/tap: §fPierce Infinity",
+    "§7Sneak + right-click: §fChain whirl + hurl",
+    "§7Sprint + attack: §fHeavenly Ambush",
     "§7Hold 20s: §fHeavenly Restriction",
     "§7Hold 20s + jump: §dHeaven-Splitting Plunge",
     "§7Attack x4: §fcombo finisher",
     "§7Every hit: §5nullifies effects",
   ],
   vi: [
-    "§7Chuột phải/chạm: §fĐâm Vô Hiệu",
-    "§7Khuỵu + chuột phải: §fXích Vạn Lý",
-    "§7Chạy + chém: §fThiên Dữ Tốc Trảm",
+    "§7Chuột phải/chạm: §fĐâm Xuyên Vô Hạn",
+    "§7Khuỵu + chuột phải: §fXích Vạn Lý (quay + ném)",
+    "§7Chạy + chém: §fÁm Sát Sau Lưng",
     "§7Cầm 20s: §fThiên Dữ Chú Phược",
     "§7Cầm 20s + nhảy: §dGiáng Thiên Nhất Kích",
     "§7Đánh 4 lần: §fđòn kết liễu",
@@ -463,7 +469,7 @@ function syncSpear(player) {
 }
 
 // ---------------------------------------------------------------------------
-// Normal attacks — 4-hit combo + passive nullification (+ sprint attack = Heavenly Rush)
+// Normal attacks — 4-hit combo + passive nullification (+ sprint attack = Heavenly Ambush)
 // ---------------------------------------------------------------------------
 
 world.afterEvents.entityHitEntity.subscribe(({ damagingEntity: player, hitEntity: target }) => {
@@ -570,12 +576,20 @@ function castThrust(player, state, direction) {
     const aimed = aimedTarget(player, cfg.length + 1);
     if (aimed && !targets.some((e) => e.id === aimed.id)) targets.push(aimed);
     for (const target of targets) {
+      // The Infinity barrier appears between the spear and the target, then shatters as the spear goes through
+      const front = add(up(target.location, 1.1), direction, -0.7);
+      particle(dimension, P.infinity, front);
+      system.runTimeout(() => {
+        particle(dimension, P.shardBlue, front);
+        particle(dimension, P.flash, front);
+        sound(dimension, "random.glass", front, 1.4);
+      }, 2);
       nullify(target, true);
       dealDamage(player, target, cfg.damage);
+      stun(target, cfg.stun);
       knockback(target, { x: direction.x * cfg.knockback, z: direction.z * cfg.knockback }, 0.25);
       particle(dimension, P.blood, up(target.location, 1));
-      particle(dimension, P.flash, up(target.location, 1));
-      shake(target, 0.25, 0.2);
+      shake(target, 0.3, 0.25);
     }
     if (targets.length) {
       sound(dimension, "item.trident.hit", origin, 0.9);
@@ -588,7 +602,7 @@ function castThrust(player, state, direction) {
 // Sneak + right-click — Thousand-Mile Chain
 // ---------------------------------------------------------------------------
 
-const MAX_THROW = 40; // ticks: the spear always comes back after this long
+const MAX_THROW = 40; // ticks: a hurled spear always comes back after this long
 
 function isBlocked(dimension, location) {
   try {
@@ -599,22 +613,60 @@ function isBlocked(dimension, location) {
   }
 }
 
+// Thousand-Mile Chain: the spear leaves the hand at once and whirls around Toji on its chain,
+// hitting everything in the ring on each lap, then is hurled forward (launchChain)
 function castChain(player, state) {
+  const cfg = CONFIG.chain;
   startCooldown(state, "chain");
-  const release = ticks(CONFIG.chain.release);
+  const spinTicks = ticks(cfg.spinTime);
+  const release = ticks(cfg.release);
   state.busyUntil = now() + release + MAX_THROW;
-  playAnim(player, "throw");
+  playAnim(player, "whirl");
   sound(player.dimension, "item.trident.return", player.location, 0.6);
+  releaseSpear(player, state, release + MAX_THROW);
+
+  const dimension = player.dimension;
+  const start = Math.atan2(aimDirection(player).z, aimDirection(player).x) + Math.PI; // start behind
+  const hitOnLap = new Map(); // entity id -> last lap it was hit on
+  let elapsed = 0;
+  const spin = system.runInterval(() => {
+    if (!player.isValid || ++elapsed > spinTicks) return system.clearRun(spin);
+    const progress = elapsed / spinTicks;
+    const lap = Math.floor(progress * cfg.laps);
+    // The chain pays out during the first half-lap, then keeps full length
+    const radius = cfg.spinRadius * Math.min(1, 0.35 + progress * 2);
+    const angle = start + progress * cfg.laps * Math.PI * 2;
+    const center = up(player.location, 1.5);
+    const head = { x: center.x + Math.cos(angle) * radius, y: center.y + 0.3 * Math.sin(angle * 2), z: center.z + Math.sin(angle) * radius };
+    const tangent = { x: -Math.sin(angle), y: 0, z: Math.cos(angle) };
+    particle(dimension, P.spear, head, withDirection(tangent));
+    particleLine(dimension, P.chain, handLocation(player), head, 0.6);
+    if (elapsed % 2 === 0) particle(dimension, P.slash, head);
+    if (elapsed % 5 === 0) sound(dimension, "mob.phantom.swoop", head, 1.6, 0.8);
+    if (elapsed % 3 === 0) particle(dimension, P.dust, { x: head.x, y: player.location.y + 0.1, z: head.z });
+
+    for (const target of getTargetsNear(player, head, 1.8)) {
+      if ((hitOnLap.get(target.id) ?? -1) >= lap) continue;
+      hitOnLap.set(target.id, lap);
+      const away = flatUnit({ x: target.location.x - player.location.x, z: target.location.z - player.location.z }) ?? tangent;
+      nullify(target);
+      dealDamage(player, target, cfg.spinDamage);
+      knockback(target, { x: away.x * cfg.spinKnockback, z: away.z * cfg.spinKnockback }, 0.3);
+      particle(dimension, P.blood, up(target.location, 1));
+      sound(dimension, "item.trident.hit", target.location, 1.1);
+      shake(target, 0.2, 0.2);
+    }
+  }, 1);
   system.runTimeout(() => launchChain(player, state), release);
 }
 
 // The spear leaves the hand: only the chain stays until it comes back
-function releaseSpear(player, state) {
-  state.thrownUntil = now() + MAX_THROW;
+function releaseSpear(player, state, duration = MAX_THROW) {
+  state.thrownUntil = now() + duration;
   syncSpear(player);
   system.runTimeout(() => {
     if (state.thrownUntil && !isThrown(state)) returnSpear(player, state);
-  }, MAX_THROW + 1);
+  }, duration + 1);
 }
 
 function returnSpear(player, state) {
@@ -628,7 +680,7 @@ function returnSpear(player, state) {
 
 function launchChain(player, state) {
   if (!canAct(player)) {
-    state.busyUntil = now();
+    returnSpear(player, state);
     return;
   }
   const cfg = CONFIG.chain;
@@ -638,6 +690,7 @@ function launchChain(player, state) {
   let travelled = 0;
   releaseSpear(player, state);
   sound(dimension, "item.trident.throw", player.location, 0.7);
+  sound(dimension, "mob.phantom.swoop", player.location, 0.8);
   shake(player, 0.1, 0.1);
 
   const flight = system.runInterval(() => {
@@ -741,58 +794,98 @@ function grapple(player, state, point) {
 }
 
 // ---------------------------------------------------------------------------
-// Sprint + attack — Heavenly Rush
+// Sprint + attack — Heavenly Ambush
 // ---------------------------------------------------------------------------
+
+// The enemy you look at: under the crosshair first, else the closest one inside a narrow cone
+function ambushTarget(player, range) {
+  const aimed = aimedTarget(player, range);
+  if (aimed) return aimed;
+  const eye = player.getHeadLocation();
+  const view = player.getViewDirection();
+  let best;
+  let bestScore = Infinity;
+  for (const entity of getTargetsNear(player, player.location, range)) {
+    const to = { x: entity.location.x - eye.x, y: entity.location.y + 1 - eye.y, z: entity.location.z - eye.z };
+    const distance = Math.hypot(to.x, to.y, to.z);
+    const dot = (to.x * view.x + to.y * view.y + to.z * view.z) / (distance || 1);
+    if (dot < 0.9) continue;
+    const score = distance * (2 - dot);
+    if (score < bestScore) {
+      bestScore = score;
+      best = entity;
+    }
+  }
+  return best;
+}
+
+function isFree(dimension, location) {
+  return !isBlocked(dimension, location) && !isBlocked(dimension, up(location, 1));
+}
 
 function castRush(player, state, direction) {
   const cfg = CONFIG.rush;
-  startCooldown(state, "rush");
-  state.busyUntil = now() + 6;
-  playAnim(player, "rush");
-  knockback(player, { x: direction.x * cfg.strength, z: direction.z * cfg.strength }, cfg.vertical);
-  sound(player.dimension, "item.trident.riptide_1", player.location, 1.3);
-  sound(player.dimension, "mob.phantom.swoop", player.location, 1.6);
-  particle(player.dimension, P.dust, up(player.location, 0.1));
-
-  const caught = new Set();
-  let count = 0;
-  const trail = system.runInterval(() => {
-    if (!player.isValid || ++count > 9) return system.clearRun(trail);
-    const at = player.location;
-    if (count % 2 === 1) particle(player.dimension, P.afterimage, up(at, 0.9));
-    if (count % 3 === 0) particle(player.dimension, P.dust, up(at, 0.1));
-    for (const target of getTargetsNear(player, up(at, 0.8), cfg.hitRadius + 0.6)) {
-      if (caught.has(target.id)) continue;
-      caught.add(target.id);
-      slashTarget(player, target, direction);
-    }
-  }, 1);
-}
-
-// 3 flashing slashes on a caught target; the damage lands once on the last one
-// (mobs are briefly invulnerable after each hit, so separate hits would be lost)
-function slashTarget(player, target, direction) {
-  const cfg = CONFIG.rush;
   const dimension = player.dimension;
-  stun(target, (cfg.slashes * cfg.slashInterval) / TPS + 0.2);
-  for (let i = 0; i < cfg.slashes; i++) {
-    system.runTimeout(() => {
-      if (!target.isValid) return;
-      const at = up(target.location, 1 + (i - 1) * 0.3);
-      particle(dimension, P.slash, at);
-      particle(dimension, P.spark, at);
-      sound(dimension, "item.trident.hit", target.location, 1.2 + i * 0.2, 0.7);
-      if (i === cfg.slashes - 1) {
-        nullify(target);
-        dealDamage(player, target, cfg.damage * cfg.slashes);
-        particle(dimension, P.blood, at);
-        particle(dimension, P.flash, at);
-        knockback(target, { x: direction.x * 0.6, z: direction.z * 0.6 }, 0.3);
-        shake(target, 0.25, 0.2);
-        shake(player, 0.1, 0.1);
-      }
-    }, i * cfg.slashInterval);
+  const target = ambushTarget(player, cfg.range);
+  startCooldown(state, "rush");
+  // Vanish: smoke and an afterimage stay where Toji was
+  particle(dimension, P.vanish, up(player.location, 1));
+  particle(dimension, P.afterimage, up(player.location, 0.9));
+  sound(dimension, "mob.phantom.swoop", player.location, 1.8);
+  sound(dimension, "mob.endermen.portal", player.location, 1.6, 0.5);
+
+  if (!target) {
+    // Nobody in sight: a vanishing dash
+    state.busyUntil = now() + 6;
+    knockback(player, { x: direction.x * cfg.strength, z: direction.z * cfg.strength }, cfg.vertical);
+    let count = 0;
+    const trail = system.runInterval(() => {
+      if (!player.isValid || ++count > 6) return system.clearRun(trail);
+      if (count % 2 === 0) particle(player.dimension, P.afterimage, up(player.location, 0.9));
+    }, 1);
+    return;
   }
+
+  // Reappear behind the target, facing its back
+  const toTarget = flatUnit({ x: target.location.x - player.location.x, z: target.location.z - player.location.z }) ?? direction;
+  let spot = add(target.location, toTarget, cfg.behind);
+  if (!isFree(dimension, spot)) spot = add(target.location, { x: -toTarget.z, y: 0, z: toTarget.x }, cfg.behind); // side
+  if (!isFree(dimension, spot)) spot = add(target.location, toTarget, -cfg.behind); // in front
+  const trail = player.location;
+  try {
+    player.teleport(spot, { facingLocation: up(target.location, 1) });
+  } catch {
+    return;
+  }
+  particleLine(dimension, P.afterimage, up(trail, 0.9), up(spot, 0.9), 1.4);
+  particle(dimension, P.vanish, up(spot, 1));
+  playAnim(player, "ambush");
+  stun(target, cfg.stun + cfg.cuts[cfg.cuts.length - 1]);
+  const lastCut = ticks(cfg.cuts[cfg.cuts.length - 1]);
+  state.busyUntil = now() + lastCut + 6;
+
+  // Two cuts crossing into an X; the damage lands once on the second one
+  // (mobs are briefly invulnerable after a hit, so two separate hits would lose one)
+  const back = { x: -toTarget.x, y: 0, z: -toTarget.z };
+  cfg.cuts.forEach((at, i) => {
+    system.runTimeout(() => {
+      if (!player.isValid || !target.isValid) return;
+      const where = add(up(target.location, 1.1), back, 0.3);
+      particle(dimension, P.slash, where);
+      particle(dimension, P.spark, where);
+      sound(dimension, "item.trident.hit", target.location, 1.2 + i * 0.3);
+      if (i < cfg.cuts.length - 1) return;
+      particle(dimension, P.xSlash, where, withRadius(2.6));
+      particle(dimension, P.flash, where);
+      particle(dimension, P.blood, where);
+      nullify(target, true);
+      dealDamage(player, target, cfg.damage * cfg.cuts.length);
+      knockback(target, { x: toTarget.x * 0.9, z: toTarget.z * 0.9 }, 0.35);
+      sound(dimension, "random.anvil_land", target.location, 1.8, 0.6);
+      shake(target, 0.35, 0.3);
+      shake(player, 0.2, 0.15);
+    }, ticks(at));
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -805,6 +898,7 @@ function awaken(player, state) {
   state.awakeUntil = now() + duration;
   state.plungeUsed = false;
   state.holdTicks = 0;
+  state.wormSince = now();
   playAnim(player, "awaken");
   syncSpear(player);
   addEffect(player, "speed", duration, cfg.speedAmplifier);
@@ -841,6 +935,34 @@ function awaken(player, state) {
   }
 }
 
+// Inventory Curse: the worm Toji keeps his weapons in coils around his body while awakened.
+// It emerges from the ground in a spiral during the first second. Drawn every 2 ticks with short-lived
+// segments, so it looks like it slithers around him.
+const WORM_SEGMENTS = 10;
+
+function drawWorm(player, state, t) {
+  const age = t - (state.wormSince ?? t);
+  const shown = Math.min(WORM_SEGMENTS, Math.floor(age / 2) + 1);
+  const rise = Math.min(1, age / 20); // coils up from the feet to the shoulders
+  const base = player.location;
+  for (let i = 0; i < shown; i++) {
+    const phase = t * 0.22 - i * 0.5;
+    const radius = 0.62 + 0.9 * (1 - rise) * (i / WORM_SEGMENTS);
+    const height = (1.55 - i * 0.13) * rise + 0.1 * (1 - rise);
+    const at = { x: base.x + Math.cos(phase) * radius, y: base.y + Math.max(0.1, height), z: base.z + Math.sin(phase) * radius };
+    if (i === 0) particle(player.dimension, P.wormHead, at);
+    else particle(player.dimension, P.wormBody, at, withRadius(0.3 - i * 0.012));
+  }
+}
+
+system.runInterval(() => {
+  const t = now();
+  for (const player of world.getAllPlayers()) {
+    const state = states.get(player.id);
+    if (state && isAwake(state)) drawWorm(player, state, t);
+  }
+}, 2);
+
 // Let go of the spear while awakened: the awakening and its buffs end
 function endAwakeningEarly(player, state) {
   state.awakeUntil = 0;
@@ -854,9 +976,35 @@ function endAwakeningEarly(player, state) {
 // Held 20 s + jump — Heaven-Splitting Plunge
 // ---------------------------------------------------------------------------
 
+// The enemy to plunge onto: the closest one in front within lockRange
+function plungeTarget(player, range) {
+  const forward = aimDirection(player);
+  let best;
+  let bestDistance = Infinity;
+  for (const entity of getTargetsNear(player, player.location, range)) {
+    const to = flatUnit({ x: entity.location.x - player.location.x, z: entity.location.z - player.location.z });
+    const distance = horizontalDistance(entity.location, player.location);
+    if (to && to.x * forward.x + to.z * forward.z < 0.5) continue;
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = entity;
+    }
+  }
+  return best;
+}
+
 function castPlunge(player, state) {
   const cfg = CONFIG.plunge;
-  const direction = aimDirection(player);
+  const target = plungeTarget(player, cfg.lockRange);
+  let direction = aimDirection(player);
+  let push = cfg.forward;
+  if (target) {
+    direction = flatUnit({ x: target.location.x - player.location.x, z: target.location.z - player.location.z }) ?? direction;
+    push = Math.min(cfg.maxHoming, horizontalDistance(target.location, player.location) * cfg.homing);
+    // Mark the victim: Infinity ring and a pinning stun so it cannot run away
+    particle(player.dimension, P.nullGround, up(target.location, 0.08), withRadius(3));
+    stun(target, cfg.diveAt + 0.5);
+  }
   state.plungeUsed = true;
   state.plunging = true;
   const diveTick = ticks(cfg.diveAt);
@@ -872,7 +1020,7 @@ function castPlunge(player, state) {
 
   system.runTimeout(() => {
     if (!player.isValid) return;
-    knockback(player, { x: direction.x * cfg.forward, z: direction.z * cfg.forward }, cfg.leap);
+    knockback(player, { x: direction.x * push, z: direction.z * push }, cfg.leap);
     particle(dimension, P.afterimage, up(player.location, 0.9));
   }, 2);
 
@@ -892,7 +1040,11 @@ function castPlunge(player, state) {
       return;
     }
     if (elapsed === diveTick) {
-      knockback(player, { x: direction.x * 0.3, z: direction.z * 0.3 }, -cfg.diveSpeed);
+      // Dive straight at the victim's current position
+      const aim = target?.isValid ? flatUnit({ x: target.location.x - player.location.x, z: target.location.z - player.location.z }) : undefined;
+      const left = target?.isValid ? Math.min(1.5, horizontalDistance(target.location, player.location) * 0.3) : 0.3;
+      const d = aim ?? direction;
+      knockback(player, { x: d.x * left, z: d.z * left }, -cfg.diveSpeed);
       sound(dimension, "mob.phantom.swoop", player.location, 0.6);
       flashScreen(player, 0.7, 0.6, 0.95);
     }
@@ -914,6 +1066,19 @@ function plungeImpact(player, state, direction) {
 
   crater(dimension, center, cfg.radius * 0.9);
   particle(dimension, P.nullGround, up(center, 0.1), withRadius(cfg.radius * 1.6));
+  particle(dimension, P.xSlash, up(center, 1.2), withRadius(4.5));
+  particle(dimension, P.shard, up(center, 1));
+  particle(dimension, P.shardBlue, up(center, 1));
+  // A second crack wave and debris pillars around the rim
+  system.runTimeout(() => crater(dimension, center, cfg.radius * 1.4), 4);
+  for (let i = 0; i < 6; i++) {
+    const angle = (i / 6) * Math.PI * 2 + 0.5;
+    const at = { x: center.x + Math.cos(angle) * cfg.radius, y: center.y, z: center.z + Math.sin(angle) * cfg.radius };
+    system.runTimeout(() => {
+      particle(dimension, P.debris, up(at, 0.2));
+      particle(dimension, P.dust, up(at, 0.3));
+    }, 5 + i);
+  }
   particle(dimension, P.flash, up(center, 0.8));
   particle(dimension, P.debris, up(center, 0.2));
   for (let i = 0; i < 3; i++) system.runTimeout(() => shockRing(dimension, center, cfg.radius * (0.5 + i * 0.35)), i * 3);
