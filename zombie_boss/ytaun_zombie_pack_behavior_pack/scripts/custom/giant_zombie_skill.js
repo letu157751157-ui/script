@@ -645,14 +645,12 @@ function warRoarSkill(boss, data, target) {
       knock: 2.2, up: 0.5, effects: [["slowness", 80, 2], ["weakness", 80, 0], ["mining_fatigue", 100, 1]],
     });
     try {
-      boss.addEffect("speed", 200, { amplifier: 1 });
-      boss.addEffect("strength", 200, { amplifier: 0 });
+      boss.addEffect("speed", 100, { amplifier: 0 });
     } catch { }
-    for (const m of dim.getEntities({ location: loc, maxDistance: 16, families: ["zombie"] })) {
+    for (const m of dim.getEntities({ location: loc, maxDistance: 16, tags: [MINION_TAG] })) {
       if (m.id === boss.id) continue;
       try {
-        m.addEffect("speed", 200, { amplifier: 1 });
-        m.addEffect("strength", 200, { amplifier: 1 });
+        m.addEffect("speed", 100, { amplifier: 0 });
         particle(dim, "ytaun:rage_aura", m.location);
       } catch { }
     }
@@ -718,8 +716,7 @@ function summonHordeSkill(boss, data, target) {
       const m = dim.spawnEntity(type, p);
       m.addTag(MINION_TAG);
       if (!leader) {
-        m.addEffect("speed", 20000000, { amplifier: 0, showParticles: false });
-        if (data.phase >= 2) m.addEffect("strength", 20000000, { amplifier: 0, showParticles: false });
+        // lính thường: không buff vĩnh viễn
       }
       m.addEffect("fire_resistance", 20000000, { showParticles: false });
     }));
@@ -773,7 +770,7 @@ function enterPhase(boss, data, phase) {
     shake(dim, loc, 32, 0.9, 1.2);
     hitArea(boss, data, loc, 8, 4, { knock: 3.0, up: 0.8 });
     try {
-      boss.addEffect("speed", 20000000, { amplifier: phase === 1 ? 0 : 1, showParticles: false });
+      if (phase >= 2) boss.addEffect("speed", 20000000, { amplifier: 0, showParticles: false });
     } catch { }
   });
   world.sendMessage(phase === 1 ? "§c§l⚠ GIANT ZOMBIE IS ENRAGED! ⚠" : "§4§l☠ GIANT ZOMBIE ENTERS FINAL FURY! ☠");
@@ -963,7 +960,6 @@ function impThrowSkill(boss, data, target) {
             const imp = dim.spawnEntity("minecraft:zombie", to);
             imp.triggerEvent("minecraft:as_baby");
             imp.addTag(MINION_TAG);
-            imp.addEffect("speed", 20000000, { amplifier: 1, showParticles: false });
           } catch { }
         }
       }, 1);

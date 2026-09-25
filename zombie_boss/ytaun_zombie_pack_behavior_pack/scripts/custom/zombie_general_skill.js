@@ -106,11 +106,9 @@ function rally(g) {
   sound(dim, "raid.horn", g.location, 0.6, 1.2);
   particle(dim, "ytaun:roar_wave", g.location);
   particle(dim, "ytaun:ember", g.location);
-  for (const z of dim.getEntities({ location: g.location, maxDistance: 14, families: ["zombie"] })) {
+  for (const z of dim.getEntities({ location: g.location, maxDistance: 14, tags: [SOLDIER_TAG] })) {
     try {
-      z.addEffect("speed", 200, { amplifier: 1 });
-      z.addEffect("strength", 200, { amplifier: 1 });
-      z.addEffect("resistance", 200, { amplifier: 0 });
+      z.addEffect("speed", 100, { amplifier: 0 });
       particle(dim, "ytaun:rage_aura", z.location);
     } catch { }
   }
@@ -136,7 +134,6 @@ function callSoldiers(g) {
       particle(dim, "ytaun:rock_debris", p);
       const z = dim.spawnEntity("minecraft:zombie", p);
       z.addTag(SOLDIER_TAG);
-      z.addEffect("speed", 20000000, { amplifier: 0, showParticles: false });
     });
   }
   return 30;

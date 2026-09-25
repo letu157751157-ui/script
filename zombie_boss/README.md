@@ -119,3 +119,8 @@ mật phun, vũng axit sủi bọt, cục axit, lưỡi thịt, con mắt quỷ 
 - Hàm dưới cho 2 mặt đầu lâu; vương miện sắt giữ cụm pha lê; máu chảy trên khối thịt.
 - Gai xương trên các đốt cán, vành sắt dưới cổ búa, tua rua vải + xương treo ở chuôi (đung đưa).
 - Icon cập nhật: thêm gai ở đầu bịt và rune.
+
+## v1.14 — giảm buff
+- Gầm Chiến (boss) và Hiệu Triệu (Zombie General) **chỉ buff lính do chính nó triệu hồi**, không còn buff mọi zombie xung quanh.
+- Buff chỉ còn Tốc Độ I trong 5 giây (bỏ Sức Mạnh, Kháng Cự). Boss khi gầm chỉ được Tốc Độ I 5 giây.
+- Lính/imp triệu hồi không còn buff vĩnh viễn; boss chỉ được Tốc Độ I vĩnh viễn ở Final Fury.
