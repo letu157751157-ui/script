@@ -21,7 +21,8 @@
       0,
       24,
       0
-     ]
+     ],
+     "binding": "q.item_slot_to_bone_name(c.item_slot)"
     },
     {
      "name": "spear",

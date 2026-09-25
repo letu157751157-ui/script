@@ -7,24 +7,22 @@
 //   Sprint + attack                Heavenly Rush (sprint + right-click also works)
 //   Hold the spear 20 s            Heavenly Restriction: Awakened (triggers by itself)
 //   Hold 20 s + jump (awakened)    Heaven-Splitting Plunge
+//   Normal attacks                 4-hit combo, the 4th hit is a spinning finisher
 //   Every hit                      Passive: Nullification (strips the target's positive effects)
+//
+// Texts are translation keys (TojiRP/texts/*.lang): each player sees them in their game language.
 
 import { world, system, ItemStack, EquipmentSlot, InputButton, ButtonState, EntityDamageCause, MolangVariableMap } from "@minecraft/server";
 import { CONFIG } from "./config.js";
 
+// Item variants (see packs.py): the script swaps the held spear between them
 const ITEM_ID = "toji:inverted_spear";
-const AWAKE_ID = "toji:inverted_spear_awakened"; // same spear with a glowing edge layer
-const isSpearId = (id) => id === ITEM_ID || id === AWAKE_ID;
+const AWAKE_ID = "toji:inverted_spear_awakened"; // glowing edges while awakened
+const THROWN_ID = "toji:inverted_spear_thrown"; // only the chain in the hand while the spear flies
+const SPEAR_IDS = new Set([ITEM_ID, AWAKE_ID, THROWN_ID]);
+const isSpearId = (id) => SPEAR_IDS.has(id);
 const TPS = 20;
 const SKILLS = ["thrust", "chain", "rush"];
-const SKILL_NAMES = {
-  thrust: "Nullifying Thrust",
-  chain: "Thousand-Mile Chain",
-  rush: "Heavenly Rush",
-  awaken: "Heavenly Restriction",
-  plunge: "Heaven-Splitting Plunge",
-};
-const SHORT = { thrust: "Thrust", chain: "Chain", rush: "Rush" };
 
 // Custom particles live in the resource pack (TojiRP/particles)
 const P = {
@@ -53,9 +51,47 @@ const NULLIFIED_EFFECTS = [
   "speed", "haste", "strength", "jump_boost", "regeneration", "resistance", "fire_resistance", "water_breathing",
   "invisibility", "night_vision", "health_boost", "absorption", "saturation", "slow_falling", "conduit_power", "village_hero",
 ];
+// Buffs granted by the awakening (removed if it ends early)
+const AWAKEN_EFFECTS = ["speed", "strength", "jump_boost", "resistance"];
 
 const ticks = (seconds) => Math.max(1, Math.round(seconds * TPS));
 const now = () => system.currentTick;
+
+// ---------------------------------------------------------------------------
+// Texts
+// ---------------------------------------------------------------------------
+
+/** Translated text; args may be plain strings or other translated texts */
+function tr(key, ...args) {
+  if (!args.length) return { translate: key };
+  return { translate: key, with: { rawtext: args.map((a) => (typeof a === "string" ? { text: a } : a)) } };
+}
+
+const skillName = (skill) => tr(`toji.skill.${skill}`);
+const shortName = (skill) => tr(`toji.short.${skill}`);
+
+// Item lore (tooltip) cannot be translated per player: CONFIG.loreLanguage picks it
+const LORE = {
+  en: [
+    "§7Right-click/tap: §fNullifying Thrust",
+    "§7Sneak + right-click: §fThousand-Mile Chain",
+    "§7Sprint + attack: §fHeavenly Rush",
+    "§7Hold 20s: §fHeavenly Restriction",
+    "§7Hold 20s + jump: §dHeaven-Splitting Plunge",
+    "§7Attack x4: §fcombo finisher",
+    "§7Every hit: §5nullifies effects",
+  ],
+  vi: [
+    "§7Chuột phải/chạm: §fĐâm Vô Hiệu",
+    "§7Khuỵu + chuột phải: §fXích Vạn Lý",
+    "§7Chạy + chém: §fThiên Dữ Tốc Trảm",
+    "§7Cầm 20s: §fThiên Dữ Chú Phược",
+    "§7Cầm 20s + nhảy: §dGiáng Thiên Nhất Kích",
+    "§7Đánh 4 lần: §fđòn kết liễu",
+    "§7Mọi đòn: §5vô hiệu buff",
+  ],
+};
+const loreLines = () => LORE[CONFIG.loreLanguage] ?? LORE.en;
 
 // ---------------------------------------------------------------------------
 // Per-player state
@@ -75,7 +111,12 @@ function getState(player) {
       awakeUntil: 0,
       plungeUsed: false,
       plunging: false,
+      thrownUntil: 0,
+      combo: 0,
+      lastHit: -100,
       lastUse: -100,
+      notice: undefined,
+      noticeUntil: 0,
     };
     states.set(player.id, state);
   }
@@ -83,6 +124,7 @@ function getState(player) {
 }
 
 const isAwake = (state) => now() < state.awakeUntil;
+const isThrown = (state) => now() < state.thrownUntil;
 const isStunned = (entity) => (stunnedUntil.get(entity.id) ?? 0) > now();
 
 function startCooldown(state, skill) {
@@ -205,6 +247,7 @@ function flashScreen(player, red, green, blue) {
   }
 }
 
+// Player animation (TojiRP/animations/toji_player.animation.json)
 function playAnim(player, name) {
   try {
     player.playAnimation(`animation.toji.${name}`, { blendOutTime: 0.12 });
@@ -221,6 +264,14 @@ function addEffect(entity, id, duration, amplifier = 0) {
   }
 }
 
+function removeEffect(entity, id) {
+  try {
+    entity.removeEffect(id);
+  } catch {
+    // ignore
+  }
+}
+
 function knockback(entity, horizontal, vertical) {
   try {
     entity.applyKnockback(horizontal, vertical);
@@ -230,11 +281,16 @@ function knockback(entity, horizontal, vertical) {
 }
 
 // Approximate spear tip: held in the right hand, pointing forward
-function spearTip(player, reach = 1.4) {
+function spearTip(player, reach = 1.2) {
   const view = player.getViewDirection();
   const forward = aimDirection(player);
   const right = { x: -forward.z, y: 0, z: forward.x };
   return add(add(player.getHeadLocation(), right, 0.35), view, reach);
+}
+
+function handLocation(player) {
+  const forward = aimDirection(player);
+  return add(up(player.location, 1.3), { x: -forward.z, y: 0, z: forward.x }, 0.35);
 }
 
 // ---------------------------------------------------------------------------
@@ -269,6 +325,16 @@ function getTargetsInBox(player, origin, direction, length, width) {
     const along = dx * direction.x + dz * direction.z;
     const side = dx * right.x + dz * right.z;
     return along >= -0.5 && along <= length + 0.6 && Math.abs(side) <= width / 2 + 0.6 && dy > -2.5 && dy < 3;
+  });
+}
+
+// Targets within `radius` and inside an arc of `arc` degrees in front
+function getTargetsInArc(player, origin, direction, radius, arc) {
+  const minDot = Math.cos(((arc / 2) * Math.PI) / 180);
+  return getTargetsNear(player, origin, radius + 0.5).filter((entity) => {
+    const to = flatUnit({ x: entity.location.x - origin.x, z: entity.location.z - origin.z });
+    if (!to || horizontalDistance(entity.location, origin) < 1) return true;
+    return to.x * direction.x + to.z * direction.z >= minDot && Math.abs(entity.location.y - origin.y) < 2.5;
   });
 }
 
@@ -331,7 +397,7 @@ function nullify(target, big = false) {
   }
   if (removed > 0 && target.typeId === "minecraft:player") {
     try {
-      target.onScreenDisplay.setActionBar("§5Your effects were nullified!");
+      target.onScreenDisplay.setActionBar(tr("toji.notice.nullified"));
     } catch {
       // ignore
     }
@@ -340,15 +406,130 @@ function nullify(target, big = false) {
 }
 
 // ---------------------------------------------------------------------------
-// Passive — Nullification on every normal hit
+// Item variants: the held spear shows the current form (normal / awakened / thrown)
+// ---------------------------------------------------------------------------
+
+function convertSpear(stack, typeId) {
+  const out = new ItemStack(typeId, 1);
+  try {
+    if (stack.nameTag) out.nameTag = stack.nameTag;
+  } catch {
+    // ignore
+  }
+  try {
+    out.setLore(stack.getLore());
+  } catch {
+    // ignore
+  }
+  try {
+    const from = stack.getComponent("minecraft:durability");
+    const to = out.getComponent("minecraft:durability");
+    if (from && to) to.damage = from.damage;
+  } catch {
+    // ignore
+  }
+  try {
+    const from = stack.getComponent("minecraft:enchantable");
+    const to = out.getComponent("minecraft:enchantable");
+    if (from && to) to.addEnchantments(from.getEnchantments());
+  } catch {
+    // ignore
+  }
+  return out;
+}
+
+function desiredVariant(state) {
+  if (state && isThrown(state)) return THROWN_ID;
+  if (state && isAwake(state)) return AWAKE_ID;
+  return ITEM_ID;
+}
+
+// Held spear -> the variant for the current form; spears in any other slot -> normal spear
+function syncSpear(player) {
+  try {
+    const container = player.getComponent("minecraft:inventory")?.container;
+    if (!container) return;
+    const selected = player.selectedSlotIndex;
+    const state = states.get(player.id);
+    for (let i = 0; i < container.size; i++) {
+      const item = container.getItem(i);
+      if (!item || !isSpearId(item.typeId)) continue;
+      const want = i === selected ? desiredVariant(state) : ITEM_ID;
+      if (item.typeId !== want) container.setItem(i, convertSpear(item, want));
+    }
+  } catch {
+    // ignore
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Normal attacks — 4-hit combo + passive nullification (+ sprint attack = Heavenly Rush)
 // ---------------------------------------------------------------------------
 
 world.afterEvents.entityHitEntity.subscribe(({ damagingEntity: player, hitEntity: target }) => {
-  if (!CONFIG.passive.nullifyOnHit || player.typeId !== "minecraft:player" || !holdsSpear(player)) return;
+  if (player.typeId !== "minecraft:player" || !holdsSpear(player)) return;
+  const state = getState(player);
+  if (player.isSprinting && now() >= state.cd.rush) {
+    trySkill(player, "rush", true);
+    return;
+  }
   if (!isTarget(player, target)) return;
-  nullify(target);
+  if (CONFIG.passive.nullifyOnHit) nullify(target);
   particle(target.dimension, P.spark, up(target.location, 1));
+  countComboHit(player, state);
 });
+
+// Sprint + hitting a block also starts the rush
+world.afterEvents.entityHitBlock.subscribe(({ damagingEntity: player }) => {
+  if (player?.typeId === "minecraft:player" && player.isSprinting && holdsSpear(player)) trySkill(player, "rush", true);
+});
+
+function countComboHit(player, state) {
+  const t = now();
+  if (t - state.lastHit < 4) return; // several events from one click
+  state.combo = t - state.lastHit <= ticks(CONFIG.combo.window) ? state.combo + 1 : 1;
+  state.lastHit = t;
+  if (state.combo >= 4 && t >= state.busyUntil && !state.plunging) {
+    state.combo = 0;
+    comboFinisher(player, state);
+  }
+}
+
+function comboFinisher(player, state) {
+  const cfg = CONFIG.combo;
+  const delay = ticks(cfg.finisherDelay);
+  state.busyUntil = now() + delay + 4;
+  playAnim(player, "finisher");
+  sound(player.dimension, "item.trident.riptide_1", player.location, 1.6, 0.7);
+  notify(state, tr("toji.notice.cast", skillName("finisher")), 0.8);
+
+  system.runTimeout(() => {
+    if (!canAct(player)) return;
+    const dimension = player.dimension;
+    const origin = player.location;
+    const direction = aimDirection(player);
+    const right = { x: -direction.z, y: 0, z: direction.x };
+    // Crescent slashes sweeping from right to left in front
+    for (let i = 0; i < 5; i++) {
+      const angle = ((i / 4) * 2 - 1) * ((cfg.arc / 2) * Math.PI) / 180;
+      const d = add({ x: direction.x * Math.cos(angle), y: 0, z: direction.z * Math.cos(angle) }, right, -Math.sin(angle));
+      system.runTimeout(() => particle(dimension, P.slash, up(add(origin, d, 2), 1.1)), i);
+    }
+    particle(dimension, P.dust, up(origin, 0.1));
+    sound(dimension, "item.trident.throw", origin, 1.1);
+    shake(player, 0.15, 0.15);
+    for (const target of getTargetsInArc(player, origin, direction, cfg.radius, cfg.arc)) {
+      const away = flatUnit({ x: target.location.x - origin.x, z: target.location.z - origin.z }) ?? direction;
+      nullify(target);
+      dealDamage(player, target, cfg.damage);
+      knockback(target, { x: away.x * cfg.knockback, z: away.z * cfg.knockback }, cfg.vertical);
+      particle(dimension, P.flash, up(target.location, 1));
+      particle(dimension, P.blood, up(target.location, 1));
+      sound(dimension, "item.trident.hit", target.location, 0.9);
+      shake(target, 0.3, 0.25);
+    }
+  }, delay);
+}
 
 // ---------------------------------------------------------------------------
 // Right-click — Nullifying Thrust
@@ -407,6 +588,8 @@ function castThrust(player, state, direction) {
 // Sneak + right-click — Thousand-Mile Chain
 // ---------------------------------------------------------------------------
 
+const MAX_THROW = 40; // ticks: the spear always comes back after this long
+
 function isBlocked(dimension, location) {
   try {
     const block = dimension.getBlock(location);
@@ -418,20 +601,42 @@ function isBlocked(dimension, location) {
 
 function castChain(player, state) {
   startCooldown(state, "chain");
-  state.busyUntil = now() + ticks(CONFIG.chain.release) + 4;
+  const release = ticks(CONFIG.chain.release);
+  state.busyUntil = now() + release + MAX_THROW;
   playAnim(player, "throw");
   sound(player.dimension, "item.trident.return", player.location, 0.6);
-  system.runTimeout(() => launchChain(player), ticks(CONFIG.chain.release));
+  system.runTimeout(() => launchChain(player, state), release);
 }
 
-function launchChain(player) {
-  if (!canAct(player)) return;
+// The spear leaves the hand: only the chain stays until it comes back
+function releaseSpear(player, state) {
+  state.thrownUntil = now() + MAX_THROW;
+  syncSpear(player);
+  system.runTimeout(() => {
+    if (state.thrownUntil && !isThrown(state)) returnSpear(player, state);
+  }, MAX_THROW + 1);
+}
+
+function returnSpear(player, state) {
+  state.thrownUntil = 0;
+  state.busyUntil = Math.min(state.busyUntil, now() + 2);
+  if (!player.isValid) return;
+  syncSpear(player);
+  sound(player.dimension, "item.trident.return", player.location, 1.2);
+  particle(player.dimension, P.spark, handLocation(player));
+}
+
+function launchChain(player, state) {
+  if (!canAct(player)) {
+    state.busyUntil = now();
+    return;
+  }
   const cfg = CONFIG.chain;
   const dimension = player.dimension;
   const direction = player.getViewDirection();
-  const hand = () => add(up(player.location, 1.3), { x: -aimDirection(player).z, y: 0, z: aimDirection(player).x }, 0.35);
   let head = add(player.getHeadLocation(), direction, 0.8);
   let travelled = 0;
+  releaseSpear(player, state);
   sound(dimension, "item.trident.throw", player.location, 0.7);
   shake(player, 0.1, 0.1);
 
@@ -448,38 +653,42 @@ function launchChain(player) {
       );
       if (target) {
         system.clearRun(flight);
-        chainHitTarget(player, target);
+        chainHitTarget(player, state, target);
         return;
       }
       if (isBlocked(dimension, head)) {
         system.clearRun(flight);
-        grapple(player, previous);
+        grapple(player, state, previous);
         return;
       }
       if (travelled >= cfg.range) {
         system.clearRun(flight);
         particle(dimension, P.dust, head);
         sound(dimension, "random.break", head, 1.2);
+        // Reel the spear back in
+        drawChain(player, () => head, 4);
+        system.runTimeout(() => returnSpear(player, state), 4);
         return;
       }
     }
     particle(dimension, P.spear, head, withDirection(direction));
-    particleLine(dimension, P.chain, hand(), head, 0.55);
+    particleLine(dimension, P.chain, handLocation(player), head, 0.55);
   }, 1);
 }
 
-// Keep the chain drawn between the player and a moving end for a few ticks
+// Keep the chain (and the spear at its end) drawn for a few ticks
 function drawChain(player, getEnd, duration) {
   let elapsed = 0;
   const run = system.runInterval(() => {
     const end = getEnd();
     if (!player.isValid || !end || ++elapsed > duration) return system.clearRun(run);
-    particleLine(player.dimension, P.chain, up(player.location, 1.2), end, 0.45);
-    particle(player.dimension, P.spear, end, withDirection({ x: end.x - player.location.x, y: end.y - player.location.y - 1.2, z: end.z - player.location.z }));
+    const hand = handLocation(player);
+    particleLine(player.dimension, P.chain, hand, end, 0.45);
+    particle(player.dimension, P.spear, end, withDirection({ x: end.x - hand.x, y: end.y - hand.y, z: end.z - hand.z }));
   }, 1);
 }
 
-function chainHitTarget(player, target) {
+function chainHitTarget(player, state, target) {
   const cfg = CONFIG.chain;
   const dimension = player.dimension;
   nullify(target, true);
@@ -504,10 +713,11 @@ function chainHitTarget(player, target) {
     shake(player, 0.15, 0.15);
   }, 3);
   drawChain(player, () => (target.isValid ? up(target.location, 1) : undefined), 12);
+  system.runTimeout(() => returnSpear(player, state), 12);
 }
 
 // Spear sticks in a wall/ground: pull yourself to it
-function grapple(player, point) {
+function grapple(player, state, point) {
   const cfg = CONFIG.chain;
   const dimension = player.dimension;
   particle(dimension, P.dust, point);
@@ -527,6 +737,7 @@ function grapple(player, point) {
     particle(dimension, P.afterimage, up(player.location, 0.9));
   }, 2);
   drawChain(player, () => point, 8);
+  system.runTimeout(() => returnSpear(player, state), 8);
 }
 
 // ---------------------------------------------------------------------------
@@ -595,7 +806,7 @@ function awaken(player, state) {
   state.plungeUsed = false;
   state.holdTicks = 0;
   playAnim(player, "awaken");
-  swapMainhand(player, ITEM_ID, AWAKE_ID);
+  syncSpear(player);
   addEffect(player, "speed", duration, cfg.speedAmplifier);
   addEffect(player, "strength", duration, cfg.strengthAmplifier);
   addEffect(player, "jump_boost", duration, cfg.jumpAmplifier);
@@ -619,8 +830,8 @@ function awaken(player, state) {
   }, 9);
   sound(dimension, "item.trident.thunder", origin, 1.8, 0.4);
   try {
-    player.onScreenDisplay.setTitle("§f§lHEAVENLY RESTRICTION", {
-      subtitle: "§7Awakened — §fjump §7to use §dHeaven-Splitting Plunge",
+    player.onScreenDisplay.setTitle(tr("toji.title.awaken"), {
+      subtitle: tr("toji.title.awaken_hint"),
       fadeInDuration: 5,
       stayDuration: 40,
       fadeOutDuration: 15,
@@ -630,9 +841,13 @@ function awaken(player, state) {
   }
 }
 
-function endAwakening(state) {
+// Let go of the spear while awakened: the awakening and its buffs end
+function endAwakeningEarly(player, state) {
   state.awakeUntil = 0;
   state.holdTicks = 0;
+  if (state.plunging) return;
+  for (const id of AWAKEN_EFFECTS) removeEffect(player, id);
+  sound(player.dimension, "random.fizz", player.location, 1.4, 0.5);
 }
 
 // ---------------------------------------------------------------------------
@@ -727,15 +942,13 @@ function plungeImpact(player, state, direction) {
   }
 
   // Take the plunge immunity off, keep the awakening resistance if it is still running
+  // (if the spear was let go mid-air, the awakening ended: clear its buffs now that we landed)
   system.runTimeout(() => {
     if (!player.isValid) return;
-    try {
-      player.removeEffect("resistance");
-    } catch {
-      // ignore
-    }
+    removeEffect(player, "resistance");
     const left = state.awakeUntil - now();
     if (left > 0) addEffect(player, "resistance", left, CONFIG.awaken.resistanceAmplifier);
+    else for (const id of AWAKEN_EFFECTS) removeEffect(player, id);
   }, 10);
 }
 
@@ -743,36 +956,30 @@ function plungeImpact(player, state, direction) {
 // Input
 // ---------------------------------------------------------------------------
 
-const LORE = [
-  "§7Right-click/tap: §fNullifying Thrust",
-  "§7Sneak + right-click: §fThousand-Mile Chain",
-  "§7Sprint + attack: §fHeavenly Rush",
-  "§7Hold 20 s: §fHeavenly Restriction",
-  "§7Hold 20 s + jump: §dHeaven-Splitting Plunge",
-  "§7Every hit: §5nullifies effects",
-];
 const INTERACTIVE_BLOCK =
   /door|gate|button|lever|chest|barrel|shulker|furnace|smoker|crafting|crafter|anvil|table|:bed$|bell|hopper|dispenser|dropper|loom|grindstone|stonecutter|beacon|lectern|repeater|comparator|noteblock|jukebox|cake|campfire|anchor|lodestone|composter|cauldron|brewing|sign|frame|vault|chiseled_bookshelf|decorated_pot/;
 const INTERACTIVE_ENTITY = new Set(["minecraft:villager", "minecraft:villager_v2", "minecraft:wandering_trader", "minecraft:armor_stand"]);
 
+// Skill cast by right-click, depending on the stance
 function chooseSkill(player) {
   if (player.isSneaking) return "chain";
   if (player.isSprinting) return "rush";
   return "thrust";
 }
 
-function notify(state, text, seconds = 1.2) {
-  state.notice = text;
+function notify(state, message, seconds = 1.2) {
+  state.notice = message;
   state.noticeUntil = now() + ticks(seconds);
 }
 
+// forced: skill fixed by the input (rush on sprint-attack); quiet: no cooldown message
 function trySkill(player, forced, quiet = false) {
   if (!canAct(player)) return;
   const state = getState(player);
   if (now() - state.lastUse < 4) return; // one press can fire several events
   state.lastUse = now();
-  if (isStunned(player)) return notify(state, "§cYou are stunned!");
-  if (now() < state.busyUntil || state.plunging) return;
+  if (isStunned(player)) return notify(state, tr("toji.notice.stunned"));
+  if (now() < state.busyUntil || state.plunging || isThrown(state)) return;
 
   const skill = forced ?? chooseSkill(player);
   const left = state.cd[skill] - now();
@@ -783,20 +990,22 @@ function trySkill(player, forced, quiet = false) {
     } catch {
       // ignore
     }
-    return notify(state, `§c${SHORT[skill]} on cooldown: ${(left / TPS).toFixed(1)}s`);
+    return notify(state, tr("toji.notice.cooldown", shortName(skill), (left / TPS).toFixed(1)));
   }
 
   const direction = aimDirection(player);
   if (skill === "chain") castChain(player, state);
   else if (skill === "rush") castRush(player, state, direction);
   else castThrust(player, state, direction);
-  notify(state, `§f▶ ${SKILL_NAMES[skill]}`);
+  notify(state, tr("toji.notice.cast", skillName(skill)));
 }
 
+// Right-click / tap into the air
 world.afterEvents.itemUse.subscribe(({ source, itemStack }) => {
   if (isSpearId(itemStack?.typeId)) trySkill(source);
 });
 
+// Right-click / tap while aiming at a block (ground, wall...)
 world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
   if (!isSpearId(event.itemStack?.typeId) || event.isFirstEvent === false) return;
   if (INTERACTIVE_BLOCK.test(event.block.typeId)) return;
@@ -804,12 +1013,13 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
   system.run(() => trySkill(player));
 });
 
+// Right-click / hold on a mob
 world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
   if (!isSpearId(event.itemStack?.typeId)) return;
   const target = event.target;
   if (INTERACTIVE_ENTITY.has(target.typeId)) return;
   try {
-    if (target.getComponent("minecraft:rideable")) return;
+    if (target.getComponent("minecraft:rideable")) return; // horses, boats... ride them as usual
   } catch {
     // ignore
   }
@@ -822,17 +1032,10 @@ world.afterEvents.playerButtonInput.subscribe(({ player, button, newButtonState 
   if (button !== InputButton.Jump || newButtonState !== ButtonState.Pressed) return;
   if (!canAct(player) || isStunned(player)) return;
   const state = getState(player);
-  if (!isAwake(state) || state.plungeUsed || state.plunging || now() < state.busyUntil) return;
+  if (!isAwake(state) || state.plungeUsed || state.plunging || isThrown(state) || now() < state.busyUntil) return;
   castPlunge(player, state);
-  notify(state, `§d▶ ${SKILL_NAMES.plunge}`);
+  notify(state, tr("toji.notice.cast_ult", skillName("plunge")));
 });
-
-// Sprint + attack (hitting a mob or block): Heavenly Rush
-function sprintSlash(player) {
-  if (player?.typeId === "minecraft:player" && player.isSprinting && holdsSpear(player)) trySkill(player, "rush", true);
-}
-world.afterEvents.entityHitEntity.subscribe(({ damagingEntity }) => sprintSlash(damagingEntity));
-world.afterEvents.entityHitBlock.subscribe(({ damagingEntity }) => sprintSlash(damagingEntity));
 
 world.afterEvents.playerLeave.subscribe(({ playerId }) => {
   states.delete(playerId);
@@ -844,22 +1047,16 @@ world.afterEvents.playerLeave.subscribe(({ playerId }) => {
 // ---------------------------------------------------------------------------
 
 function sendGuide(player) {
-  player.sendMessage("§5━━━━━━ Inverted Spear of Heaven ━━━━━━");
-  player.sendMessage("§7Hold the spear (mobile: right-click = §ftap the screen§7 / §fUse§7 button):");
-  player.sendMessage("§f Right-click §7— §fNullifying Thrust§7: lunge and stab, pierces a line and strips all buffs");
-  player.sendMessage("§f Sneak + right-click §7— §fThousand-Mile Chain§7: throw the spear; hit = yank the target, wall = grapple");
-  player.sendMessage("§f Sprint + attack §7— §fHeavenly Rush§7: dash through enemies with 3 slashes");
-  player.sendMessage("§f Hold 20 s §7— §fHeavenly Restriction§7: awaken for 15 s (speed, strength, halved cooldowns)");
-  player.sendMessage("§f Hold 20 s + jump §7— §dHeaven-Splitting Plunge§7: leap and drive the spear into the ground");
-  player.sendMessage("§7Every hit nullifies the target's positive effects. §f/scriptevent toji:help §7shows this again.");
+  for (let i = 0; i <= 8; i++) player.sendMessage(tr(`toji.guide.${i}`));
 }
 
 function ensureLore(player) {
   try {
     const equippable = player.getComponent("minecraft:equippable");
     const item = equippable?.getEquipment(EquipmentSlot.Mainhand);
-    if (!isSpearId(item?.typeId) || item.getLore().join("\n") === LORE.join("\n")) return;
-    item.setLore(LORE);
+    const lore = loreLines();
+    if (!isSpearId(item?.typeId) || item.getLore().join("\n") === lore.join("\n")) return;
+    item.setLore(lore);
     equippable.setEquipment(EquipmentSlot.Mainhand, item);
   } catch {
     // ignore
@@ -871,63 +1068,7 @@ system.afterEvents.scriptEventReceive.subscribe(({ id, sourceEntity }) => {
 });
 
 // ---------------------------------------------------------------------------
-// Awakened spear swap (keeps durability, enchantments, name, lore)
-// ---------------------------------------------------------------------------
-
-function convertSpear(stack, typeId) {
-  const out = new ItemStack(typeId, 1);
-  try {
-    if (stack.nameTag) out.nameTag = stack.nameTag;
-  } catch {
-    // ignore
-  }
-  try {
-    out.setLore(stack.getLore());
-  } catch {
-    // ignore
-  }
-  try {
-    const from = stack.getComponent("minecraft:durability");
-    const to = out.getComponent("minecraft:durability");
-    if (from && to) to.damage = from.damage;
-  } catch {
-    // ignore
-  }
-  try {
-    const from = stack.getComponent("minecraft:enchantable");
-    const to = out.getComponent("minecraft:enchantable");
-    if (from && to) to.addEnchantments(from.getEnchantments());
-  } catch {
-    // ignore
-  }
-  return out;
-}
-
-function swapMainhand(player, fromId, toId) {
-  try {
-    const equippable = player.getComponent("minecraft:equippable");
-    const item = equippable?.getEquipment(EquipmentSlot.Mainhand);
-    if (item?.typeId === fromId) equippable.setEquipment(EquipmentSlot.Mainhand, convertSpear(item, toId));
-  } catch {
-    // ignore
-  }
-}
-
-function revertAwakenedItems(player) {
-  try {
-    const container = player.getComponent("minecraft:inventory")?.container;
-    if (!container) return;
-    for (let i = 0; i < container.size; i++) {
-      const item = container.getItem(i);
-      if (item?.typeId === AWAKE_ID) container.setItem(i, convertSpear(item, ITEM_ID));
-    }
-  } catch {
-    // ignore
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Main loop: hold timer, awakening, action bar
+// Main loop: hold timer, awakening, spear variant, action bar
 // ---------------------------------------------------------------------------
 
 const LOOP = 5;
@@ -944,29 +1085,53 @@ function holdBar(state) {
   return `§f${"▮".repeat(filled)}§8${"▮".repeat(10 - filled)} §7${Math.floor(state.holdTicks / TPS)}/${CONFIG.awaken.holdTime}s`;
 }
 
+function actionBar(player, state, t) {
+  const parts = [];
+  if (isAwake(state)) {
+    parts.push(tr("toji.bar.awake", String(Math.ceil((state.awakeUntil - t) / TPS))));
+    parts.push(tr(state.plungeUsed ? "toji.bar.plunge_used" : "toji.bar.plunge_ready"));
+  } else {
+    parts.push(tr("toji.bar.hold", holdBar(state)));
+  }
+  if (t < state.noticeUntil && state.notice) parts.push(state.notice);
+  else if (isThrown(state)) parts.push(tr("toji.bar.thrown"));
+  else if (state.combo > 0 && t - state.lastHit <= ticks(CONFIG.combo.window)) parts.push(tr("toji.bar.combo", String(state.combo)));
+  else parts.push(tr("toji.bar.press", shortName(chooseSkill(player))));
+  for (const skill of SKILLS) {
+    parts.push({ rawtext: [{ text: "§b" }, shortName(skill), { text: ` ${formatCooldown(state.cd[skill] - t)}` }] });
+  }
+  const rawtext = [];
+  parts.forEach((part, i) => {
+    if (i) rawtext.push({ text: "§r  " });
+    rawtext.push(part);
+  });
+  return { rawtext };
+}
+
 system.runInterval(() => {
   const t = now();
   for (const player of world.getAllPlayers()) {
-    const state = states.get(player.id);
+    const existing = states.get(player.id);
     const holding = holdsSpear(player) && (getHealth(player)?.currentValue ?? 0) > 0;
 
     if (!holding) {
       // Letting go of the spear resets the hold timer and ends the awakening
-      if (state) {
-        state.holdTicks = 0;
-        if (isAwake(state)) endAwakening(state);
+      if (existing) {
+        existing.holdTicks = 0;
+        existing.combo = 0;
+        if (isAwake(existing)) endAwakeningEarly(player, existing);
       }
-      revertAwakenedItems(player);
+      syncSpear(player);
       continue;
     }
-    const s = state ?? getState(player);
+    const state = existing ?? getState(player);
 
     if (!greeted.has(player.id)) {
       greeted.add(player.id);
       sendGuide(player);
       try {
-        player.onScreenDisplay.setTitle("§fInverted Spear of Heaven", {
-          subtitle: "§7Right-click / tap to §fthrust§7 — hold it §f20s§7 to awaken",
+        player.onScreenDisplay.setTitle(tr("toji.title.name"), {
+          subtitle: tr("toji.title.hint"),
           fadeInDuration: 10,
           stayDuration: 60,
           fadeOutDuration: 20,
@@ -978,39 +1143,25 @@ system.runInterval(() => {
     }
     ensureLore(player);
 
-    if (isAwake(s)) {
+    if (isAwake(state)) {
       particle(player.dimension, P.aura, player.location);
-      if (t % 20 === 0) particle(player.dimension, P.spark, spearTip(player, 0.9));
+      if (t % 20 === 0 && !isThrown(state)) particle(player.dimension, P.spark, spearTip(player, 0.9));
     } else {
-      if (s.awakeUntil) {
+      if (state.awakeUntil) {
         // Awakening just ran out
-        s.awakeUntil = 0;
-        s.holdTicks = 0;
-        revertAwakenedItems(player);
+        state.awakeUntil = 0;
+        state.holdTicks = 0;
         sound(player.dimension, "random.fizz", player.location, 1.4, 0.5);
       }
-      s.holdTicks += LOOP;
+      state.holdTicks += LOOP;
       const need = ticks(CONFIG.awaken.holdTime);
-      if (s.holdTicks >= need - 20 && s.holdTicks < need && t % 10 === 0) {
+      if (state.holdTicks >= need - 20 && state.holdTicks < need && t % 10 === 0) {
         particle(player.dimension, P.charge, up(player.location, 1));
       }
-      if (s.holdTicks >= need && !s.plunging) awaken(player, s);
+      if (state.holdTicks >= need && !state.plunging && !isThrown(state)) awaken(player, state);
     }
-
-    const parts = [];
-    if (isAwake(s)) {
-      parts.push(`§f§lAWAKENED ${Math.ceil((s.awakeUntil - t) / TPS)}s§r`);
-      parts.push(s.plungeUsed ? "§8Plunge used" : "§dJump: Plunge");
-    } else {
-      parts.push(`§7Hold ${holdBar(s)}`);
-    }
-    if (t < (s.noticeUntil ?? 0)) {
-      parts.push(s.notice);
-    } else {
-      parts.push(`§fPress: §e${SHORT[chooseSkill(player)]}`);
-    }
-    for (const skill of SKILLS) parts.push(`§b${SHORT[skill]} ${formatCooldown(s.cd[skill] - t)}`);
-    player.onScreenDisplay.setActionBar(parts.join("§r  "));
+    syncSpear(player);
+    player.onScreenDisplay.setActionBar(actionBar(player, state, t));
   }
 
   for (const [id, until] of stunnedUntil) {

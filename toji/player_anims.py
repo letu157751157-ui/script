@@ -256,6 +256,23 @@ ANIMATIONS = {
                  (0.0, -0.55, -0.8), ((6, 3, 8), (0.3, -0.75, 0.45))),
         0.85: key(),
     }},
+    # 4th normal hit: spinning finisher. Wind up to the right, sweep the spear all the way across to the left
+    "finisher": {"length": 0.6, "keys": {
+        0.0: key(),
+        0.08: key(pose(right=(-40, 60, 30), left=(-10, 0, -20), body=(0, 40, 0), head=(0, -25, 0),
+                       rleg=(10, 0, 0), lleg=(-10, 0, 0), root=(0, -0.6, 0)),
+                  (0.9, 0.1, 0.4), ((-5, 0, 3), (-0.9, 0.2, 0.4))),
+        0.2: key(pose(right=(-85, -40, 0), left=(20, 0, -20), body=(8, -45, 0), head=(0, 25, 0),
+                      rleg=(-25, 0, 0), lleg=(25, 0, 0), root=(0, -1.0, 0)),
+                 (-0.8, 0.0, -0.6), ((9, 0, 6), (0.95, 0.0, 0.3))),
+        0.28: key(pose(right=(-80, -80, -5), left=(25, 0, -20), body=(10, -60, 0), head=(0, 30, 0),
+                       rleg=(-28, 0, 0), lleg=(28, 0, 0), root=(0, -1.1, 0)),
+                  (-0.95, 0.0, 0.2), ((11, -1, 5), (0.97, 0.0, 0.1))),
+        0.42: key(pose(right=(-78, -72, -3), left=(20, 0, -18), body=(8, -52, 0), head=(0, 26, 0),
+                       rleg=(-24, 0, 0), lleg=(24, 0, 0), root=(0, -0.9, 0)),
+                  (-0.95, 0.0, 0.1), ((10, -1, 5), (0.96, 0.0, 0.2))),
+        0.6: key(),
+    }},
     # Held 20 s: Heavenly Restriction awakening. Crouch, then rise into a low stance, spear reverse-gripped behind
     "awaken": {"length": 1.4, "keys": {
         0.0: key(),

@@ -1,12 +1,12 @@
 {
   "format_version": 2,
   "header": {
-    "name": "\u00a75Toji - Inverted Spear of Heaven \u00a7r(RP)",
-    "description": "Model, textures, animations and particles for the Inverted Spear of Heaven.",
+    "name": "§5Toji - Inverted Spear of Heaven §r(RP)",
+    "description": "Model, textures, animations, particles and texts for the Inverted Spear of Heaven.",
     "uuid": "3632bd64-7766-4c6a-a8c3-822bb2413c01",
     "version": [
       1,
-      0,
+      1,
       0
     ],
     "min_engine_version": [
@@ -21,7 +21,7 @@
       "uuid": "c5eb004a-c550-4bde-a4d0-3d41f87e6a51",
       "version": [
         1,
-        0,
+        1,
         0
       ]
     }
@@ -31,7 +31,7 @@
       "uuid": "40e20d6e-1d50-49a8-bcfd-2df5de5e7686",
       "version": [
         1,
-        0,
+        1,
         0
       ]
     }

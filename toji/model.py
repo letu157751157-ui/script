@@ -79,6 +79,21 @@ def spear_cubes():
     return c
 
 
+def thrown_cubes():
+    """Spear thrown on the Thousand-Mile Chain: only the chain stays in the hand, running out forward."""
+    c = [
+        cube((-0.5, 21, -0.5), (1, 6, 1), "chain"),
+    ]
+    y = 27
+    for i in range(7):
+        if i % 2 == 0:
+            c.append(cube((-0.4, y, -1), (0.8, 3, 2), "chain"))
+        else:
+            c.append(cube((-1, y, -0.4), (2, 3, 0.8), "chain"))
+        y += 2.5
+    return c
+
+
 def glow_cubes():
     """Emissive layer for the awakened spear: blade edges, tip, ridge and prong."""
     return [
@@ -190,7 +205,8 @@ def geometry(identifier, bone, cubes, tex_w, tex_h, glow=False):
                 "visible_bounds_offset": [0, 1.5, 0],
             },
             "bones": [
-                {"name": bone, "pivot": [0, 24, 0]},
+                # Attach to the hand holding the item (without this the model sits at the player's origin)
+                {"name": bone, "pivot": [0, 24, 0], "binding": "q.item_slot_to_bone_name(c.item_slot)"},
                 {"name": "spear", "parent": bone, "pivot": [0, 24, 0], "cubes": cube_json},
             ],
         }],
@@ -295,6 +311,8 @@ def write_model(root, write_png):
     write_tga(os.path.join(rp, "textures/entity/isoh_glow.tga"), build_glow_texture())
     write_json(os.path.join(rp, "models/entity/isoh.geo.json"),
                geometry("geometry.toji.isoh", "isoh", cubes, TEX_W, TEX_H))
+    write_json(os.path.join(rp, "models/entity/isoh_thrown.geo.json"),
+               geometry("geometry.toji.isoh_thrown", "isoh", thrown_cubes(), TEX_W, TEX_H))
     write_json(os.path.join(rp, "models/entity/isoh_glow.geo.json"),
                geometry("geometry.toji.isoh_glow", "isoh", glow_cubes(), 16, 16, glow=True))
     item_icon = render_icon(32, cubes)

@@ -79,25 +79,21 @@ def streak():
 
 
 def null_ring():
-    """32x32 broken rune ring: two circles, 6 inverted triangles, gaps like it is cracking apart."""
+    """32x32 broken rune ring: cracked outer circle, 6 inverted spikes pointing at the center."""
     def pixel(x, y):
         px, py = x + 0.5 - 16, y + 0.5 - 16
         d = math.hypot(px, py)
         a = math.atan2(py, px)
-        gap = (a * 3 / math.pi) % 1 < 0.1  # 6 cracks in the ring
-        if 14 <= d <= 15.5 and not gap:
+        seg = (a / (2 * math.pi) * 6) % 1  # position inside one of 6 sectors
+        if 14 <= d <= 15.5 and not seg < 0.08:
             return "#"
-        if 11.5 <= d <= 12.3 and not gap:
+        if 11.8 <= d <= 12.6 and not 0.46 < seg < 0.54:
             return "+"
-        # inverted triangles between the circles
-        seg = (a / (2 * math.pi) * 6) % 1
-        if 12.3 < d < 14 and abs(seg - 0.5) < (14 - d) / 6:
-            return "+"
-        # inner cross (the spear's mark)
-        if d < 10 and (abs(px) < 0.8 or abs(py) < 0.8) and d > 3:
+        # spikes: wide at the inner circle, sharp tip toward the center (inverted)
+        if 4.5 <= d < 11.8 and abs(seg - 0.5) < 0.2 * (d - 4.5) / 7.3:
+            return "#" if abs(seg - 0.5) < 0.08 * (d - 4.5) / 7.3 else "+"
+        if 2 <= d <= 3.2:
             return "-"
-        if 2 < d < 3.2:
-            return "#"
         return "."
 
     return grid(32, 32, pixel)
@@ -368,7 +364,7 @@ PARTICLES = {
     # Thrust streaks shooting along the stab direction (v.dir_*)
     "thrust": particle("toji:thrust", "particles_add", {
         **burst(10),
-        "minecraft:emitter_shape_disc": {"radius": 0.35, "plane_normal": DIR, "direction": DIR},
+        "minecraft:emitter_shape_sphere": {"radius": 0.3, "direction": DIR},
         "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.15, 0.3)"},
         "minecraft:particle_initial_speed": "math.random(14, 26)",
         "minecraft:particle_motion_dynamic": {"linear_drag_coefficient": 6},

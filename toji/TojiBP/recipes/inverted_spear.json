@@ -1,16 +1,11 @@
 {
-  "format_version": "1.21.90",
+  "format_version": "1.20.10",
   "minecraft:recipe_shapeless": {
     "description": {
-      "identifier": "toji:inverted_spear"
+      "identifier": "toji:inverted_spear_recipe"
     },
     "tags": [
       "crafting_table"
-    ],
-    "unlock": [
-      {
-        "item": "minecraft:echo_shard"
-      }
     ],
     "ingredients": [
       {
@@ -28,6 +23,11 @@
     ],
     "result": {
       "item": "toji:inverted_spear"
-    }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:echo_shard"
+      }
+    ]
   }
 }

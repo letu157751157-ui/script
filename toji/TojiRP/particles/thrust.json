@@ -15,13 +15,8 @@
       "minecraft:emitter_lifetime_once": {
         "active_time": 0.05
       },
-      "minecraft:emitter_shape_disc": {
-        "radius": 0.35,
-        "plane_normal": [
-          "v.dir_x",
-          "v.dir_y",
-          "v.dir_z"
-        ],
+      "minecraft:emitter_shape_sphere": {
+        "radius": 0.3,
         "direction": [
           "v.dir_x",
           "v.dir_y",

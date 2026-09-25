@@ -15,7 +15,7 @@
         }
       },
       "minecraft:display_name": {
-        "value": "\u00a7fInverted Spear of Heaven"
+        "value": "item.toji.inverted_spear.name"
       },
       "minecraft:hand_equipped": true,
       "minecraft:max_stack_size": 1,

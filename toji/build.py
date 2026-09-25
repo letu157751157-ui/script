@@ -9,6 +9,7 @@ import zipfile
 import zlib
 
 import model
+import packs
 import particles
 import player_anims
 
@@ -57,6 +58,7 @@ def build_addon():
 
 
 if __name__ == "__main__":
+    packs.write_packs(ROOT)
     model.write_model(ROOT, write_png)
     make_images()
     player_anims.write_player_animations(ROOT)

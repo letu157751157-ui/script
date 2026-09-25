@@ -4,11 +4,25 @@
 export const CONFIG = {
   // Whether skills can hit other players (false = mobs only)
   pvp: true,
+  // Language of the spear's tooltip (item lore): "vi" or "en".
+  // Chat, titles and the bar above the hotbar follow each player's game language automatically.
+  loreLanguage: "vi",
 
   // Passive — Nullification: every hit with the spear strips the target's positive effects
   // (the Inverted Spear of Heaven cancels cursed techniques)
   passive: {
     nullifyOnHit: true,
+  },
+
+  // Normal attacks — 4-hit combo like JJS M1s: the 4th hit is a spinning finisher that knocks back
+  combo: {
+    window: 1.2, // seconds allowed between two hits of the combo
+    finisherDelay: 0.2, // matches the sweep keyframe of the "finisher" animation
+    radius: 3.5,
+    arc: 150, // degrees in front of you
+    damage: 6,
+    knockback: 1.6,
+    vertical: 0.45,
   },
 
   // Right-click — Nullifying Thrust: short lunge + straight stab that pierces every target in a line
