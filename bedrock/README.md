@@ -65,7 +65,7 @@ Animation chiêu có đủ nhịp lấy đà → vung → chạm → quá đà �
 
 Sau đó tạo/sửa thế giới → **Behavior Packs** → bật *Aatrox - Quỷ Kiếm Darkin (BP)* (Resource Pack sẽ tự bật theo).
 
-> **Đã cài bản cũ?** Bản này là **v1.6.2**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.6.2.
+> **Đã cài bản cũ?** Bản này là **v1.6.3**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.6.3.
 > Nếu vẫn thấy kiếm cầm như cây thương hoặc không có animation, vào **Cài đặt → Bộ nhớ** xoá hết pack Aatrox cũ rồi nhập lại file `.mcaddon`.
 
 Lấy kiếm:
