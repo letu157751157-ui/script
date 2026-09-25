@@ -391,12 +391,12 @@ function drawQTelegraph(player, cast, direction) {
 
   if (cast.shape === "circle") {
     const center = add(ground, direction, cast.offset);
-    // Disc: the center is the sweet spot (like the original Q3)
+    // Disc: the outer rim is the sweet spot
     for (let dx = -cast.radius; dx <= cast.radius; dx += 0.8) {
       for (let dz = -cast.radius; dz <= cast.radius; dz += 0.8) {
         const distance = Math.hypot(dx, dz);
         if (distance > cast.radius) continue;
-        const id = distance <= cast.sweet ? P.markSweet : P.mark;
+        const id = distance >= cast.radius - cast.sweet ? P.markSweet : P.mark;
         particle(dimension, id, { x: center.x + dx, y: center.y, z: center.z + dz });
       }
     }
@@ -471,11 +471,11 @@ function slamQ(player, cast, direction) {
   if (cast.shape === "circle") {
     const center = add(origin, direction, cast.offset);
     targets = getTargetsNear(player, center, cast.radius + 0.5);
-    isSweetSpot = (entity) => horizontalDistance(entity.location, center) <= cast.sweet + 0.3;
+    isSweetSpot = (entity) => horizontalDistance(entity.location, center) >= cast.radius - cast.sweet;
     shockRing(dimension, center, cast.radius + 0.5);
     bloodBurst(dimension, add(center, { x: 0, y: 0.5, z: 0 }));
     crater(dimension, center, cast.radius);
-    // Fire pillars erupt around the rim
+    // Fire pillars erupt around the rim (sweet spot)
     for (let i = 0; i < 6; i++) {
       const angle = (i / 6) * Math.PI * 2;
       const at = { x: center.x + Math.cos(angle) * cast.radius, y: center.y, z: center.z + Math.sin(angle) * cast.radius };
@@ -483,8 +483,6 @@ function slamQ(player, cast, direction) {
     }
     system.runTimeout(() => shockRing(dimension, center, cast.radius + 1.5), 3);
     particle(dimension, P.lightning, add(center, { x: 0, y: 1.6, z: 0 }));
-    particle(dimension, P.pillar, center);
-    particle(dimension, P.flash, add(center, { x: 0, y: 0.5, z: 0 }));
     particle(dimension, P.soul, add(center, { x: 0, y: 0.5, z: 0 }));
     shake(player, 0.4, 0.35);
     sound(dimension, "mob.irongolem.throw", center, 0.6);
@@ -642,7 +640,10 @@ function launchChain(player, direction, tethered = new Set()) {
       if (step === 0) particle(dimension, P.ember, head);
       if (step === 2) particle(dimension, P.chainHead, head);
 
-      const target = getTargetsNear(player, head, cfg.hitRadius).find((e) => !tethered.has(e.id));
+      // Measure against the mob's body, not its feet: horizontal radius + a tall vertical band
+      const target = getTargetsNear(player, head, cfg.hitRadius + 2.5).find(
+        (e) => !tethered.has(e.id) && horizontalDistance(e.location, head) <= cfg.hitRadius && head.y - e.location.y > -1 && head.y - e.location.y < 3
+      );
       if (target) {
         tethered.add(target.id);
         system.clearRun(flight);
@@ -931,7 +932,7 @@ world.afterEvents.playerLeave.subscribe(({ playerId }) => {
 function sendGuide(player) {
   player.sendMessage("§4━━━━━━━━ The Darkin Blade ━━━━━━━━");
   player.sendMessage("§7Hold the blade and use these controls (mobile: right-click = §ftap the screen§7 / §fUse§7 button):");
-  player.sendMessage("§c Q §f— right-click: §7slash 3 times, orange rune tiles are the sweet spot (Q1/Q2 tip, Q3 center)");
+  player.sendMessage("§c Q §f— right-click: §7slash 3 times, the orange rune tiles are the sweet spot");
   player.sendMessage("§c E §f— sprint + attack (or sprint + right-click): §7dash where you look");
   player.sendMessage("§c W §f— sneak (Shift / sneak button) + right-click: §7launch fiery chains");
   player.sendMessage("§c R §f— sneak + jump: §7transform into the World Ender");

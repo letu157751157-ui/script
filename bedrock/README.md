@@ -65,7 +65,7 @@ Skill animations have the full rhythm anticipation → swing → impact → over
 
 Then create/edit a world → **Behavior Packs** → activate *Aatrox - The Darkin Blade (BP)* (the Resource Pack is activated with it).
 
-> **Upgrading from an older version?** This is **v1.7.2**. In your world, remove the old packs and activate version 1.7.2.
+> **Upgrading from an older version?** This is **v1.7.3**. In your world, remove the old packs and activate version 1.7.3.
 > If the blade is still held like a lance or has no animations, go to **Settings → Storage**, delete every old Aatrox pack and import the `.mcaddon` again.
 
 Getting the blade:
