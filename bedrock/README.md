@@ -35,7 +35,7 @@ Dung nham và mắt là một lớp riêng vẽ bằng material `entity_emissive
 ![Cầm kiếm và animation chiêu](preview_animation.png)
 
 - **Cầm kiếm:** tay nắm đúng chuôi kiếm, kiếm vuông góc với cánh tay, lưỡi chĩa ngang về trước, dài xấp xỉ chiều cao nhân vật.
-  Góc nhìn thứ nhất: kiếm dựng dọc bên phải màn hình, chỉ hơi nghiêng.
+  Góc nhìn thứ nhất: kiếm dựng dọc bên phải màn hình, xoay ngang 135° cho mặt kiếm hướng vào giữa.
 - **Animation khi dùng chiêu** (cả người xung quanh lẫn chính bạn đều thấy):
   - **Q1** giơ kiếm qua vai rồi chém chéo xuống, **Q2** quét ngang từ phải sang trái, **Q3** nhảy lên hai tay giơ kiếm rồi nện xuống đất
   - **E** lao người về trước, kiếm kéo lê phía sau
@@ -65,7 +65,7 @@ Animation chiêu có đủ nhịp lấy đà → vung → chạm → quá đà �
 
 Sau đó tạo/sửa thế giới → **Behavior Packs** → bật *Aatrox - Quỷ Kiếm Darkin (BP)* (Resource Pack sẽ tự bật theo).
 
-> **Đã cài bản cũ?** Bản này là **v1.6.0**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.6.0.
+> **Đã cài bản cũ?** Bản này là **v1.6.1**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.6.1.
 > Nếu vẫn thấy kiếm cầm như cây thương hoặc không có animation, vào **Cài đặt → Bộ nhớ** xoá hết pack Aatrox cũ rồi nhập lại file `.mcaddon`.
 
 Lấy kiếm:
