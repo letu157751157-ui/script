@@ -22,8 +22,7 @@
       "animations": {
         "walk": "animation.ytaun_zombie_geneal.walk",
         "idle": "animation.ytaun_zombie_geneal.idle",
-        "mad": "animation.ytaun_zombie_geneal.mad",
-        "alive": "animation.ytaun_zombie_geneal.alive"
+        "mad": "animation.ytaun_zombie_geneal.mad"
       },
       "scripts": {
         "animate": [
@@ -36,8 +35,7 @@
           },
           {
             "idle": "!query.is_moving"
-          },
-          "alive"
+          }
         ]
       }
     }

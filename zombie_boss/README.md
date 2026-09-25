@@ -99,9 +99,11 @@ mật phun, vũng axit sủi bọt, cục axit, lưỡi thịt, con mắt quỷ 
 - **Vẽ lại model 3D + icon**: búa Zombie Hammer mới (cán gỗ quấn vải, đầu búa thịt thối đai sắt, mặt đầu lâu, pha lê xanh),
   và icon búa mới khớp model (`tools/gen_items.py`). Các item khác giữ icon gốc.
 
-## v1.9 — model, texture, animation
-- **Texture** Giant Zombie & Zombie General tô lại theo từng mặt khối (`tools/gen_models.py`, gốc lưu ở `tools/orig/`):
-  mặt trên sáng, mặt dưới tối, viền tối (AO), da thịt thối nhiều sắc độ + đốm thối, vải rách có đường khâu và mép sờn.
-- **Model boss**: thêm gai xương trên 2 vai, 3 gai xương sau lưng, dải vải rách trước/sau hông (bone mới, giữ nguyên rig cũ nên các chiêu vẫn khớp).
-- **Animation "alive"** chạy liên tục: boss thở, lắc đầu, tay đung đưa, bước đi nặng nề (nhún hông), vải bay theo tốc độ chạy;
-  Zombie General thở và ngó nghiêng.
+## v1.10 — Zombie Hammer làm lại hoàn toàn
+(Bản v1.9 chỉnh boss/General đã được hoàn tác theo yêu cầu.)
+- **Model mới** (`tools/gen_items.py`): cán gỗ có 3 đốt xương, quấn da, núm xương + pha lê ở chuôi, cổ sắt;
+  đầu búa thịt thối, 2 đầu bịt sắt có đinh tán, 2 đai sắt, mặt đầu lâu (mắt xanh phát sáng) trước và sau,
+  gai xương hai bên, cụm pha lê xanh trên đỉnh, 2 sợi xích treo mảnh xương.
+- **Texture vẽ lại** độ phân giải gấp đôi: vân gỗ, dây da quấn chéo, sắt trầy có đinh tán, thịt có mạch máu và mụn mủ, xương chuyển sắc.
+- **Animation**: pha lê xoay và lơ lửng, xích đung đưa khi cầm.
+- **Icon** vẽ lại khớp model mới.

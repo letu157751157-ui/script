@@ -16,7 +16,8 @@
       },
       "animations": {
         "wield_first_person": "animation.ytaun_zombieaxe.first_person",
-        "wield_third_person": "animation.ytaun_zombieaxe.third_person"
+        "wield_third_person": "animation.ytaun_zombieaxe.third_person",
+        "alive": "animation.ytaun_zombieaxe.alive"
       },
       "scripts": {
         "pre_animation": [
@@ -28,7 +29,8 @@
           },
           {
             "wield_third_person": "!c.is_first_person"
-          }
+          },
+          "alive"
         ]
       },
       "render_controllers": [

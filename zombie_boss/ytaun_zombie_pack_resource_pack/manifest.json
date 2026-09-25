@@ -2,11 +2,11 @@
   "format_version": 2,
   "header": {
     "description": "Fight the Giant Zombie boss - 8 telegraphed skills, 3 phases, custom particles & animations. Defeat it to unlock the Nether!",
-    "name": "BOSS-Giant Zombie v1.9",
-    "uuid": "8c882d95-e941-4d83-ac0a-e010753c0ed3",
+    "name": "BOSS-Giant Zombie v1.10",
+    "uuid": "506f0a59-17ed-449b-bf92-9c8656b80486",
     "version": [
       1,
-      9,
+      10,
       0
     ],
     "min_engine_version": [
@@ -19,20 +19,20 @@
     {
       "description": "BOSS-Giant Zombie resource pack",
       "type": "resources",
-      "uuid": "4c7d5692-a0a5-4358-975f-68f544e6ece5",
+      "uuid": "8d74e9e0-a87e-4d8f-a336-a80994d7f668",
       "version": [
         1,
-        9,
+        10,
         0
       ]
     }
   ],
   "dependencies": [
     {
-      "uuid": "3435f0f7-6ca2-4c30-a6ed-e2f8e914debf",
+      "uuid": "9dc26217-bd72-45a9-b5be-0e86907d8e89",
       "version": [
         1,
-        9,
+        10,
         0
       ]
     }
