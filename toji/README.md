@@ -49,7 +49,7 @@ Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, conso
 | `toji:null_ring` / `toji:null_ground` | Vòng rune tím nứt vỡ, gai hướng vào tâm, trên mục tiêu / dưới đất khi bị vô hiệu |
 | `toji:shard` | Mảnh kính tím vỡ tung (hiệu ứng của mục tiêu bị phá) |
 | `toji:spear` + `toji:chain_link` | Mâu bay (mũi luôn hướng theo đường bay) và sợi xích nối về tay |
-| `toji:slash` | Vết chém thép trắng-tím (Tốc Trảm, đòn kết liễu, vòng chém khi Giáng Thiên chạm đất) |
+| `toji:slash` | Vết chém thép trắng-tím (Xích Vạn Lý, đòn kết liễu, Loạn Trảm) |
 | `toji:afterimage` | Bóng mờ Toji để lại khi lướt |
 | `toji:aura` / `toji:charge` | Gió trắng bốc lên khi Thức Tỉnh / gió tụ vào mâu trước khi Thức Tỉnh và khi đâm |
 | `toji:shock_ring`, `toji:crack`, `toji:dust`, `toji:debris` | Sóng xung kích, nứt đất, bụi, đá văng |
@@ -72,7 +72,7 @@ Yêu cầu: Minecraft Bedrock **1.21.90 trở lên** (PC, điện thoại, conso
 | `leap_cut` | Nhảy lên co chân, giơ mâu qua đầu rồi bổ xuống |
 | `rampage_end` | Về chỗ cũ: trượt dừng hạ thấp người, mâu chìa sang bên, rồi đứng dậy |
 
-Ngoài ra còn rung màn hình, chớp màn hình khi Thức Tỉnh / Giáng Thiên, và âm thanh cho từng chiêu.
+Ngoài ra còn rung màn hình, chớp màn hình khi Thức Tỉnh / Loạn Trảm, và âm thanh cho từng chiêu.
 
 **Mô hình 3D**: lưỡi thẳng hai cạnh với sống tím, móc phụ bên cạnh lưỡi (kiểu jitte), chắn kiếm tối màu, chuôi quấn vải tím với đai đồng,
 vòng đồng ở đuôi nối các mắt xích. Có 3 dạng: thường, **Thức Tỉnh** (thêm lớp phát sáng `entity_emissive` dọc cạnh lưỡi, sáng cả ban đêm)
