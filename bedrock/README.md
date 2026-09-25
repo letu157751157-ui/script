@@ -34,8 +34,8 @@ Dung nham và mắt là một lớp riêng vẽ bằng material `entity_emissive
 
 ![Cầm kiếm và animation chiêu](preview_animation.png)
 
-- **Cầm kiếm:** tay nắm đúng chuôi kiếm, lưỡi chếch lên phía trước (giống cách cầm kiếm thường của Minecraft), dài xấp xỉ chiều cao nhân vật.
-  Góc nhìn thứ nhất: kiếm nằm góc phải dưới, lưỡi chéo lên, thấy rõ mắt và dòng dung nham mà không che tâm ngắm.
+- **Cầm kiếm:** tay nắm đúng chuôi kiếm, lưỡi gần như dựng thẳng, hơi nghiêng về trước, dài xấp xỉ chiều cao nhân vật.
+  Góc nhìn thứ nhất: kiếm nhỏ gọn ở góc phải dưới, lưỡi dựng lên, không che màn hình.
 - **Animation khi dùng chiêu** (cả người xung quanh lẫn chính bạn đều thấy):
   - **Q1** giơ kiếm qua vai rồi chém chéo xuống, **Q2** quét ngang từ phải sang trái, **Q3** nhảy lên hai tay giơ kiếm rồi nện xuống đất
   - **E** lao người về trước, kiếm kéo lê phía sau
@@ -50,7 +50,7 @@ Dung nham và mắt là một lớp riêng vẽ bằng material `entity_emissive
 
 Sau đó tạo/sửa thế giới → **Behavior Packs** → bật *Aatrox - Quỷ Kiếm Darkin (BP)* (Resource Pack sẽ tự bật theo).
 
-> **Đã cài bản cũ?** Bản này là **v1.4.0**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.4.0.
+> **Đã cài bản cũ?** Bản này là **v1.5.0**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.5.0.
 > Nếu vẫn thấy kiếm cầm như cây thương hoặc không có animation, vào **Cài đặt → Bộ nhớ** xoá hết pack Aatrox cũ rồi nhập lại file `.mcaddon`.
 
 Lấy kiếm:
@@ -132,7 +132,7 @@ Có thể mở các file `.geo.json` bằng Blockbench để chỉnh tay.
 **Tư thế cầm kiếm** nằm trong [`AatroxRP/animations/darkin_blade.animation.json`](AatroxRP/animations/darkin_blade.animation.json).
 Model attachable được gắn sao cho điểm `(0, 24, 0)` của model nằm ở bàn tay (đã kiểm chứng bằng model đinh ba, khiên, ống nhòm gốc),
 và tâm tay cầm của kiếm đặt đúng điểm này, nên `position` chỉ dịch nhẹ vào lòng bàn tay, `rotation` là hướng kiếm, `scale` là độ lớn
-(góc nhìn thứ 3: 0.5, góc nhìn thứ nhất: 0.45).
+(góc nhìn thứ 3: 0.5, góc nhìn thứ nhất: 0.28).
 
 **Animation chiêu** sinh từ [`player_anims.py`](player_anims.py) ra `AatroxRP/animations/aatrox_player.animation.json`, script phát bằng `playAnimation`:
 - góc nhìn thứ 3: độ xoay/dịch cộng thêm cho các bone của người chơi, cộng với hướng lưỡi kiếm mong muốn (cổ tay được giải ngược cho đúng hướng)

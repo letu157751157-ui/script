@@ -4,20 +4,20 @@
     "name": "§4Aatrox - Quỷ Kiếm Darkin §r(RP)",
     "description": "Texture cho Quỷ Kiếm Darkin.",
     "uuid": "8cf7f220-0f2d-4200-9edd-c1ac113ce29c",
-    "version": [1, 4, 0],
+    "version": [1, 5, 0],
     "min_engine_version": [1, 21, 90]
   },
   "modules": [
     {
       "type": "resources",
       "uuid": "afa8390d-c613-46da-a941-9de8feb83625",
-      "version": [1, 4, 0]
+      "version": [1, 5, 0]
     }
   ],
   "dependencies": [
     {
       "uuid": "a3dbd914-73be-40ac-84d0-a1b4006efafd",
-      "version": [1, 4, 0]
+      "version": [1, 5, 0]
     }
   ]
 }
