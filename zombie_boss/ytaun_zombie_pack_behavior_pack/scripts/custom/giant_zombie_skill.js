@@ -355,7 +355,7 @@ function groundSlamSkill(boss, data, target) {
   const radius = data.phase >= 2 ? 7.5 : 6;
   rootBoss(boss, 34, target);
   playAnim(boss, "slam");
-  sound(dim, "mob.ravager.roar", boss.location, 1, 0.6);
+  sound(dim, "ytaun.boss_roar", boss.location, 1.2, 1.2);
   const center = telegraph(dim, boss.location, radius, SLAM_IMPACT);
 
   later(SLAM_IMPACT, () => {
@@ -364,6 +364,8 @@ function groundSlamSkill(boss, data, target) {
     particle(dim, "ytaun:shockwave", center, radius);
     particle(dim, "ytaun:dust_burst", center);
     particle(dim, "ytaun:rock_debris", center);
+    particle(dim, "ytaun:bone_shards", center);
+    sound(dim, "ytaun.boss_slam", center, 2, 1);
     particle(dim, "minecraft:huge_explosion_emitter", center);
     sound(dim, "random.explode", center, 1, 0.6);
     sound(dim, "mob.irongolem.hit", center, 1, 0.4);
@@ -406,7 +408,7 @@ function spikeAt(boss, data, pos, warnTicks, damage) {
     particle(dim, "ytaun:spike", g);
     particle(dim, "ytaun:rock_debris", g);
     particle(dim, "ytaun:ground_crack", g);
-    sound(dim, "dig.stone", g, 0.8, 0.6);
+    sound(dim, "ytaun.rock_crumble", g, 0.9, 0.8 + Math.random() * 0.4);
     hitArea(boss, data, { x: g.x, y: g.y + 0.5, z: g.z }, 1.5, damage, {
       knock: 0.2, up: 0.9, effects: [["slowness", 40, 2]],
     });
@@ -510,6 +512,8 @@ function leapLand(boss, data, land, radius) {
   particle(dim, "ytaun:ground_crack", land);
   particle(dim, "minecraft:huge_explosion_emitter", land);
   sound(dim, "random.explode", land, 1, 0.5);
+  sound(dim, "ytaun.boss_slam", land, 2, 0.8);
+  particle(dim, "ytaun:bone_shards", land);
   sound(dim, "mob.irongolem.hit", land, 1, 0.4);
   shake(dim, land, 28, 0.9, 0.8);
   hitArea(boss, data, land, radius, 12, {
@@ -598,6 +602,8 @@ function poisonBreathSkill(boss, data, target) {
     if (!boss.isValid) return;
     const center = onGround(dim, boss.location);
     particle(dim, "ytaun:poison_cloud", center);
+    particle(dim, "ytaun:flies", center);
+    sound(dim, "ytaun.bile_vomit", center, 1.5, 0.8);
     sound(dim, "random.fizz", center, 1, 0.5);
     const amp = data.phase >= 2 ? 1 : 0;
     for (let tick = 0; tick <= 80; tick += 20) {
@@ -629,7 +635,8 @@ function warRoarSkill(boss, data, target) {
   later(15, () => {
     if (!boss.isValid) return;
     const loc = boss.location;
-    sound(dim, "mob.ravager.roar", loc, 1.5, 0.5);
+    sound(dim, "ytaun.boss_roar", loc, 2, 1);
+    particle(dim, "ytaun:skull_rise", loc);
     sound(dim, "mob.enderdragon.growl", loc, 0.8, 0.7);
     shake(dim, loc, 30, 0.5, 1.2);
     for (let i = 0; i < 3; i++) later(i * 4, () => boss.isValid && particle(dim, "ytaun:roar_wave", boss.location));
@@ -680,17 +687,20 @@ function summonHordeSkill(boss, data, target) {
     const p = onGround(dim, { x: loc.x + Math.cos(a) * r, y: loc.y, z: loc.z + Math.sin(a) * r });
     spots.push(p);
     particle(dim, "ytaun:summon_rune", p);
+    particle(dim, "ytaun:zombie_hands", p, 1.5);
     later(20, () => particle(dim, "ytaun:summon_rune", p));
   }
 
   later(SUMMON_IMPACT, () => {
     if (!boss.isValid) return;
     particle(dim, "ytaun:shockwave", onGround(dim, loc), 4);
-    sound(dim, "mob.zombie.remedy", loc, 1, 0.7);
+    sound(dim, "ytaun.horde_moan", loc, 2, 1);
     shake(dim, loc, 18, 0.4, 0.5);
     spots.forEach((p, i) => later(i * 2, () => {
       particle(dim, "ytaun:ground_crack", p);
       particle(dim, "ytaun:dust_burst", p);
+      particle(dim, "ytaun:zombie_hands", p, 1.2);
+      particle(dim, "ytaun:skull_rise", p);
       sound(dim, "dig.gravel", p, 1, 0.6);
       const type = i % 2 === 0 ? "minecraft:zombie" : "minecraft:husk";
       const m = dim.spawnEntity(type, p);
@@ -711,17 +721,36 @@ const ENRAGE_BURST = 24;
 function enterPhase(boss, data, phase) {
   const dim = boss.dimension;
   data.phase = phase;
+  try { boss.setDynamicProperty("ytaun:phase", phase); } catch { }
   rootBoss(boss, 48);
   playAnim(boss, "enrage");
+  sound(dim, "ytaun.transform", boss.location, 2, 1);
   sound(dim, "mob.ravager.stun", boss.location, 1, 0.6);
+  particle(dim, "ytaun:evil_eye", boss.location);
+  particle(dim, "ytaun:skull_rise", boss.location);
 
-  if (phase === 1) titleNear(dim, boss.location, "§c§lENRAGED", "§6Giant Zombie is getting angry!");
-  else titleNear(dim, boss.location, "§4§l☠ FINAL FURY ☠", "§cThe Giant Zombie fights with everything it has!");
+  if (phase === 1) titleNear(dim, boss.location, "§c§lENRAGED", "§6Bigger, tougher: 600 HP, -25% damage taken");
+  else titleNear(dim, boss.location, "§4§l☠ FINAL FURY ☠", "§c800 HP, -45% damage taken, wither punches!");
 
   later(ENRAGE_BURST, () => {
     if (!boss.isValid) return;
     const loc = boss.location;
     particle(dim, "ytaun:rage_burst", loc);
+    particle(dim, "ytaun:skull_rise", loc);
+    particle(dim, "ytaun:flesh_chunks", loc);
+    particle(dim, "ytaun:goo_splash", loc);
+    sound(dim, "ytaun.boss_roar", loc, 2, phase === 1 ? 0.9 : 0.75);
+    // LÊN FORM: to hơn, nhiều máu hơn, giảm sát thương nhận vào, đánh thường mạnh hơn (component group)
+    try {
+      boss.triggerEvent(phase === 1 ? "ytaun:form_rage" : "ytaun:form_fury");
+      system.run(() => {
+        try {
+          const h = boss.getComponent("minecraft:health");
+          h.setCurrentValue(h.effectiveMax * (phase === 1 ? 0.65 : 0.45));
+          boss.addEffect("absorption", 20000000, { amplifier: phase === 1 ? 4 : 9, showParticles: false });
+        } catch { }
+      });
+    } catch { }
     particle(dim, "ytaun:roar_wave", loc);
     particle(dim, "ytaun:shockwave", onGround(dim, loc), 8);
     particle(dim, "minecraft:huge_explosion_emitter", loc);
@@ -751,6 +780,191 @@ function healSkill(boss, data) {
   sound(dim, "random.levelup", boss.location, 0.6, 0.5);
 }
 
+
+// ============================================
+// ====== SKILL MỚI THEO CÁC TRÙM ZOMBIE KHÁC ======
+// ============================================
+function dirVars(dir) {
+  const v = new MolangVariableMap();
+  v.setFloat("variable.dir_x", dir.x);
+  v.setFloat("variable.dir_z", dir.z);
+  return v;
+}
+
+// Boomer (Left 4 Dead): nôn mật hình nón — mù, buồn nôn; nạn nhân bị "đánh dấu" và zombie kéo tới
+function bileVomitSkill(boss, data, target) {
+  const dim = boss.dimension;
+  rootBoss(boss, 40, target);
+  playAnim(boss, "breath");
+  const dir = flatDir(boss.location, target.location);
+  for (let s = 2; s <= 8; s += 2) telegraph(dim, { x: boss.location.x + dir.x * s, y: boss.location.y, z: boss.location.z + dir.z * s }, 0.6 + s * 0.2, 14);
+  later(14, () => {
+    if (!boss.isValid) return;
+    const o = boss.location;
+    sound(dim, "ytaun.bile_vomit", o, 2, 1);
+    try { dim.spawnParticle("ytaun:bile_spray", o, dirVars(dir)); } catch { }
+    const marked = new Set();
+    for (let k = 0; k < 4; k++) {
+      later(k * 5, () => {
+        if (!boss.isValid) return;
+        for (const e of enemiesNear(boss, boss.location, 9)) {
+          const d = flatDir(boss.location, e.location);
+          if (d.x * dir.x + d.z * dir.z < 0.6 || marked.has(e.id)) continue; // ngoài hình nón ~50°
+          marked.add(e.id);
+          try {
+            e.applyDamage(4 * PHASES[data.phase].dmgMult, { cause: EntityDamageCause.entityAttack, damagingEntity: boss });
+            e.addEffect("blindness", 100, { amplifier: 0 });
+            e.addEffect("nausea", 160, { amplifier: 0 });
+            e.addEffect("slowness", 80, { amplifier: 1 });
+          } catch { }
+          particle(dim, "ytaun:goo_splash", e.location);
+          particle(dim, "ytaun:flies", e.location);
+          // Đánh dấu: 2 zombie chui lên cạnh nạn nhân
+          if (countMinions(boss) < MINION_CAP) {
+            for (let i = 0; i < 2; i++) {
+              const a = Math.random() * Math.PI * 2;
+              const p = onGround(dim, { x: e.location.x + Math.cos(a) * 3, y: e.location.y, z: e.location.z + Math.sin(a) * 3 });
+              particle(dim, "ytaun:zombie_hands", p, 1);
+              later(20, () => {
+                particle(dim, "ytaun:ground_crack", p);
+                const m = dim.spawnEntity("minecraft:zombie", p);
+                m.addTag(MINION_TAG);
+              });
+            }
+          }
+        }
+      });
+    }
+  });
+  return 40;
+}
+
+// Spitter (Left 4 Dead): nhổ cục axit bay vòng cung → vũng axit 5 giây
+function acidSpitSkill(boss, data, target) {
+  const dim = boss.dimension;
+  rootBoss(boss, 26, target);
+  playAnim(boss, "throw");
+  later(14, () => {
+    if (!boss.isValid || !target.isValid) return;
+    const view = boss.getViewDirection();
+    const from = { x: boss.location.x + view.x, y: boss.location.y + 4.5, z: boss.location.z + view.z };
+    const pools = data.phase >= 1 ? 2 : 1;
+    sound(dim, "ytaun.spit", from, 1.5, 0.9);
+    for (let i = 0; i < pools; i++) {
+      const to = onGround(dim, i === 0 ? target.location : {
+        x: target.location.x + (Math.random() - 0.5) * 6, y: target.location.y, z: target.location.z + (Math.random() - 0.5) * 6,
+      });
+      telegraph(dim, to, 3, 18);
+      let t = 0;
+      const run = system.runInterval(() => {
+        t++;
+        const k = t / 18;
+        const pos = { x: lerp(from.x, to.x, k), y: lerp(from.y, to.y, k) + 4 * 4 * k * (1 - k), z: lerp(from.z, to.z, k) };
+        particle(dim, "ytaun:acid_glob", pos);
+        if (t % 3 === 0) particle(dim, "ytaun:goo_drip", { x: pos.x, y: pos.y - 2.5, z: pos.z });
+        if (t >= 18) {
+          system.clearRun(run);
+          acidPool(boss, data, to);
+        }
+      }, 1);
+    }
+  });
+  return 28;
+}
+
+function acidPool(boss, data, at) {
+  const dim = boss.dimension;
+  particle(dim, "ytaun:acid_pool", at, 3.2);
+  particle(dim, "ytaun:acid_bubbles", at, 3);
+  particle(dim, "ytaun:goo_splash", at);
+  sound(dim, "ytaun.acid_sizzle", at, 1.5, 1);
+  for (let k = 0; k <= 100; k += 10) {
+    later(k, () => {
+      if (!boss.isValid) return;
+      if (k % 40 === 0) sound(dim, "ytaun.acid_sizzle", at, 0.8, 1.1);
+      hitArea(boss, data, at, 3, 1.5, { cause: EntityDamageCause.magic, effects: [["poison", 40, 1]] });
+    });
+  }
+}
+
+// Smoker (Left 4 Dead): phóng lưỡi kéo mục tiêu về phía boss
+function tongueSkill(boss, data, target) {
+  const dim = boss.dimension;
+  rootBoss(boss, 34, target);
+  playAnim(boss, "roar");
+  sound(dim, "ytaun.tongue_whip", boss.location, 1.5, 0.9);
+  const mouth = () => ({ x: boss.location.x, y: boss.location.y + 4.2, z: boss.location.z });
+  let t = 0;
+  const run = system.runInterval(() => {
+    try {
+      if (!boss.isValid || !target.isValid || t > 24) { system.clearRun(run); return; }
+      t++;
+      const m = mouth(), p = target.location;
+      const reach = Math.min(t / 6, 1);
+      for (let i = 1; i <= 10; i++) {
+        const k = (i / 10) * reach;
+        particle(dim, "ytaun:tongue", { x: lerp(m.x, p.x, k), y: lerp(m.y, p.y + 1, k) - Math.sin(k * Math.PI) * 0.6, z: lerp(m.z, p.z, k) });
+      }
+      if (t === 6) {
+        if (dist(boss.location, target.location) > 18) { system.clearRun(run); return; }
+        sound(dim, "ytaun.tongue_whip", p, 1.5, 1.2);
+        particle(dim, "ytaun:goo_splash", p);
+        try {
+          target.applyDamage(4 * PHASES[data.phase].dmgMult, { cause: EntityDamageCause.entityAttack, damagingEntity: boss });
+          target.addEffect("slowness", 60, { amplifier: 3 });
+        } catch { }
+      }
+      if (t > 6 && t % 3 === 0) {
+        const d = flatDir(target.location, boss.location);
+        try { target.applyKnockback({ x: d.x * 1.1, z: d.z * 1.1 }, 0.15); } catch { }
+      }
+    } catch { system.clearRun(run); }
+  }, 1);
+  return 34;
+}
+
+// Gargantuar (Plants vs Zombies): ném Imp — zombie con bay tới đáp xuống cạnh mục tiêu
+function impThrowSkill(boss, data, target) {
+  const dim = boss.dimension;
+  rootBoss(boss, 30, target);
+  playAnim(boss, "throw");
+  sound(dim, "ytaun.imp_scream", boss.location, 1, 1);
+  later(16, () => {
+    if (!boss.isValid || !target.isValid) return;
+    const n = data.phase >= 2 ? 3 : data.phase >= 1 ? 2 : 1;
+    const view = boss.getViewDirection();
+    const from = { x: boss.location.x + view.x * 1.5, y: boss.location.y + 5.5, z: boss.location.z + view.z * 1.5 };
+    sound(dim, "mob.irongolem.throw", from, 1, 0.8);
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, r = i === 0 ? 1.2 : 2.5;
+      const to = onGround(dim, { x: target.location.x + Math.cos(a) * r, y: target.location.y, z: target.location.z + Math.sin(a) * r });
+      telegraph(dim, to, 1.5, 20);
+      let t = 0;
+      const run = system.runInterval(() => {
+        t++;
+        const k = t / 20;
+        const pos = { x: lerp(from.x, to.x, k), y: lerp(from.y, to.y, k) + 4 * 5 * k * (1 - k), z: lerp(from.z, to.z, k) };
+        particle(dim, "ytaun:skull_rise", pos);
+        particle(dim, "ytaun:rock_trail", pos);
+        if (t >= 20) {
+          system.clearRun(run);
+          particle(dim, "ytaun:shockwave", to, 2);
+          particle(dim, "ytaun:flesh_chunks", to);
+          sound(dim, "ytaun.imp_scream", to, 1, 1.3);
+          if (boss.isValid) hitArea(boss, data, to, 2, 5, { knock: 0.6, up: 0.3 });
+          try {
+            const imp = dim.spawnEntity("minecraft:zombie", to);
+            imp.triggerEvent("minecraft:as_baby");
+            imp.addTag(MINION_TAG);
+            imp.addEffect("speed", 20000000, { amplifier: 1, showParticles: false });
+          } catch { }
+        }
+      }, 1);
+    }
+  });
+  return 32;
+}
+
 // ============================================
 // ====== BỘ CHỌN CHIÊU ======
 // cd: hồi chiêu (tick), range: [min, max] khoảng cách tới mục tiêu
@@ -763,6 +977,10 @@ const SKILLS = {
   poison: { cd: 520, range: [0, 8], weight: 2, run: poisonBreathSkill },
   roar: { cd: 700, range: [0, 12], weight: 1, run: warRoarSkill },
   summon: { cd: 900, range: [0, 24], weight: 1, run: summonHordeSkill, cond: (b) => countMinions(b) < MINION_CAP - 2 },
+  bile: { cd: 560, range: [0, 8], weight: 2, run: bileVomitSkill },
+  acid: { cd: 280, range: [6, 24], weight: 2, run: acidSpitSkill },
+  tongue: { cd: 420, range: [8, 18], weight: 2, run: tongueSkill },
+  imp: { cd: 480, range: [6, 24], weight: 2, run: impThrowSkill, cond: (b) => countMinions(b) < MINION_CAP },
   grab: {
     cd: 600, range: [0, 4.5], weight: 4, run: grabSlamSkill,
     cond: (b, t) => t.typeId === "minecraft:player",
@@ -820,7 +1038,9 @@ function trackBoss(boss) {
   const ratio = health.currentValue / health.effectiveMax;
   bossData.set(boss.id, {
     boss,
-    phase: ratio <= PHASES[2].hp ? 2 : ratio <= PHASES[1].hp ? 1 : 0,
+    phase: typeof boss.getDynamicProperty("ytaun:phase") === "number"
+      ? boss.getDynamicProperty("ytaun:phase")
+      : ratio <= PHASES[2].hp ? 2 : ratio <= PHASES[1].hp ? 1 : 0,
     castUntil: now + 40, // nghỉ 2 giây sau khi xuất hiện
     lastCast: { summon: now - 400, roar: now - 300 },
     lastSkill: null,
@@ -838,6 +1058,9 @@ function tickBoss(data, now) {
   // Hiệu ứng thường trực theo giai đoạn
   if (data.phase >= 1 && now % (data.phase >= 2 ? 5 : 10) === 0) particle(dim, "ytaun:rage_aura", boss.location);
   if (data.phase >= 2 && now % 12 === 0) particle(dim, "ytaun:ember", boss.location);
+  if (data.phase >= 1 && now % 10 === 0) particle(dim, "ytaun:goo_drip", boss.location);
+  if (now % 40 === 0) particle(dim, "ytaun:flies", boss.location);
+  if (now % 100 === 0) sound(dim, "ytaun.flies", boss.location, 0.5, 1);
   if (now % 16 === 0) {
     try {
       const v = boss.getVelocity();
@@ -908,6 +1131,10 @@ world.afterEvents.entityDie.subscribe(({ deadEntity: entity }) => {
     const loc = { ...entity.location };
     const dim = entity.dimension;
     particle(dim, "ytaun:death_burst", loc);
+    particle(dim, "ytaun:skull_rise", loc);
+    particle(dim, "ytaun:flesh_chunks", loc);
+    particle(dim, "ytaun:bone_shards", loc);
+    sound(dim, "ytaun.boss_roar", loc, 2, 0.6);
     particle(dim, "ytaun:shockwave", onGround(dim, loc), 9);
     particle(dim, "minecraft:huge_explosion_emitter", loc);
     sound(dim, "mob.enderdragon.death", loc, 0.8, 1.2);

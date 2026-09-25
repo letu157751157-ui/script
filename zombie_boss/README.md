@@ -62,3 +62,29 @@ Atlas `textures/particle/ytaun_boss.png` vẽ lại kiểu pixel art 16px (giố
 ### Version / UUID
 Mỗi lần phát hành chạy `tools/release.py`: version tăng 1.4 → 1.5 → 1.6…, UUID của cả 2 pack và module đều đổi mới,
 tên pack có số version (vd. `BOSS-Giant Zombie v1.5`) nên game không nhầm với bản cũ.
+
+## v1.6
+
+### Chiêu mới cho boss — lấy cảm hứng từ các trùm zombie nổi tiếng
+| Chiêu | Nguồn cảm hứng | Tầm | Mô tả |
+|---|---|---|---|
+| Nôn Mật | Boomer (Left 4 Dead) | 0–8 | Phun mật hình nón: mù, buồn nôn, chậm. Nạn nhân bị "đánh dấu": 2 zombie chui lên cạnh họ. |
+| Nhổ Axit | Spitter (Left 4 Dead) | 6–24 | Cục axit bay vòng cung → vũng axit 5 giây gây độc liên tục (2 vũng từ Cuồng Nộ). |
+| Lưỡi Kéo | Smoker (Left 4 Dead) | 8–18 | Phóng lưỡi thịt quấn mục tiêu, kéo về phía boss. |
+| Ném Imp | Gargantuar (Plants vs Zombies) | 6–24 | Ném zombie con bay tới đáp cạnh mục tiêu (1/2/3 con theo giai đoạn). |
+
+### Lên form thì trâu hơn
+| Form | Máu tối đa | Sát thương nhận vào | Kích thước | Đánh thường | Khác |
+|---|---|---|---|---|---|
+| Thường | 400 | 100% | 1.6 | 6 | |
+| Cuồng Nộ (≤50%) | 600 (hồi về 65%) | 75% | 1.75 | 9 | Hấp thụ V, miễn đẩy lùi |
+| Final Fury (≤20%) | 800 (hồi về 45%) | 55% | 1.9 | 13 + khô héo | Hấp thụ X, miễn đẩy lùi |
+Giai đoạn được lưu vào boss (dynamic property) nên thoát game vào lại vẫn giữ form.
+
+### Particle zombie (13 mới)
+Ruồi bay quanh xác, mảnh thịt thối, xương văng, đầu lâu xanh bay lên, bàn tay zombie trồi khỏi đất, nhớt xanh nhỏ giọt,
+mật phun, vũng axit sủi bọt, cục axit, lưỡi thịt, con mắt quỷ khi lên form. Tất cả pixel art 16px.
+
+### Âm thanh mới (14 file `.ogg`, tự tổng hợp — `tools/gen_sounds.py`)
+`ytaun.boss_roar`, `boss_slam`, `rock_crumble`, `bile_vomit`, `acid_sizzle`, `spit`, `tongue_whip`, `horde_moan`,
+`general_shout`, `transform`, `flies`, `axe_smash`, `soul_drain`, `imp_scream`. Dùng cho boss, Zombie General và Zombie Axe.

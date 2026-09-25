@@ -1,0 +1,173 @@
+{
+  "format_version": "1.14.0",
+  "sound_definitions": {
+    "ytaun.boss_roar": {
+      "category": "hostile",
+      "min_distance": 4,
+      "max_distance": 64,
+      "sounds": [
+        {
+          "name": "sounds/ytaun/boss_roar",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "ytaun.boss_slam": {
+      "category": "hostile",
+      "min_distance": 4,
+      "max_distance": 64,
+      "sounds": [
+        {
+          "name": "sounds/ytaun/boss_slam",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "ytaun.rock_crumble": {
+      "category": "hostile",
+      "min_distance": 4,
+      "max_distance": 32,
+      "sounds": [
+        {
+          "name": "sounds/ytaun/rock_crumble",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "ytaun.bile_vomit": {
+      "category": "hostile",
+      "min_distance": 4,
+      "max_distance": 32,
+      "sounds": [
+        {
+          "name": "sounds/ytaun/bile_vomit",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "ytaun.acid_sizzle": {
+      "category": "hostile",
+      "min_distance": 4,
+      "max_distance": 32,
+      "sounds": [
+        {
+          "name": "sounds/ytaun/acid_sizzle",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "ytaun.spit": {
+      "category": "hostile",
+      "min_distance": 4,
+      "max_distance": 32,
+      "sounds": [
+        {
+          "name": "sounds/ytaun/spit",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "ytaun.tongue_whip": {
+      "category": "hostile",
+      "min_distance": 4,
+      "max_distance": 32,
+      "sounds": [
+        {
+          "name": "sounds/ytaun/tongue_whip",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "ytaun.horde_moan": {
+      "category": "hostile",
+      "min_distance": 4,
+      "max_distance": 64,
+      "sounds": [
+        {
+          "name": "sounds/ytaun/horde_moan",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "ytaun.general_shout": {
+      "category": "hostile",
+      "min_distance": 4,
+      "max_distance": 32,
+      "sounds": [
+        {
+          "name": "sounds/ytaun/general_shout",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "ytaun.transform": {
+      "category": "hostile",
+      "min_distance": 4,
+      "max_distance": 64,
+      "sounds": [
+        {
+          "name": "sounds/ytaun/transform",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "ytaun.flies": {
+      "category": "hostile",
+      "min_distance": 4,
+      "max_distance": 32,
+      "sounds": [
+        {
+          "name": "sounds/ytaun/flies",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "ytaun.axe_smash": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 32,
+      "sounds": [
+        {
+          "name": "sounds/ytaun/axe_smash",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "ytaun.soul_drain": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 32,
+      "sounds": [
+        {
+          "name": "sounds/ytaun/soul_drain",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "ytaun.imp_scream": {
+      "category": "hostile",
+      "min_distance": 4,
+      "max_distance": 32,
+      "sounds": [
+        {
+          "name": "sounds/ytaun/imp_scream",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    }
+  }
+}

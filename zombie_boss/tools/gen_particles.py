@@ -5,11 +5,12 @@ import json, os
 OUT = os.path.join(os.path.dirname(__file__), "..", "ytaun_zombie_pack_resource_pack", "particles")
 TEX = "textures/particle/ytaun_boss"
 AGE = "v.particle_age / v.particle_lifetime"
-_NAMES = ["glow", "smoke", "ring", "star", "spike", "rock", "rune", "bubble", "crack", "flame", "streak", "shard"]
+_NAMES = ["glow", "smoke", "ring", "star", "spike", "rock", "rune", "bubble", "crack", "flame", "streak", "shard",
+          "skull", "bone", "flesh", "fly", "goo", "splat", "hand", "eye"]
 CELLS = {n: ((i % 4) * 16, (i // 4) * 16) for i, n in enumerate(_NAMES)}
 
 def uv(name):
-    return {"texture_width": 64, "texture_height": 48, "uv": list(CELLS[name]), "uv_size": [16, 16]}
+    return {"texture_width": 64, "texture_height": 80, "uv": list(CELLS[name]), "uv_size": [16, 16]}
 
 def bb(size, cell, mode="lookat_xyz", **extra):
     w, h = size if isinstance(size, (list, tuple)) else (size, size)
@@ -180,6 +181,89 @@ P["death_burst"] = effect("death_burst", {**steady(160, 400, 2.0), "minecraft:em
     **life("math.random(1, 2)"), **SPIN,
     **bb(["0.5 + v.particle_random_1 * 0.6"] * 2, "smoke", "rotate_xyz"),
     **tint({"0.0": "#FFFFE08A", "0.4": "#C04FB33A", "1.0": "#00203010"})}, ADD)
+
+# ---------- Particle zombie ----------
+GREEN = {"0.0": "#FFB8FF4A", "0.5": "#FF6ACF2A", "1.0": "#00306A10"}
+P["flies"] = effect("flies", {**once(10), "minecraft:emitter_shape_sphere": {"offset": [0, 1.5, 0], "radius": 1.6},
+    "minecraft:particle_initial_speed": 0,
+    "minecraft:particle_motion_parametric": {"relative_position": [
+        "math.sin(v.particle_age * 900 + v.particle_random_1 * 360) * 0.5",
+        "math.sin(v.particle_age * 1300 + v.particle_random_2 * 360) * 0.25",
+        "math.cos(v.particle_age * 800 + v.particle_random_3 * 360) * 0.5"]},
+    **life("math.random(1.5, 2.5)"), **bb([0.12, 0.12], "fly"),
+    **tint({"0.0": "#00FFFFFF", "0.1": "#FFFFFFFF", "0.9": "#FFFFFFFF", "1.0": "#00FFFFFF"})}, BLEND)
+
+P["flesh_chunks"] = effect("flesh_chunks", {**once(12), "minecraft:emitter_shape_sphere": {"offset": [0, 1, 0], "radius": 0.4,
+    "direction": ["math.random(-1,1)", "math.random(0.5,2)", "math.random(-1,1)"]},
+    "minecraft:particle_initial_speed": "math.random(3, 6)",
+    "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -18, 0]}, **SPIN,
+    "minecraft:particle_motion_collision": {"coefficient_of_restitution": 0.1, "collision_radius": 0.08, "collision_drag": 8},
+    **life("math.random(1.2, 2)"), **bb(["0.12 + v.particle_random_1 * 0.12"] * 2, "flesh", "rotate_xyz"),
+    **tint({"0.0": "#FF8A3A2E", "0.5": "#FF5E6A2A", "0.9": "#FF4A5A22", "1.0": "#004A5A22"})}, BLEND)
+
+P["goo_splash"] = effect("goo_splash", {**once(18), "minecraft:emitter_shape_sphere": {"offset": [0, 0.8, 0], "radius": 0.5,
+    "direction": ["math.random(-1,1)", "math.random(0.3,1.5)", "math.random(-1,1)"]},
+    "minecraft:particle_initial_speed": "math.random(2, 5)",
+    "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -16, 0]},
+    "minecraft:particle_motion_collision": {"coefficient_of_restitution": 0, "collision_radius": 0.06, "collision_drag": 10},
+    **life("math.random(0.8, 1.4)"), **bb(["0.1 + v.particle_random_1 * 0.1"] * 2, "goo", "lookat_direction"), **tint(GREEN)}, BLEND)
+
+# Nôn mật (Boomer): phun hình nón theo hướng v.dir_x / v.dir_z
+P["bile_spray"] = effect("bile_spray", {**steady(140, 220, 1.2),
+    "minecraft:emitter_shape_point": {"offset": [0, 3.2, 0], "direction": [
+        "(v.dir_x ?? 0) + math.random(-0.35, 0.35)", "math.random(-0.2, 0.25)", "(v.dir_z ?? 1) + math.random(-0.35, 0.35)"]},
+    "minecraft:particle_initial_speed": "math.random(7, 11)",
+    "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -12, 0], "linear_drag_coefficient": 0.8},
+    "minecraft:particle_motion_collision": {"coefficient_of_restitution": 0, "collision_radius": 0.08, "collision_drag": 10},
+    **life("math.random(0.8, 1.3)"), **bb(["0.14 + v.particle_random_1 * 0.18"] * 2, "goo", "lookat_direction"),
+    **tint({"0.0": "#FFE8FF6A", "0.4": "#FFA8D032", "1.0": "#00587A18"})}, BLEND)
+
+P["acid_pool"] = effect("acid_pool", {**once(1), **RADIUS, "minecraft:emitter_shape_point": {"offset": [0, 0.07, 0]},
+    **life(5), "minecraft:particle_initial_spin": {"rotation": "math.random(0, 360)"},
+    **bb(["v.r * math.min(v.particle_age * 6, 1)"] * 2, "splat", "emitter_transform_xz"),
+    **tint({"0.0": "#FFC8FF4A", "0.8": "#EE62C022", "1.0": "#00306010"})}, BLEND)
+
+P["acid_bubbles"] = effect("acid_bubbles", {**steady(25, 120, 5), **RADIUS,
+    "minecraft:emitter_shape_disc": {"offset": [0, 0.1, 0], "radius": "v.r * 0.8", "direction": [0, 1, 0], "plane_normal": "y"},
+    "minecraft:particle_initial_speed": "math.random(0.3, 1)", **life("math.random(0.4, 0.8)"),
+    **bb(["0.06 + v.particle_random_1 * 0.08"] * 2, "bubble"), **tint(GREEN)}, BLEND)
+
+P["acid_glob"] = effect("acid_glob", {**once(1), "minecraft:emitter_shape_point": {}, **life(0.07),
+    **bb([0.55, 0.55], "goo", "lookat_xyz"), "minecraft:particle_appearance_tinting": {"color": [0.6, 1, 0.25, 1]}}, BLEND)
+
+P["skull_rise"] = effect("skull_rise", {**once(6), "minecraft:emitter_shape_disc": {"offset": [0, 0.5, 0], "radius": 1.5, "direction": [0, 1, 0], "plane_normal": "y"},
+    "minecraft:particle_initial_speed": "math.random(1.2, 2.2)",
+    "minecraft:particle_motion_dynamic": {"linear_drag_coefficient": 0.5},
+    **life("math.random(1.2, 1.8)"), **bb(["0.25 + v.particle_random_1 * 0.15"] * 2, "skull"),
+    **tint({"0.0": "#00B8FF6A", "0.15": "#FFB8FF6A", "0.7": "#CC58C02A", "1.0": "#00204A08"})}, ADD)
+
+P["bone_shards"] = effect("bone_shards", {**once(14), "minecraft:emitter_shape_sphere": {"offset": [0, 0.5, 0], "radius": 0.8,
+    "direction": ["math.random(-1,1)", "math.random(0.8,2)", "math.random(-1,1)"]},
+    "minecraft:particle_initial_speed": "math.random(4, 8)",
+    "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -20, 0]}, **SPIN,
+    "minecraft:particle_motion_collision": {"coefficient_of_restitution": 0.4, "collision_radius": 0.08, "collision_drag": 5},
+    **life("math.random(1.2, 1.8)"), **bb(["0.15 + v.particle_random_1 * 0.12"] * 2, "bone", "rotate_xyz"),
+    **tint({"0.0": "#FFF0EAD0", "0.9": "#FFD8CFAE", "1.0": "#00D8CFAE"})})
+
+# Bàn tay zombie trồi lên từ đất
+P["zombie_hands"] = effect("zombie_hands", {**once(5), **RADIUS,
+    "minecraft:emitter_shape_disc": {"radius": "v.r", "direction": [0, 1, 0], "plane_normal": "y"},
+    **life("1.4 + v.particle_random_2 * 0.5"),
+    **bb(["0.35", "0.7 * math.min(v.particle_age * 3, 1) * (1 - math.pow(v.particle_age / v.particle_lifetime, 6))"], "hand", "rotate_y"),
+    **tint({"0.0": "#FF7AA05A", "0.9": "#FF5A7A40", "1.0": "#005A7A40"})})
+
+P["goo_drip"] = effect("goo_drip", {**once(4), "minecraft:emitter_shape_box": {"offset": [0, 2.5, 0], "half_dimensions": [1, 1.2, 1]},
+    "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -9, 0]},
+    "minecraft:particle_motion_collision": {"coefficient_of_restitution": 0, "collision_radius": 0.05, "collision_drag": 10},
+    **life(1.2), **bb([0.08, 0.14], "goo", "rotate_y"), **tint(GREEN)}, BLEND)
+
+P["evil_eye"] = effect("evil_eye", {**once(1), "minecraft:emitter_shape_point": {"offset": [0, 5.5, 0]}, **life(1.2),
+    **bb(["1.2 * math.min(v.particle_age * 5, 1)", "0.6 * math.min(v.particle_age * 5, 1) * (1 - math.pow(v.particle_age / v.particle_lifetime, 4))"], "eye"),
+    **tint({"0.0": "#FFFF4A2A", "1.0": "#00FF0000"})}, ADD)
+
+# Lưỡi Smoker: đoạn dây thịt nối boss -> mục tiêu (script rải các điểm)
+P["tongue"] = effect("tongue", {**once(1), "minecraft:emitter_shape_point": {}, **life(0.12),
+    **bb([0.16, 0.16], "flesh", "lookat_xyz"), "minecraft:particle_appearance_tinting": {"color": [0.75, 0.3, 0.35, 1]}}, BLEND)
 
 os.makedirs(OUT, exist_ok=True)
 for f in os.listdir(OUT):

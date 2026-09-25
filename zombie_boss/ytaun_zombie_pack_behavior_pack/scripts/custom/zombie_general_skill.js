@@ -38,7 +38,7 @@ function cleave(g, target) {
   const dir = flatDir(g.location, target.location);
   const center = { x: g.location.x + dir.x * 2, y: g.location.y, z: g.location.z + dir.z * 2 };
   telegraph(dim, center, 2.2, 10);
-  sound(dim, "mob.zombie.say", g.location, 1, 0.6);
+  sound(dim, "ytaun.general_shout", g.location, 1, 1.2);
   later(10, () => {
     if (!g.isValid) return;
     for (let i = -2; i <= 2; i++) {
@@ -48,6 +48,7 @@ function cleave(g, target) {
     particle(dim, "ytaun:ground_ring", onGround(dim, center), 2.5);
     sound(dim, "mob.irongolem.hit", center, 1, 1.3);
     hit(g, center, 2.4, 7, 0.9, 0.35, [["slowness", 40, 1]]);
+    particle(dim, "ytaun:flesh_chunks", center);
   });
   return 20;
 }
@@ -62,7 +63,7 @@ function charge(g, target) {
   for (let s = 1; s <= len; s += 1.5) {
     particle(dim, "ytaun:telegraph", onGround(dim, { x: start.x + dir.x * s, y: start.y, z: start.z + dir.z * s }), 0.9);
   }
-  sound(dim, "mob.ravager.roar", start, 0.7, 1.4);
+  sound(dim, "ytaun.general_shout", start, 1.5, 0.9);
   const hitIds = new Set();
   later(14, () => {
     let t = 0;
@@ -82,6 +83,7 @@ function charge(g, target) {
             e.applyKnockback({ x: dir.x * 1.8, z: dir.z * 1.8 }, 0.55);
           } catch { }
           particle(dim, "ytaun:flash", e.location, 1.5);
+          particle(dim, "ytaun:bone_shards", e.location);
           sound(dim, "mob.irongolem.hit", e.location, 1, 1.2);
         }
         if (t === 8) {
@@ -98,7 +100,9 @@ function charge(g, target) {
 function rally(g) {
   const dim = g.dimension;
   freeze(g, 24);
-  sound(dim, "mob.zombie.remedy", g.location, 1, 0.8);
+  sound(dim, "ytaun.general_shout", g.location, 2, 1);
+  sound(dim, "ytaun.horde_moan", g.location, 1.5, 1.2);
+  particle(dim, "ytaun:skull_rise", g.location);
   sound(dim, "raid.horn", g.location, 0.6, 1.2);
   particle(dim, "ytaun:roar_wave", g.location);
   particle(dim, "ytaun:ember", g.location);
@@ -126,6 +130,7 @@ function callSoldiers(g) {
     const a = Math.random() * Math.PI * 2;
     const p = onGround(dim, { x: g.location.x + Math.cos(a) * 2.5, y: g.location.y, z: g.location.z + Math.sin(a) * 2.5 });
     particle(dim, "ytaun:summon_rune", p);
+    particle(dim, "ytaun:zombie_hands", p, 1);
     later(24, () => {
       particle(dim, "ytaun:ground_crack", p);
       particle(dim, "ytaun:rock_debris", p);
@@ -158,6 +163,7 @@ system.runInterval(() => {
   for (const [id, s] of generals) {
     const g = s.entity;
     if (!g.isValid) { generals.delete(id); continue; }
+    if (now % 60 === 0) particle(g.dimension, "ytaun:flies", g.location);
     if (now < s.busyUntil || now % 5 !== 0) continue;
     try {
       const target = pickTarget(g);

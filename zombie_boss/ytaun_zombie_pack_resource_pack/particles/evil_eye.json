@@ -1,0 +1,58 @@
+{
+  "format_version": "1.10.0",
+  "particle_effect": {
+    "description": {
+      "identifier": "ytaun:evil_eye",
+      "basic_render_parameters": {
+        "material": "particles_add",
+        "texture": "textures/particle/ytaun_boss"
+      }
+    },
+    "components": {
+      "minecraft:emitter_rate_instant": {
+        "num_particles": 1
+      },
+      "minecraft:emitter_lifetime_once": {
+        "active_time": 0.05
+      },
+      "minecraft:emitter_shape_point": {
+        "offset": [
+          0,
+          5.5,
+          0
+        ]
+      },
+      "minecraft:particle_lifetime_expression": {
+        "max_lifetime": 1.2
+      },
+      "minecraft:particle_appearance_billboard": {
+        "size": [
+          "1.2 * math.min(v.particle_age * 5, 1)",
+          "0.6 * math.min(v.particle_age * 5, 1) * (1 - math.pow(v.particle_age / v.particle_lifetime, 4))"
+        ],
+        "facing_camera_mode": "lookat_xyz",
+        "uv": {
+          "texture_width": 64,
+          "texture_height": 80,
+          "uv": [
+            48,
+            64
+          ],
+          "uv_size": [
+            16,
+            16
+          ]
+        }
+      },
+      "minecraft:particle_appearance_tinting": {
+        "color": {
+          "interpolant": "v.particle_age / v.particle_lifetime",
+          "gradient": {
+            "0.0": "#FFFF4A2A",
+            "1.0": "#00FF0000"
+          }
+        }
+      }
+    }
+  }
+}

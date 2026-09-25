@@ -36,7 +36,7 @@
         "facing_camera_mode": "emitter_transform_xz",
         "uv": {
           "texture_width": 64,
-          "texture_height": 48,
+          "texture_height": 80,
           "uv": [
             32,
             0

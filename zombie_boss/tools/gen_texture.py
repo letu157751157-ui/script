@@ -73,8 +73,46 @@ shard = art(["................", ".......W........", "......WWL.......", "......
              ".....WWWLL......", ".....WWWLL......", "......WWL.......", "......WWL.......",
              ".......W........", "................", "................", "................"], {"W": W, "L": M})
 
-atlas = Image.new("RGBA", (N * 4, N * 3), (0, 0, 0, 0))
-for i, im in enumerate([glow, smoke, ring, star, spike, rock, rune, bubble, crack, flame, streak, shard]):
+
+# ---- Hàng 3: đồ zombie: skull, bone, flesh, fly | Hàng 4: goo, splat, hand, eye ----
+G = {"W": W, "L": L, "M": M, "D": D, "K": K}
+skull = art(["................", "....LWWWWWL.....", "...WWWWWWWWW....", "..LWWWWWWWWWL...",
+             "..WWWWWWWWWWW...", "..WKKWWWWKKWW...", "..WKKKWWWKKKW...", "..WKKWWWWWKKW...",
+             "..LWWWWKWWWWL...", "...WWWKKKWWW....", "...LWWWWWWWL....", "....WKWKWKW.....",
+             "....WWWWWWW.....", ".....LLLLL......", "................", "................"], G)
+bone = art(["................", "..LW............", ".WWWL...........", ".LWWWL..........",
+            "...LWWL.........", "....LWWL........", ".....LWWL.......", "......LWWL......",
+            ".......LWWL.....", "........LWWL....", ".........LWWWL..", "..........LWWW..",
+            "...........WWL..", "................", "................", "................"], G)
+flesh = art(["................", "................", ".....MLL........", "....MLLWLM......",
+             "...MLLWWLLM.....", "...DMLLLLLMD....", "..DMLKLLMLMMD...", "..DMMLLMMKLMD...",
+             "...DMMMLLMMD....", "....DDMMMDD.....", "......DDD.......", "................",
+             "................", "................", "................", "................"], G)
+fly = art(["................", "................", "................", "................",
+           "................", ".....LL..LL.....", "....LWWLLWWL....", ".....LLKKLL.....",
+           "......KKKK......", "......KKKK......", ".......KK.......", "................",
+           "................", "................", "................", "................"],
+          {"W": A[2], "L": A[1], "K": K})
+goo = art(["................", ".......W........", ".......W........", "......WWL.......",
+           "......WWL.......", ".....WWWLL......", ".....WWWLL......", "....WWWWLLL.....",
+           "....WLWWLLL.....", "....WWWWLLL.....", ".....WWLLL......", "......LLL.......",
+           "................", "................", "................", "................"], {"W": W, "L": L})
+splat = art(["................", "..W.......W.....", "...W..WW...W....", "....WWWWW.......",
+             "..WWWWWWWWW..W..", ".WWWWWLWWWWW....", "..WWWLLLWWWWW...", "WWWWWLLLLWWW....",
+             "..WWWWLLWWWWWW..", "...WWWWWWWWW....", "..W.WWWWWWW.....", ".....WW..WW.W...",
+             "...W........W...", "..........W.....", "................", "................"], {"W": W, "L": L})
+hand = art(["................", "...L.L.L........", "...W.W.W.L......", "...W.W.W.W......",
+            "...W.W.W.W......", "...WWWWWWW.L....", "...WWWWWWW.W....", "...WWWWWWWWW....",
+            "....WWWWWWW.....", "....WWWWWW......", ".....MWWWM......", ".....MWWWM......",
+            ".....MWWWM......", ".....MMWMM......", ".....MMMMM......", ".....MMMMM......"], G)
+eye = art(["................", "................", "................", ".....LLLLLL.....",
+           "...LLWWWWWWLL...", "..LWWWKKKKWWWL..", ".LWWWKKKKKKWWWL.", ".LWWWKKWWKKWWWL.",
+           "..LWWWKKKKWWWL..", "...LLWWWWWWLL...", ".....LLLLLL.....", "................",
+           "................", "................", "................", "................"], G)
+EXTRA = [skull, bone, flesh, fly, goo, splat, hand, eye]
+
+atlas = Image.new("RGBA", (N * 4, N * 5), (0, 0, 0, 0))
+for i, im in enumerate([glow, smoke, ring, star, spike, rock, rune, bubble, crack, flame, streak, shard] + EXTRA):
     atlas.paste(im, ((i % 4) * N, (i // 4) * N))
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 atlas.save(OUT)

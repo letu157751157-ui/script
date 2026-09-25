@@ -39,7 +39,7 @@
         "facing_camera_mode": "lookat_direction",
         "uv": {
           "texture_width": 64,
-          "texture_height": 48,
+          "texture_height": 80,
           "uv": [
             32,
             32

@@ -45,7 +45,8 @@ function earthSmash(player) {
     const c = onGround(dim, player.location);
     particle(dim, "ytaun:shockwave", c, 4.5);
     particle(dim, "ytaun:rock_debris", c);
-    sound(dim, "random.explode", c, 0.8, 0.9);
+    sound(dim, "ytaun.axe_smash", c, 1.5, 1);
+    particle(dim, "ytaun:bone_shards", c);
     sound(dim, "mob.irongolem.hit", c, 1, 0.6);
     shake(dim, c, 12, 0.35, 0.4);
     for (let i = 0; i < 8; i++) {
@@ -67,7 +68,8 @@ function earthSmash(player) {
 function soulDrain(player) {
   const dim = player.dimension;
   const loc = player.location;
-  sound(dim, "mob.zombie.unfect", loc, 1, 0.7);
+  sound(dim, "ytaun.soul_drain", loc, 1.5, 1);
+  particle(dim, "ytaun:skull_rise", loc);
   particle(dim, "ytaun:summon_rune", onGround(dim, loc));
   let healed = 0;
   for (const e of enemies(player, loc, 7)) {
@@ -76,6 +78,7 @@ function soulDrain(player) {
       e.addEffect("poison", 60, { amplifier: 0 });
       e.addEffect("weakness", 100, { amplifier: 0 });
       particle(dim, "ytaun:poison_bubble", e.location);
+      particle(dim, "ytaun:flies", e.location);
       // vệt hồn bay từ mục tiêu về người chơi
       const from = { ...e.location };
       for (let i = 1; i <= 4; i++) {
@@ -128,6 +131,7 @@ system.beforeEvents.startup.subscribe(({ itemComponentRegistry }) => {
           target.addEffect("wither", 40, { amplifier: 0 });
         } catch { }
         particle(dim, "ytaun:poison_bubble", target.location);
+        particle(dim, "ytaun:goo_splash", target.location);
       }
       if (s.hits % 4 === 0) {
         system.run(() => {
@@ -139,7 +143,8 @@ system.beforeEvents.startup.subscribe(({ itemComponentRegistry }) => {
           particle(dim, "ytaun:flash", target.location, 1.5);
           particle(dim, "ytaun:sparks", target.location);
           particle(dim, "ytaun:ground_ring", onGround(dim, target.location), 2);
-          sound(dim, "mob.irongolem.hit", target.location, 1, 0.8);
+          sound(dim, "ytaun.axe_smash", target.location, 1, 1.3);
+          particle(dim, "ytaun:flesh_chunks", target.location);
         });
       }
     },

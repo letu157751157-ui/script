@@ -1,0 +1,79 @@
+{
+  "format_version": "1.10.0",
+  "particle_effect": {
+    "description": {
+      "identifier": "ytaun:bile_spray",
+      "basic_render_parameters": {
+        "material": "particles_blend",
+        "texture": "textures/particle/ytaun_boss"
+      }
+    },
+    "components": {
+      "minecraft:emitter_rate_steady": {
+        "spawn_rate": 140,
+        "max_particles": 220
+      },
+      "minecraft:emitter_lifetime_once": {
+        "active_time": 1.2
+      },
+      "minecraft:emitter_shape_point": {
+        "offset": [
+          0,
+          3.2,
+          0
+        ],
+        "direction": [
+          "(v.dir_x ?? 0) + math.random(-0.35, 0.35)",
+          "math.random(-0.2, 0.25)",
+          "(v.dir_z ?? 1) + math.random(-0.35, 0.35)"
+        ]
+      },
+      "minecraft:particle_initial_speed": "math.random(7, 11)",
+      "minecraft:particle_motion_dynamic": {
+        "linear_acceleration": [
+          0,
+          -12,
+          0
+        ],
+        "linear_drag_coefficient": 0.8
+      },
+      "minecraft:particle_motion_collision": {
+        "coefficient_of_restitution": 0,
+        "collision_radius": 0.08,
+        "collision_drag": 10
+      },
+      "minecraft:particle_lifetime_expression": {
+        "max_lifetime": "math.random(0.8, 1.3)"
+      },
+      "minecraft:particle_appearance_billboard": {
+        "size": [
+          "0.14 + v.particle_random_1 * 0.18",
+          "0.14 + v.particle_random_1 * 0.18"
+        ],
+        "facing_camera_mode": "lookat_direction",
+        "uv": {
+          "texture_width": 64,
+          "texture_height": 80,
+          "uv": [
+            0,
+            64
+          ],
+          "uv_size": [
+            16,
+            16
+          ]
+        }
+      },
+      "minecraft:particle_appearance_tinting": {
+        "color": {
+          "interpolant": "v.particle_age / v.particle_lifetime",
+          "gradient": {
+            "0.0": "#FFE8FF6A",
+            "0.4": "#FFA8D032",
+            "1.0": "#00587A18"
+          }
+        }
+      }
+    }
+  }
+}
