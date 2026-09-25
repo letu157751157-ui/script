@@ -309,6 +309,40 @@ ANIMATIONS = {
 BONES = ["root", "body", "head", "rightarm", "rightitem", "leftarm", "rightleg", "leftleg"]
 
 
+def euler_candidates(rot):
+    """Mọi bộ góc ZYX tương đương (2 nhánh, cộng/trừ 360 mỗi trục)."""
+    out = []
+    for base in (list(rot), [rot[0] + 180, 180 - rot[1], rot[2] + 180]):
+        for dx in (-360, 0, 360):
+            for dy in (-360, 0, 360):
+                for dz in (-360, 0, 360):
+                    out.append([base[0] + dx, base[1] + dy, base[2] + dz])
+    return out
+
+
+def smooth_path(rotations):
+    """Chọn bộ góc cho từng keyframe sao cho tổng quãng xoay nhỏ nhất, đầu và cuối đúng bằng 0
+    (tránh tay/kiếm quay vòng khi nội suy hoặc khi animation mờ dần)."""
+    zero = [[0.0, 0.0, 0.0]]
+    layers = [zero] + [euler_candidates(r) for r in rotations[1:-1]] + [zero]
+    cost = [0.0]
+    back = [[]]
+    for i in range(1, len(layers)):
+        cur_cost, cur_back = [], []
+        for c in layers[i]:
+            best = min(range(len(layers[i - 1])),
+                       key=lambda j: cost[j] + sum(abs(x - y) for x, y in zip(c, layers[i - 1][j])))
+            cur_cost.append(cost[best] + sum(abs(x - y) for x, y in zip(c, layers[i - 1][best])))
+            cur_back.append(best)
+        cost, back = cur_cost, back + [cur_back]
+    path, j = [], 0
+    for i in range(len(layers) - 1, -1, -1):
+        path.append(layers[i][j])
+        if i:
+            j = back[i][j]
+    return path[::-1]
+
+
 def sample_keys(root):
     """Toàn bộ keyframe đã giải: {anim: {time: {"tp": {bone: {rot,pos}}, "fp": {"rot","pos"}}}}.
     tp có thêm rightitem.rot (cổ tay); fp.rot là độ xoay rightitem, fp.pos là độ dịch cộng thêm
@@ -316,18 +350,23 @@ def sample_keys(root):
     hold_fp, hold_tp = load_hold(root, "first_person"), load_hold(root, "third_person")
     result = {}
     for name, anim in ANIMATIONS.items():
-        frames = {}
-        prev_fp, prev_tp = [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]
-        for t in sorted(anim["keys"]):
+        times = sorted(anim["keys"])
+        fp_rot, fp_pos, tp_rot = [], [], []
+        for t in times:
             k = anim["keys"][t]
-            fp_rot, fp_pos = solve_first_person(hold_fp, *k["fp"]) if k["fp"] else ((0.0, 0.0, 0.0), (0, 0, 0))
-            tp_rot = solve_third_person(hold_tp, k["tp"], k["tp_blade"]) if k["tp_blade"] else (0.0, 0.0, 0.0)
-            prev_fp, prev_tp = closest_euler(fp_rot, prev_fp), closest_euler(tp_rot, prev_tp)
-            tp = {bone: dict(v) for bone, v in k["tp"].items()}
-            tp["rightitem"] = {"rot": list(prev_tp)}
-            frames[t] = {"tp": tp, "fp": {"rot": list(prev_fp), "pos": list(fp_pos)}}
-        if any(abs(v) > 1e-6 for v in prev_fp + prev_tp):
-            raise ValueError(f"{name}: keyframe cuối không về 0, cần thêm keyframe trung gian")
+            r, p = solve_first_person(hold_fp, *k["fp"]) if k["fp"] else ((0.0, 0.0, 0.0), (0, 0, 0))
+            fp_rot.append(r)
+            fp_pos.append(p)
+            tp_rot.append(solve_third_person(hold_tp, k["tp"], k["tp_blade"]) if k["tp_blade"] else (0.0, 0.0, 0.0))
+        for t, k in ((times[0], anim["keys"][times[0]]), (times[-1], anim["keys"][times[-1]])):
+            if k["fp"] or k["tp_blade"]:
+                raise ValueError(f"{name}: keyframe đầu/cuối phải là tư thế nghỉ")
+        fp_rot, tp_rot = smooth_path(fp_rot), smooth_path(tp_rot)
+        frames = {}
+        for i, t in enumerate(times):
+            tp = {bone: dict(v) for bone, v in anim["keys"][t]["tp"].items()}
+            tp["rightitem"] = {"rot": list(tp_rot[i])}
+            frames[t] = {"tp": tp, "fp": {"rot": list(fp_rot[i]), "pos": list(fp_pos[i])}}
         result[name] = frames
     return result
 
