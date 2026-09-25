@@ -44,7 +44,7 @@ const bossData = new Map();
 // ============================================
 // ====== TIỆN ÍCH ======
 // ============================================
-function dist(a, b) {
+export function dist(a, b) {
   const dx = a.x - b.x, dy = a.y - b.y, dz = a.z - b.z;
   return Math.sqrt(dx * dx + dy * dy + dz * dz);
 }
@@ -54,7 +54,7 @@ function dist2D(a, b) {
 }
 function lerp(a, b, t) { return a + (b - a) * t; }
 
-function later(ticks, fn) {
+export function later(ticks, fn) {
   system.runTimeout(() => {
     try { fn(); } catch (e) { logError("timer", e); }
   }, Math.max(1, Math.round(ticks)));
@@ -75,7 +75,7 @@ function groundY(dim, x, y, z) {
   } catch { }
   return y;
 }
-function onGround(dim, pos) {
+export function onGround(dim, pos) {
   return { x: pos.x, y: groundY(dim, pos.x, pos.y, pos.z), z: pos.z };
 }
 
@@ -90,7 +90,7 @@ const FX_LAYERS = {
   "ytaun:roar_wave": [["ytaun:shockwave", 4]],
 };
 
-function particle(dim, id, pos, radius) {
+export function particle(dim, id, pos, radius) {
   spawnOne(dim, id, pos, radius);
   for (const [extra, k] of FX_LAYERS[id] ?? []) {
     if (extra === "ytaun:shockwave") spawnOne(dim, extra, { x: pos.x, y: pos.y - 0.2, z: pos.z }, k);
@@ -110,12 +110,12 @@ function spawnOne(dim, id, pos, radius) {
   } catch { }
 }
 
-function sound(dim, id, pos, volume = 1, pitch = 1) {
+export function sound(dim, id, pos, volume = 1, pitch = 1) {
   try { dim.playSound(id, pos, { volume, pitch }); } catch { }
 }
 
 /** Rung màn hình cho người chơi trong bán kính */
-function shake(dim, center, radius, intensity, seconds) {
+export function shake(dim, center, radius, intensity, seconds) {
   try {
     for (const p of dim.getPlayers({ location: center, maxDistance: radius })) {
       const falloff = 1 - Math.min(dist(p.location, center) / radius, 1) * 0.7;
@@ -126,7 +126,7 @@ function shake(dim, center, radius, intensity, seconds) {
 }
 
 /** Vòng cảnh báo trên mặt đất trong `ticks` tick */
-function telegraph(dim, center, radius, ticks) {
+export function telegraph(dim, center, radius, ticks) {
   const pos = onGround(dim, center);
   for (let t = 0; t < ticks; t += 5) {
     later(t, () => {
@@ -148,7 +148,7 @@ function isValidEnemy(e) {
   return true;
 }
 
-function enemiesNear(boss, center, radius) {
+export function enemiesNear(boss, center, radius) {
   let list = [];
   try {
     list = boss.dimension.getEntities({ location: center, maxDistance: radius });
@@ -209,7 +209,7 @@ function playAnim(boss, name, blendOut = 0.2) {
   try { boss.playAnimation(ANIM + name, { blendOutTime: blendOut }); } catch { }
 }
 
-function flatDir(from, to) {
+export function flatDir(from, to) {
   let dx = to.x - from.x, dz = to.z - from.z;
   const len = Math.sqrt(dx * dx + dz * dz) || 1;
   return { x: dx / len, z: dz / len };

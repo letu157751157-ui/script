@@ -1,7 +1,7 @@
-# BOSS Giant Zombie — v1.4 (nâng cấp skill, particle, animation)
+# BOSS Giant Zombie — addon (bản mới nhất: xem `dist/`)
 
-File cài đặt: [`dist/ytaun_zombie_addon_v1_4.mcaddon`](dist/ytaun_zombie_addon_v1_4.mcaddon)
-(đóng gói lại bằng `sh zombie_boss/tools/build.sh`).
+File cài đặt: [`dist/`](dist/)
+(phát hành bản mới: `python3 zombie_boss/tools/release.py` — tự tăng version 1.x và đổi toàn bộ UUID; chỉ đóng gói lại: `sh zombie_boss/tools/build.sh`).
 
 ## Thay đổi so với v1.3
 
@@ -40,3 +40,25 @@ title trên màn hình và vụ nổ đẩy lùi.
   structure summon, item trigger, shield manager, `player.json` ghi đè người chơi, `giantzombie.mcfunction` lỗi).
   Một file lỗi lúc load là toàn bộ script chết → boss không có skill.
 - Script API hạ xuống `@minecraft/server` 2.0.0 (chạy trên Minecraft 1.21.90+), bỏ `@minecraft/server-ui`.
+
+## v1.5
+
+### Zombie General — skill mới (`scripts/custom/zombie_general_skill.js`)
+| Chiêu | Tầm | Mô tả |
+|---|---|---|
+| Chém Quét | 0–3.5 | Chém hình quạt phía trước, 7 sát thương + làm chậm. |
+| Xung Phong | 4–12 | Vạch đường cảnh báo rồi lao thẳng tới, húc văng mọi thứ trên đường (8 sát thương). |
+| Hiệu Triệu | 0–16 | Buff tốc độ / sức mạnh / kháng cho mọi zombie quanh 14 block. |
+| Gọi Quân | 0–16 | Triệu hồi 2 lính zombie (tối đa 4). Lính biến mất khi tướng chết. |
+
+### Zombie Axe — skill mới (`scripts/custom/zombie_axe_skill.js`)
+- **Chuột phải — Đập Đất** (hồi 8s): nhảy lên, nện xuống: 10 sát thương vùng 4.5 block, hất tung, vòng gai đá.
+- **Ngồi + chuột phải — Hút Hồn** (hồi 15s): 5 sát thương + độc cho kẻ địch quanh 7 block, hồi 2 máu mỗi mục tiêu (tối đa 10).
+- **Nội tại**: 25% gây độc + khô héo; mỗi đòn chém thứ 4 là Đòn Nặng (+6 sát thương, hất văng).
+
+### Particle pixel art
+Atlas `textures/particle/ytaun_boss.png` vẽ lại kiểu pixel art 16px (giống vanilla), không khử răng cưa, không blur.
+
+### Version / UUID
+Mỗi lần phát hành chạy `tools/release.py`: version tăng 1.4 → 1.5 → 1.6…, UUID của cả 2 pack và module đều đổi mới,
+tên pack có số version (vd. `BOSS-Giant Zombie v1.5`) nên game không nhầm với bản cũ.

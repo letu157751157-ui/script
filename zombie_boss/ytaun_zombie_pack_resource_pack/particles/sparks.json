@@ -47,15 +47,15 @@
         ],
         "facing_camera_mode": "lookat_direction",
         "uv": {
-          "texture_width": 256,
-          "texture_height": 256,
+          "texture_width": 64,
+          "texture_height": 48,
           "uv": [
-            128,
-            128
+            32,
+            32
           ],
           "uv_size": [
-            64,
-            64
+            16,
+            16
           ]
         }
       },

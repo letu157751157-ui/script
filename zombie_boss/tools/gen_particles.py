@@ -5,12 +5,11 @@ import json, os
 OUT = os.path.join(os.path.dirname(__file__), "..", "ytaun_zombie_pack_resource_pack", "particles")
 TEX = "textures/particle/ytaun_boss"
 AGE = "v.particle_age / v.particle_lifetime"
-CELLS = {"glow": (0, 0), "smoke": (64, 0), "ring": (128, 0), "star": (192, 0),
-         "spike": (0, 64), "rock": (64, 64), "rune": (128, 64), "bubble": (192, 64),
-         "crack": (0, 128), "flame": (64, 128), "streak": (128, 128), "shard": (192, 128)}
+_NAMES = ["glow", "smoke", "ring", "star", "spike", "rock", "rune", "bubble", "crack", "flame", "streak", "shard"]
+CELLS = {n: ((i % 4) * 16, (i // 4) * 16) for i, n in enumerate(_NAMES)}
 
 def uv(name):
-    return {"texture_width": 256, "texture_height": 256, "uv": list(CELLS[name]), "uv_size": [64, 64]}
+    return {"texture_width": 64, "texture_height": 48, "uv": list(CELLS[name]), "uv_size": [16, 16]}
 
 def bb(size, cell, mode="lookat_xyz", **extra):
     w, h = size if isinstance(size, (list, tuple)) else (size, size)
