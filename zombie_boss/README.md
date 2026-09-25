@@ -107,3 +107,9 @@ mật phun, vũng axit sủi bọt, cục axit, lưỡi thịt, con mắt quỷ 
 - **Texture vẽ lại** độ phân giải gấp đôi: vân gỗ, dây da quấn chéo, sắt trầy có đinh tán, thịt có mạch máu và mụn mủ, xương chuyển sắc.
 - **Animation**: pha lê xoay và lơ lửng, xích đung đưa khi cầm.
 - **Icon** vẽ lại khớp model mới.
+
+## v1.11 — Zombie Hammer kiểu "đầu zombie"
+- Cán là khúc xương đùi, hai đầu có khớp xương, tay cầm quấn giẻ, vòng sắt gỉ nối đầu búa.
+- Đầu búa là nguyên đầu zombie khối vuông (mặt ở trước và sau, mắt đỏ, răng), đai sắt gỉ quanh trán,
+  đinh gỉ đóng tua tủa trên đỉnh và hai bên, xương thò sau gáy, mụn mủ xanh phát sáng, 2 sợi xích gỉ.
+- Animation: đầu búa lắc nhẹ, mụn mủ phập phồng, xích đung đưa. Icon vẽ lại khớp model.

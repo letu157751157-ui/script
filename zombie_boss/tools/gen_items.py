@@ -55,26 +55,29 @@ def stack(*layers):
 
 # ---------- ICON: Zombie Hammer ----------
 def hammer_icon():
-    # Khớp model 3D: cán gỗ có đốt xương, quấn da, đầu búa thịt thối 2 đầu bịt sắt, mặt đầu lâu, pha lê xanh
-    hd = (0.707, -0.707)                         # hướng cán (lên phải)
-    pd = (0.707, 0.707)                          # hướng dọc đầu búa (vuông góc cán)
-    cx, cy = 19, 12
+    # Khớp model "đầu zombie": cán xương đùi quấn giẻ, đầu zombie vuông, đai sắt gỉ, đinh gỉ
+    hd, pd = (0.707, -0.707), (0.707, 0.707)
+    cx, cy = 20, 11
     def P(t, s): return (cx + hd[0] * t + pd[0] * s, cy + hd[1] * t + pd[1] * s)
     def quad(d, t0, t1, s0, s1): d.polygon([P(t0, s0), P(t0, s1), P(t1, s1), P(t1, s0)], fill=MAG)
-    handle = layer(lambda d: d.line([P(-19, 0), P(-2, 0)], fill=MAG, width=3), "wood")
-    grip = layer(lambda d: d.line([P(-18, 0), P(-13, 0)], fill=MAG, width=4), "cork")
-    rings = layer(lambda d: [d.line([P(t, -2), P(t, 2)], fill=MAG, width=2) for t in (-10, -6)], "bone")
-    pommel = layer(lambda d: quad(d, -22, -19, -2, 2), "bone")
-    head = layer(lambda d: quad(d, -4.5, 4.5, -6, 6), "flesh")
-    caps = layer(lambda d: (quad(d, -5.5, 5.5, -10, -6), quad(d, -5.5, 5.5, 6, 10)), "iron")
-    bands = layer(lambda d: (quad(d, -5, 5, -3.6, -2.4), quad(d, -5, 5, 2.4, 3.6)), "iron")
-    skull = layer(lambda d: quad(d, -2.5, 2.5, -2, 2), "bone")
-    sp = skull.load()
-    for t, s_ in ((0.8, -1), (0.8, 1)):
-        x, y = P(t, s_); sp[int(x), int(y)] = col("crystal", 3)
-    x, y = P(-1.5, 0); sp[int(x), int(y)] = hx("#141410")
-    gems = layer(lambda d: (quad(d, 4.5, 8.5, -1, 1), quad(d, 4.5, 7, 1.5, 3), quad(d, 4.5, 6.5, -3, -1.5)), "crystal")
-    img = outline(stack(handle, grip, rings, pommel, head, caps, bands, skull, gems))
+    shaft = layer(lambda d: d.line([P(-20, 0), P(-5, 0)], fill=MAG, width=3), "bone")
+    knob = layer(lambda d: (quad(d, -23, -20, -2.5, 2.5)), "bone")
+    rag = layer(lambda d: d.line([P(-18, 0), P(-12, 0)], fill=MAG, width=4), "cork")
+    head = Image.new("RGBA", (32, 32)); d = ImageDraw.Draw(head)
+    d.rectangle([12, 3, 27, 18], fill=MAG); shade(head, "rot")                              # đầu zombie nhìn thẳng
+    face = ImageDraw.Draw(head)
+    face.rectangle([14, 8, 17, 9], fill=hx("#10160c")); face.rectangle([22, 8, 25, 9], fill=hx("#10160c"))
+    face.point([(15, 8), (23, 8)], fill=hx("#b01e16"))
+    face.rectangle([19, 10, 20, 11], fill=col("flesh", 0))
+    face.rectangle([16, 14, 23, 15], fill=hx("#10160c")); face.point([(16, 13), (23, 13)], fill=hx("#10160c"))
+    face.point([(18, 15), (21, 15)], fill=col("bone", 3))
+    band = Image.new("RGBA", (32, 32)); ImageDraw.Draw(band).rectangle([11, 5, 28, 6], fill=MAG); shade(band, "cork")
+    nails = Image.new("RGBA", (32, 32)); nd = ImageDraw.Draw(nails)
+    for (x0, y0, x1, y1) in ((19, 0, 19, 2), (14, 1, 14, 2), (25, 1, 25, 2), (28, 6, 30, 6), (9, 14, 11, 14), (28, 15, 30, 15)):
+        nd.line([(x0, y0), (x1, y1)], fill=MAG)
+    shade(nails, "cork")
+    img = outline(stack(shaft, knob, rag, head, band, nails))
+    gp = img.load(); gp[25, 4] = gp[14, 5] = col("crystal", 3)
     return img
 
 def hand_icon():
@@ -148,6 +151,9 @@ M = {  # vật liệu: 7 sắc độ tối -> sáng
     "flesh": ["#1b2610", "#263618", "#344a20", "#44602a", "#557636", "#6b8f44", "#86a957"],
     "bone": ["#5e5642", "#7a7056", "#978c6e", "#b3a888", "#cbc1a2", "#e0d8bd", "#f4efdc"],
     "crystal": ["#0f4a12", "#1d7a1f", "#2fa82b", "#4fd23c", "#7ef060", "#b4ff94", "#eaffdc"],
+    "skin": ["#1f3a14", "#2b4f1b", "#3a6624", "#4a7d2e", "#5a9338", "#6fa845", "#88bf58"],
+    "rag": ["#1c1a14", "#2a261c", "#3a3426", "#4c4432", "#5e5440", "#72674e", "#887c5e"],
+    "rust": ["#2a130a", "#40200f", "#5a2e14", "#76401c", "#915426", "#ab6a34", "#c78648"],
 }
 def C(m, i): return hx(M[m][max(0, min(6, int(round(i))))])
 LIGHTF = {"up": 1.4, "down": -1.6, "north": 0.3, "south": -0.4, "east": -0.8, "west": -0.2}
@@ -176,10 +182,28 @@ def paint(tp, mat, fname, x0, y0, fw, fh, special=None):
             elif mat == "bone":
                 lvl = 5.2 - ty * 1.8 + LIGHTF[fname] * 0.5 + random.choice((0, 0, -0.5))
                 if random.random() < 0.03: lvl -= 2
+            elif mat == "skin":
+                lvl += random.choice((0, 0, 0, 0.7, -0.7))
+                if random.random() < 0.03: lvl -= 2                                         # đốm thối
+            elif mat == "rag":
+                if y % 6 == 5: lvl -= 1
+                lvl += random.choice((0, 0.5, -0.5))
+            elif mat == "rust":
+                lvl += random.choice((0, 0, 0.6, -0.6, -1.2))
             elif mat == "crystal":
                 lvl = 6 - abs(tx - 0.5) * 5 - ty * 1.5 + LIGHTF[fname] * 0.4
             if edge and mat not in ("crystal",): lvl -= 1.2
             tp[x0 + x, y0 + y] = C(mat, lvl)
+    if special == "zface":                                                                 # mặt zombie kiểu Minecraft
+        u = fw / 8
+        def blk(bx, by, bw, bh, c_):
+            for yy in range(int(by * u), int((by + bh) * u)):
+                for xx in range(int(bx * u), int((bx + bw) * u)): tp[x0 + xx, y0 + yy] = c_
+        blk(1, 3, 2, 1, hx("#10160c")); blk(5, 3, 2, 1, hx("#10160c"))                        # mắt
+        blk(2, 3, 1, 1, hx("#9a1a14")); blk(5, 3, 1, 1, hx("#9a1a14"))                        # đồng tử đỏ
+        blk(3, 4, 2, 1, C("skin", 1))                                                         # mũi
+        blk(2, 6, 4, 1, hx("#10160c")); blk(2, 5, 1, 1, hx("#10160c")); blk(5, 5, 1, 1, hx("#10160c"))  # miệng
+        blk(3, 6, 1, 1, C("bone", 5)); blk(4, 6, 1, 1, C("bone", 4))                          # răng
     if special == "skull":                                                                  # mặt đầu lâu
         dark = hx("#141410")
         def dot(fx_, fy_, w_=1, h_=1, c_=dark):
@@ -190,43 +214,35 @@ def paint(tp, mat, fname, x0, y0, fw, fh, special=None):
         dot(0.45, 0.55, 1, 2)                                                               # mũi
         for fx_ in (0.2, 0.4, 0.6, 0.8): dot(fx_, 0.78, 1, 2)                               # răng
 
-BONES = {  # name: (parent, pivot, [(origin, size, mat, extra)])
+BONES = {  # KIỂU "ĐẦU ZOMBIE": cán xương đùi quấn giẻ, đầu búa là đầu zombie có đai sắt gỉ + đinh
     "rightitem": (None, [0, 0, 0], [
-        ([-1, -12, -1], [2, 30, 2], "wood", {}),
-        ([-1.25, -10, -1.25], [2.5, 7, 2.5], "leather", {}),
-        ([-1.5, -2.5, -1.5], [3, 1.5, 3], "bone", {}),
-        ([-1.5, 4, -1.5], [3, 1.5, 3], "bone", {}),
-        ([-1.5, 10.5, -1.5], [3, 1.5, 3], "bone", {}),
-        ([-1.75, -15, -1.75], [3.5, 3, 3.5], "bone", {"special": "none"}),
-        ([-0.5, -17, -0.5], [1, 2, 1], "crystal", {}),
-        ([-2, 16, -2], [4, 2, 4], "iron", {}),
+        ([-1.25, -11, -1.25], [2.5, 28, 2.5], "bone", {}),
+        ([-2, -14, -2], [4, 3, 4], "bone", {}),                        # đầu khớp xương dưới
+        ([-2.5, -13.5, -1], [1, 2, 2], "bone", {}), ([1.5, -13.5, -1], [1, 2, 2], "bone", {}),
+        ([-1.5, -9, -1.5], [3, 8, 3], "rag", {}),                      # giẻ quấn tay cầm
+        ([-1.5, 6, -1.5], [3, 2, 3], "rag", {}),
+        ([-2, 15.5, -2], [4, 2, 4], "rust", {}),                       # vòng sắt gỉ nối đầu
     ]),
     "hammer_head": ("rightitem", [0, 22, 0], [
-        ([-5, 18, -4], [10, 9, 8], "flesh", {}),
-        ([-3.5, 17.5, -4.5], [1, 10, 9], "iron", {}),
-        ([2.5, 17.5, -4.5], [1, 10, 9], "iron", {}),
-        ([-8, 17, -4.5], [3, 11, 9], "iron", {}),
-        ([5, 17, -4.5], [3, 11, 9], "iron", {}),
-        ([-2.5, 19, -5], [5, 6, 1], "bone", {"special": "skull"}),
-        ([-2.5, 19, 4], [5, 6, 1], "bone", {"special": "skull"}),
-        ([-10, 21, -1], [2, 2, 2], "bone", {}),
-        ([8, 21, -1], [2, 2, 2], "bone", {}),
-        ([-11, 21.5, -0.5], [1, 1, 1], "bone", {}),
-        ([10, 21.5, -0.5], [1, 1, 1], "bone", {}),
+        ([-4.5, 17, -4.5], [9, 9, 9], "skin", {"special": "zface"}),
+        ([-5, 24.6, -5], [10, 1.2, 10], "rust", {}),                   # đai sắt ngang (trán)
+        ([-0.5, 26, -0.5], [1, 3, 1], "rust", {}),                     # đinh trên đỉnh
+        ([-3, 26, 1.5], [1, 2, 1], "rust", {}), ([2, 26, -2.5], [1, 2.5, 1], "rust", {}),
+        ([-7, 22, -0.5], [2.5, 1, 1], "rust", {}), ([4.5, 22, -0.5], [2.5, 1, 1], "rust", {}),  # đinh 2 bên
+        ([-6.5, 18.5, 1.5], [2, 1, 1], "rust", {}), ([4.5, 24, -2], [2, 1, 1], "rust", {}),
+        ([-1.5, 21, 4.5], [3, 3, 1.5], "bone", {}),                   # xương thò ra sau đầu
     ]),
-    "gems": ("hammer_head", [0, 27, 0], [
-        ([-1, 27, -1], [2, 4, 2], "crystal", {}),
-        ([1, 27, 0], [1.5, 3, 1.5], "crystal", {"rotation": [0, 0, -25]}),
-        ([-2.5, 27, -1], [1.5, 2.5, 1.5], "crystal", {"rotation": [15, 0, 25]}),
-        ([-0.5, 27, 1], [1, 2, 1], "crystal", {"rotation": [-25, 0, 0]}),
+    "gems": ("hammer_head", [0, 26, 0], [
+        ([1.5, 26, 1.5], [1.5, 1.5, 1.5], "crystal", {}),              # mụn mủ phát sáng trên đầu
+        ([-3, 26, -3], [1, 1, 1], "crystal", {}),
     ]),
-    "chain_l": ("hammer_head", [-6.5, 17, 0], [
-        ([-7, 15, -0.5], [1, 2, 1], "iron", {}), ([-7, 13, -0.5], [1, 2, 1], "iron", {}),
-        ([-7.5, 10.5, -1], [2, 2.5, 2], "bone", {}),
+    "chain_l": ("hammer_head", [-4.5, 20, 0], [
+        ([-5, 18, -0.5], [1, 2, 1], "rust", {}), ([-5, 16, -0.5], [1, 2, 1], "rust", {}),
+        ([-5, 14, -0.5], [1, 2, 1], "rust", {}),
     ]),
-    "chain_r": ("hammer_head", [6.5, 17, 0], [
-        ([6, 15, -0.5], [1, 2, 1], "iron", {}), ([6, 13, -0.5], [1, 2, 1], "iron", {}),
-        ([5.5, 10.5, -1], [2, 2.5, 2], "bone", {}),
+    "chain_r": ("hammer_head", [4.5, 20, 0], [
+        ([4, 18, -0.5], [1, 2, 1], "rust", {}), ([4, 16, -0.5], [1, 2, 1], "rust", {}),
+        ([3.5, 13.5, -1], [2, 2.5, 2], "bone", {}),
     ]),
 }
 tex = Image.new("RGBA", (TW * K, TW * K), (0, 0, 0, 0)); tp = tex.load()
@@ -243,7 +259,7 @@ for bname, (parent, pivot, cubes) in BONES.items():
         for fname, (fx, fy, fw, fh) in {"up": (cu + d, cv, w, d), "down": (cu + d + w, cv, w, d), "east": (cu, cv + d, d, h),
                                         "north": (cu + d, cv + d, w, h), "west": (cu + d + w, cv + d, d, h),
                                         "south": (cu + 2 * d + w, cv + d, w, h)}.items():
-            sp = extra.get("special") if fname == "north" else None
+            sp = extra.get("special") if fname in ("north", "south") else None
             paint(tp, mat, fname, fx * K, fy * K, fw * K, fh * K, sp)
         c = {"origin": origin, "size": size, "uv": [cu, cv]}
         if "rotation" in extra: c["rotation"] = extra["rotation"]; c["pivot"] = [origin[0] + size[0] / 2, origin[1], origin[2] + size[2] / 2]
@@ -262,7 +278,8 @@ json.dump(geo, open(os.path.join(RP, "models", "entity", "ytaun_zombieaxe.json")
 AP = os.path.join(RP, "animations", "ytaun_zombieaxe.animation.json")
 anim = json.load(open(AP))
 anim["animations"]["animation.ytaun_zombieaxe.alive"] = {"loop": True, "bones": {
-    "gems": {"rotation": [0, "q.life_time * 90", 0], "position": [0, "math.sin(q.life_time * 180) * 0.4", 0]},
+    "gems": {"scale": "1 + math.sin(q.life_time * 240) * 0.15"},
+    "hammer_head": {"rotation": [0, 0, "math.sin(q.life_time * 60) * 1.5"]},
     "chain_l": {"rotation": ["math.sin(q.life_time * 120) * 8", 0, "math.sin(q.life_time * 150) * 12"]},
     "chain_r": {"rotation": ["math.sin(q.life_time * 120 + 60) * 8", 0, "math.sin(q.life_time * 150 + 90) * 12"]},
 }}

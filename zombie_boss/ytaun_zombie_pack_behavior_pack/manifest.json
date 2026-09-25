@@ -2,11 +2,11 @@
   "format_version": 2,
   "header": {
     "description": "Fight the Giant Zombie boss - 8 telegraphed skills, 3 phases, custom particles & animations. Defeat it to unlock the Nether!",
-    "name": "BOSS-Giant Zombie v1.10",
-    "uuid": "9dc26217-bd72-45a9-b5be-0e86907d8e89",
+    "name": "BOSS-Giant Zombie v1.11",
+    "uuid": "d8f04922-ad90-4e2e-ad29-78042016fb5a",
     "version": [
       1,
-      10,
+      11,
       0
     ],
     "min_engine_version": [
@@ -19,19 +19,19 @@
     {
       "description": "BOSS-Giant Zombie behavior pack",
       "type": "data",
-      "uuid": "1c2bc944-efdc-42c5-a664-8c0189d09a0f",
+      "uuid": "cf63d718-bd0f-465d-9f02-0949ae02e594",
       "version": [
         1,
-        10,
+        11,
         0
       ]
     },
     {
       "type": "script",
-      "uuid": "a20fd887-2a29-4f20-bc6e-ef41c4deae5a",
+      "uuid": "2fd34c5b-fb98-4a52-a37a-84155490fbc6",
       "version": [
         1,
-        10,
+        11,
         0
       ],
       "entry": "scripts/main.js",
@@ -40,10 +40,10 @@
   ],
   "dependencies": [
     {
-      "uuid": "506f0a59-17ed-449b-bf92-9c8656b80486",
+      "uuid": "765eb4ba-6da5-45e9-bfc2-db422175e202",
       "version": [
         1,
-        10,
+        11,
         0
       ]
     },
