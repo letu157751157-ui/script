@@ -90,7 +90,7 @@ mật phun, vũng axit sủi bọt, cục axit, lưỡi thịt, con mắt quỷ 
 `general_shout`, `transform`, `flies`, `axe_smash`, `soul_drain`, `imp_scream`. Dùng cho boss, Zombie General và Zombie Axe.
 
 ## v1.7
-- **Sửa boss không rơi đồ**: loot table cũ trỏ tới item không tồn tại nên hỏng cả bảng. Boss giờ rơi: Tay Giant Zombie (luôn),
+- **Sửa boss không rơi đồ**: (v1.13) đồ rơi của boss giờ do script thả khi boss chết (loot table để trống). Boss giờ rơi: Tay Giant Zombie (luôn),
   Tim Zombie (33%), thịt thối, mắt nhện. Zombie General rơi Tim Zombie 17% (loot cũ còn lại giữ nguyên).
 - **Giảm độ trâu giữa trận**: Cuồng Nộ 500 máu (hồi về 45%), nhận 90% sát thương, đánh 8; Final Fury 550 máu (hồi về 22%),
   nhận 80% sát thương, đánh 10. Bỏ hiệu ứng Hấp Thụ / Kháng Cự / Sức Mạnh khi lên form; sát thương chiêu +10% / +20%;

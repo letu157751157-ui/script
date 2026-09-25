@@ -6,7 +6,7 @@
 // - Particle tùy chỉnh ytaun:* (resource pack /particles) + animation riêng từng chiêu
 // - Tự nhận lại boss sau khi thoát/vào lại thế giới (không phụ thuộc entitySpawn)
 // ============================================
-import { world, system, EntityDamageCause, MolangVariableMap, GameMode } from "@minecraft/server";
+import { world, system, EntityDamageCause, MolangVariableMap, GameMode, ItemStack } from "@minecraft/server";
 
 const BOSS_TYPE_ID = "ytaun:giant_zombie";
 const MINION_TAG = "ytaun_gz_minion";
@@ -1131,8 +1131,21 @@ world.afterEvents.entitySpawn.subscribe(({ entity }) => {
 });
 
 // ====== BOSS CHẾT ======
+// Đồ rơi của boss (rơi bằng script cho chắc chắn; loot table để trống để không rơi đôi)
+// Tay Giant Zombie 100% · Tim Zombie 33% · thịt thối 4–10 · mắt nhện 1–3
+function dropBossLoot(dim, loc) {
+  const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const drops = [["ytaun:handgiantzombie", 1], ["minecraft:rotten_flesh", rnd(4, 10)], ["minecraft:spider_eye", rnd(1, 3)]];
+  if (Math.random() < 0.33) drops.push(["ytaun:zombie_heart", 1]);
+  const at = { x: loc.x, y: loc.y + 1, z: loc.z };
+  for (const [id, n] of drops) {
+    try { dim.spawnItem(new ItemStack(id, n), at); } catch (e) { logError("drop " + id, e); }
+  }
+}
+
 world.afterEvents.entityDie.subscribe(({ deadEntity: entity }) => {
   if (entity.typeId !== BOSS_TYPE_ID) return;
+  try { dropBossLoot(entity.dimension, { ...entity.location }); } catch (e) { logError("loot", e); }
   bossData.delete(entity.id);
   try {
     const loc = { ...entity.location };
