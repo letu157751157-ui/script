@@ -46,7 +46,7 @@ Dung nham và mắt là một lớp riêng vẽ bằng material `entity_emissive
 ### Dạng Kẻ Diệt Thế (R)
 
 Khi biến hình, kiếm trên tay được đổi sang bản **Diệt Thế** (hết biến hình tự đổi lại, giữ nguyên độ bền, phù phép, tên):
-- **Cặp cánh quỷ 3D** gắn sau lưng (xương đen, màng đỏ thẫm, mép rực lửa) vỗ liên tục, **cặp sừng 3D** trên đầu, kiếm to hơn.
+- **Cặp cánh quỷ 3D** kiểu cánh dơi gắn sau lưng (xương cánh tay, vuốt ở khớp cổ tay, 4 nan ngón, màng đỏ thẫm lõm giữa các ngón, gân và mép rực dung nham) vỗ liên tục, **cặp sừng 3D** trên đầu, kiếm to hơn.
   Cánh và sừng ẩn ở góc nhìn thứ nhất để không che màn hình.
 - **Vùng Diệt Thế** bán kính 6 block bám theo người: vòng rune có gai xoay dưới chân, rune và lửa chạy quanh mép, linh hồn bay lên;
   kẻ địch trong vùng mất 1.5 máu mỗi giây và bị làm chậm.
@@ -65,7 +65,7 @@ Animation chiêu có đủ nhịp lấy đà → vung → chạm → quá đà �
 
 Sau đó tạo/sửa thế giới → **Behavior Packs** → bật *Aatrox - Quỷ Kiếm Darkin (BP)* (Resource Pack sẽ tự bật theo).
 
-> **Đã cài bản cũ?** Bản này là **v1.6.3**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.6.3.
+> **Đã cài bản cũ?** Bản này là **v1.6.4**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.6.4.
 > Nếu vẫn thấy kiếm cầm như cây thương hoặc không có animation, vào **Cài đặt → Bộ nhớ** xoá hết pack Aatrox cũ rồi nhập lại file `.mcaddon`.
 
 Lấy kiếm:

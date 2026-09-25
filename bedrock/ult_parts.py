@@ -9,35 +9,78 @@ cánh) rồi đùn thành khối. Xương cánh dày 2, màng cánh dày 1, mép
 """
 import math
 
-WING_PIVOT = (-2, 21, 2.5)  # gốc cánh phải (bên phải người chơi là -X trong Bedrock)
-BONE_ANGLES = (56, 26, 0, -24)  # các nan xương cánh (độ, so với phương ngang)
+WING_PIVOT = (-2, 20, 2.5)  # gốc cánh phải (bên phải người chơi là -X trong Bedrock)
 WING_MATERIALS = {
     "wbone": {"depth": 2, "glow": False},
     "membrane": {"depth": 1, "glow": False},
     "wedge": {"depth": 1, "glow": True},
 }
 
+# Khung cánh kiểu cánh dơi/rồng (toạ độ u ra ngoài, v lên trên, gốc cánh ở (0, 0))
+WRIST = (10.0, 15.0)  # khớp cổ tay: xương cánh tay đi từ gốc lên đây
+FINGER_TIPS = [(27.0, 17.0), (27.0, 5.0), (22.0, -6.0), (13.0, -12.0)]  # 4 nan ngón xoè ra
+LOWER_TIP = (2.0, -13.0)  # mép màng sát thân
+CLAW = [(10.0, 15.0), (8.5, 18.5), (10.5, 20.0)]  # vuốt móc ở khớp cổ tay
+
+
+def _seg_dist(p, a, b):
+    ax, ay = a
+    bx, by = b
+    t = max(0.0, min(1.0, ((p[0] - ax) * (bx - ax) + (p[1] - ay) * (by - ay)) / ((bx - ax) ** 2 + (by - ay) ** 2)))
+    return math.hypot(p[0] - ax - t * (bx - ax), p[1] - ay - t * (by - ay)), t
+
+
+def _in_triangle(p, a, b, c):
+    def side(p1, p2, p3):
+        return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
+    d1, d2, d3 = side(p, a, b), side(p, b, c), side(p, c, a)
+    return not ((d1 < 0 or d2 < 0 or d3 < 0) and (d1 > 0 or d2 > 0 or d3 > 0))
+
 
 def wing_art():
+    """Màng căng giữa các nan (mép sau lõm vào như cánh dơi), xương tay + ngón thuôn dần,
+    gân dung nham phát sáng toả từ cổ tay, mép lõm phát sáng."""
+    root = (0.0, 0.0)
+    # Các ô màng: giữa 2 nan liền kề (đỉnh là cổ tay), và giữa nan cuối với thân
+    panels = [(WRIST, FINGER_TIPS[i], FINGER_TIPS[i + 1]) for i in range(len(FINGER_TIPS) - 1)]
+    panels += [(WRIST, FINGER_TIPS[-1], root), (root, FINGER_TIPS[-1], LOWER_TIP)]
+    # Mép lõm: mỗi mép ngoài bị khoét bởi một hình tròn đặt lệch ra ngoài
+    edges = [(FINGER_TIPS[i], FINGER_TIPS[i + 1]) for i in range(len(FINGER_TIPS) - 1)] + [(FINGER_TIPS[-1], LOWER_TIP)]
+    cuts = []
+    for (ax, ay), (bx, by) in edges:
+        mx, my = (ax + bx) / 2, (ay + by) / 2
+        length = math.hypot(bx - ax, by - ay)
+        nx, ny = (by - ay) / length, -(bx - ax) / length  # pháp tuyến hướng ra ngoài (ra xa cổ tay)
+        if (mx - WRIST[0]) * nx + (my - WRIST[1]) * ny < 0:
+            nx, ny = -nx, -ny
+        depth = length * 0.22
+        radius = (length / 2) ** 2 / (2 * depth) + depth / 2
+        cuts.append((mx + nx * (radius - depth), my + ny * (radius - depth), radius))
+    bones = [(root, WRIST, 1.5, 1.1)] + [(WRIST, tip, 1.1, 0.45) for tip in FINGER_TIPS]
+    veins = [(WRIST, ((FINGER_TIPS[i][0] + FINGER_TIPS[i + 1][0]) / 2, (FINGER_TIPS[i][1] + FINGER_TIPS[i + 1][1]) / 2))
+             for i in range(len(FINGER_TIPS) - 1)]
     art = {}
-    for u in range(22):
-        for v in range(-9, 18):
-            px, py = u + 0.5, v + 0.5
-            r = math.hypot(px, py)
-            theta = math.degrees(math.atan2(py, px))
-            if not -30 <= theta <= 60:
-                continue
-            reach = 21 - (60 - theta) * 0.09
-            gap = min(abs(theta - b) for b in BONE_ANGLES)
-            if theta < BONE_ANGLES[0]:
-                reach -= gap * 0.22  # mép sau lượn sóng giữa các nan
-            if r > reach:
-                continue
-            on_bone = any(abs(r * math.sin(math.radians(theta - b))) < 0.75 and math.cos(math.radians(theta - b)) > 0
-                          for b in BONE_ANGLES)
-            if r < 2 or on_bone:
+    for u in range(0, 29):
+        for v in range(-15, 22):
+            p = (u + 0.5, v + 0.5)
+            bone = False
+            for a, b, w0, w1 in bones:
+                d, t = _seg_dist(p, a, b)
+                if d <= w0 + (w1 - w0) * t:
+                    bone = True
+            if any(_seg_dist(p, CLAW[i], CLAW[i + 1])[0] <= 0.7 for i in range(len(CLAW) - 1)):
+                bone = True
+            if bone:
                 art[(u, v)] = "wbone"
-            elif reach - r < 1.3:
+                continue
+            if not any(_in_triangle(p, *tri) for tri in panels):
+                continue
+            inside_cut = [math.hypot(p[0] - cx, p[1] - cy) - r for cx, cy, r in cuts]
+            if min(inside_cut) < 0:
+                continue
+            if min(inside_cut) < 1.0:
+                art[(u, v)] = "wedge"
+            elif any(_seg_dist(p, a, b)[0] < 0.55 and _seg_dist(p, a, b)[1] < 0.8 for a, b in veins):
                 art[(u, v)] = "wedge"
             else:
                 art[(u, v)] = "membrane"

@@ -681,129 +681,129 @@
        0.0
       ],
       "0.04": [
-       "v.is_first_person ? 3.34 : 58.33",
-       "v.is_first_person ? -8.03 : -8.49",
-       "v.is_first_person ? -9.9 : -34.43"
+       "v.is_first_person ? 3.34 : -8.07",
+       "v.is_first_person ? -8.03 : 3.61",
+       "v.is_first_person ? -9.9 : -7.99"
       ],
       "0.08": [
-       "v.is_first_person ? 8.01 : 127.31",
-       "v.is_first_person ? -17.22 : -13.12",
-       "v.is_first_person ? -22.67 : -80.49"
+       "v.is_first_person ? 8.01 : -15.02",
+       "v.is_first_person ? -17.22 : 8.41",
+       "v.is_first_person ? -22.67 : -14.34"
       ],
       "0.10": [
-       "v.is_first_person ? 9.94 : 139.58",
-       "v.is_first_person ? -18.38 : -5.68",
-       "v.is_first_person ? -26.58 : -96.84"
+       "v.is_first_person ? 9.94 : -12.28",
+       "v.is_first_person ? -18.38 : 10.07",
+       "v.is_first_person ? -26.58 : -10.72"
       ],
       "0.12": [
-       "v.is_first_person ? 10.99 : 136.2",
-       "v.is_first_person ? -17.19 : 3.97",
-       "v.is_first_person ? -27.79 : -104.24"
+       "v.is_first_person ? 10.99 : -7.52",
+       "v.is_first_person ? -17.19 : 10.87",
+       "v.is_first_person ? -27.79 : -4.47"
       ],
       "0.16": [
-       "v.is_first_person ? 12.98 : 110.08",
-       "v.is_first_person ? -11.07 : 32.92",
-       "v.is_first_person ? -28.18 : -115.53"
+       "v.is_first_person ? 12.98 : 7.58",
+       "v.is_first_person ? -11.07 : 12.33",
+       "v.is_first_person ? -28.18 : 16.4"
       ],
       "0.20": [
-       "v.is_first_person ? 14.84 : 72.13",
-       "v.is_first_person ? -3.15 : 67.75",
-       "v.is_first_person ? -27.39 : -123.82"
+       "v.is_first_person ? 14.84 : 26.36",
+       "v.is_first_person ? -3.15 : 13.42",
+       "v.is_first_person ? -27.39 : 41.1"
       ],
       "0.24": [
-       "v.is_first_person ? 16.67 : 35.72",
-       "v.is_first_person ? 3.39 : 102.51",
-       "v.is_first_person ? -27.07 : -131.15"
+       "v.is_first_person ? 16.67 : 45.66",
+       "v.is_first_person ? 3.39 : 13.98",
+       "v.is_first_person ? -27.07 : 62.61"
       ],
       "0.28": [
-       "v.is_first_person ? 18.5 : 17.04",
-       "v.is_first_person ? 4.67 : 129.3",
-       "v.is_first_person ? -29.03 : -139.19"
+       "v.is_first_person ? 18.5 : 61.31",
+       "v.is_first_person ? 4.67 : 13.72",
+       "v.is_first_person ? -29.03 : 71.93"
       ],
       "0.32": [
-       "v.is_first_person ? 20.72 : 34.02",
-       "v.is_first_person ? -5.43 : 162.94",
-       "v.is_first_person ? -38.14 : -155.01"
+       "v.is_first_person ? 20.72 : 81.55",
+       "v.is_first_person ? -5.43 : 10.61",
+       "v.is_first_person ? -38.14 : 50.65"
       ],
       "0.36": [
-       "v.is_first_person ? 23.44 : 66.89",
-       "v.is_first_person ? -23.95 : 177.88",
-       "v.is_first_person ? -49.72 : -167.29"
+       "v.is_first_person ? 23.44 : 94.93",
+       "v.is_first_person ? -23.95 : 6.26",
+       "v.is_first_person ? -49.72 : 17.41"
       ],
       "0.38": [
-       "v.is_first_person ? 25.35 : 73.76",
-       "v.is_first_person ? -32.73 : 175.18",
-       "v.is_first_person ? -54.13 : -169.91"
+       "v.is_first_person ? 25.35 : 97.76",
+       "v.is_first_person ? -32.73 : 4.82",
+       "v.is_first_person ? -54.13 : 10.09"
       ],
       "0.41": [
-       "v.is_first_person ? 32.87 : 72.62",
-       "v.is_first_person ? -59.33 : 139.42",
-       "v.is_first_person ? -64.9 : -169.79"
+       "v.is_first_person ? 32.87 : 96.56",
+       "v.is_first_person ? -59.33 : 1.81",
+       "v.is_first_person ? -64.9 : 8.68"
       ],
       "0.45": [
-       "v.is_first_person ? 46.37 : 59.03",
-       "v.is_first_person ? -107.52 : 54.19",
-       "v.is_first_person ? -80.98 : -159.77"
+       "v.is_first_person ? 46.37 : 84.57",
+       "v.is_first_person ? -107.52 : -1.82",
+       "v.is_first_person ? -80.98 : 21.0"
       ],
       "0.49": [
-       "v.is_first_person ? 45.58 : 64.47",
-       "v.is_first_person ? -117.95 : 48.42",
-       "v.is_first_person ? -80.65 : -148.24"
+       "v.is_first_person ? 45.58 : 80.32",
+       "v.is_first_person ? -117.95 : 0.21",
+       "v.is_first_person ? -80.65 : 27.1"
       ],
       "0.52": [
-       "v.is_first_person ? 41.85 : 71.05",
-       "v.is_first_person ? -118.18 : 56.83",
-       "v.is_first_person ? -76.75 : -139.7"
+       "v.is_first_person ? 41.85 : 77.97",
+       "v.is_first_person ? -118.18 : 2.8",
+       "v.is_first_person ? -76.75 : 30.71"
       ],
       "0.53": [
-       "v.is_first_person ? 41.67 : 71.36",
-       "v.is_first_person ? -118.39 : 56.86",
-       "v.is_first_person ? -76.64 : -139.66"
+       "v.is_first_person ? 41.67 : 77.93",
+       "v.is_first_person ? -118.39 : 2.89",
+       "v.is_first_person ? -76.64 : 30.78"
       ],
       "0.57": [
-       "v.is_first_person ? 41.74 : 74.55",
-       "v.is_first_person ? -122.09 : 58.38",
-       "v.is_first_person ? -78.56 : -148.13"
+       "v.is_first_person ? 41.74 : 81.33",
+       "v.is_first_person ? -122.09 : 3.02",
+       "v.is_first_person ? -78.56 : 30.22"
       ],
       "0.61": [
-       "v.is_first_person ? 41.2 : 75.11",
-       "v.is_first_person ? -122.15 : 58.37",
-       "v.is_first_person ? -79.19 : -156.12"
+       "v.is_first_person ? 41.2 : 83.84",
+       "v.is_first_person ? -122.15 : 2.62",
+       "v.is_first_person ? -79.19 : 27.84"
       ],
       "0.64": [
-       "v.is_first_person ? 37.63 : 69.38",
-       "v.is_first_person ? -112.41 : 53.7",
-       "v.is_first_person ? -73.2 : -147.86"
+       "v.is_first_person ? 37.63 : 78.46",
+       "v.is_first_person ? -112.41 : 2.2",
+       "v.is_first_person ? -73.2 : 24.34"
       ],
       "0.65": [
-       "v.is_first_person ? 36.76 : 67.88",
-       "v.is_first_person ? -109.92 : 52.51",
-       "v.is_first_person ? -71.59 : -144.87"
+       "v.is_first_person ? 36.76 : 76.81",
+       "v.is_first_person ? -109.92 : 2.14",
+       "v.is_first_person ? -71.59 : 23.72"
       ],
       "0.69": [
-       "v.is_first_person ? 30.55 : 56.73",
-       "v.is_first_person ? -91.7 : 43.78",
-       "v.is_first_person ? -59.73 : -121.7"
+       "v.is_first_person ? 30.55 : 64.31",
+       "v.is_first_person ? -91.7 : 1.76",
+       "v.is_first_person ? -59.73 : 19.51"
       ],
       "0.73": [
-       "v.is_first_person ? 22.09 : 41.15",
-       "v.is_first_person ? -66.45 : 31.72",
-       "v.is_first_person ? -43.29 : -88.52"
+       "v.is_first_person ? 22.09 : 46.7",
+       "v.is_first_person ? -66.45 : 1.27",
+       "v.is_first_person ? -43.29 : 14.03"
       ],
       "0.77": [
-       "v.is_first_person ? 13.3 : 24.8",
-       "v.is_first_person ? -40.05 : 19.11",
-       "v.is_first_person ? -26.09 : -53.4"
+       "v.is_first_person ? 13.3 : 28.16",
+       "v.is_first_person ? -40.05 : 0.76",
+       "v.is_first_person ? -26.09 : 8.44"
       ],
       "0.81": [
-       "v.is_first_person ? 5.31 : 9.88",
-       "v.is_first_person ? -15.96 : 7.62",
-       "v.is_first_person ? -10.4 : -21.23"
+       "v.is_first_person ? 5.31 : 11.21",
+       "v.is_first_person ? -15.96 : 0.31",
+       "v.is_first_person ? -10.4 : 3.38"
       ],
       "0.85": [
        0.0,
-       -0.0,
-       0.0
+       0.0,
+       -0.0
       ]
      }
     },
@@ -1757,128 +1757,128 @@
        0.0
       ],
       "0.04": [
-       "v.is_first_person ? 6.25 : 56.32",
-       "v.is_first_person ? -0.67 : 13.42",
-       "v.is_first_person ? -11.42 : -45.4"
+       "v.is_first_person ? 6.25 : 7.46",
+       "v.is_first_person ? -0.67 : -0.74",
+       "v.is_first_person ? -11.42 : -8.75"
       ],
       "0.08": [
-       "v.is_first_person ? 15.25 : 124.15",
-       "v.is_first_person ? 0.73 : 29.67",
-       "v.is_first_person ? -26.3 : -104.69"
+       "v.is_first_person ? 15.25 : 20.37",
+       "v.is_first_person ? 0.73 : -0.19",
+       "v.is_first_person ? -26.3 : -17.14"
       ],
       "0.10": [
-       "v.is_first_person ? 19.3 : 138.07",
-       "v.is_first_person ? 4.34 : 33.13",
-       "v.is_first_person ? -31.05 : -123.8"
+       "v.is_first_person ? 19.3 : 28.93",
+       "v.is_first_person ? 4.34 : 2.07",
+       "v.is_first_person ? -31.05 : -15.61"
       ],
       "0.12": [
-       "v.is_first_person ? 21.78 : 137.13",
-       "v.is_first_person ? 8.65 : 32.35",
-       "v.is_first_person ? -32.62 : -131.1"
+       "v.is_first_person ? 21.78 : 35.8",
+       "v.is_first_person ? 8.65 : 4.73",
+       "v.is_first_person ? -32.62 : -11.4"
       ],
       "0.16": [
-       "v.is_first_person ? 27.11 : 119.03",
-       "v.is_first_person ? 22.13 : 24.65",
-       "v.is_first_person ? -33.3 : -139.23"
+       "v.is_first_person ? 27.11 : 53.52",
+       "v.is_first_person ? 22.13 : 12.84",
+       "v.is_first_person ? -33.3 : 3.63"
       ],
       "0.20": [
-       "v.is_first_person ? 32.36 : 90.35",
-       "v.is_first_person ? 37.25 : 14.74",
-       "v.is_first_person ? -32.78 : -142.32"
+       "v.is_first_person ? 32.36 : 72.74",
+       "v.is_first_person ? 37.25 : 22.11",
+       "v.is_first_person ? -32.78 : 21.83"
       ],
       "0.24": [
-       "v.is_first_person ? 37.1 : 61.59",
-       "v.is_first_person ? 49.23 : 8.86",
-       "v.is_first_person ? -33.25 : -144.17"
+       "v.is_first_person ? 37.1 : 90.13",
+       "v.is_first_person ? 49.23 : 30.12",
+       "v.is_first_person ? -33.25 : 37.78"
       ],
       "0.28": [
-       "v.is_first_person ? 40.59 : 45.29",
-       "v.is_first_person ? 51.97 : 14.71",
-       "v.is_first_person ? -37.28 : -148.6"
+       "v.is_first_person ? 40.59 : 101.02",
+       "v.is_first_person ? 51.97 : 33.72",
+       "v.is_first_person ? -37.28 : 44.58"
       ],
       "0.32": [
-       "v.is_first_person ? 48.86 : 49.57",
-       "v.is_first_person ? 30.16 : 71.11",
-       "v.is_first_person ? -62.32 : -163.62"
+       "v.is_first_person ? 48.86 : 100.97",
+       "v.is_first_person ? 30.16 : 27.91",
+       "v.is_first_person ? -62.32 : 26.96"
       ],
       "0.36": [
-       "v.is_first_person ? 48.91 : 64.98",
-       "v.is_first_person ? -3.43 : 128.18",
-       "v.is_first_person ? -82.59 : -175.8"
+       "v.is_first_person ? 48.91 : 91.99",
+       "v.is_first_person ? -3.43 : 15.99",
+       "v.is_first_person ? -82.59 : 2.05"
       ],
       "0.38": [
-       "v.is_first_person ? 42.4 : 68.05",
-       "v.is_first_person ? -14.78 : 133.6",
-       "v.is_first_person ? -80.52 : -177.1"
+       "v.is_first_person ? 42.4 : 89.66",
+       "v.is_first_person ? -14.78 : 11.6",
+       "v.is_first_person ? -80.52 : -1.8"
       ],
       "0.41": [
-       "v.is_first_person ? 5.64 : 67.37",
-       "v.is_first_person ? -38.24 : 92.62",
-       "v.is_first_person ? -43.95 : -169.19"
+       "v.is_first_person ? 5.64 : 86.72",
+       "v.is_first_person ? -38.24 : 1.31",
+       "v.is_first_person ? -43.95 : 6.56"
       ],
       "0.45": [
-       "v.is_first_person ? -73.37 : 60.74",
-       "v.is_first_person ? -70.76 : -18.54",
-       "v.is_first_person ? 44.36 : -145.31"
+       "v.is_first_person ? -73.37 : 83.27",
+       "v.is_first_person ? -70.76 : -15.6",
+       "v.is_first_person ? 44.36 : 35.12"
       ],
       "0.49": [
-       "v.is_first_person ? -88.21 : 59.18",
-       "v.is_first_person ? -69.32 : -20.49",
-       "v.is_first_person ? 60.57 : -140.15"
+       "v.is_first_person ? -88.21 : 84.04",
+       "v.is_first_person ? -69.32 : -19.59",
+       "v.is_first_person ? 60.57 : 40.04"
       ],
       "0.52": [
-       "v.is_first_person ? -88.74 : 58.67",
-       "v.is_first_person ? -62.39 : -5.32",
-       "v.is_first_person ? 61.03 : -139.52"
+       "v.is_first_person ? -88.74 : 85.4",
+       "v.is_first_person ? -62.39 : -19.46",
+       "v.is_first_person ? 61.03 : 39.89"
       ],
       "0.53": [
-       "v.is_first_person ? -89.26 : 58.72",
-       "v.is_first_person ? -62.51 : -5.23",
-       "v.is_first_person ? 61.47 : -139.66"
+       "v.is_first_person ? -89.26 : 85.53",
+       "v.is_first_person ? -62.51 : -19.41",
+       "v.is_first_person ? 61.47 : 39.95"
       ],
       "0.57": [
-       "v.is_first_person ? -94.92 : 61.55",
-       "v.is_first_person ? -67.94 : -7.39",
-       "v.is_first_person ? 65.04 : -147.09"
+       "v.is_first_person ? -94.92 : 89.23",
+       "v.is_first_person ? -67.94 : -18.45",
+       "v.is_first_person ? 65.04 : 40.74"
       ],
       "0.61": [
-       "v.is_first_person ? -97.46 : 63.44",
-       "v.is_first_person ? -73.3 : -11.01",
-       "v.is_first_person ? 65.82 : -152.47"
+       "v.is_first_person ? -97.46 : 90.99",
+       "v.is_first_person ? -73.3 : -16.49",
+       "v.is_first_person ? 65.82 : 40.13"
       ],
       "0.64": [
-       "v.is_first_person ? -90.98 : 59.37",
-       "v.is_first_person ? -70.26 : -12.05",
-       "v.is_first_person ? 60.93 : -143.12"
+       "v.is_first_person ? -90.98 : 84.63",
+       "v.is_first_person ? -70.26 : -14.14",
+       "v.is_first_person ? 60.93 : 36.6"
       ],
       "0.65": [
-       "v.is_first_person ? -89.09 : 58.13",
-       "v.is_first_person ? -68.91 : -11.91",
-       "v.is_first_person ? 59.64 : -140.15"
+       "v.is_first_person ? -89.09 : 82.83",
+       "v.is_first_person ? -68.91 : -13.75",
+       "v.is_first_person ? 59.64 : 35.76"
       ],
       "0.69": [
-       "v.is_first_person ? -74.69 : 48.69",
-       "v.is_first_person ? -58.1 : -10.33",
-       "v.is_first_person ? 49.92 : -117.5"
+       "v.is_first_person ? -74.69 : 69.29",
+       "v.is_first_person ? -58.1 : -11.22",
+       "v.is_first_person ? 49.92 : 29.76"
       ],
       "0.73": [
-       "v.is_first_person ? -54.27 : 35.36",
-       "v.is_first_person ? -42.34 : -7.64",
-       "v.is_first_person ? 36.24 : -85.38"
+       "v.is_first_person ? -54.27 : 50.29",
+       "v.is_first_person ? -42.34 : -8.04",
+       "v.is_first_person ? 36.24 : 21.53"
       ],
       "0.77": [
-       "v.is_first_person ? -32.73 : 21.32",
-       "v.is_first_person ? -25.56 : -4.63",
-       "v.is_first_person ? 21.85 : -51.49"
+       "v.is_first_person ? -32.73 : 30.32",
+       "v.is_first_person ? -25.56 : -4.83",
+       "v.is_first_person ? 21.85 : 12.97"
       ],
       "0.81": [
-       "v.is_first_person ? -13.02 : 8.49",
-       "v.is_first_person ? -10.14 : -1.82",
-       "v.is_first_person ? 8.7 : -20.48"
+       "v.is_first_person ? -13.02 : 12.07",
+       "v.is_first_person ? -10.14 : -1.94",
+       "v.is_first_person ? 8.7 : 5.18"
       ],
       "0.85": [
        0.0,
-       0.0,
+       -0.0,
        0.0
       ]
      }
@@ -3042,144 +3042,144 @@
        0.0
       ],
       "0.04": [
-       "v.is_first_person ? 5.9 : -8.56",
-       "v.is_first_person ? -8.24 : -71.14",
-       "v.is_first_person ? -13.89 : -1.42"
+       "v.is_first_person ? 5.9 : -1.49",
+       "v.is_first_person ? -8.24 : 5.39",
+       "v.is_first_person ? -13.89 : -2.95"
       ],
       "0.08": [
-       "v.is_first_person ? 13.05 : -24.12",
-       "v.is_first_person ? -17.91 : -151.66",
-       "v.is_first_person ? -30.59 : -2.66"
+       "v.is_first_person ? 13.05 : -1.55",
+       "v.is_first_person ? -17.91 : 11.44",
+       "v.is_first_person ? -30.59 : -5.93"
       ],
       "0.10": [
-       "v.is_first_person ? 15.38 : -38.27",
-       "v.is_first_person ? -20.5 : -167.93",
-       "v.is_first_person ? -35.83 : -2.23"
+       "v.is_first_person ? 15.38 : 1.5",
+       "v.is_first_person ? -20.5 : 12.56",
+       "v.is_first_person ? -35.83 : -5.84"
       ],
       "0.12": [
-       "v.is_first_person ? 15.68 : -50.92",
-       "v.is_first_person ? -20.4 : -161.83",
-       "v.is_first_person ? -36.4 : -1.28"
+       "v.is_first_person ? 15.68 : 4.8",
+       "v.is_first_person ? -20.4 : 11.97",
+       "v.is_first_person ? -36.4 : -4.76"
       ],
       "0.16": [
-       "v.is_first_person ? 14.03 : -87.57",
-       "v.is_first_person ? -17.06 : -120.27",
-       "v.is_first_person ? -32.55 : 2.11"
+       "v.is_first_person ? 14.03 : 14.19",
+       "v.is_first_person ? -17.06 : 8.41",
+       "v.is_first_person ? -32.55 : -0.47"
       ],
       "0.20": [
-       "v.is_first_person ? 11.74 : -127.87",
-       "v.is_first_person ? -12.15 : -60.01",
-       "v.is_first_person ? -26.81 : 6.24"
+       "v.is_first_person ? 11.74 : 26.46",
+       "v.is_first_person ? -12.15 : 3.38",
+       "v.is_first_person ? -26.81 : 4.97"
       ],
       "0.24": [
-       "v.is_first_person ? 11.9 : -155.47",
-       "v.is_first_person ? -9.36 : -10.98",
-       "v.is_first_person ? -25.61 : 9.35"
+       "v.is_first_person ? 11.9 : 39.8",
+       "v.is_first_person ? -9.36 : -0.63",
+       "v.is_first_person ? -25.61 : 9.14"
       ],
       "0.25": [
-       "v.is_first_person ? 12.98 : -159.65",
+       "v.is_first_person ? 12.98 : 44.35",
        "v.is_first_person ? -9.45 : -1.38",
        "v.is_first_person ? -27.23 : 9.9"
       ],
       "0.28": [
-       "v.is_first_person ? 20.66 : -154.95",
-       "v.is_first_person ? -10.21 : 10.35",
-       "v.is_first_person ? -39.51 : 10.15"
+       "v.is_first_person ? 20.66 : 60.52",
+       "v.is_first_person ? -10.21 : -2.27",
+       "v.is_first_person ? -39.51 : 10.4"
       ],
       "0.32": [
-       "v.is_first_person ? 38.0 : -123.1",
-       "v.is_first_person ? -13.89 : 6.67",
-       "v.is_first_person ? -68.06 : 8.53"
+       "v.is_first_person ? 38.0 : 88.54",
+       "v.is_first_person ? -13.89 : -1.73",
+       "v.is_first_person ? -68.06 : 8.69"
       ],
       "0.36": [
-       "v.is_first_person ? 48.0 : -97.77",
+       "v.is_first_person ? 48.0 : 106.23",
        "v.is_first_person ? -30.36 : -0.36",
        "v.is_first_person ? -88.15 : 7.06"
       ],
       "0.40": [
-       "v.is_first_person ? 35.07 : -108.18",
+       "v.is_first_person ? 35.07 : 95.82",
        "v.is_first_person ? -74.74 : 1.45",
        "v.is_first_person ? -79.0 : 7.51"
       ],
       "0.43": [
-       "v.is_first_person ? 12.8 : -132.03",
+       "v.is_first_person ? 12.8 : 71.97",
        "v.is_first_person ? -131.25 : 3.82",
        "v.is_first_person ? -57.61 : 8.61"
       ],
       "0.45": [
-       "v.is_first_person ? 8.18 : -137.78",
+       "v.is_first_person ? 8.18 : 66.22",
        "v.is_first_person ? -145.22 : 4.52",
        "v.is_first_person ? -53.14 : 8.93"
       ],
       "0.47": [
-       "v.is_first_person ? 8.52 : -142.31",
+       "v.is_first_person ? 8.52 : 61.69",
        "v.is_first_person ? -155.86 : 5.67",
        "v.is_first_person ? -53.1 : 9.46"
       ],
       "0.52": [
-       "v.is_first_person ? 18.22 : -141.42",
+       "v.is_first_person ? 18.22 : 62.58",
        "v.is_first_person ? -151.79 : 6.68",
        "v.is_first_person ? -60.93 : 9.99"
       ],
       "0.55": [
-       "v.is_first_person ? 19.11 : -142.41",
+       "v.is_first_person ? 19.11 : 65.22",
        "v.is_first_person ? -154.74 : 6.54",
        "v.is_first_person ? -62.45 : 10.05"
       ],
       "0.59": [
-       "v.is_first_person ? 19.68 : -144.84",
+       "v.is_first_person ? 19.68 : 70.88",
        "v.is_first_person ? -160.45 : 6.1",
        "v.is_first_person ? -64.73 : 10.1"
       ],
       "0.63": [
-       "v.is_first_person ? 19.46 : -143.92",
+       "v.is_first_person ? 19.46 : 75.02",
        "v.is_first_person ? -162.3 : 5.46",
        "v.is_first_person ? -65.27 : 9.88"
       ],
       "0.67": [
-       "v.is_first_person ? 18.1 : -134.61",
+       "v.is_first_person ? 18.1 : 73.47",
        "v.is_first_person ? -153.86 : 4.67",
        "v.is_first_person ? -61.72 : 9.13"
       ],
       "0.68": [
-       "v.is_first_person ? 17.73 : -131.73",
+       "v.is_first_person ? 17.73 : 72.27",
        "v.is_first_person ? -150.81 : 4.52",
        "v.is_first_person ? -60.49 : 8.93"
       ],
       "0.71": [
-       "v.is_first_person ? 16.31 : -120.92",
+       "v.is_first_person ? 16.31 : 67.03",
        "v.is_first_person ? -138.9 : 4.07",
        "v.is_first_person ? -55.71 : 8.18"
       ],
       "0.75": [
-       "v.is_first_person ? 13.77 : -101.92",
+       "v.is_first_person ? 13.77 : 56.99",
        "v.is_first_person ? -117.4 : 3.37",
        "v.is_first_person ? -47.09 : 6.88"
       ],
       "0.79": [
-       "v.is_first_person ? 10.71 : -79.12",
+       "v.is_first_person ? 10.71 : 44.47",
        "v.is_first_person ? -91.3 : 2.59",
        "v.is_first_person ? -36.62 : 5.33"
       ],
       "0.83": [
-       "v.is_first_person ? 7.53 : -55.61",
+       "v.is_first_person ? 7.53 : 31.32",
        "v.is_first_person ? -64.21 : 1.81",
        "v.is_first_person ? -25.75 : 3.75"
       ],
       "0.87": [
-       "v.is_first_person ? 4.41 : -32.6",
+       "v.is_first_person ? 4.41 : 18.34",
        "v.is_first_person ? -37.62 : 1.06",
        "v.is_first_person ? -15.09 : 2.2"
       ],
       "0.91": [
-       "v.is_first_person ? 1.83 : -13.58",
+       "v.is_first_person ? 1.83 : 7.59",
        "v.is_first_person ? -15.64 : 0.45",
        "v.is_first_person ? -6.27 : 0.92"
       ],
       "0.95": [
        0.0,
-       0.0,
-       0.0
+       -0.0,
+       -0.0
       ]
      }
     },
@@ -4112,64 +4112,64 @@
        0.0
       ],
       "0.04": [
-       "v.is_first_person ? 6.88 : -180.67",
-       "v.is_first_person ? -18.27 : 21.13",
-       "v.is_first_person ? -21.18 : -40.46"
+       "v.is_first_person ? 6.88 : 6.45",
+       "v.is_first_person ? -18.27 : 3.96",
+       "v.is_first_person ? -21.18 : 0.11"
       ],
       "0.05": [
-       "v.is_first_person ? 10.42 : -205.98",
-       "v.is_first_person ? -21.65 : 22.12",
-       "v.is_first_person ? -28.68 : -44.09"
+       "v.is_first_person ? 10.42 : 12.14",
+       "v.is_first_person ? -21.65 : 13.48",
+       "v.is_first_person ? -28.68 : -0.1"
       ],
       "0.08": [
-       "v.is_first_person ? 23.73 : -182.3",
-       "v.is_first_person ? -23.75 : 8.41",
-       "v.is_first_person ? -50.87 : -27.51"
+       "v.is_first_person ? 23.73 : 39.05",
+       "v.is_first_person ? -23.75 : 63.11",
+       "v.is_first_person ? -50.87 : -0.19"
       ],
       "0.12": [
-       "v.is_first_person ? 41.03 : -112.15",
-       "v.is_first_person ? -23.09 : -14.99",
-       "v.is_first_person ? -77.77 : 3.81"
+       "v.is_first_person ? 41.03 : 72.22",
+       "v.is_first_person ? -23.09 : 130.26",
+       "v.is_first_person ? -77.77 : -3.19"
       ],
       "0.16": [
-       "v.is_first_person ? 43.14 : -106.81",
-       "v.is_first_person ? -23.22 : -17.31",
-       "v.is_first_person ? -81.17 : 6.67"
+       "v.is_first_person ? 43.14 : 73.1",
+       "v.is_first_person ? -23.22 : 136.83",
+       "v.is_first_person ? -81.17 : -6.41"
       ],
       "0.20": [
-       "v.is_first_person ? 44.39 : -106.31",
-       "v.is_first_person ? -23.35 : -18.29",
-       "v.is_first_person ? -83.2 : 7.61"
+       "v.is_first_person ? 44.39 : 70.67",
+       "v.is_first_person ? -23.35 : 139.45",
+       "v.is_first_person ? -83.2 : -11.11"
       ],
       "0.24": [
-       "v.is_first_person ? 44.78 : -108.17",
-       "v.is_first_person ? -23.44 : -18.24",
-       "v.is_first_person ? -83.87 : 7.22"
+       "v.is_first_person ? 44.78 : 65.86",
+       "v.is_first_person ? -23.44 : 138.46",
+       "v.is_first_person ? -83.87 : -16.36"
       ],
       "0.28": [
-       "v.is_first_person ? 44.34 : -109.89",
-       "v.is_first_person ? -23.45 : -17.46",
-       "v.is_first_person ? -83.18 : 6.12"
+       "v.is_first_person ? 44.34 : 59.56",
+       "v.is_first_person ? -23.45 : 134.23",
+       "v.is_first_person ? -83.18 : -21.21"
       ],
       "0.32": [
-       "v.is_first_person ? 43.09 : -109.01",
-       "v.is_first_person ? -23.34 : -16.28",
-       "v.is_first_person ? -81.14 : 4.89"
+       "v.is_first_person ? 43.09 : 52.71",
+       "v.is_first_person ? -23.34 : 127.09",
+       "v.is_first_person ? -81.14 : -24.7"
       ],
       "0.36": [
-       "v.is_first_person ? 41.03 : -103.03",
-       "v.is_first_person ? -23.09 : -14.98",
-       "v.is_first_person ? -77.77 : 4.14"
+       "v.is_first_person ? 41.03 : 46.21",
+       "v.is_first_person ? -23.09 : 117.39",
+       "v.is_first_person ? -77.77 : -25.9"
       ],
       "0.40": [
-       "v.is_first_person ? 30.51 : -63.63",
-       "v.is_first_person ? -22.43 : -9.35",
-       "v.is_first_person ? -60.97 : 2.61"
+       "v.is_first_person ? 30.51 : 26.96",
+       "v.is_first_person ? -22.43 : 72.33",
+       "v.is_first_person ? -60.97 : -17.8"
       ],
       "0.44": [
-       "v.is_first_person ? 16.8 : -15.51",
-       "v.is_first_person ? -20.77 : -2.28",
-       "v.is_first_person ? -38.57 : 0.63"
+       "v.is_first_person ? 16.8 : 6.61",
+       "v.is_first_person ? -20.77 : 17.64",
+       "v.is_first_person ? -38.57 : -4.3"
       ],
       "0.46": [
        "v.is_first_person ? 11.58 : 0.0",
@@ -4177,19 +4177,19 @@
        "v.is_first_person ? -29.33 : 0.0"
       ],
       "0.48": [
-       "v.is_first_person ? 8.89 : 5.41",
-       "v.is_first_person ? -16.83 : 0.79",
-       "v.is_first_person ? -23.88 : -0.22"
+       "v.is_first_person ? 8.89 : -2.42",
+       "v.is_first_person ? -16.83 : -6.16",
+       "v.is_first_person ? -23.88 : 1.36"
       ],
       "0.52": [
-       "v.is_first_person ? 4.76 : 7.21",
-       "v.is_first_person ? -10.85 : 1.05",
-       "v.is_first_person ? -13.88 : -0.29"
+       "v.is_first_person ? 4.76 : -3.23",
+       "v.is_first_person ? -10.85 : -8.21",
+       "v.is_first_person ? -13.88 : 1.81"
       ],
       "0.56": [
-       "v.is_first_person ? 1.94 : 3.0",
-       "v.is_first_person ? -4.46 : 0.44",
-       "v.is_first_person ? -5.69 : -0.12"
+       "v.is_first_person ? 1.94 : -1.35",
+       "v.is_first_person ? -4.46 : -3.42",
+       "v.is_first_person ? -5.69 : 0.76"
       ],
       "0.60": [
        0.0,
@@ -6303,19 +6303,19 @@
        0.0
       ],
       "0.04": [
-       "v.is_first_person ? 2.55 : 3.06",
-       "v.is_first_person ? -4.36 : -0.98",
-       "v.is_first_person ? -6.55 : -0.93"
+       "v.is_first_person ? 2.55 : -2.25",
+       "v.is_first_person ? -4.36 : -0.26",
+       "v.is_first_person ? -6.55 : -0.9"
       ],
       "0.08": [
-       "v.is_first_person ? 6.35 : 7.87",
-       "v.is_first_person ? -10.86 : -2.51",
-       "v.is_first_person ? -16.3 : -2.39"
+       "v.is_first_person ? 6.35 : -5.78",
+       "v.is_first_person ? -10.86 : -0.68",
+       "v.is_first_person ? -16.3 : -2.3"
       ],
       "0.12": [
-       "v.is_first_person ? 9.88 : 7.38",
-       "v.is_first_person ? -16.59 : -2.36",
-       "v.is_first_person ? -25.22 : -2.24"
+       "v.is_first_person ? 9.88 : -5.42",
+       "v.is_first_person ? -16.59 : -0.64",
+       "v.is_first_person ? -25.22 : -2.16"
       ],
       "0.15": [
        "v.is_first_person ? 11.58 : 0.0",
@@ -6323,149 +6323,149 @@
        "v.is_first_person ? -29.33 : 0.0"
       ],
       "0.16": [
-       "v.is_first_person ? 11.97 : -5.24",
-       "v.is_first_person ? -19.23 : 1.75",
-       "v.is_first_person ? -30.16 : 1.54"
+       "v.is_first_person ? 11.97 : 3.78",
+       "v.is_first_person ? -19.23 : 0.53",
+       "v.is_first_person ? -30.16 : 1.5"
       ],
       "0.20": [
-       "v.is_first_person ? 12.66 : -37.17",
-       "v.is_first_person ? -18.29 : 13.11",
-       "v.is_first_person ? -30.94 : 10.58"
+       "v.is_first_person ? 12.66 : 26.24",
+       "v.is_first_person ? -18.29 : 4.39",
+       "v.is_first_person ? -30.94 : 10.43"
       ],
       "0.24": [
-       "v.is_first_person ? 12.54 : -76.17",
-       "v.is_first_person ? -15.61 : 26.62",
-       "v.is_first_person ? -29.49 : 21.81"
+       "v.is_first_person ? 12.54 : 53.97",
+       "v.is_first_person ? -15.61 : 8.76",
+       "v.is_first_person ? -29.49 : 21.46"
       ],
       "0.28": [
-       "v.is_first_person ? 12.1 : -108.64",
-       "v.is_first_person ? -12.94 : 36.17",
-       "v.is_first_person ? -27.49 : 32.12"
+       "v.is_first_person ? 12.1 : 78.51",
+       "v.is_first_person ? -12.94 : 10.76",
+       "v.is_first_person ? -27.49 : 31.26"
       ],
       "0.30": [
-       "v.is_first_person ? 11.92 : -117.35",
-       "v.is_first_person ? -12.22 : 37.49",
-       "v.is_first_person ? -26.85 : 35.58"
+       "v.is_first_person ? 11.92 : 86.13",
+       "v.is_first_person ? -12.22 : 10.11",
+       "v.is_first_person ? -26.85 : 34.35"
       ],
       "0.32": [
-       "v.is_first_person ? 11.42 : -122.55",
-       "v.is_first_person ? -11.48 : 33.33",
-       "v.is_first_person ? -25.69 : 40.54"
+       "v.is_first_person ? 11.42 : 95.16",
+       "v.is_first_person ? -11.48 : 4.93",
+       "v.is_first_person ? -25.69 : 38.03"
       ],
       "0.36": [
-       "v.is_first_person ? 10.02 : -112.27",
-       "v.is_first_person ? -10.93 : 14.77",
-       "v.is_first_person ? -23.14 : 46.29"
+       "v.is_first_person ? 10.02 : 101.26",
+       "v.is_first_person ? -10.93 : -10.71",
+       "v.is_first_person ? -23.14 : 40.7"
       ],
       "0.40": [
-       "v.is_first_person ? 9.01 : -103.0",
-       "v.is_first_person ? -10.7 : 1.35",
-       "v.is_first_person ? -21.38 : 48.95"
+       "v.is_first_person ? 9.01 : 102.3",
+       "v.is_first_person ? -10.7 : -21.45",
+       "v.is_first_person ? -21.38 : 41.64"
       ],
       "0.44": [
-       "v.is_first_person ? 8.94 : -103.39",
-       "v.is_first_person ? -10.69 : 0.53",
-       "v.is_first_person ? -21.27 : 49.3"
+       "v.is_first_person ? 8.94 : 102.63",
+       "v.is_first_person ? -10.69 : -22.24",
+       "v.is_first_person ? -21.27 : 41.98"
       ],
       "0.48": [
-       "v.is_first_person ? 8.95 : -104.61",
-       "v.is_first_person ? -10.74 : 0.3",
-       "v.is_first_person ? -21.33 : 49.62"
+       "v.is_first_person ? 8.95 : 103.05",
+       "v.is_first_person ? -10.74 : -22.63",
+       "v.is_first_person ? -21.33 : 42.41"
       ],
       "0.52": [
-       "v.is_first_person ? 9.02 : -106.45",
-       "v.is_first_person ? -10.85 : 0.53",
-       "v.is_first_person ? -21.51 : 49.88"
+       "v.is_first_person ? 9.02 : 103.47",
+       "v.is_first_person ? -10.85 : -22.68",
+       "v.is_first_person ? -21.51 : 42.89"
       ],
       "0.56": [
-       "v.is_first_person ? 9.13 : -108.73",
-       "v.is_first_person ? -10.98 : 1.16",
-       "v.is_first_person ? -21.77 : 50.07"
+       "v.is_first_person ? 9.13 : 103.83",
+       "v.is_first_person ? -10.98 : -22.43",
+       "v.is_first_person ? -21.77 : 43.38"
       ],
       "0.60": [
-       "v.is_first_person ? 9.26 : -111.11",
-       "v.is_first_person ? -11.13 : 2.05",
-       "v.is_first_person ? -22.07 : 50.14"
+       "v.is_first_person ? 9.26 : 104.01",
+       "v.is_first_person ? -11.13 : -21.94",
+       "v.is_first_person ? -22.07 : 43.8"
       ],
       "0.65": [
-       "v.is_first_person ? 9.38 : -113.44",
-       "v.is_first_person ? -11.26 : 3.14",
-       "v.is_first_person ? -22.36 : 50.05"
+       "v.is_first_person ? 9.38 : 103.93",
+       "v.is_first_person ? -11.26 : -21.26",
+       "v.is_first_person ? -22.36 : 44.13"
       ],
       "0.69": [
-       "v.is_first_person ? 9.49 : -115.48",
-       "v.is_first_person ? -11.37 : 4.32",
-       "v.is_first_person ? -22.6 : 49.79"
+       "v.is_first_person ? 9.49 : 103.53",
+       "v.is_first_person ? -11.37 : -20.42",
+       "v.is_first_person ? -22.6 : 44.31"
       ],
       "0.73": [
-       "v.is_first_person ? 9.57 : -117.04",
-       "v.is_first_person ? -11.44 : 5.54",
-       "v.is_first_person ? -22.76 : 49.31"
+       "v.is_first_person ? 9.57 : 102.67",
+       "v.is_first_person ? -11.44 : -19.44",
+       "v.is_first_person ? -22.76 : 44.29"
       ],
       "0.77": [
-       "v.is_first_person ? 9.59 : -117.82",
-       "v.is_first_person ? -11.43 : 6.65",
-       "v.is_first_person ? -22.79 : 48.58"
+       "v.is_first_person ? 9.59 : 101.32",
+       "v.is_first_person ? -11.43 : -18.42",
+       "v.is_first_person ? -22.79 : 44.02"
       ],
       "0.81": [
-       "v.is_first_person ? 9.53 : -117.64",
-       "v.is_first_person ? -11.35 : 7.58",
-       "v.is_first_person ? -22.64 : 47.59"
+       "v.is_first_person ? 9.53 : 99.38",
+       "v.is_first_person ? -11.35 : -17.38",
+       "v.is_first_person ? -22.64 : 43.46"
       ],
       "0.85": [
-       "v.is_first_person ? 9.38 : -116.23",
-       "v.is_first_person ? -11.15 : 8.26",
-       "v.is_first_person ? -22.27 : 46.24"
+       "v.is_first_person ? 9.38 : 96.69",
+       "v.is_first_person ? -11.15 : -16.34",
+       "v.is_first_person ? -22.27 : 42.53"
       ],
       "0.89": [
-       "v.is_first_person ? 9.13 : -113.43",
-       "v.is_first_person ? -10.84 : 8.56",
-       "v.is_first_person ? -21.66 : 44.59"
+       "v.is_first_person ? 9.13 : 93.29",
+       "v.is_first_person ? -10.84 : -15.4",
+       "v.is_first_person ? -21.66 : 41.22"
       ],
       "0.90": [
-       "v.is_first_person ? 9.02 : -112.18",
-       "v.is_first_person ? -10.71 : 8.57",
-       "v.is_first_person ? -21.4 : 43.98"
+       "v.is_first_person ? 9.02 : 92.01",
+       "v.is_first_person ? -10.71 : -15.11",
+       "v.is_first_person ? -21.4 : 40.7"
       ],
       "0.93": [
-       "v.is_first_person ? 8.59 : -107.21",
-       "v.is_first_person ? -10.2 : 8.4",
-       "v.is_first_person ? -20.39 : 41.74"
+       "v.is_first_person ? 8.59 : 87.34",
+       "v.is_first_person ? -10.2 : -14.2",
+       "v.is_first_person ? -20.39 : 38.76"
       ],
       "0.97": [
-       "v.is_first_person ? 7.7 : -96.33",
-       "v.is_first_person ? -9.14 : 7.76",
-       "v.is_first_person ? -18.26 : 37.22"
+       "v.is_first_person ? 7.7 : 77.89",
+       "v.is_first_person ? -9.14 : -12.51",
+       "v.is_first_person ? -18.26 : 34.68"
       ],
       "1.01": [
-       "v.is_first_person ? 6.6 : -82.82",
-       "v.is_first_person ? -7.84 : 6.8",
-       "v.is_first_person ? -15.67 : 31.84"
+       "v.is_first_person ? 6.6 : 66.62",
+       "v.is_first_person ? -7.84 : -10.61",
+       "v.is_first_person ? -15.67 : 29.74"
       ],
       "1.05": [
-       "v.is_first_person ? 5.37 : -67.5",
-       "v.is_first_person ? -6.38 : 5.61",
-       "v.is_first_person ? -12.75 : 25.86"
+       "v.is_first_person ? 5.37 : 54.11",
+       "v.is_first_person ? -6.38 : -8.57",
+       "v.is_first_person ? -12.75 : 24.19"
       ],
       "1.09": [
-       "v.is_first_person ? 4.06 : -51.01",
-       "v.is_first_person ? -4.82 : 4.26",
-       "v.is_first_person ? -9.63 : 19.51"
+       "v.is_first_person ? 4.06 : 40.82",
+       "v.is_first_person ? -4.82 : -6.44",
+       "v.is_first_person ? -9.63 : 18.27"
       ],
       "1.13": [
-       "v.is_first_person ? 2.8 : -35.23",
-       "v.is_first_person ? -3.33 : 2.94",
-       "v.is_first_person ? -6.65 : 13.47"
+       "v.is_first_person ? 2.8 : 28.2",
+       "v.is_first_person ? -3.33 : -4.45",
+       "v.is_first_person ? -6.65 : 12.62"
       ],
       "1.17": [
-       "v.is_first_person ? 1.66 : -20.79",
-       "v.is_first_person ? -1.97 : 1.72",
-       "v.is_first_person ? -3.93 : 7.97"
+       "v.is_first_person ? 1.66 : 16.69",
+       "v.is_first_person ? -1.97 : -2.65",
+       "v.is_first_person ? -3.93 : 7.46"
       ],
       "1.21": [
-       "v.is_first_person ? 0.68 : -8.49",
-       "v.is_first_person ? -0.81 : 0.69",
-       "v.is_first_person ? -1.61 : 3.28"
+       "v.is_first_person ? 0.68 : 6.86",
+       "v.is_first_person ? -0.81 : -1.1",
+       "v.is_first_person ? -1.61 : 3.06"
       ],
       "1.25": [
        -0.0,
