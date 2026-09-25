@@ -7,10 +7,12 @@
 //   Khụy + chuột phải       W  Xiềng Xích Địa Ngục
 //   Khụy + nhảy             R  Kẻ Diệt Thế
 
-import { world, system, EquipmentSlot, InputButton, ButtonState, EntityDamageCause, MolangVariableMap } from "@minecraft/server";
+import { world, system, ItemStack, EquipmentSlot, InputButton, ButtonState, EntityDamageCause, MolangVariableMap } from "@minecraft/server";
 import { CONFIG } from "./config.js";
 
 const ITEM_ID = "aatrox:darkin_blade";
+const ULT_ITEM_ID = "aatrox:darkin_blade_ult"; // kiếm dạng Diệt Thế: attachable có thêm cánh và sừng 3D
+const isBladeId = (id) => id === ITEM_ID || id === ULT_ITEM_ID;
 const TPS = 20;
 const SKILLS = ["Q", "E", "W", "R"];
 
@@ -36,9 +38,16 @@ const P = {
   afterimage: "aatrox:afterimage",
   chainHead: "aatrox:chain_head",
   bind: "aatrox:bind_circle",
-  wings: "aatrox:wings",
   xSlash: "aatrox:x_slash",
   bloodOrb: "aatrox:blood_orb",
+  domain: "aatrox:domain",
+  soul: "aatrox:soul",
+  lightning: "aatrox:lightning",
+  glyph: "aatrox:glyph",
+  lavaDrip: "aatrox:lava_drip",
+  fear: "aatrox:fear",
+  mist: "aatrox:blood_mist",
+  fireTrail: "aatrox:fire_trail",
 };
 
 const ticks = (seconds) => Math.max(1, Math.round(seconds * TPS));
@@ -96,7 +105,7 @@ function aimDirection(player) {
 function holdsBlade(player) {
   try {
     const item = player.getComponent("minecraft:equippable")?.getEquipment(EquipmentSlot.Mainhand);
-    return item?.typeId === ITEM_ID;
+    return isBladeId(item?.typeId);
   } catch {
     return false;
   }
@@ -332,6 +341,8 @@ world.afterEvents.entityHitEntity.subscribe(({ damagingEntity: player, hitEntity
     heal(player, bonus * cfg.healRatio);
     bloodBurst(target.dimension, add(target.location, { x: 0, y: 1, z: 0 }));
     particle(target.dimension, P.xSlash, add(target.location, { x: 0, y: 1, z: 0 }));
+    particle(target.dimension, P.mist, add(target.location, { x: 0, y: 1, z: 0 }));
+    particle(target.dimension, P.soul, add(target.location, { x: 0, y: 1.2, z: 0 }));
     sound(target.dimension, "random.anvil_land", target.location, 1.6);
     sound(target.dimension, "mob.zombie.woodbreak", target.location, 0.7);
     shake(player, 0.15, 0.15);
@@ -391,7 +402,13 @@ function castQ(player, state, direction) {
   if (state.qStage === 1 && t < state.cd.Q) return;
 
   const stage = state.qStage;
-  const cast = cfg.casts[stage - 1];
+  /** @type {any} */
+  let cast = cfg.casts[stage - 1];
+  if (isUltActive(state)) {
+    const k = CONFIG.R.empowered.qScale;
+    cast = { ...cast, empowered: true, length: (cast.length ?? 0) * k, width: (cast.width ?? 0) * k,
+      radius: (cast.radius ?? 0) * k, offset: (cast.offset ?? 0) * k, sweet: cast.sweet * k };
+  }
   const windup = ticks(cfg.windup);
   state.busyUntil = t + windup + 2;
   const token = ++state.qToken;
@@ -447,6 +464,8 @@ function slamQ(player, cast, direction) {
       system.runTimeout(() => particle(dimension, P.pillar, at), i);
     }
     system.runTimeout(() => shockRing(dimension, center, cast.radius + 1.5), 3);
+    particle(dimension, P.lightning, add(center, { x: 0, y: 1.6, z: 0 }));
+    particle(dimension, P.soul, add(center, { x: 0, y: 0.5, z: 0 }));
     shake(player, 0.4, 0.35);
     sound(dimension, "mob.irongolem.throw", center, 0.6);
   } else {
@@ -461,6 +480,13 @@ function slamQ(player, cast, direction) {
     const sweetCenter = add(origin, direction, cast.length - cast.sweet / 2);
     particle(dimension, P.flash, add(sweetCenter, { x: 0, y: 0.5, z: 0 }));
     crater(dimension, sweetCenter, 1.1);
+    if (cast.empowered) {
+      // Biến hình: cột lửa phun dọc đường chém
+      for (let along = 1; along <= cast.length; along += 1.3) {
+        const at = add(origin, direction, along);
+        system.runTimeout(() => particle(dimension, P.pillar, at), Math.round(along));
+      }
+    }
     // Vệt chém thứ hai lệch lên cao cho nhát chém dày hơn
     for (let along = 2.25; along <= cast.length; along += 1.5) {
       particle(dimension, P.slash, add(add(origin, direction, along), { x: 0, y: 1.6, z: 0 }));
@@ -479,6 +505,7 @@ function slamQ(player, cast, direction) {
       stun(target, cfg.stun);
       bloodBurst(dimension, add(target.location, { x: 0, y: 1, z: 0 }));
       particle(dimension, P.xSlash, add(target.location, { x: 0, y: 1, z: 0 }));
+      particle(dimension, P.mist, add(target.location, { x: 0, y: 1, z: 0 }));
       shake(target, 0.3, 0.25);
     }
     dealDamage(player, target, damage);
@@ -502,18 +529,37 @@ function castE(player, state, direction) {
   const cfg = CONFIG.E;
   if (now() < state.cd.E) return;
   startCooldown(state, "E");
+  const empowered = isUltActive(state);
+  const emp = CONFIG.R.empowered;
+  if (empowered) state.cd.E = now() + ticks(cfg.cooldown * emp.eCooldown);
   playAnim(player, "e");
-  knockback(player, direction, cfg.strength, cfg.vertical);
+  knockback(player, direction, cfg.strength * (empowered ? emp.eStrength : 1), cfg.vertical);
   sound(player.dimension, "item.trident.riptide_1", player.location, 1.2);
 
   particle(player.dimension, P.smoke, add(player.location, { x: 0, y: 0.3, z: 0 }));
   particle(player.dimension, P.debris, add(player.location, { x: 0, y: 0.1, z: 0 }));
+  const burned = new Set();
   let count = 0;
   const trail = system.runInterval(() => {
     if (!player.isValid || ++count > 7) return system.clearRun(trail);
     if (count % 2 === 1) particle(player.dimension, P.afterimage, add(player.location, { x: 0, y: 1, z: 0 }));
     particle(player.dimension, P.ember, add(player.location, { x: 0, y: 1.1, z: 0 }));
     if (count === 7) particle(player.dimension, P.smoke, add(player.location, { x: 0, y: 0.3, z: 0 }));
+    if (empowered) {
+      // Biến hình: để lại vệt lửa, kẻ địch đứng trên vệt bị đốt
+      const at = player.location;
+      particle(player.dimension, P.fireTrail, add(at, { x: 0, y: 0.1, z: 0 }));
+      for (const target of getTargetsNear(player, at, 1.4)) {
+        if (burned.has(target.id)) continue;
+        burned.add(target.id);
+        dealDamage(player, target, emp.eTrailDamage);
+        try {
+          target.setOnFire(3, true);
+        } catch {
+          // bỏ qua
+        }
+      }
+    }
   }, 1);
 }
 
@@ -536,11 +582,26 @@ function castW(player, state, direction) {
   startCooldown(state, "W");
   state.busyUntil = t + 8;
   playAnim(player, "w");
+  const emp = CONFIG.R.empowered;
+  const directions = [direction];
+  if (isUltActive(state)) {
+    // Biến hình: phóng nhiều sợi xích hình quạt, hồi chiêu nhanh hơn
+    state.cd.W = t + ticks(CONFIG.W.cooldown * emp.wCooldown);
+    for (let i = 1; i < emp.wChains; i++) {
+      const angle = ((i % 2 ? 1 : -1) * Math.ceil(i / 2) * emp.wSpread * Math.PI) / 180;
+      directions.push({
+        x: direction.x * Math.cos(angle) - direction.z * Math.sin(angle),
+        y: 0,
+        z: direction.x * Math.sin(angle) + direction.z * Math.cos(angle),
+      });
+    }
+  }
+  const tethered = new Set();
   // Xích bay ra đúng lúc tay trái vung tới trong animation (0.25 giây)
-  system.runTimeout(() => launchChain(player, direction), 5);
+  system.runTimeout(() => directions.forEach((d) => launchChain(player, d, tethered)), 5);
 }
 
-function launchChain(player, direction) {
+function launchChain(player, direction, tethered = new Set()) {
   if (!canAct(player)) return;
   const cfg = CONFIG.W;
   const dimension = player.dimension;
@@ -559,8 +620,9 @@ function launchChain(player, direction) {
       if (step === 0) particle(dimension, P.ember, head);
       if (step === 2) particle(dimension, P.chainHead, head);
 
-      const target = getTargetsNear(player, head, cfg.hitRadius)[0];
+      const target = getTargetsNear(player, head, cfg.hitRadius).find((e) => !tethered.has(e.id));
       if (target) {
+        tethered.add(target.id);
         system.clearRun(flight);
         tether(player, target);
         return;
@@ -584,6 +646,7 @@ function tether(player, target) {
   sound(dimension, "mob.evocation_illager.cast_spell", anchor, 0.8);
   particle(dimension, P.bind, add(anchor, { x: 0, y: 0.08, z: 0 }), withRadius(cfg.escapeRadius));
   particle(dimension, P.smoke, add(anchor, { x: 0, y: 0.5, z: 0 }));
+  particle(dimension, P.glyph, add(anchor, { x: 0, y: 0.2, z: 0 }));
   shake(target, 0.2, 0.2);
   try {
     target.addEffect("slowness", pullTick, { amplifier: cfg.slowAmplifier, showParticles: false });
@@ -674,8 +737,18 @@ function castR(player, state) {
       state.passiveReadyAt = now() + Math.floor(remaining * cfg.passiveCooldownMultiplier);
     }
 
-    // Chớp đỏ màn hình, rung, cột lửa phun lên quanh người, đất nứt
+    // Hiện hình Kẻ Diệt Thế: đổi sang kiếm có cánh + sừng 3D
+    swapMainhand(player, ITEM_ID, ULT_ITEM_ID);
+
+    // Chớp đỏ màn hình, rung, cột lửa phun lên quanh người, đất nứt, sét, linh hồn
     flashScreen(player, 0.55, 0.02, 0.02);
+    for (let i = 0; i < 4; i++) {
+      const angle = (i / 4) * Math.PI * 2 + 0.4;
+      const at = { x: origin.x + Math.cos(angle) * 3.5, y: origin.y + 1.6, z: origin.z + Math.sin(angle) * 3.5 };
+      system.runTimeout(() => particle(dimension, P.lightning, at), i * 2);
+    }
+    particle(dimension, P.soul, add(origin, { x: 0, y: 1, z: 0 }));
+    particle(dimension, P.soul, add(origin, { x: 0, y: 1.6, z: 0 }));
     shake(player, 0.5, 0.7);
     sound(dimension, "mob.enderdragon.growl", origin, 0.8);
     sound(dimension, "mob.ravager.roar", origin, 0.7);
@@ -707,6 +780,10 @@ function castR(player, state) {
       }
       dealDamage(player, target, cfg.castDamage);
       shake(target, 0.35, 0.35);
+      // Biểu tượng sợ hãi trên đầu trong thời gian bị dọa
+      for (let k = 0; k < cfg.fearDuration * 2; k++) {
+        system.runTimeout(() => target.isValid && particle(dimension, P.fear, add(target.location, { x: 0, y: 2.4, z: 0 })), k * 10);
+      }
     }
   }, castTicks);
 }
@@ -782,12 +859,12 @@ function trySkill(player, forced, quiet = false) {
 
 // Chuột phải / chạm vào khoảng không
 world.afterEvents.itemUse.subscribe(({ source, itemStack }) => {
-  if (itemStack?.typeId === ITEM_ID) trySkill(source);
+  if (isBladeId(itemStack?.typeId)) trySkill(source);
 });
 
 // Chuột phải / chạm khi tâm ngắm đang chỉ vào block (mặt đất, tường...)
 world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
-  if (event.itemStack?.typeId !== ITEM_ID || event.isFirstEvent === false) return;
+  if (!isBladeId(event.itemStack?.typeId) || event.isFirstEvent === false) return;
   if (INTERACTIVE_BLOCK.test(event.block.typeId)) return;
   const player = event.player;
   system.run(() => trySkill(player));
@@ -795,7 +872,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
 
 // Chuột phải / chạm giữ vào mob
 world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
-  if (event.itemStack?.typeId !== ITEM_ID) return;
+  if (!isBladeId(event.itemStack?.typeId)) return;
   const target = event.target;
   if (INTERACTIVE_ENTITY.has(target.typeId)) return;
   try {
@@ -844,7 +921,7 @@ function ensureLore(player) {
   try {
     const equippable = player.getComponent("minecraft:equippable");
     const item = equippable?.getEquipment(EquipmentSlot.Mainhand);
-    if (item?.typeId !== ITEM_ID || item.getLore().join("\n") === LORE.join("\n")) return;
+    if (!isBladeId(item?.typeId) || item.getLore().join("\n") === LORE.join("\n")) return;
     item.setLore(LORE);
     equippable.setEquipment(EquipmentSlot.Mainhand, item);
   } catch {
@@ -856,18 +933,96 @@ system.afterEvents.scriptEventReceive.subscribe(({ id, sourceEntity }) => {
   if (id === "aatrox:help" && sourceEntity?.typeId === "minecraft:player") sendGuide(sourceEntity);
 });
 
-// Cánh quỷ sau lưng khi đang biến hình (sinh liên tục để bám theo người)
+// ---------------------------------------------------------------------------
+// Dạng Diệt Thế: đổi kiếm thường <-> kiếm có cánh + sừng 3D, vùng Diệt Thế
+// ---------------------------------------------------------------------------
+
+function convertBlade(stack, typeId) {
+  const out = new ItemStack(typeId, 1);
+  try {
+    if (stack.nameTag) out.nameTag = stack.nameTag;
+  } catch {
+    // bỏ qua
+  }
+  try {
+    out.setLore(stack.getLore());
+  } catch {
+    // bỏ qua
+  }
+  try {
+    const from = stack.getComponent("minecraft:durability");
+    const to = out.getComponent("minecraft:durability");
+    if (from && to) to.damage = from.damage;
+  } catch {
+    // bỏ qua
+  }
+  try {
+    const from = stack.getComponent("minecraft:enchantable");
+    const to = out.getComponent("minecraft:enchantable");
+    if (from && to) to.addEnchantments(from.getEnchantments());
+  } catch {
+    // bỏ qua
+  }
+  return out;
+}
+
+function swapMainhand(player, fromId, toId) {
+  try {
+    const equippable = player.getComponent("minecraft:equippable");
+    const item = equippable?.getEquipment(EquipmentSlot.Mainhand);
+    if (item?.typeId === fromId) equippable.setEquipment(EquipmentSlot.Mainhand, convertBlade(item, toId));
+  } catch {
+    // bỏ qua
+  }
+}
+
+// Hết biến hình: trả mọi kiếm Diệt Thế trong túi đồ về kiếm thường
+function revertUltItems(player) {
+  try {
+    const container = player.getComponent("minecraft:inventory")?.container;
+    if (!container) return;
+    for (let i = 0; i < container.size; i++) {
+      const item = container.getItem(i);
+      if (item?.typeId === ULT_ITEM_ID) container.setItem(i, convertBlade(item, ITEM_ID));
+    }
+  } catch {
+    // bỏ qua
+  }
+}
+
 system.runInterval(() => {
   const t = now();
   for (const player of world.getAllPlayers()) {
     const state = states.get(player.id);
-    if (!state || !isUltActive(state)) continue;
-    const back = aimDirection(player);
-    const molang = new MolangVariableMap();
-    molang.setFloat("variable.flap", Math.sin(t * 0.35));
-    particle(player.dimension, P.wings, add(add(player.location, { x: 0, y: 1.45, z: 0 }), back, -0.35), molang);
+    if (!state || !isUltActive(state)) {
+      revertUltItems(player);
+      continue;
+    }
+    const cfg = CONFIG.R;
+    const center = player.location;
+    const dimension = player.dimension;
+    // Vòng Diệt Thế dưới chân, xoay liền mạch giữa các lần sinh lại (20 độ/giây)
+    const molang = withRadius(cfg.zoneRadius);
+    molang.setFloat("variable.spin", t);
+    particle(dimension, P.domain, add(center, { x: 0, y: 0.07, z: 0 }), molang);
+    const angle = t * 0.25;
+    particle(dimension, P.glyph, { x: center.x + Math.cos(angle) * cfg.zoneRadius, y: center.y + 0.2, z: center.z + Math.sin(angle) * cfg.zoneRadius });
+    particle(dimension, P.fireTrail, { x: center.x - Math.cos(angle) * cfg.zoneRadius, y: center.y + 0.1, z: center.z - Math.sin(angle) * cfg.zoneRadius });
+    if (t % 20 === 0) {
+      particle(dimension, P.soul, add(center, { x: 0, y: 0.8, z: 0 }));
+      for (const target of getTargetsNear(player, center, cfg.zoneRadius)) {
+        dealDamage(player, target, cfg.zoneDamage);
+        particle(dimension, P.mist, add(target.location, { x: 0, y: 1, z: 0 }));
+        try {
+          target.addEffect("slowness", 25, { amplifier: 0, showParticles: false });
+        } catch {
+          // bỏ qua
+        }
+      }
+    }
   }
-}, 2);
+}, 10);
+
 
 // ---------------------------------------------------------------------------
 // Thanh hồi chiêu (action bar) + hào quang khi biến hình
@@ -928,8 +1083,9 @@ system.runInterval(() => {
       parts.push(`§6§lDIỆT THẾ ${Math.ceil((state.ultUntil - t) / TPS)}s`);
       particle(player.dimension, P.aura, player.location);
     } else if (t % 10 === 0) {
-      // Tàn lửa bốc lên từ lưỡi kiếm đang cầm
+      // Tàn lửa bốc lên và dung nham nhỏ giọt từ lưỡi kiếm đang cầm
       particle(player.dimension, P.ember, bladeLocation(player));
+      if (t % 20 === 0) particle(player.dimension, P.lavaDrip, bladeLocation(player));
     }
     player.onScreenDisplay.setActionBar(parts.join("§r  "));
   }

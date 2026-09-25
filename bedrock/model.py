@@ -22,6 +22,7 @@ import os
 import struct
 
 from sword_art import ART, MATERIALS
+from ult_parts import ULT_BONES, ult_cubes
 
 # Điểm (0, 24, 0) của model attachable nằm đúng bàn tay (điểm xoay bone rightItem),
 # nên đặt tâm tay cầm tại đây thì animation chỉ cần xoay kiếm quanh nắm tay.
@@ -46,12 +47,18 @@ PALETTES = {
     "pommel": [(26, 26, 33), (40, 42, 52), (58, 61, 75), (82, 86, 104), (116, 121, 142)],
     "spike": [(14, 14, 18), (24, 24, 31), (38, 39, 48), (58, 60, 73), (86, 90, 108)],
     "lid": [(30, 3, 8), (52, 7, 14), (78, 13, 22), (106, 22, 30), (140, 38, 44)],
+    "membrane": [(38, 4, 10), (58, 8, 16), (84, 12, 22), (112, 20, 30), (142, 32, 38)],
+    "wbone": [(16, 15, 20), (28, 27, 35), (42, 42, 53), (64, 66, 81), (98, 102, 124)],
+    "wedge": [(178, 36, 12), (224, 74, 20), (255, 122, 34), (255, 176, 64), (255, 222, 128)],
+    "uhorn": [(16, 15, 20), (28, 27, 35), (42, 42, 53), (64, 66, 81), (98, 102, 124)],
 }
 PUPIL = (22, 2, 5)
 BASE_SHADE = {"frame": 2, "horn": 1, "core": 2, "lava": 2, "socket": 2, "eye": 3,
-              "guard": 2, "grip": 2, "band": 2, "pommel": 2, "spike": 1, "lid": 2}
+              "guard": 2, "grip": 2, "band": 2, "pommel": 2, "spike": 1, "lid": 2,
+              "membrane": 2, "wbone": 1, "wedge": 3, "uhorn": 1}
 DITHER = {"frame": 0.18, "horn": 0.14, "core": 0.22, "socket": 0.2, "guard": 0.12,
-          "pommel": 0.12, "band": 0.1, "spike": 0.1, "grip": 0.0, "lava": 0.0, "eye": 0.0, "lid": 0.2}
+          "pommel": 0.12, "band": 0.1, "spike": 0.1, "grip": 0.0, "lava": 0.0, "eye": 0.0, "lid": 0.2,
+          "membrane": 0.25, "wbone": 0.12, "wedge": 0.0, "uhorn": 0.14}
 
 
 def hash01(x, y, salt=0):
@@ -127,6 +134,32 @@ def lid_color(x, y):
     return palette[1] if n < 0.2 else palette[2]
 
 
+def wing_color(material, u, v):
+    """Cánh: màng sẫm dần về phía mép, gân sáng dọc theo xương, mép rực lửa."""
+    palette = PALETTES[material]
+    shade = BASE_SHADE[material]
+    if material == "membrane":
+        shade = 3 if (u + v) % 7 == 0 else 2 if u < 12 else 1
+    elif material == "wbone":
+        shade = 3 if v > 0 and u < 6 else 2
+    elif material == "wedge":
+        shade = 3 if (u + v) % 3 else 4
+    dither = DITHER[material]
+    if dither:
+        n = hash01(u, v, 21)
+        shade += -1 if n < dither / 2 else 1 if n > 1 - dither / 2 else 0
+    return palette[max(0, min(4, shade))]
+
+
+def ult_horn_color(x, y):
+    """Sừng biến hình: gốc tối, sáng dần lên đỉnh, có vệt bóng."""
+    palette = PALETTES["uhorn"]
+    shade = 1 + (1 if y >= 33 else 0) + (1 if y >= 36 else 0)
+    if hash01(x, y, 31) < 0.15:
+        shade += 1
+    return palette[min(4, shade)]
+
+
 def side_color(material, x, y, face):
     """Màu các mặt bên (độ dày): tối hơn mặt trước, mặt trên sáng hơn."""
     palette = PALETTES[material]
@@ -176,7 +209,7 @@ def build_cubes():
     for x, y, w, h in rectangles(EYE_PIXELS):
         cubes.append({"material": "lid", "glow": False, "bone": "eyelid", "inflate": LID_INFLATE,
                       "origin": (x, y, -LID_DEPTH / 2), "size": (w, h, LID_DEPTH)})
-    return cubes
+    return cubes + ult_cubes(wing_color, ult_horn_color)
 
 
 def pack_uvs(cubes):
@@ -213,7 +246,7 @@ def build_texture(cubes, uvs, size):
         ox, oy, _ = cube["origin"]
         w, h, d = cube["size"]
         material = cube["material"]
-        face = lid_color if material == "lid" else front_color
+        face = cube.get("face") or (lid_color if material == "lid" else front_color)
         for j in range(h):
             y = oy + h - 1 - j  # hàng trên cùng của mặt = đỉnh khối
             for i in range(w):
@@ -229,17 +262,18 @@ def build_texture(cubes, uvs, size):
     return pixels
 
 
-def build_geometry(identifier, cubes, uvs, size, glow):
-    """glow=False: phần thường + mí mắt; glow=True: chỉ các khối phát sáng."""
-    entries = {"sword": [], "eyelid": []}
+def build_geometry(identifier, cubes, uvs, size, glow, ult=False):
+    """glow=False: phần thường + mí mắt; glow=True: chỉ các khối phát sáng.
+    ult=True: thêm cánh và sừng của dạng biến hình (gắn vào body/head người chơi)."""
+    entries = {}
     for cube, uv in zip(cubes, uvs):
         if cube["glow"] != glow:
             continue
         ox, oy, oz = cube["origin"]
-        entry = {"origin": [ox, oy + GRIP_Y, oz], "size": list(cube["size"]), "uv": list(uv)}
+        entry = {"origin": [ox, oy if cube.get("abs") else oy + GRIP_Y, oz], "size": list(cube["size"]), "uv": list(uv)}
         if cube.get("inflate"):
             entry["inflate"] = cube["inflate"]
-        entries[cube["bone"]].append(entry)
+        entries.setdefault(cube["bone"], []).append(entry)
     bones = [
         {
             "name": "darkin_blade",
@@ -247,10 +281,20 @@ def build_geometry(identifier, cubes, uvs, size, glow):
             "binding": "q.item_slot_to_bone_name(c.item_slot)",
             "pivot": [0, GRIP_Y, 0],
         },
-        {"name": "sword", "parent": "darkin_blade", "pivot": [0, GRIP_Y, 0], "cubes": entries["sword"]},
+        {"name": "sword", "parent": "darkin_blade", "pivot": [0, GRIP_Y, 0], "cubes": entries.get("sword", [])},
     ]
-    if entries["eyelid"]:
+    if entries.get("eyelid"):
         bones.append({"name": "eyelid", "parent": "sword", "pivot": [0, EYE_TOP + GRIP_Y, 0], "cubes": entries["eyelid"]})
+    if ult:
+        for name, parent, binding, pivot in ULT_BONES:
+            bone = {"name": name, "pivot": list(pivot)}
+            if parent:
+                bone["parent"] = parent
+            if binding:
+                bone["binding"] = binding
+            if entries.get(name):
+                bone["cubes"] = entries[name]
+            bones.append(bone)
     return {
         "format_version": "1.16.0",
         "minecraft:geometry": [
@@ -300,4 +344,8 @@ def write_model(root, write_png):
                build_geometry("geometry.aatrox.darkin_blade", cubes, uvs, size, glow=False))
     write_json(os.path.join(models, "darkin_blade_glow.geo.json"),
                build_geometry("geometry.aatrox.darkin_blade_glow", cubes, uvs, size, glow=True))
+    write_json(os.path.join(models, "darkin_blade_ult.geo.json"),
+               build_geometry("geometry.aatrox.darkin_blade_ult", cubes, uvs, size, glow=False, ult=True))
+    write_json(os.path.join(models, "darkin_blade_ult_glow.geo.json"),
+               build_geometry("geometry.aatrox.darkin_blade_ult_glow", cubes, uvs, size, glow=True, ult=True))
     print(f"Model: {len(ART)} pixel -> {len(cubes)} khối, texture {size[0]}x{size[1]}")

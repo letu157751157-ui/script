@@ -1,0 +1,48 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "aatrox:darkin_blade_ult",
+      "materials": {
+        "default": "entity_alphatest",
+        "enchanted": "entity_alphatest_glint",
+        "glow": "entity_emissive"
+      },
+      "textures": {
+        "default": "textures/entity/darkin_blade",
+        "enchanted": "textures/misc/enchanted_item_glint",
+        "glow": "textures/entity/darkin_blade_glow"
+      },
+      "geometry": {
+        "default": "geometry.aatrox.darkin_blade_ult",
+        "glow": "geometry.aatrox.darkin_blade_ult_glow"
+      },
+      "animations": {
+        "hold_first_person": "animation.aatrox.darkin_blade.ult_hold_first_person",
+        "hold_third_person": "animation.aatrox.darkin_blade.ult_hold_third_person",
+        "blink": "animation.aatrox.darkin_blade.blink",
+        "wings": "animation.aatrox.darkin_blade.ult_wings",
+        "hide_fp": "animation.aatrox.darkin_blade.ult_hide_first_person"
+      },
+      "scripts": {
+        "animate": [
+          {
+            "hold_first_person": "c.is_first_person"
+          },
+          {
+            "hold_third_person": "!c.is_first_person"
+          },
+          "blink",
+          "wings",
+          {
+            "hide_fp": "c.is_first_person"
+          }
+        ]
+      },
+      "render_controllers": [
+        "controller.render.item_default",
+        "controller.render.aatrox.darkin_blade_glow"
+      ]
+    }
+  }
+}

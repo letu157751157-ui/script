@@ -34,14 +34,29 @@ Dung nham và mắt là một lớp riêng vẽ bằng material `entity_emissive
 
 ![Cầm kiếm và animation chiêu](preview_animation.png)
 
-- **Cầm kiếm:** tay nắm đúng chuôi kiếm, lưỡi gần như dựng thẳng, hơi nghiêng về trước, dài xấp xỉ chiều cao nhân vật.
-  Góc nhìn thứ nhất: kiếm nhỏ gọn ở góc phải dưới, lưỡi dựng lên, không che màn hình.
+- **Cầm kiếm:** tay nắm đúng chuôi kiếm, kiếm vuông góc với cánh tay, lưỡi chĩa ngang về trước, dài xấp xỉ chiều cao nhân vật.
+  Góc nhìn thứ nhất: kiếm dựng dọc bên phải màn hình, chỉ hơi nghiêng.
 - **Animation khi dùng chiêu** (cả người xung quanh lẫn chính bạn đều thấy):
   - **Q1** giơ kiếm qua vai rồi chém chéo xuống, **Q2** quét ngang từ phải sang trái, **Q3** nhảy lên hai tay giơ kiếm rồi nện xuống đất
   - **E** lao người về trước, kiếm kéo lê phía sau
   - **W** tay trái vung phóng xích (xích bay ra đúng lúc vung tay)
   - **R** khom người rồi gầm lên, dang tay giơ kiếm lên trời
 - **Mắt Darkin trên kiếm chớp mắt** định kỳ.
+
+### Dạng Kẻ Diệt Thế (R)
+
+Khi biến hình, kiếm trên tay được đổi sang bản **Diệt Thế** (hết biến hình tự đổi lại, giữ nguyên độ bền, phù phép, tên):
+- **Cặp cánh quỷ 3D** gắn sau lưng (xương đen, màng đỏ thẫm, mép rực lửa) vỗ liên tục, **cặp sừng 3D** trên đầu, kiếm to hơn.
+  Cánh và sừng ẩn ở góc nhìn thứ nhất để không che màn hình.
+- **Vùng Diệt Thế** bán kính 6 block bám theo người: vòng rune có gai xoay dưới chân, rune và lửa chạy quanh mép, linh hồn bay lên;
+  kẻ địch trong vùng mất 1.5 máu mỗi giây và bị làm chậm.
+- **Chiêu được cường hoá:**
+  - **Q** vùng chém to hơn 30%, cột lửa phun dọc đường chém
+  - **E** lướt xa hơn 40%, hồi chiêu còn một nửa, để lại vệt lửa đốt kẻ địch đi qua
+  - **W** phóng **3 sợi xích** hình quạt, mỗi sợi trói một mục tiêu, hồi chiêu nhanh hơn
+  - **Nội tại** hồi nhanh gấp đôi (như trước)
+
+Animation chiêu có đủ nhịp lấy đà → vung → chạm → quá đà → hồi về, nội suy Catmull-Rom cho chuyển động cong và mượt.
 
 ## Cài đặt
 
@@ -50,7 +65,7 @@ Dung nham và mắt là một lớp riêng vẽ bằng material `entity_emissive
 
 Sau đó tạo/sửa thế giới → **Behavior Packs** → bật *Aatrox - Quỷ Kiếm Darkin (BP)* (Resource Pack sẽ tự bật theo).
 
-> **Đã cài bản cũ?** Bản này là **v1.5.0**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.5.0.
+> **Đã cài bản cũ?** Bản này là **v1.6.0**. Trong thế giới, gỡ pack cũ ra rồi bật lại bản 1.6.0.
 > Nếu vẫn thấy kiếm cầm như cây thương hoặc không có animation, vào **Cài đặt → Bộ nhớ** xoá hết pack Aatrox cũ rồi nhập lại file `.mcaddon`.
 
 Lấy kiếm:
@@ -87,7 +102,7 @@ Riêng block/mob có thao tác riêng (rương, cửa, bàn chế tạo, giườ
 
 ![Texture particle](preview_particles.png)
 
-Addon có 22 particle riêng, texture pixel art tự vẽ. Phần lớn là **flipbook nhiều khung hình**:
+Addon có 29 particle riêng, texture pixel art tự vẽ. Phần lớn là **flipbook nhiều khung hình**:
 hiệu ứng chạy hết các khung trong thời gian sống của particle.
 
 | Particle | Hình | Dùng ở đâu |
@@ -110,7 +125,14 @@ hiệu ứng chạy hết các khung trong thời gian sống của particle.
 | `aatrox:afterimage` | Bóng mờ đỏ thẫm | Để lại phía sau khi lướt E |
 | `aatrox:chain_head` | Đầu móc sắt nung đỏ | Mũi sợi xích W |
 | `aatrox:bind_circle` | Vòng rune ngôi sao sáu cánh xoay chậm | Dưới chân mục tiêu trúng W (đúng bằng vòng trói) |
-| `aatrox:wings` | Cặp cánh quỷ vỗ nhẹ | Sau lưng suốt thời gian biến hình R |
+| `aatrox:domain` | Vòng Diệt Thế lớn có gai, rune, xoay chậm | Dưới chân suốt thời gian biến hình R |
+| `aatrox:soul` | Linh hồn Darkin gào thét bay lên | Nội tại, Q3, biến hình, vùng Diệt Thế |
+| `aatrox:lightning` | Sét đỏ gấp khúc | Nện Q3, 4 tia quanh người khi biến hình |
+| `aatrox:glyph` | Ký tự rune bay lên (4 loại) | Vòng trói W, mép vùng Diệt Thế |
+| `aatrox:lava_drip` | Dung nham nhỏ giọt | Từ lưỡi kiếm khi cầm |
+| `aatrox:fear` | Đầu lâu sợ hãi | Trên đầu mục tiêu bị R dọa |
+| `aatrox:blood_mist` | Sương máu loang | Trúng điểm ngọt, nội tại, trong vùng Diệt Thế |
+| `aatrox:fire_trail` | Vệt lửa cháy trên đất | Lướt E khi biến hình, mép vùng Diệt Thế |
 
 Ngoài particle, chiêu còn **rung màn hình** (Q3, trúng điểm ngọt, nội tại, kéo xích, R) và **chớp đỏ màn hình** khi biến hình R,
 kèm thêm tiếng gầm (rồng + ravager) khi biến hình.
@@ -132,7 +154,7 @@ Có thể mở các file `.geo.json` bằng Blockbench để chỉnh tay.
 **Tư thế cầm kiếm** nằm trong [`AatroxRP/animations/darkin_blade.animation.json`](AatroxRP/animations/darkin_blade.animation.json).
 Model attachable được gắn sao cho điểm `(0, 24, 0)` của model nằm ở bàn tay (đã kiểm chứng bằng model đinh ba, khiên, ống nhòm gốc),
 và tâm tay cầm của kiếm đặt đúng điểm này, nên `position` chỉ dịch nhẹ vào lòng bàn tay, `rotation` là hướng kiếm, `scale` là độ lớn
-(góc nhìn thứ 3: 0.5, góc nhìn thứ nhất: 0.28).
+(góc nhìn thứ 3: 0.5, góc nhìn thứ nhất: 0.3; khi biến hình 0.62 / 0.34).
 
 **Animation chiêu** sinh từ [`player_anims.py`](player_anims.py) ra `AatroxRP/animations/aatrox_player.animation.json`, script phát bằng `playAnimation`:
 - góc nhìn thứ 3: độ xoay/dịch cộng thêm cho các bone của người chơi, cộng với hướng lưỡi kiếm mong muốn (cổ tay được giải ngược cho đúng hướng)
@@ -159,7 +181,7 @@ bedrock/
 │   ├── animations/            tư thế cầm kiếm, chớp mắt, animation chiêu của người chơi
 │   ├── render_controllers/    vẽ lớp phát sáng
 │   ├── models/entity/         model 3D (.geo.json) + lớp phát sáng
-│   ├── particles/             22 particle riêng
+│   ├── particles/             29 particle riêng
 │   └── textures/              icon, texture model (.png + .tga phát sáng), texture particle
 ├── art/                       icon render từ model 3D
 ├── sword_art.py               bản vẽ pixel mặt trước của kiếm (hình dáng)

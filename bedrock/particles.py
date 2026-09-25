@@ -446,7 +446,125 @@ def wings():
 
 
 # (tên, x, y, danh sách khung, bảng màu); các khung xếp liền nhau theo chiều ngang
+SOUL = {"W": (255, 236, 226), "P": (255, 170, 160), "R": (220, 60, 60), "K": (60, 6, 12)}
+MIST = {"A": (170, 20, 30), "B": (120, 10, 20), "C": (80, 6, 14)}
+FEAR = {"W": (255, 230, 220), "R": (220, 30, 40), "K": (40, 4, 8)}
+
+
+def domain():
+    """Vùng Diệt Thế 64x64 (thang xám, tô đỏ): vành gai ngoài, vòng rune, vòng trong, tia toả ra."""
+    def pixel(x, y):
+        px, py = x + 0.5 - 32, y + 0.5 - 32
+        d = math.hypot(px, py)
+        a = math.degrees(math.atan2(py, px)) % 360
+        if d > 31.5:
+            return "."
+        spike = 29.5 + 2 * max(0.0, 1 - abs((a % 15) - 7.5) / 3)  # răng cưa quanh vành
+        if abs(d - 29.5) < 0.8 or (29.5 < d < spike):
+            return "#"
+        if abs(d - 25.5) < 0.6:
+            return "+"
+        if 26.3 < d < 28.8 and (int(a / 6) % 5 in (0, 2)) and hash01(int(a / 6), int(d), 3) > 0.3:
+            return "#"
+        if abs(d - 14) < 0.6:
+            return "-"
+        if 14.6 < d < 25 and abs((a + 11.25) % 45 - 22.5) < 0.9:
+            return "-"
+        return "."
+
+    return grid(64, 64, pixel)
+
+
+def soul_frame(frame):
+    """Linh hồn Darkin 16x16: ngọn khói hình mặt gào thét, uốn lượn khi bay lên."""
+    sway = (0, 1, 0, -1)[frame]
+
+    def pixel(x, y):
+        px, py = x + 0.5 - 8, y + 0.5
+        head = math.hypot(px, py - 6) <= 4.2
+        tail = 9 <= py <= 15 and abs(px - sway * (py - 9) / 3) <= 3.2 * (1 - (py - 9) / 7)
+        if not (head or tail):
+            return "."
+        if head and (abs(px + 1.8) < 0.8 or abs(px - 1.8) < 0.8) and 5 <= py <= 6.5:
+            return "K"  # hốc mắt
+        if head and abs(px) < 1.2 and 7.5 <= py <= 9 + frame % 2:
+            return "K"  # miệng gào
+        edge = (head and math.hypot(px, py - 6) > 3.2) or (tail and py > 12)
+        return "R" if edge and tail else "P" if edge else "W"
+
+    return grid(16, 16, pixel)
+
+
+def lightning_frame(frame):
+    """Sét đỏ 16x48: tia gấp khúc với nhánh phụ, loé -> rực -> tàn."""
+    heat_max = (0.8, 1.0, 0.5)[frame]
+    points, x = [], 8.0
+    for y in range(48):
+        if y % 4 == 0:
+            x = min(13, max(3, x + (hash01(y, 7, frame) - 0.5) * 6))
+        points.append(x)
+
+    def pixel(xx, yy):
+        dx = abs(xx + 0.5 - points[yy])
+        heat = max(0.0, 1 - dx / 1.4) * heat_max
+        if 18 <= yy <= 30:  # nhánh phụ
+            bx = points[18] + (yy - 18) * 0.6
+            heat = max(heat, max(0.0, 1 - abs(xx + 0.5 - bx) / 0.9) * heat_max * 0.7)
+        return fire_char(heat)
+
+    return grid(16, 48, pixel)
+
+
+GLYPHS = [
+    ["..#..#..", ".#.##.#.", "#..##..#", "...##...", "..#..#..", ".#....#.", "#......#", "........"],
+    ["#######.", "...#....", "..###...", ".#.#.#..", "#..#..#.", "...#....", "..###...", "........"],
+    ["..###...", ".#...#..", "#.#.#.#.", "#..#..#.", "#.#.#.#.", ".#...#..", "..###...", "........"],
+    ["#.....#.", ".#...#..", "..#.#...", "...#....", "..#.#...", ".#...#..", "#######.", "........"],
+]
+
+LAVA_DRIP = ["..Y.....", ".YWY....", ".OYO....", "OOYOO...", "ROOOR...", ".RRR....", "........", "........"]
+
+FEAR_ICON = [
+    "................",
+    ".....KKKKKK.....",
+    "....KWWWWWWK....",
+    "...KWWWWWWWWK...",
+    "...KWKKWWKKWK...",
+    "...KWKRWWKRWK...",
+    "...KWKKWWKKWK...",
+    "...KWWWKKWWWK...",
+    "....KWWKKWWK....",
+    ".....KWWWWK.....",
+    ".....KWKWKK.....",
+    ".....KKKKKK.....",
+    "................",
+    "......RRRR......",
+    ".......RR.......",
+    "................",
+]
+
+
+def mist_frame(frame):
+    """Sương máu 16x16: đám mờ loang ra rồi tan."""
+    radius, holes = ((4.0, 0.2), (5.5, 0.35), (6.8, 0.5), (7.5, 0.7))[frame]
+
+    def pixel(x, y):
+        d = math.hypot(x + 0.5 - 8, y + 0.5 - 8) / radius
+        if d > 1 or hash01(x, y, 130 + frame) < holes:
+            return "."
+        return "A" if d < 0.45 else "B" if d < 0.8 else "C"
+
+    return grid(16, 16, pixel)
+
+
 SPRITES = {
+    "domain": (0, 128, [domain()], GRAY),
+    "soul": (64, 128, [soul_frame(i) for i in range(4)], SOUL),
+    "lightning": (64, 144, [lightning_frame(i) for i in range(3)], FIRE),
+    "glyph": (0, 192, GLYPHS, GRAY),
+    "lava_drip": (32, 192, [LAVA_DRIP], FIRE),
+    "fear": (48, 192, [FEAR_ICON], FEAR),
+    "mist": (64, 192, [mist_frame(i) for i in range(4)], MIST),
     "smoke": (128, 0, [smoke_frame(i) for i in range(4)], SMOKE),
     "debris": (192, 0, DEBRIS, ROCK),
     "chain_head": (224, 0, [CHAIN_HEAD], HOT_IRON),
@@ -454,7 +572,6 @@ SPRITES = {
     "crack": (128, 64, [ground_crack()], CRACK),
     "bind": (160, 64, [bind_circle()], GRAY),
     "afterimage": (192, 64, [AFTERIMAGE], GHOST),
-    "wings": (128, 96, [wings()], WING),
     "slash": (0, 0, [slash_frame(i) for i in range(4)], FIRE),
     "ring": (0, 32, [ring_frame(i) for i in range(3)], FIRE),
     "flame": (0, 64, [flame_frame(i) for i in range(4)], FIRE),
@@ -743,18 +860,6 @@ PARTICLES = {
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#00FF281E", "0.15": "#FFFF281E", "0.85": "#FFFF6428", "1.0": "#00FFB450"}),
     }),
-    # Cánh quỷ sau lưng khi biến hình R (script sinh liên tục mỗi 2 tick)
-    "wings": particle("aatrox:wings", "particles_blend", {
-        **burst(1),
-        "minecraft:emitter_shape_point": {},
-        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.14},
-        "minecraft:particle_appearance_billboard": {
-            "size": ["1.15 + v.flap * 0.1", "0.58 + v.flap * 0.06"],
-            "facing_camera_mode": "rotate_y",
-            "uv": uv("wings"),
-        },
-        "minecraft:particle_appearance_tinting": tint({"0.0": "#E6FFFFFF", "1.0": "#99FFFFFF"}),
-    }),
     # Vết chém chữ X khi nội tại phát nổ
     "x_slash": particle("aatrox:x_slash", "particles_add", {
         **burst(1),
@@ -776,6 +881,104 @@ PARTICLES = {
             "size": [0.1, 0.1], "facing_camera_mode": "rotate_xyz", "uv": uv("drop"),
         },
         "minecraft:particle_appearance_tinting": tint({"0.0": "#FFFF8C8C", "0.8": "#FFFF4646", "1.0": "#00FF4646"}),
+    }),
+    # Vùng Diệt Thế dưới chân khi biến hình: script sinh lại mỗi 10 tick, v.spin giữ góc xoay liền mạch
+    "domain": particle("aatrox:domain", "particles_add", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.6},
+        "minecraft:particle_initial_spin": {"rotation": "v.spin", "rotation_rate": 20},
+        "minecraft:particle_appearance_billboard": {
+            "size": ["v.radius", "v.radius"], "facing_camera_mode": "emitter_transform_xz", "uv": uv("domain"),
+        },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#99D2141E", "0.2": "#CCD2141E", "0.8": "#CCD2141E", "1.0": "#00D2141E"}),
+    }),
+    # Linh hồn Darkin gào thét bay lên (nội tại, biến hình, vùng Diệt Thế)
+    "soul": particle("aatrox:soul", "particles_add", {
+        **burst(3),
+        "minecraft:emitter_shape_sphere": {"radius": 0.4, "direction": [0, 1, 0]},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.8, 1.2)"},
+        "minecraft:particle_initial_speed": "math.random(0.8, 1.4)",
+        "minecraft:particle_motion_dynamic": {
+            "linear_acceleration": ["math.sin(v.particle_age * 500 + v.particle_random_1 * 360) * 3", 0.6,
+                                    "math.cos(v.particle_age * 500 + v.particle_random_2 * 360) * 3"],
+            "linear_drag_coefficient": 1.2},
+        "minecraft:particle_appearance_billboard": {
+            "size": [0.22, 0.22], "facing_camera_mode": "rotate_xyz", "uv": uv("soul"),
+        },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#00FFFFFF", "0.15": "#DDFFFFFF", "0.7": "#AAFFC8C8", "1.0": "#00FF8080"}),
+    }),
+    # Sét đỏ giáng xuống (nện Q3, biến hình R)
+    "lightning": particle("aatrox:lightning", "particles_add", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.25},
+        "minecraft:particle_appearance_billboard": {
+            "size": [0.55, 1.65], "facing_camera_mode": "lookat_y", "uv": uv("lightning"),
+        },
+        "minecraft:particle_appearance_tinting": FADE,
+    }),
+    # Ký tự rune Darkin bay lên rồi tan (vòng trói W, vùng Diệt Thế); chọn ngẫu nhiên 1 trong 4 ký tự
+    "glyph": particle("aatrox:glyph", "particles_add", {
+        **burst(4),
+        "minecraft:emitter_shape_disc": {"radius": 0.8, "plane_normal": "y", "direction": [0, 1, 0]},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.7, 1.1)"},
+        "minecraft:particle_initial_speed": "math.random(0.4, 0.9)",
+        "minecraft:particle_motion_dynamic": {"linear_drag_coefficient": 0.8},
+        "minecraft:particle_appearance_billboard": {
+            "size": [0.13, 0.13], "facing_camera_mode": "rotate_xyz",
+            "uv": {"texture_width": ATLAS, "texture_height": ATLAS,
+                   "uv": ["math.floor(v.particle_random_1 * 3.99) * 8", 192], "uv_size": [8, 8]},
+        },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#00FF3C28", "0.2": "#FFFF3C28", "0.7": "#FFFF9650", "1.0": "#00FF9650"}),
+    }),
+    # Dung nham nhỏ giọt từ lưỡi kiếm
+    "lava_drip": particle("aatrox:lava_drip", "particles_add", {
+        **burst(1),
+        "minecraft:emitter_shape_sphere": {"radius": 0.2, "direction": [0, -1, 0]},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.9},
+        "minecraft:particle_initial_speed": 0.2,
+        "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -9, 0]},
+        "minecraft:particle_motion_collision": {"collision_radius": 0.03, "coefficient_of_restitution": 0, "collision_drag": 30},
+        "minecraft:particle_appearance_billboard": {
+            "size": [0.07, 0.07], "facing_camera_mode": "rotate_xyz", "uv": uv("lava_drip"),
+        },
+        "minecraft:particle_appearance_tinting": FADE,
+    }),
+    # Biểu tượng sợ hãi trên đầu mục tiêu bị R dọa
+    "fear": particle("aatrox:fear", "particles_alpha", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.55},
+        "minecraft:particle_initial_speed": 0,
+        "minecraft:particle_appearance_billboard": {
+            "size": [f"0.25 + math.sin({AGE} * 540) * 0.02", f"0.25 + math.sin({AGE} * 540) * 0.02"],
+            "facing_camera_mode": "rotate_xyz", "uv": uv("fear"),
+        },
+    }),
+    # Sương máu loang (trúng điểm ngọt, nội tại)
+    "blood_mist": particle("aatrox:blood_mist", "particles_blend", {
+        **burst(3),
+        "minecraft:emitter_shape_sphere": {"radius": 0.4, "direction": "outwards"},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.5, 0.8)"},
+        "minecraft:particle_initial_speed": 0.5,
+        "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -0.5, 0], "linear_drag_coefficient": 2},
+        "minecraft:particle_appearance_billboard": {
+            "size": [f"0.35 + {AGE} * 0.3", f"0.35 + {AGE} * 0.3"], "facing_camera_mode": "rotate_xyz", "uv": uv("mist"),
+        },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#CCFFFFFF", "1.0": "#00FFFFFF"}),
+    }),
+    # Vệt lửa cháy trên mặt đất khi lướt E trong lúc biến hình
+    "fire_trail": particle("aatrox:fire_trail", "particles_add", {
+        **burst(2),
+        "minecraft:emitter_shape_disc": {"radius": 0.4, "plane_normal": "y", "direction": [0, 1, 0]},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.8, 1.3)"},
+        "minecraft:particle_initial_speed": 0.2,
+        "minecraft:particle_appearance_billboard": {
+            "size": [f"0.25 * (1 - {AGE} * 0.5)", f"0.25 * (1 - {AGE} * 0.5)"], "facing_camera_mode": "lookat_y",
+            "uv": uv("flame"),
+        },
+        "minecraft:particle_appearance_tinting": FADE,
     }),
     # Hút máu: giọt máu phát sáng bay lên quanh người
     "lifesteal": particle("aatrox:lifesteal", "particles_add", {

@@ -71,5 +71,18 @@ export const CONFIG = {
     speedAmplifier: 1,
     strengthAmplifier: 0, // tăng sát thương đánh thường qua hiệu ứng Sức Mạnh
     passiveCooldownMultiplier: 0.5,
+    // Vùng Diệt Thế bám theo người khi biến hình: kẻ địch trong vùng mất máu mỗi giây và bị làm chậm
+    zoneRadius: 6,
+    zoneDamage: 1.5,
+    // Chiêu được cường hoá khi đang biến hình
+    empowered: {
+      qScale: 1.3, // Q: vùng chém to hơn, thêm cột lửa dọc đường chém
+      eStrength: 1.4, // E: lướt xa hơn
+      eCooldown: 0.5, // E: hồi chiêu còn một nửa
+      eTrailDamage: 3, // E: vệt lửa gây sát thương kẻ địch đi qua
+      wChains: 3, // W: phóng 3 sợi xích hình quạt
+      wSpread: 20, // W: góc lệch giữa các sợi (độ)
+      wCooldown: 0.6,
+    },
   },
 };

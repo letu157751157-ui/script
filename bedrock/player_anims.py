@@ -186,71 +186,124 @@ def key(tp=None, tp_blade=None, fp=None):
     return {"tp": tp or {}, "tp_blade": tp_blade, "fp": fp}
 
 
-Q1_STRIKE = {"rightarm": {"rot": [-55, -30, -10]}, "leftarm": {"rot": [10, 0, -10]}, "body": {"rot": [12, -22, 0]},
-             "rightleg": {"rot": [-15, 0, 0]}, "leftleg": {"rot": [15, 0, 0]}}
-Q2_STRIKE = {"rightarm": {"rot": [-80, -65, 0]}, "leftarm": {"rot": [10, 0, -15]}, "body": {"rot": [5, -30, 0]},
-             "rightleg": {"rot": [-10, 0, 0]}, "leftleg": {"rot": [10, 0, 0]}}
-Q3_SLAM = {"rightarm": {"rot": [-45, -10, 0]}, "leftarm": {"rot": [-45, 10, 0]}, "body": {"rot": [28, 0, 0]},
-           "root": {"pos": [0, -1.5, 0]}, "rightleg": {"rot": [-35, 0, 0]}, "leftleg": {"rot": [25, 0, 0]}}
-E_DASH = {"body": {"rot": [30, 0, 0]}, "rightarm": {"rot": [45, 0, 15]}, "leftarm": {"rot": [45, 0, -15]},
-          "rightleg": {"rot": [-40, 0, 0]}, "leftleg": {"rot": [35, 0, 0]}, "root": {"pos": [0, -1, 0]}}
-W_THROW = {"leftarm": {"rot": [-100, -10, 5]}, "body": {"rot": [0, 20, 0]}, "rightarm": {"rot": [15, 0, 5]}}
-R_ROAR = {"rightarm": {"rot": [-165, 0, 30]}, "leftarm": {"rot": [-165, 0, -30]}, "body": {"rot": [-15, 0, 0]},
-          "head": {"rot": [-30, 0, 0]}, "root": {"pos": [0, 0.5, 0]}}
+def pose(right=None, left=None, body=None, head=None, rleg=None, lleg=None, root=None):
+    out = {}
+    for bone, value in (("rightarm", right), ("leftarm", left), ("body", body), ("head", head),
+                        ("rightleg", rleg), ("leftleg", lleg)):
+        if value:
+            out[bone] = {"rot": list(value)}
+    if root:
+        out["root"] = {"pos": list(root)}
+    return out
 
+
+# Mỗi chiêu có đủ nhịp: lấy đà -> vung -> giữa nhát -> chạm -> quá đà -> giữ -> hồi về.
+# Nội suy Catmull-Rom giữa các keyframe nên chuyển động cong và mượt.
 ANIMATIONS = {
     # Q lần 1: giơ kiếm qua vai phải rồi chém chéo xuống bên trái
-    "q1": {"length": 0.8, "keys": {
+    "q1": {"length": 0.85, "keys": {
         0.0: key(),
-        0.28: key({"rightarm": {"rot": [ARM_UP, 10, 30]}, "leftarm": {"rot": [-30, 0, -15]}, "body": {"rot": [0, 18, 0]}},
+        0.1: key(pose(right=(12, 0, 8), body=(6, 8, 0), rleg=(8, 0, 0), lleg=(-6, 0, 0)),
+                 (0.3, 0.1, -0.95), ((-1, -2, -1), (0.2, 0.9, 0.3))),
+        0.28: key(pose(right=(ARM_UP, 10, 30), left=(-30, 0, -15), body=(-4, 20, 0), head=(-8, 0, 0),
+                       rleg=(10, 0, 0), lleg=(-8, 0, 0)),
                   (0.35, 0.6, 0.7), ((-2, 5, 2), (-0.2, 0.9, 0.3))),
-        0.45: key(Q1_STRIKE, (-0.5, -0.45, -0.75), ((8, 1, 6), (0.9, -0.2, 0.4))),
-        0.56: key(Q1_STRIKE, (-0.55, -0.5, -0.7), ((9, 0, 6), (0.9, -0.3, 0.4))),
-        0.8: key(),
-    }},
-    # Q lần 2: quét ngang từ phải sang trái
-    "q2": {"length": 0.8, "keys": {
-        0.0: key(),
-        0.28: key({"rightarm": {"rot": [-75, 55, 20]}, "leftarm": {"rot": [-20, 0, -20]}, "body": {"rot": [0, 30, 0]}},
-                  (0.8, 0.15, 0.5), ((-3, 2, 3), (-0.8, 0.3, 0.5))),
-        0.45: key(Q2_STRIKE, (-0.85, 0.05, -0.5), ((9, 0, 5), (0.95, 0.1, 0.3))),
-        0.56: key(Q2_STRIKE, (-0.9, 0.0, -0.4), ((10, -1, 5), (0.95, 0.0, 0.3))),
-        0.8: key(),
-    }},
-    # Q lần 3: nhảy lên, hai tay giơ kiếm qua đầu rồi nện xuống đất
-    "q3": {"length": 0.85, "keys": {
-        0.0: key(),
-        0.25: key({"rightarm": {"rot": [-170, 0, 10]}, "leftarm": {"rot": [-170, 0, -10]}, "body": {"rot": [-10, 0, 0]},
-                   "root": {"pos": [0, 2.5, 0]}, "rightleg": {"rot": [-25, 0, 0]}, "leftleg": {"rot": [-10, 0, 0]}},
-                  (0.0, 0.5, 0.85), ((3, 8, 5), (0.05, 0.95, 0.3))),
-        0.45: key(Q3_SLAM, (0.0, -0.6, -0.8), ((8, 7, 8), (0.5, -0.8, 0.35))),
-        0.6: key(Q3_SLAM, (0.0, -0.65, -0.75), ((8, 6, 8), (0.5, -0.82, 0.3))),
+        0.38: key(pose(right=(-110, -5, 10), left=(-10, 0, -12), body=(4, 0, 0), rleg=(-5, 0, 0), lleg=(5, 0, 0)),
+                  (0.0, 0.35, -0.95), ((3, 4, 5), (0.35, 0.65, 0.7))),
+        0.45: key(pose(right=(-55, -30, -10), left=(10, 0, -10), body=(12, -22, 0), head=(6, -8, 0),
+                       rleg=(-15, 0, 0), lleg=(15, 0, 0), root=(0, -0.5, 0)),
+                  (-0.5, -0.45, -0.75), ((8, 1, 6), (0.9, -0.2, 0.4))),
+        0.52: key(pose(right=(-40, -42, -18), left=(15, 0, -12), body=(16, -28, 0), head=(8, -10, 0),
+                       rleg=(-18, 0, 0), lleg=(18, 0, 0), root=(0, -0.8, 0)),
+                  (-0.6, -0.55, -0.6), ((10, -1, 6), (0.9, -0.35, 0.35))),
+        0.64: key(pose(right=(-45, -35, -12), left=(12, 0, -10), body=(13, -24, 0), head=(6, -8, 0),
+                       rleg=(-15, 0, 0), lleg=(15, 0, 0), root=(0, -0.6, 0)),
+                  (-0.55, -0.5, -0.7), ((9, 0, 6), (0.9, -0.3, 0.4))),
         0.85: key(),
     }},
-    # E: lao người về trước, kiếm kéo lê phía sau
-    "e": {"length": 0.5, "keys": {
+    # Q lần 2: quét ngang từ phải sang trái
+    "q2": {"length": 0.85, "keys": {
         0.0: key(),
-        0.08: key(E_DASH, (0.3, -0.3, 0.9), ((-1, -3, -2), (0.2, 0.35, 0.9))),
-        0.32: key(E_DASH, (0.3, -0.3, 0.9), ((-1, -3, -2), (0.2, 0.35, 0.9))),
-        0.5: key(),
+        0.1: key(pose(right=(-20, 20, 10), body=(0, 12, 0)), (0.4, 0.1, -0.9), ((-1, 0, 0), (-0.2, 0.9, 0.35))),
+        0.28: key(pose(right=(-75, 55, 20), left=(-20, 0, -20), body=(0, 32, 0), head=(0, -10, 0),
+                       rleg=(8, 0, 0), lleg=(-8, 0, 0)),
+                  (0.8, 0.15, 0.5), ((-3, 2, 3), (-0.8, 0.3, 0.5))),
+        0.38: key(pose(right=(-85, 5, 10), left=(-5, 0, -18), body=(2, 5, 0)),
+                  (0.1, 0.1, -1.0), ((3, 1, 5), (0.1, 0.3, 0.95))),
+        0.45: key(pose(right=(-80, -65, 0), left=(10, 0, -15), body=(5, -30, 0), head=(0, 8, 0),
+                       rleg=(-10, 0, 0), lleg=(10, 0, 0)),
+                  (-0.85, 0.05, -0.5), ((9, 0, 5), (0.95, 0.1, 0.3))),
+        0.52: key(pose(right=(-76, -78, -5), left=(14, 0, -15), body=(6, -38, 0), head=(0, 10, 0),
+                       rleg=(-12, 0, 0), lleg=(12, 0, 0)),
+                  (-0.95, 0.0, -0.25), ((11, -1, 5), (0.97, 0.0, 0.2))),
+        0.64: key(pose(right=(-78, -70, 0), left=(10, 0, -15), body=(5, -33, 0), rleg=(-10, 0, 0), lleg=(10, 0, 0)),
+                  (-0.9, 0.0, -0.4), ((10, -1, 5), (0.95, 0.0, 0.3))),
+        0.85: key(),
     }},
-    # W: tay trái phóng xích về phía trước
-    "w": {"length": 0.65, "keys": {
+    # Q lần 3: nhún, nhảy lên, hai tay giơ kiếm qua đầu rồi nện xuống đất
+    "q3": {"length": 0.95, "keys": {
         0.0: key(),
-        0.12: key({"leftarm": {"rot": [35, 0, -25]}, "body": {"rot": [0, -15, 0]}, "rightarm": {"rot": [10, 0, 0]}},
-                  None, ((-1, -3, -2), (0.45, 0.75, 0.5))),
-        0.25: key(W_THROW, None, ((-2, -5, -3), (0.4, 0.75, 0.55))),
-        0.45: key(W_THROW, None, ((-2, -5, -3), (0.4, 0.75, 0.55))),
-        0.65: key(),
+        0.1: key(pose(right=(10, 0, 5), left=(10, 0, -5), body=(12, 0, 0), rleg=(-20, 0, 0), lleg=(-20, 0, 0),
+                      root=(0, -1.2, 0)),
+                 (0.2, -0.2, -0.95), ((0, -3, 0), (0.2, 0.85, 0.45))),
+        0.25: key(pose(right=(-170, 0, 10), left=(-170, 0, -10), body=(-12, 0, 0), head=(-12, 0, 0),
+                       rleg=(-25, 0, 0), lleg=(-10, 0, 0), root=(0, 2.8, 0)),
+                  (0.0, 0.5, 0.85), ((3, 8, 5), (0.05, 0.95, 0.3))),
+        0.36: key(pose(right=(-120, -5, 5), left=(-120, 5, -5), body=(8, 0, 0), rleg=(-30, 0, 0), lleg=(10, 0, 0),
+                       root=(0, 1.5, 0)),
+                  (0.0, 0.3, -0.95), ((5, 8, 7), (0.3, 0.2, 0.93))),
+        0.45: key(pose(right=(-45, -10, 0), left=(-45, 10, 0), body=(28, 0, 0), head=(10, 0, 0),
+                       rleg=(-35, 0, 0), lleg=(25, 0, 0), root=(0, -1.5, 0)),
+                  (0.0, -0.6, -0.8), ((8, 7, 8), (0.5, -0.8, 0.35))),
+        0.52: key(pose(right=(-38, -12, 0), left=(-38, 12, 0), body=(33, 0, 0), head=(14, 0, 0),
+                       rleg=(-40, 0, 0), lleg=(30, 0, 0), root=(0, -2.2, 0)),
+                  (0.0, -0.7, -0.7), ((8, 6, 8), (0.5, -0.84, 0.3))),
+        0.68: key(pose(right=(-45, -10, 0), left=(-45, 10, 0), body=(26, 0, 0), head=(8, 0, 0),
+                       rleg=(-32, 0, 0), lleg=(24, 0, 0), root=(0, -1.6, 0)),
+                  (0.0, -0.65, -0.75), ((8, 6, 8), (0.5, -0.82, 0.3))),
+        0.95: key(),
     }},
-    # R: khom người rồi gầm lên, dang tay giơ kiếm lên trời
-    "r": {"length": 1.1, "keys": {
+    # E: thu người lấy đà, lao về trước, kiếm kéo lê phía sau
+    "e": {"length": 0.6, "keys": {
         0.0: key(),
-        0.12: key({"body": {"rot": [15, 0, 0]}, "root": {"pos": [0, -1, 0]}, "rightarm": {"rot": [-20, 0, 10]},
-                   "leftarm": {"rot": [-20, 0, -10]}}, None, ((0, -3, 0), (0.5, 0.7, 0.6))),
-        0.35: key(R_ROAR, (0.25, 0.95, 0.1), ((5, 8, 5), (0.1, 0.97, 0.2))),
-        0.8: key(R_ROAR, (0.25, 0.95, 0.1), ((5, 9, 5), (0.1, 0.97, 0.2))),
-        1.1: key(),
+        0.05: key(pose(body=(-8, 0, 0), right=(-10, 0, 5), rleg=(8, 0, 0), lleg=(-8, 0, 0), root=(0, -0.5, 0)),
+                  (0.2, 0.3, -0.9), ((0, -1, 0), (0.25, 0.9, 0.35))),
+        0.12: key(pose(body=(32, 0, 0), right=(48, 0, 15), left=(48, 0, -15), head=(-15, 0, 0),
+                       rleg=(-42, 0, 0), lleg=(38, 0, 0), root=(0, -1, 0)),
+                  (0.3, -0.3, 0.9), ((-1, -3, -2), (0.2, 0.35, 0.9))),
+        0.36: key(pose(body=(28, 0, 0), right=(40, 0, 12), left=(40, 0, -12), head=(-12, 0, 0),
+                       rleg=(-36, 0, 0), lleg=(32, 0, 0), root=(0, -1, 0)),
+                  (0.3, -0.35, 0.88), ((-1, -3, -2), (0.2, 0.35, 0.9))),
+        0.46: key(pose(body=(-5, 0, 0), right=(-5, 0, 5), rleg=(10, 0, 0), lleg=(-10, 0, 0), root=(0, -0.3, 0)),
+                  None, ((0, -1, 0), (0.2, 0.9, 0.35))),
+        0.6: key(),
+    }},
+    # W: kéo tay trái ra sau rồi phóng xích về phía trước
+    "w": {"length": 0.75, "keys": {
+        0.0: key(),
+        0.12: key(pose(left=(35, 0, -25), body=(0, -18, 0), right=(10, 0, 0), head=(0, 8, 0)),
+                  None, ((-1, -3, -2), (0.2, 0.9, 0.3))),
+        0.22: key(pose(left=(-80, -5, 0), body=(2, 10, 0), right=(12, 0, 3)), None, ((-2, -4, -3), (0.2, 0.9, 0.3))),
+        0.28: key(pose(left=(-105, -12, 6), body=(4, 24, 0), right=(15, 0, 5), head=(0, -6, 0), lleg=(-12, 0, 0),
+                       rleg=(10, 0, 0)),
+                  None, ((-2, -5, -3), (0.2, 0.9, 0.3))),
+        0.5: key(pose(left=(-100, -10, 5), body=(2, 20, 0), right=(15, 0, 5), lleg=(-10, 0, 0), rleg=(8, 0, 0)),
+                 None, ((-2, -5, -3), (0.2, 0.9, 0.3))),
+        0.75: key(),
+    }},
+    # R: khom người tụ lực rồi gầm lên, dang tay giơ kiếm lên trời
+    "r": {"length": 1.25, "keys": {
+        0.0: key(),
+        0.15: key(pose(body=(22, 0, 0), head=(15, 0, 0), right=(-15, 0, 12), left=(-15, 0, -12),
+                       rleg=(-20, 0, 0), lleg=(-20, 0, 0), root=(0, -1.5, 0)),
+                  None, ((0, -3, 0), (0.2, 0.9, 0.35))),
+        0.3: key(pose(right=(-120, 0, 25), left=(-120, 0, -25), body=(-5, 0, 0), root=(0, 0.3, 0)),
+                 (0.25, 0.8, -0.5), ((3, 5, 3), (0.1, 0.95, 0.3))),
+        0.4: key(pose(right=(-170, 0, 32), left=(-170, 0, -32), body=(-18, 0, 0), head=(-35, 0, 0), root=(0, 0.8, 0)),
+                 (0.25, 0.95, 0.1), ((5, 8, 5), (0.1, 0.97, 0.2))),
+        0.9: key(pose(right=(-162, 0, 28), left=(-162, 0, -28), body=(-14, 0, 0), head=(-28, 0, 0), root=(0, 0.5, 0)),
+                 (0.25, 0.95, 0.1), ((5, 9, 5), (0.1, 0.97, 0.2))),
+        1.25: key(),
     }},
 }
 BONES = ["root", "body", "head", "rightarm", "rightitem", "leftarm", "rightleg", "leftleg"]
@@ -308,7 +361,7 @@ def build_animations(root):
                     else:
                         fp = [0, 0, 0]  # góc nhìn thứ nhất chỉ thấy tay phải
                     used = used or any(abs(v) > 1e-6 for v in list(tp) + list(fp))
-                    track[f"{t:.2f}"] = [molang(f, p) for f, p in zip(fp, tp)]
+                    track[f"{t:.2f}"] = {"post": [molang(f, p) for f, p in zip(fp, tp)], "lerp_mode": "catmullrom"}
                 if used:
                     bones.setdefault(bone, {})[channel] = track
         animations[f"animation.aatrox.{name}"] = {"loop": False, "animation_length": anim["length"], "bones": bones}

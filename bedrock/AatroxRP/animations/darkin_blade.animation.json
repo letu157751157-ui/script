@@ -11,11 +11,11 @@
             -1.0
           ],
           "rotation": [
-            109.0,
-            39.0,
-            -48.0
+            95.5,
+            54.3,
+            -50.0
           ],
-          "scale": 0.28
+          "scale": 0.3
         }
       }
     },
@@ -29,9 +29,9 @@
             -1.0
           ],
           "rotation": [
-            89.9,
-            -52.1,
-            -92.1
+            90.0,
+            -6.0,
+            90.0
           ],
           "scale": 0.5
         }
@@ -69,6 +69,79 @@
               1.0
             ]
           }
+        }
+      }
+    },
+    "animation.aatrox.darkin_blade.ult_hold_first_person": {
+      "loop": true,
+      "bones": {
+        "darkin_blade": {
+          "position": [
+            0.0,
+            -1.5,
+            -1.0
+          ],
+          "rotation": [
+            95.5,
+            54.3,
+            -50.0
+          ],
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.aatrox.darkin_blade.ult_hold_third_person": {
+      "loop": true,
+      "bones": {
+        "darkin_blade": {
+          "position": [
+            0.0,
+            -1.5,
+            -1.0
+          ],
+          "rotation": [
+            90.0,
+            -6.0,
+            90.0
+          ],
+          "scale": 0.62
+        }
+      }
+    },
+    "animation.aatrox.darkin_blade.ult_wings": {
+      "loop": true,
+      "bones": {
+        "wing_r": {
+          "rotation": [
+            0,
+            "25 + math.sin(q.anim_time * 420) * 22",
+            "math.sin(q.anim_time * 420) * 8"
+          ]
+        },
+        "wing_l": {
+          "rotation": [
+            0,
+            "-25 - math.sin(q.anim_time * 420) * 22",
+            "-math.sin(q.anim_time * 420) * 8"
+          ]
+        },
+        "ult_body": {
+          "position": [
+            0,
+            "math.sin(q.anim_time * 420 - 60) * 0.4",
+            0
+          ]
+        }
+      }
+    },
+    "animation.aatrox.darkin_blade.ult_hide_first_person": {
+      "loop": true,
+      "bones": {
+        "ult_body": {
+          "scale": 0
+        },
+        "ult_head": {
+          "scale": 0
         }
       }
     }
