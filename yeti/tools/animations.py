@@ -485,6 +485,43 @@ def howl():
                          (1.6, "fx_roar", "mouth")] + both_hands(0.7) + both_hands(1.4))
 
 
+def slide():
+    """Barioth-style ice slide: crouches low, spins on the belly across the ice, gets up with a claw sweep."""
+    low = pose(stance(6), sym(arm=(35, 0, 60), elbow=(-20, 0, 0)), torso=(55, 0, 0), head=(-35, 0, 0), jaw=(25, 0, 0))
+    keys = [(0, N), (0.25, low)]
+    for i, t in enumerate((0.45, 0.65, 0.85, 1.05)):
+        keys.append((t, pose(low, torso=(55, 180 * (i + 1), 0))))
+    keys += [(1.25, pose(stance(3), side("arm", (-60, 0, -40)), torso=(20, 720 + 30, 0), jaw=(35, 0, 0))), (1.6, pose(torso=(0, 720, 0)))]
+    return bake(1.6, keys, linear={"torso"}, effects=[(0.25, "fx_step", "foot_r"), (0.25, "fx_step", "foot_l"),
+                                                    (1.25, "fx_claw_trail", "hand_r")])
+
+
+def dance():
+    """Malenia-style flurry: leaps up spinning, then three fast diving claw slashes."""
+    up = pose(sym(arm=(-160, 0, 40), elbow=(30, 0, 0)), bodyPos=(0, 4, 0), torso=(-20, 0, 0), legR=(-50, 0, 0), kneeR=(70, 0, 0),
+              legL=(-40, 0, 0), kneeL=(60, 0, 0), jaw=(30, 0, 0))
+    keys = [(0, N), (0.3, pose(stance(5), torso=(30, 0, 0))), (0.6, up)]
+    for i, t in enumerate((0.8, 1.05, 1.3)):
+        s = 1 if i % 2 == 0 else -1
+        keys.append((t, pose(stance(3, -3), side("arm", (-60, 0, -40), s > 0), side("elbow", (-10, 0, 0), s > 0),
+                             torso=(30, 30 * s, 0), jaw=(40, 0, 0))))
+        keys.append((t + 0.12, pose(stance(2), side("arm", (-120, 0, 50), s < 0), torso=(10, -25 * s, 0))))
+    keys += [(1.9, N)]
+    return bake(1.9, keys, effects=[(0.7, "fx_claw_trail", "hand_r"), (0.7, "fx_claw_trail", "hand_l"),
+                                    (1.0, "fx_claw_trail", "hand_r"), (1.25, "fx_claw_trail", "hand_l")])
+
+
+def beam_sweep():
+    """Moon Lord-style mouth beam: charges with the head back, then sweeps the beam right to left."""
+    charge = pose(stance(2), sym(arm=(10, 0, 40), elbow=(-40, 0, 0)), torso=(-25, 0, 0), head=(-35, 0, 0), jaw=(10, 0, 0), chestScale=1.1)
+    keys = [(0, N), (0.8, charge)]
+    for t, yaw in ((1.0, 35), (2.2, -35)):
+        keys.append((t, pose(stance(3), sym(arm=(20, 0, 30), elbow=(-30, 0, 0)), torso=(15, yaw, 0), head=(-10, yaw * 0.3, 0), jaw=(48, 0, 0))))
+    keys += [(2.6, N)]
+    return bake(2.6, keys, shakes=[(1.0, 2.2, ("head", "jaw"), 3, 14)],
+                effects=[(0.1, "fx_breath_core", "mouth"), (0.5, "fx_breath_core", "mouth"), (1.0, "fx_roar", "mouth")])
+
+
 def death_breathe():
     """yeti_death lies on its back: slow heavy breathing, the head and arms twitch now and then."""
     return bake(3.0, [(0, N), (1.2, pose(torso=(-4, 0, 0), chestScale=1.04, head=(0, 0, 4))),
@@ -506,6 +543,9 @@ def death_pulse():
 
 SKILLS = {
     "idle": idle,
+    "slide": slide,
+    "dance": dance,
+    "beam_sweep": beam_sweep,
     "walk": walk,
     "attack": attack,
     "ground_punch": ground_punch,

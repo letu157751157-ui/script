@@ -1,19 +1,18 @@
 // File: scripts/custom/yeti_skills.js
-// Bộ skill mới của Yeti (v1.5), lấy ý tưởng từ boss của game / addon / modpack khác rồi biến tấu
-// theo phong cách băng tuyết:
-//   Nanh Băng        <- Evoker (hàm răng mọc từ đất)
-//   Cầu Gió Tuyết    <- Breeze (wind charge hất văng)
-//   Gầm Xuyên Băng   <- Warden (sonic boom xuyên mọi thứ)
-//   Tung Hất         <- Iron Golem (hất tung lên trời)
-//   Lao Xuống        <- Ender Dragon (bổ nhào)
-//   Loạt Băng Nhọn   <- Blaze (bắn 3 quả liên tiếp)
-//   Đầu Lâu Băng     <- Wither (đầu lâu đuổi theo mục tiêu)
-//   Vũng Hơi Băng    <- Ender Dragon (dragon breath đọng lại)
-//   Linh Hồn Băng    <- Vex (linh hồn bay vòng rồi lao vào)
-//   Tia Băng Khóa    <- Elder Guardian (tia laser khóa mục tiêu)
-//   Bão Trắng        <- Warden darkness (xung mù)
-//   Tuyết Lở         <- tự chế: tảng tuyết lăn theo làn, chừa 1 làn an toàn
-// Mọi skill đánh người chơi và mob mà boss đang nhắm (yeti_fx.enemiesNear).
+// Bộ skill Yeti v1.6 - lấy ý tưởng từ boss của mod / modpack / game khác (không dùng boss Minecraft gốc)
+// rồi biến tấu theo phong cách băng tuyết, cộng vài skill tự chế:
+//   Nắm Đấm Pha Lê   <- Frostmaw (Mowzie's Mobs): tinh thể băng mọc trên nắm đấm rồi đập xuống
+//   Mưa Băng Trần    <- Alpha Yeti (Twilight Forest): gầm làm băng nhọn rơi đúng chỗ đối thủ
+//   Gai Quạt         <- Deerclops (Terraria): 3 làn gai băng tỏa hình quạt
+//   Đập Đất Dội Sóng <- False Knight (Hollow Knight): sóng chạy dọc mặt đất + đá băng rơi từ trời
+//   Trượt Băng Xoay  <- Barioth (Monster Hunter): trượt xoay bằng bụng, để lại vệt băng
+//   Vòng Khiên Băng  <- Snow Queen (Twilight Forest): cầu băng quay quanh người rồi bắn tỏa ra
+//   Sương Giá Tử Thần <- Borealis (Elden Ring): sương giá lan rộng, đứng lâu bị đóng băng
+//   Vũ Điệu Bão Tuyết <- Malenia (Elden Ring): nhảy lên rồi chém liên hoàn nhiều hướng
+//   Tia Băng Quét    <- Moon Lord (Terraria): tia băng từ miệng quét hình quạt
+//   Mìn Pha Lê       (tự chế): cắm pha lê quanh sân, lần lượt phát nổ
+//   Tuyết Lở         (tự chế): tảng tuyết lăn theo làn, chừa 1 làn an toàn
+// Mọi skill đánh người chơi và mob mà boss đang nhắm.
 
 import { system } from '@minecraft/server';
 import {
@@ -68,352 +67,313 @@ function projectile(yeti, from, target, o) {
 }
 
 // ============================================================================
-// Nanh Băng (Evoker fangs) - hàng nanh băng mọc từ đất về phía mục tiêu; nếu mục tiêu sát bên thì
-// mọc 2 vòng nanh quanh người Yeti
-// o: { damage, count }
+// Nắm Đấm Pha Lê (Frostmaw) - tinh thể băng mọc bọc nắm đấm, rồi đập xuống nổ vòng gai
+// o: { damage, radius }
 // ============================================================================
-export function frostFangs(yeti, target, o) {
+export function crystalFist(yeti, target, o) {
     faceTarget(yeti, target);
-    lockCast(yeti, 30);
+    lockCast(yeti, 32);
     playAnim(yeti, ANIM.groundPunch);
     const dim = yeti.dimension;
-    const origin = { ...yeti.location };
-    const close = dist2D(origin, target.location) < 5;
-    const points = [];
-    if (close) {
-        for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; points.push({ loc: { x: origin.x + Math.cos(a) * 2.6, y: origin.y + 1, z: origin.z + Math.sin(a) * 2.6 }, delay: 0 }); }
-        for (let i = 0; i < 12; i++) { const a = (i + 0.5) / 12 * Math.PI * 2; points.push({ loc: { x: origin.x + Math.cos(a) * 4.4, y: origin.y + 1, z: origin.z + Math.sin(a) * 4.4 }, delay: 5 }); }
-    } else {
-        const dir = flatDir(origin, target.location);
-        for (let i = 0; i < o.count; i++) points.push({ loc: add({ ...origin, y: origin.y + 1 }, dir, 2.5 + i * 1.3), delay: i * 2 });
-    }
-    for (const p of points) { p.loc = groundAt(dim, p.loc); telegraph(dim, p.loc, 0.9, (T.punchImpact + p.delay) / 20, false); }
-    sound(dim, 'mob.evocation_illager.prepare_attack', origin, 1.5, 0.6);
-    const hit = new Set();
+    const at = groundAt(dim, add(yeti.location, flatDir(yeti.location, target.location), 3));
+    telegraph(dim, at, o.radius, T.punchImpact / 20, true);
+    for (let t = 0; t < T.punchImpact; t += 3) later(t, () => { if (alive(yeti)) fx(dim, FX.orb, add({ ...yeti.location, y: yeti.location.y + 5 }, rightOf(flatDir(yeti.location, target.location)), -1.8)); });
     later(T.punchImpact, () => {
         if (!alive(yeti)) return;
-        impact(dim, add(origin, flatDir(origin, target.location), 2), 1.4);
-        for (const p of points) later(p.delay, () => {
-            iceSpike(dim, p.loc, 1.1, 0.9);
-            sound(dim, 'mob.evocation_fangs.attack', p.loc, 0.8, 0.7);
-            for (const e of enemiesNear(dim, p.loc, 1.2, yeti)) {
-                if (hit.has(e.id)) continue;
-                hit.add(e.id);
-                hurt(e, o.damage, yeti);
-                effect(e, 'slowness', 50, 2);
-            }
-        });
+        impact(dim, at, 2.6);
+        fx(dim, FX.crystal, at, { duration: 1.5 });
+        spikeRing(dim, at, o.radius * 0.6, 6, 1.2, 1.4);
+        spikeRing(dim, at, o.radius, 10, 0.9, 1.2, 0.3);
+        sound(dim, 'random.explode', at, 2, 0.8);
+        sound(dim, 'random.glass', at, 2, 0.5);
+        shake(dim, at, 16, 0.6, 0.5);
+        for (const e of enemiesNear(dim, at, o.radius, yeti)) { hurt(e, o.damage, yeti); knockbackFrom(at, e, 1.6, 0.6); effect(e, 'slowness', 60, 2); }
     });
 }
 
 // ============================================================================
-// Cầu Gió Tuyết (Breeze wind charge) - ném quả cầu gió tuyết, nổ hất văng mọi thứ xung quanh
-// o: { damage, radius, power }
+// Mưa Băng Trần (Alpha Yeti) - gầm vang, băng nhọn rơi đúng chỗ từng đối thủ 3 đợt
+// o: { damage, waves }
 // ============================================================================
-export function galeBall(yeti, target, o) {
-    faceTarget(yeti, target);
-    lockCast(yeti, 28);
-    playAnim(yeti, ANIM.throw);
-    const dim = yeti.dimension;
-    sound(dim, 'mob.breeze.charge', yeti.location, 1.5, 0.7);
-    later(T.throwRelease, () => {
-        if (!alive(yeti)) return;
-        const from = add(yeti.location, { ...flatDir(yeti.location, target.location), y: 0 }, 1.5);
-        from.y += 4.5;
-        sound(dim, 'mob.breeze.shoot', from, 1.5, 0.6);
-        projectile(yeti, from, target, {
-            speed: 1.3, head: FX.boulder, trail: FX.snow, maxTicks: 30, onHit: pos => {
-                impact(dim, pos, 2);
-                fx(dim, FX.tornado, groundAt(dim, pos), { radius: 1.5 });
-                sound(dim, 'mob.breeze.wind_burst', pos, 2, 0.7);
-                for (const e of enemiesNear(dim, pos, o.radius, yeti)) {
-                    hurt(e, o.damage, yeti);
-                    knockbackFrom(pos, e, o.power, 0.9);
-                }
-            }
-        });
-    });
-}
-
-// ============================================================================
-// Gầm Xuyên Băng (Warden sonic boom) - tụ băng ở miệng 1 giây rồi gầm một luồng sóng thẳng,
-// xuyên qua mọi thứ trên đường
-// o: { damage, range }
-// ============================================================================
-export function sonicHowl(yeti, target, o) {
-    faceTarget(yeti, target);
+export function ceilingIcicles(yeti, o) {
     lockCast(yeti, 40);
     playAnim(yeti, ANIM.roar);
     const dim = yeti.dimension;
-    const origin = { ...yeti.location };
-    const dir = flatDir(origin, target.location);
-    sound(dim, 'mob.warden.sonic_charge', origin, 2, 0.7);
-    for (let d = 2; d <= o.range; d += 2) telegraph(dim, add(origin, dir, d), 1.3, (T.roarPeak + 4) / 20, true);
-    later(T.roarPeak + 4, () => {
-        if (!alive(yeti)) return;
-        sound(dim, 'mob.warden.sonic_boom', origin, 3, 0.8);
-        shake(dim, origin, o.range, 0.6, 0.5);
-        const hit = new Set();
-        for (let d = 2; d <= o.range; d += 1.5) {
-            later(d / 3, () => {
-                const p = add({ ...origin, y: origin.y + 3 }, dir, d);
-                fx(dim, FX.flash, p, { radius: 1.2 });
-                fx(dim, FX.shockwave, groundAt(dim, p), { radius: 1.6 });
-                for (const e of enemiesNear(dim, p, 2, yeti)) {
-                    if (hit.has(e.id)) continue;
-                    hit.add(e.id);
-                    hurt(e, o.damage, yeti);
-                    try { e.applyKnockback({ x: dir.x * 2.2, z: dir.z * 2.2 }, 0.5); } catch (_) {}
-                }
-            });
-        }
-    });
-}
-
-// ============================================================================
-// Tung Hất (Iron Golem) - vả mạnh ở tầm gần, mục tiêu bị hất thẳng lên trời
-// o: { damage, launch }
-// ============================================================================
-export function golemToss(yeti, target, o) {
-    faceTarget(yeti, target);
-    lockCast(yeti, 20, false);
-    playAnim(yeti, ANIM.swipe);
-    const dim = yeti.dimension;
-    later(T.swipeHit1, () => {
-        if (!alive(yeti)) return;
-        const at = add(yeti.location, flatDir(yeti.location, target.location), 2.4);
-        fx(dim, FX.claw, { ...at, y: at.y + 2 }, { radius: 2.2 });
-        sound(dim, 'mob.irongolem.throw', at, 1.5, 0.7);
-        for (const e of enemiesNear(dim, at, 3, yeti)) {
-            hurt(e, o.damage, yeti);
-            try { e.applyKnockback({ x: 0, z: 0 }, o.launch); } catch (_) {}
-            fx(dim, FX.snow, e.location, { radius: 1 });
-        }
-    });
-}
-
-// ============================================================================
-// Lao Xuống (Ender Dragon dive) - nhảy vọt lên cao rồi bổ nhào xuống vị trí mục tiêu
-// o: { damage, radius, height }
-// ============================================================================
-export function glacierDive(yeti, target, o) {
-    faceTarget(yeti, target);
-    lockCast(yeti, T.leapLanding + 14);
-    playAnim(yeti, ANIM.leap);
-    const dim = yeti.dimension;
-    const start = { ...yeti.location };
-    const land = groundAt(dim, target.location);
-    telegraph(dim, land, o.radius, T.leapLanding / 20, true);
-    const air = T.leapLanding - T.leapTakeoff;
-    for (let k = 1; k <= air; k++) {
-        later(T.leapTakeoff + k, () => {
+    sound(dim, 'mob.ravager.roar', yeti.location, 3, 0.6);
+    for (let w = 0; w < o.waves; w++) {
+        later(T.roarPeak + w * 12, () => {
             if (!alive(yeti)) return;
-            const s = k / air;
-            const pos = { x: start.x + (land.x - start.x) * s, y: start.y + (land.y - start.y) * s + Math.sin(Math.PI * s) * o.height, z: start.z + (land.z - start.z) * s };
-            safeTeleport(yeti, pos, { facingLocation: { x: land.x, y: pos.y, z: land.z }, keepVelocity: false });
-            fx(dim, FX.trail, pos);
-        });
-    }
-    later(T.leapLanding, () => {
-        if (!alive(yeti)) return;
-        impact(dim, land, 3);
-        spikeRing(dim, land, o.radius * 0.8, 8, 1.1, 1.3);
-        sound(dim, 'random.explode', land, 2.5, 0.8);
-        shake(dim, land, 20, 0.7, 0.6);
-        for (const e of enemiesNear(dim, land, o.radius, yeti)) {
-            hurt(e, o.damage, yeti);
-            knockbackFrom(land, e, 2, 0.6);
-        }
-    });
-}
-
-// ============================================================================
-// Loạt Băng Nhọn (Blaze) - bắn liên tiếp 3 mũi băng thẳng vào mục tiêu
-// o: { damage, shots }
-// ============================================================================
-export function icicleVolley(yeti, target, o) {
-    faceTarget(yeti, target);
-    lockCast(yeti, 12 + o.shots * 8);
-    const dim = yeti.dimension;
-    for (let i = 0; i < o.shots; i++) {
-        later(i * 8, () => {
-            if (!alive(yeti)) return;
-            faceTarget(yeti, target);
-            playAnim(yeti, ANIM.throw, 0.1);
-            later(T.throwRelease - 4, () => {
-                if (!alive(yeti)) return;
-                const from = { ...yeti.location, y: yeti.location.y + 4.5 };
-                sound(dim, 'mob.blaze.shoot', from, 1.2, 1.4);
-                projectile(yeti, from, target, {
-                    speed: 1.8, head: FX.shards, trail: FX.trail, maxTicks: 25, onHit: (pos, e) => {
-                        impact(dim, pos, 1);
-                        if (e) { hurt(e, o.damage, yeti); effect(e, 'slowness', 40, 1); }
-                    }
+            shake(dim, yeti.location, 24, 0.4, 0.4);
+            for (const e of enemiesNear(dim, yeti.location, 24, yeti)) {
+                const g = groundAt(dim, { x: e.location.x + (Math.random() - 0.5) * 1.5, y: e.location.y, z: e.location.z + (Math.random() - 0.5) * 1.5 });
+                telegraph(dim, g, 1.6, 0.9, true);
+                fx(dim, FX.icicle, { ...g, y: g.y + 12 });
+                later(18, () => {
+                    impact(dim, g, 1.2);
+                    iceSpike(dim, g, 0.8, 1);
+                    sound(dim, 'random.glass', g, 1.2, 0.9);
+                    for (const v of enemiesNear(dim, g, 1.8, yeti)) { hurt(v, o.damage, yeti); effect(v, 'slowness', 40, 2); }
                 });
-            });
-        });
-    }
-}
-
-// ============================================================================
-// Đầu Lâu Băng (Wither skull) - 3 đầu lâu băng phát sáng đuổi theo mục tiêu
-// o: { damage, count }
-// ============================================================================
-export function frostSkulls(yeti, target, o) {
-    faceTarget(yeti, target);
-    lockCast(yeti, 36);
-    playAnim(yeti, ANIM.cast);
-    const dim = yeti.dimension;
-    sound(dim, 'mob.wither.ambient', yeti.location, 1.5, 1.3);
-    for (let i = 0; i < o.count; i++) {
-        later(T.castRelease + i * 6, () => {
-            if (!alive(yeti)) return;
-            const side = rightOf(flatDir(yeti.location, target.location));
-            const from = add({ ...yeti.location, y: yeti.location.y + 4 + i * 0.5 }, side, (i - 1) * 1.5);
-            sound(dim, 'mob.wither.shoot', from, 1.2, 1.2);
-            projectile(yeti, from, target, {
-                speed: 0.8, homing: 0.12, head: FX.comet, trail: FX.snow, maxTicks: 70, onHit: pos => {
-                    impact(dim, pos, 1.6);
-                    sound(dim, 'random.explode', pos, 1, 1.3);
-                    for (const e of enemiesNear(dim, pos, 2.5, yeti)) {
-                        hurt(e, o.damage, yeti);
-                        effect(e, 'weakness', 80, 1);
-                        effect(e, 'slowness', 60, 2);
-                    }
-                }
-            });
-        });
-    }
-}
-
-// ============================================================================
-// Vũng Hơi Băng (Dragon breath) - phun 1 quả cầu hơi băng, nổ thành vũng sương đọng lại gây sát
-// thương liên tục
-// o: { damage, radius, seconds }
-// ============================================================================
-export function frostPool(yeti, target, o) {
-    faceTarget(yeti, target);
-    lockCast(yeti, 30);
-    playAnim(yeti, ANIM.breath);
-    const dim = yeti.dimension;
-    const aim = groundAt(dim, target.location);
-    telegraph(dim, aim, o.radius, 1.2, true);
-    later(T.breathStart, () => {
-        if (!alive(yeti)) return;
-        sound(dim, 'mob.enderdragon.growl', yeti.location, 2, 1.2);
-        const from = { ...yeti.location, y: yeti.location.y + 4.2 };
-        projectile(yeti, from, { location: aim, isValid: true }, {
-            speed: 1.1, head: FX.flash, trail: FX.snow, maxTicks: 30, hitRadius: 0.8, onHit: () => {
-                impact(dim, aim, 2);
-                fx(dim, FX.rune, aim, { radius: o.radius, duration: o.seconds });
-                let n = 0;
-                const run = system.runInterval(() => {
-                    n++;
-                    fx(dim, FX.mist, aim, { radius: o.radius * 0.4 });
-                    fx(dim, FX.snowfall, aim, { radius: o.radius });
-                    for (const e of enemiesNear(dim, aim, o.radius, yeti)) { hurt(e, o.damage, yeti); effect(e, 'slowness', 30, 2); }
-                    if (n * 10 >= o.seconds * 20) system.clearRun(run);
-                }, 10);
             }
         });
-    });
-}
-
-// ============================================================================
-// Linh Hồn Băng (Vex) - gọi các linh hồn băng bay vòng quanh Yeti rồi lần lượt lao vào đối thủ
-// o: { damage, count }
-// ============================================================================
-export function frostWisps(yeti, o) {
-    lockCast(yeti, 40);
-    playAnim(yeti, ANIM.summon);
-    const dim = yeti.dimension;
-    sound(dim, 'mob.evocation_illager.prepare_summon', yeti.location, 1.5, 1.2);
-    let t = 0;
-    const run = system.runInterval(() => {
-        t += 2;
-        if (!alive(yeti)) { system.clearRun(run); return; }
-        for (let i = 0; i < o.count; i++) {
-            const a = t * 0.15 + i / o.count * Math.PI * 2;
-            const p = { x: yeti.location.x + Math.cos(a) * 3, y: yeti.location.y + 4 + Math.sin(t * 0.2 + i) * 0.5, z: yeti.location.z + Math.sin(a) * 3 };
-            fx(dim, FX.spark, p);
-        }
-        if (t >= 30) system.clearRun(run);
-    }, 2);
-    for (let i = 0; i < o.count; i++) {
-        later(32 + i * 5, () => {
-            if (!alive(yeti)) return;
-            const foes = enemiesNear(dim, yeti.location, 24, yeti);
-            if (!foes.length) return;
-            const tgt = foes[i % foes.length];
-            const a = 32 * 0.15 + i / o.count * Math.PI * 2;
-            const from = { x: yeti.location.x + Math.cos(a) * 3, y: yeti.location.y + 4, z: yeti.location.z + Math.sin(a) * 3 };
-            sound(dim, 'mob.vex.charge', from, 1, 1.3);
-            projectile(yeti, from, tgt, {
-                speed: 1.2, homing: 0.25, head: FX.spark, trail: FX.trail, maxTicks: 50, onHit: (pos, e) => {
-                    impact(dim, pos, 0.8, { crack: false });
-                    if (e) hurt(e, o.damage, yeti);
-                }
-            });
-        });
     }
 }
 
 // ============================================================================
-// Tia Băng Khóa (Elder Guardian) - tia băng mảnh khóa vào mục tiêu 2 giây, dày dần rồi bùng nổ
-// o: { damage, range }
+// Gai Quạt (Deerclops) - 3 làn gai băng chạy tỏa hình quạt về phía mục tiêu
+// o: { damage, length }
 // ============================================================================
-export function guardianBeam(yeti, target, o) {
+export function fanSpikes(yeti, target, o) {
     faceTarget(yeti, target);
-    lockCast(yeti, 56);
-    playAnim(yeti, ANIM.cast);
+    lockCast(yeti, 32);
+    playAnim(yeti, ANIM.slam);
     const dim = yeti.dimension;
-    sound(dim, 'mob.guardian.attack_loop', yeti.location, 2, 0.6);
-    let t = 0;
-    const run = system.runInterval(() => {
-        t += 2;
-        if (!alive(yeti) || !alive(target) || dist2D(yeti.location, target.location) > o.range) { system.clearRun(run); return; }
-        safeTeleport(yeti, yeti.location, { facingLocation: target.location });
-        const a = { x: yeti.location.x, y: yeti.location.y + 4.2, z: yeti.location.z };
-        const b = chest(target);
-        const len = Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z);
-        const step = t < 30 ? 1.2 : 0.5;
-        for (let s = 0; s <= len; s += step) {
-            const k = s / len;
-            fx(dim, t < 30 ? FX.trail : FX.spark, { x: a.x + (b.x - a.x) * k, y: a.y + (b.y - a.y) * k, z: a.z + (b.z - a.z) * k });
+    const origin = { ...yeti.location, y: yeti.location.y + 1 };
+    const base = flatDir(origin, target.location);
+    const hit = new Set();
+    for (const ang of [-25, 0, 25]) {
+        const a = ang * Math.PI / 180, r = rightOf(base);
+        const dir = { x: base.x * Math.cos(a) + r.x * Math.sin(a), z: base.z * Math.cos(a) + r.z * Math.sin(a) };
+        for (let d = 2; d <= o.length; d += 1.6) {
+            const p = groundAt(dim, add(origin, dir, d));
+            telegraph(dim, p, 0.9, (T.slamImpact + d) / 20, false);
+            later(T.slamImpact + d, () => {
+                iceSpike(dim, p, 0.9 + d / o.length * 0.6, 1.1);
+                for (const e of enemiesNear(dim, p, 1.3, yeti)) { if (hit.has(e.id)) continue; hit.add(e.id); hurt(e, o.damage, yeti); try { e.applyKnockback({ x: 0, z: 0 }, 0.6); } catch (_) {} }
+            });
         }
-        if (t >= 44) {
-            system.clearRun(run);
-            impact(dim, target.location, 2);
-            sound(dim, 'mob.elderguardian.curse', target.location, 1.5, 1.2);
-            hurt(target, o.damage, yeti);
-            effect(target, 'mining_fatigue', 200, 2);
-            effect(target, 'slowness', 60, 3);
-        }
-    }, 2);
+    }
+    later(T.slamImpact, () => { if (alive(yeti)) { impact(dim, yeti.location, 2.2); sound(dim, 'random.explode', yeti.location, 1.5, 1); } });
 }
 
 // ============================================================================
-// Bão Trắng (Warden darkness) - hú lên, 3 xung bão tuyết làm mù và làm chậm
+// Đập Đất Dội Sóng (False Knight) - đập đất, 2 sóng băng chạy dọc 2 bên, đá băng rơi từ trời
+// o: { damage, length, rocks }
+// ============================================================================
+export function quakeWaves(yeti, target, o) {
+    faceTarget(yeti, target);
+    lockCast(yeti, 32);
+    playAnim(yeti, ANIM.slam);
+    const dim = yeti.dimension;
+    const origin = { ...yeti.location, y: yeti.location.y + 1 };
+    const dir = flatDir(origin, target.location);
+    later(T.slamImpact, () => {
+        if (!alive(yeti)) return;
+        impact(dim, origin, 3);
+        shake(dim, origin, 24, 0.8, 0.8);
+        sound(dim, 'random.explode', origin, 2.5, 0.6);
+        for (const sgn of [1, -1]) {
+            const hit = new Set();
+            for (let d = 2; d <= o.length; d += 1.5) {
+                later(d * 0.8, () => {
+                    const p = groundAt(dim, add(origin, dir, d * sgn));
+                    fx(dim, FX.shockwave, p, { radius: 1.8 });
+                    fx(dim, FX.snow, p, { radius: 1 });
+                    fx(dim, FX.crack, p, { radius: 1.4 });
+                    for (const e of enemiesNear(dim, p, 1.8, yeti)) { if (hit.has(e.id)) continue; hit.add(e.id); hurt(e, o.damage, yeti); knockbackFrom(p, e, 1, 0.7); }
+                });
+            }
+        }
+        for (let i = 0; i < o.rocks; i++) {
+            const a = Math.random() * Math.PI * 2, r = 3 + Math.random() * 12;
+            const g = groundAt(dim, { x: origin.x + Math.cos(a) * r, y: origin.y, z: origin.z + Math.sin(a) * r });
+            later(i * 3, () => {
+                telegraph(dim, g, 1.5, 0.9, true);
+                fx(dim, FX.icicle, { ...g, y: g.y + 12 });
+                later(18, () => { impact(dim, g, 1.3); for (const e of enemiesNear(dim, g, 1.7, yeti)) hurt(e, o.damage, yeti); });
+            });
+        }
+    });
+}
+
+// ============================================================================
+// Trượt Băng Xoay (Barioth) - trượt xoay bằng bụng xuyên qua mục tiêu, để lại vệt băng làm chậm
+// o: { damage, distance }
+// ============================================================================
+export function spinSlide(yeti, target, o) {
+    faceTarget(yeti, target);
+    lockCast(yeti, 34, false);
+    playAnim(yeti, ANIM.slide);
+    const dim = yeti.dimension;
+    const start = { ...yeti.location };
+    const dir = flatDir(start, target.location);
+    for (let d = 2; d <= o.distance; d += 2) telegraph(dim, add(start, dir, d), 1.4, 0.3 + d / o.distance * 0.8, true);
+    const hit = new Set();
+    later(5, () => {
+        let t = 0;
+        const run = system.runInterval(() => {
+            t++;
+            if (!alive(yeti)) { system.clearRun(run); return; }
+            const p = add(start, dir, o.distance * t / 16);
+            safeTeleport(yeti, p, { keepVelocity: false });
+            fx(dim, FX.footprint, groundAt(dim, p));
+            fx(dim, FX.snow, p, { radius: 1 });
+            fx(dim, FX.claw, { ...p, y: p.y + 1.5 }, { radius: 1.8 });
+            for (const e of enemiesNear(dim, p, 2.4, yeti)) { if (hit.has(e.id)) continue; hit.add(e.id); hurt(e, o.damage, yeti); knockbackFrom(p, e, 1.8, 0.4); effect(e, 'slowness', 60, 3); }
+            if (t >= 16) { system.clearRun(run); impact(dim, p, 1.8); }
+        }, 1);
+    });
+}
+
+// ============================================================================
+// Vòng Khiên Băng (Snow Queen) - cầu băng quay quanh người, rồi bắn tỏa ra mọi hướng
+// o: { damage, count }
+// ============================================================================
+export function orbShield(yeti, o) {
+    lockCast(yeti, 44);
+    playAnim(yeti, ANIM.cast);
+    const dim = yeti.dimension;
+    sound(dim, 'beacon.activate', yeti.location, 1.5, 1.6);
+    let t = 0;
+    const angle = i => t * 0.18 + i / o.count * Math.PI * 2;
+    const pos = i => ({ x: yeti.location.x + Math.cos(angle(i)) * 3, y: yeti.location.y + 3, z: yeti.location.z + Math.sin(angle(i)) * 3 });
+    const run = system.runInterval(() => {
+        t++;
+        if (!alive(yeti)) { system.clearRun(run); return; }
+        for (let i = 0; i < o.count; i++) {
+            const p = pos(i);
+            fx(dim, FX.orb, p);
+            for (const e of enemiesNear(dim, p, 1.2, yeti)) { hurt(e, 1, yeti); knockbackFrom(yeti.location, e, 1, 0.3); }
+        }
+        if (t >= 36) {
+            system.clearRun(run);
+            sound(dim, 'random.glass', yeti.location, 2, 1.4);
+            for (let i = 0; i < o.count; i++) {
+                const from = pos(i);
+                const dir = flatDir(yeti.location, from);
+                projectile(yeti, from, { location: add(from, dir, 20), isValid: true }, {
+                    speed: 1.2, head: FX.orb, trail: FX.trail, maxTicks: 20, onHit: (p, e) => { impact(dim, p, 1, { crack: false }); if (e) { hurt(e, o.damage, yeti); effect(e, 'slowness', 40, 2); } }
+                });
+            }
+        }
+    }, 1);
+}
+
+// ============================================================================
+// Sương Giá Tử Thần (Borealis) - sương giá lan quanh Yeti 6 giây, ai đứng trong 3 giây bị đóng băng
 // o: { damage, radius }
 // ============================================================================
-export function whiteout(yeti, o) {
+export function deathFrost(yeti, o) {
     lockCast(yeti, 44);
     playAnim(yeti, ANIM.howl);
     const dim = yeti.dimension;
     const c = groundAt(dim, yeti.location);
-    sound(dim, 'mob.warden.roar', c, 2, 0.8);
-    for (let i = 0; i < 3; i++) {
-        later(T.howlPeak + i * 10, () => {
-            fx(dim, FX.shockwave, c, { radius: o.radius });
-            fx(dim, FX.mist, c, { radius: o.radius * 0.5 });
-            fx(dim, FX.swirl, c, { radius: o.radius * 0.7 });
-            for (const e of enemiesNear(dim, c, o.radius, yeti)) {
-                effect(e, 'blindness', 60, 0, false);
-                effect(e, 'slowness', 60, 2);
+    fx(dim, FX.rune, c, { radius: o.radius, duration: 6 });
+    sound(dim, 'ambient.weather.thunder', c, 2, 1.3);
+    const time = new Map();
+    let n = 0;
+    const run = system.runInterval(() => {
+        n++;
+        fx(dim, FX.mist, c, { radius: o.radius * 0.4 });
+        fx(dim, FX.snowfall, c, { radius: o.radius });
+        for (const e of enemiesNear(dim, c, o.radius, yeti)) {
+            const k = (time.get(e.id) ?? 0) + 1;
+            time.set(e.id, k);
+            effect(e, 'slowness', 20, 1);
+            if (k === 6) {
+                fx(dim, FX.frozen, e.location, { duration: 2 });
+                fx(dim, FX.prison, e.location, { radius: 0.8, duration: 2 });
+                effect(e, 'slowness', 40, 6);
                 hurt(e, o.damage, yeti);
+                sound(dim, 'random.glass', e.location, 1.5, 0.5);
             }
+        }
+        if (n >= 12) system.clearRun(run);
+    }, 10);
+}
+
+// ============================================================================
+// Vũ Điệu Bão Tuyết (Malenia) - nhảy lên, 3 cú bổ nhào chém liên tiếp quanh mục tiêu
+// o: { damage }
+// ============================================================================
+export function blizzardDance(yeti, target, o) {
+    faceTarget(yeti, target);
+    lockCast(yeti, 40);
+    playAnim(yeti, ANIM.dance);
+    const dim = yeti.dimension;
+    sound(dim, 'mob.polarbear.warning', yeti.location, 2, 1.2);
+    [16, 21, 26].forEach((tick, i) => {
+        later(tick, () => {
+            if (!alive(yeti) || !alive(target)) return;
+            const a = Math.random() * Math.PI * 2;
+            const p = { x: target.location.x + Math.cos(a) * 2.5, y: target.location.y, z: target.location.z + Math.sin(a) * 2.5 };
+            fx(dim, FX.trail, yeti.location);
+            safeTeleport(yeti, p, { facingLocation: target.location });
+            fx(dim, FX.claw, { ...target.location, y: target.location.y + 1.2 }, { radius: 2.6 });
+            fx(dim, FX.flash, target.location, { radius: 1.5 });
+            sound(dim, 'game.player.attack.strong', p, 1.5, 0.7 + i * 0.1);
+            for (const e of enemiesNear(dim, target.location, 3, yeti)) { hurt(e, o.damage, yeti); effect(e, 'slowness', 30, 2); }
+        });
+    });
+}
+
+// ============================================================================
+// Tia Băng Quét (Moon Lord) - tụ lực ở miệng rồi quét tia băng hình quạt
+// o: { damage, range }
+// ============================================================================
+export function sweepBeam(yeti, target, o) {
+    faceTarget(yeti, target);
+    lockCast(yeti, 54);
+    playAnim(yeti, ANIM.beamSweep);
+    const dim = yeti.dimension;
+    const origin = { ...yeti.location };
+    const base = flatDir(origin, target.location);
+    sound(dim, 'beacon.power', origin, 2, 1.6);
+    for (let d = 3; d <= o.range; d += 3) for (const ang of [-35, 0, 35]) {
+        const a = ang * Math.PI / 180, r = rightOf(base);
+        telegraph(dim, add(origin, { x: base.x * Math.cos(a) + r.x * Math.sin(a), z: base.z * Math.cos(a) + r.z * Math.sin(a) }, d), 1, 1, true);
+    }
+    const hit = new Map();
+    for (let tick = 20; tick <= 44; tick += 2) {
+        later(tick, () => {
+            if (!alive(yeti)) return;
+            safeTeleport(yeti, origin, { facingLocation: add(origin, base, 10) });
+            const ang = (35 - (tick - 20) / 24 * 70) * Math.PI / 180, r = rightOf(base);
+            const dir = { x: base.x * Math.cos(ang) + r.x * Math.sin(ang), z: base.z * Math.cos(ang) + r.z * Math.sin(ang) };
+            const mouth = { x: origin.x + dir.x * 1.8, y: origin.y + 4.2, z: origin.z + dir.z * 1.8 };
+            for (let d = 0; d <= o.range; d += 0.8) {
+                const p = { x: mouth.x + dir.x * d, y: mouth.y - d * 0.15, z: mouth.z + dir.z * d };
+                fx(dim, d % 3.2 < 0.8 ? FX.beamCore : FX.spark, p);
+                if (tick % 4 === 0) for (const e of enemiesNear(dim, p, 1.2, yeti)) {
+                    if ((hit.get(e.id) ?? -9) >= tick - 4) continue;
+                    hit.set(e.id, tick);
+                    hurt(e, o.damage, yeti);
+                    fx(dim, FX.flash, e.location, { radius: 1 });
+                }
+            }
+            if (tick % 6 === 0) sound(dim, 'random.fizz', mouth, 1.2, 0.5);
         });
     }
+}
+
+// ============================================================================
+// Mìn Pha Lê (tự chế) - cắm pha lê băng quanh sân, lần lượt phát nổ
+// o: { damage, count }
+// ============================================================================
+export function crystalMines(yeti, o) {
+    lockCast(yeti, 36);
+    playAnim(yeti, ANIM.summon);
+    const dim = yeti.dimension;
+    const c = { ...yeti.location };
+    later(T.summonImpact, () => {
+        if (!alive(yeti)) return;
+        impact(dim, c, 2);
+        const foes = enemiesNear(dim, c, 24, yeti);
+        for (let i = 0; i < o.count; i++) {
+            const f = foes[i % Math.max(1, foes.length)];
+            const a = Math.random() * Math.PI * 2, r = 2 + Math.random() * 3;
+            const base = f ? f.location : c;
+            const g = groundAt(dim, { x: base.x + Math.cos(a) * r, y: base.y + 1, z: base.z + Math.sin(a) * r });
+            fx(dim, FX.crystal, g, { duration: 2 + i * 0.3 });
+            telegraph(dim, g, 2.5, 2 + i * 0.3, true);
+            later(40 + i * 6, () => {
+                impact(dim, g, 2);
+                spikeRing(dim, g, 1.5, 5, 0.8, 1);
+                sound(dim, 'random.explode', g, 1.5, 1.3);
+                for (const e of enemiesNear(dim, g, 2.5, yeti)) { hurt(e, o.damage, yeti); knockbackFrom(g, e, 1.2, 0.5); }
+            });
+        }
+    });
 }
 
 // ============================================================================

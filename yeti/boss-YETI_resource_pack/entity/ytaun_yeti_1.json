@@ -37,7 +37,10 @@
         "skill_cast": "animation.ytaun_yeti.cast",
         "skill_phase_intro": "animation.ytaun_yeti.phase_intro",
         "skill_combo": "animation.ytaun_yeti.combo",
-        "skill_howl": "animation.ytaun_yeti.howl"
+        "skill_howl": "animation.ytaun_yeti.howl",
+        "skill_slide": "animation.ytaun_yeti.slide",
+        "skill_dance": "animation.ytaun_yeti.dance",
+        "skill_beam_sweep": "animation.ytaun_yeti.beam_sweep"
       },
       "particle_effects": {
         "fx_eye": "ytaun:eye_glow",

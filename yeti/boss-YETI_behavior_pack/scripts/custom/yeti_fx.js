@@ -24,6 +24,9 @@ export const ANIM = {
     spin: 'animation.ytaun_yeti.spin',
     cast: 'animation.ytaun_yeti.cast',
     howl: 'animation.ytaun_yeti.howl',
+    slide: 'animation.ytaun_yeti.slide',
+    dance: 'animation.ytaun_yeti.dance',
+    beamSweep: 'animation.ytaun_yeti.beam_sweep',
     groundPunch: 'animation.ytaun_yeti.ground_punch',
     charge: 'animation.ytaun_yeti.charge',
     phaseIntro: 'animation.ytaun_yeti.phase_intro',
@@ -85,7 +88,10 @@ export const FX = {
     spark: 'ytaun:beam_spark',
     boulder: 'ytaun:ice_boulder',
     comet: 'ytaun:comet',
-    icicle: 'ytaun:icicle_fall'
+    icicle: 'ytaun:icicle_fall',
+    orb: 'ytaun:ice_orb',
+    crystal: 'ytaun:big_crystal',
+    beamCore: 'ytaun:beam_core'
 };
 
 export const DIMENSIONS = ['overworld', 'nether', 'the_end'];

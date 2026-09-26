@@ -1041,6 +1041,17 @@ def effects():
                                                      "minecraft:particle_initial_spin": {"rotation": 20}},
                                      board([0.6, 0.6], uv_static("boulder"))), "particles_alpha"
 
+    # v1.6
+    fx["ytaun:ice_orb"] = merge(once(), {"minecraft:emitter_shape_point": {},
+                                         "minecraft:particle_lifetime_expression": {"max_lifetime": 0.1}},
+                                board([0.35, 0.35], uv_flip("orb", 4), "lookat_xyz")), "particles_alpha"
+    fx["ytaun:big_crystal"] = merge(once(), {"minecraft:emitter_shape_point": {"offset": [0, 1.5, 0]},
+                                             "minecraft:particle_lifetime_expression": {"max_lifetime": DURATION.format(d=2)}},
+                                    board(["0.5 * math.min(1, v.particle_age * 6)", "1.5 * math.min(1, v.particle_age * 6)"],
+                                          uv_static("pillar"), "lookat_y")), "particles_alpha"
+    fx["ytaun:beam_core"] = merge(once(), {"minecraft:emitter_shape_point": {},
+                                           "minecraft:particle_lifetime_expression": {"max_lifetime": 0.12}},
+                                  board([0.55, 0.55], uv_flip("flash", 4), "lookat_xyz")), "particles_alpha"
     return {k: particle(k, material, comps) for k, (comps, material) in fx.items()}
 
 
