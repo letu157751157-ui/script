@@ -1,4 +1,4 @@
-summon pa:yeti_boss_pet
-summon pa:yeti_boss_pet
-summon pa:yeti_boss_pet
-summon pa:yeti_mage
+summon ytaun:yeti_boss_pet
+summon ytaun:yeti_boss_pet
+summon ytaun:yeti_boss_pet
+summon ytaun:yeti_boss_pet_riu

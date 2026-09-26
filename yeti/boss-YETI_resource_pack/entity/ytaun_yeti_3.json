@@ -25,7 +25,8 @@
         "move": "animation.ytaun_yeti_3.move",
         "move_controller": "controller.animation.ytaun_yeti_3.move",
         "arm_controller": "controller.animation.ytaun_yeti_3.arm_movement",
-        "walk": "animation.ytaun_yeti_3.walk"
+        "walk": "animation.ytaun_yeti_3.walk",
+        "fx": "controller.animation.yeti.fx"
       },
       "render_controllers": [
         "controller.render.iron_golem",
@@ -38,12 +39,18 @@
         "animate": [
           "look_at_target",
           "move_controller",
-          "arm_controller"
+          "arm_controller",
+          "fx"
         ]
       },
       "spawn_egg": {
         "texture": "ytaun:yeti_3_spawn_egg",
         "texture_index": 0
+      },
+      "particle_effects": {
+        "aura": "yeti:aura",
+        "aura_enraged": "yeti:aura_enraged",
+        "breath": "yeti:breath_puff"
       }
     }
   }

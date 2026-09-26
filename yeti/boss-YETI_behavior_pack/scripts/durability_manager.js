@@ -8,7 +8,7 @@ class DurabilityManager {
     static #IGNORABLE_DAMAGE_CAUSES = Object.freeze([
         EntityDamageCause.drowning, EntityDamageCause.fall, EntityDamageCause.flyIntoWall,
         EntityDamageCause.freezing, EntityDamageCause.magic, EntityDamageCause.override,
-        EntityDamageCause.starve, EntityDamageCause.suffocation, EntityDamageCause.suicide,
+        EntityDamageCause.starve, EntityDamageCause.suffocation, EntityDamageCause.selfDestruct,
         EntityDamageCause.temperature, EntityDamageCause.void, EntityDamageCause.wither
     ]);
 

@@ -2,6 +2,7 @@
 
 - **Roblox**: hướng dẫn ngay bên dưới (thư mục `AatroxSword/`).
 - **Minecraft Bedrock (addon)**: xem [`bedrock/README.md`](bedrock/README.md).
+- **Boss YETI v2.0 (addon Minecraft Bedrock)**: bản nâng cấp kỹ năng, particle và animation, xem [`yeti/README.md`](yeti/README.md).
 
 ## Roblox
 

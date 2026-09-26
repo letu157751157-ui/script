@@ -487,9 +487,7 @@
       },
       "on:target_acquired": {
         "queue_command": {
-          "command": [
-            "function Pet_Yeti_boss"
-          ]
+          "command": []
         }
       },
       "on:hurt": {

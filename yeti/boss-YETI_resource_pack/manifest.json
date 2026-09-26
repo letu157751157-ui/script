@@ -1,12 +1,12 @@
 {
   "format_version": 2,
   "header": {
-    "description": "Boss Yeti - 3 evolution phases + Ice Spike & Charge Attack skills",
+    "description": "Boss Yeti v2.0 - 3 phases + last stand, 19 skills with ground warnings, ice particles & skill animations",
     "name": "boss-YETI",
     "uuid": "65d381f3-0626-4781-9f38-2c86c65cfa21",
     "version": [
-      1,
-      1,
+      2,
+      0,
       0
     ],
     "min_engine_version": [
@@ -21,8 +21,8 @@
       "type": "resources",
       "uuid": "6896d5ae-7bf1-49c8-b08c-16a7327442ca",
       "version": [
-        1,
-        1,
+        2,
+        0,
         0
       ]
     }
@@ -31,8 +31,8 @@
     {
       "uuid": "783c33f4-f383-4068-955f-222cbd7016e5",
       "version": [
-        1,
-        1,
+        2,
+        0,
         0
       ]
     }

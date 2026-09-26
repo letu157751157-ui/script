@@ -1,0 +1,54 @@
+{
+  "format_version": "1.10.0",
+  "particle_effect": {
+    "description": {
+      "identifier": "yeti:warning_tile",
+      "basic_render_parameters": {
+        "material": "particles_add",
+        "texture": "textures/particle/yeti_particles"
+      }
+    },
+    "components": {
+      "minecraft:emitter_rate_instant": {
+        "num_particles": 1
+      },
+      "minecraft:emitter_lifetime_once": {
+        "active_time": 0.05
+      },
+      "minecraft:emitter_shape_point": {},
+      "minecraft:particle_lifetime_expression": {
+        "max_lifetime": "v.life"
+      },
+      "minecraft:particle_initial_spin": {
+        "rotation": "v.yaw"
+      },
+      "minecraft:particle_appearance_billboard": {
+        "size": [
+          0.4,
+          0.4
+        ],
+        "facing_camera_mode": "emitter_transform_xz",
+        "uv": {
+          "texture_width": 256,
+          "texture_height": 256,
+          "uv": [
+            48,
+            48
+          ],
+          "uv_size": [
+            8,
+            8
+          ]
+        }
+      },
+      "minecraft:particle_appearance_tinting": {
+        "color": [
+          1.0,
+          0.34,
+          0.24,
+          "math.min(1, v.particle_age / v.particle_lifetime * 5) * (0.55 + 0.45 * math.sin(v.particle_age * (400 + 900 * v.particle_age / v.particle_lifetime)))"
+        ]
+      }
+    }
+  }
+}

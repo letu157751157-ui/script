@@ -1,0 +1,82 @@
+{
+  "format_version": "1.10.0",
+  "particle_effect": {
+    "description": {
+      "identifier": "yeti:blizzard",
+      "basic_render_parameters": {
+        "material": "particles_add",
+        "texture": "textures/particle/yeti_particles"
+      }
+    },
+    "components": {
+      "minecraft:emitter_rate_steady": {
+        "spawn_rate": "math.min(90, v.radius * 6)",
+        "max_particles": 140
+      },
+      "minecraft:emitter_lifetime_once": {
+        "active_time": 1.1
+      },
+      "minecraft:emitter_shape_box": {
+        "half_dimensions": [
+          "v.radius",
+          3,
+          "v.radius"
+        ],
+        "offset": [
+          0,
+          3,
+          0
+        ],
+        "direction": [
+          1,
+          -0.6,
+          0.35
+        ]
+      },
+      "minecraft:particle_lifetime_expression": {
+        "max_lifetime": "math.random(0.6, 1.0)"
+      },
+      "minecraft:particle_initial_speed": "math.random(7, 11)",
+      "minecraft:particle_motion_dynamic": {
+        "linear_acceleration": [
+          0,
+          -2,
+          0
+        ]
+      },
+      "minecraft:particle_appearance_billboard": {
+        "size": [
+          0.035,
+          0.2
+        ],
+        "facing_camera_mode": "lookat_direction",
+        "direction": {
+          "mode": "derive_from_velocity"
+        },
+        "uv": {
+          "texture_width": 256,
+          "texture_height": 256,
+          "uv": [
+            152,
+            48
+          ],
+          "uv_size": [
+            1,
+            8
+          ]
+        }
+      },
+      "minecraft:particle_appearance_tinting": {
+        "color": {
+          "interpolant": "v.particle_age / v.particle_lifetime",
+          "gradient": {
+            "0.0": "#00FFFFFF",
+            "0.15": "#E6FFFFFF",
+            "0.8": "#E6FFFFFF",
+            "1.0": "#00FFFFFF"
+          }
+        }
+      }
+    }
+  }
+}

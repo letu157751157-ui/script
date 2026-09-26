@@ -1,0 +1,60 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.yeti.fx": {
+      "initial_state": "calm",
+      "states": {
+        "calm": {
+          "particle_effects": [
+            {
+              "effect": "aura"
+            },
+            {
+              "effect": "breath",
+              "locator": "mouth"
+            }
+          ],
+          "transitions": [
+            {
+              "enraged": "q.max_health > 0 && q.health / q.max_health < 0.35"
+            }
+          ]
+        },
+        "enraged": {
+          "particle_effects": [
+            {
+              "effect": "aura"
+            },
+            {
+              "effect": "aura_enraged"
+            },
+            {
+              "effect": "breath",
+              "locator": "mouth"
+            }
+          ],
+          "transitions": [
+            {
+              "calm": "!(q.max_health > 0 && q.health / q.max_health < 0.35)"
+            }
+          ]
+        }
+      }
+    },
+    "controller.animation.yeti.fx_last_stand": {
+      "initial_state": "default",
+      "states": {
+        "default": {
+          "particle_effects": [
+            {
+              "effect": "aura"
+            },
+            {
+              "effect": "aura_enraged"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

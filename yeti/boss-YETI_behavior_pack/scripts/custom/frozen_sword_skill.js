@@ -1,4 +1,5 @@
 import { world, system } from '@minecraft/server';
+import * as fx from '../yeti/fx';
 
 // === FROZEN SWORD - PASSIVE SKILLS ===
 // Cầm 20s → Ice Aura
@@ -37,8 +38,10 @@ function spawnIceCircle(player, radius, count, particleId) {
 function executeHoldAura(player) {
     try {
         spawnIceCircle(player, 1.5, 12, 'minecraft:snowflake_particle');
-        spawnIceCircle(player, 1.0, 8,  'minecraft:ice_evaporation_particle');
-        spawnIceCircle(player, 0.5, 6,  'minecraft:blue_flame_particle');
+        spawnIceCircle(player, 1.2, 8,  'yeti:sparkle');
+        fx.emit(player.dimension, 'yeti:rune_circle', fx.add(player.location, { x: 0, y: 0.06, z: 0 }), { radius: 1.6, life: 1.5 });
+        fx.emit(player.dimension, 'yeti:glyph', player.location);
+        fx.emit(player.dimension, 'yeti:heal', player.location);
 
         player.addEffect('resistance',   500, { amplifier: 0, showParticles: false });
         player.addEffect('slow_falling', 200, { amplifier: 0, showParticles: false });
@@ -53,9 +56,12 @@ function executeHoldAura(player) {
 // === Skill 2: Ice Burst (khụy 4s) ===
 function executeIceBurst(player) {
     try {
-        spawnIceCircle(player, 2.5, 20, 'minecraft:snowflake_particle');
-        spawnIceCircle(player, 1.5, 12, 'minecraft:bleach');
-        spawnIceCircle(player, 3.5, 16, 'minecraft:ice_evaporation_particle');
+        const loc = player.location;
+        fx.emit(player.dimension, 'yeti:frost_ring', fx.add(loc, { x: 0, y: 0.1, z: 0 }), { radius: 4 });
+        fx.emit(player.dimension, 'yeti:ice_burst', fx.add(loc, { x: 0, y: 1, z: 0 }));
+        fx.emit(player.dimension, 'yeti:ice_shard', fx.add(loc, { x: 0, y: 0.8, z: 0 }));
+        fx.emit(player.dimension, 'yeti:ice_crack', fx.add(loc, { x: 0, y: 0.04, z: 0 }), { radius: 2.5 });
+        spawnIceCircle(player, 2.5, 12, 'yeti:frost_mist');
 
         player.addEffect('speed',    100, { amplifier: 1, showParticles: true });
         player.addEffect('strength', 100, { amplifier: 0, showParticles: true });
@@ -70,6 +76,7 @@ function executeIceBurst(player) {
         nearby.forEach((entity, index) => {
             system.runTimeout(() => {
                 try {
+                    fx.emit(entity.dimension, 'yeti:frozen_mark', fx.add(entity.location, { x: 0, y: 2.3, z: 0 }));
                     entity.addEffect('slowness',      80, { amplifier: 2, showParticles: true });
                     entity.addEffect('weakness',      80, { amplifier: 0, showParticles: true });
                     entity.addEffect('mining_fatigue', 60, { amplifier: 1, showParticles: false });
