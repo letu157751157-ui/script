@@ -47,6 +47,11 @@
       "spawn_egg": {
         "texture": "ytaun:yeti_death_spawn_egg",
         "texture_index": 0
+      },
+      "particle_effects": {
+        "fx_breath_puff": "ytaun:breath_puff",
+        "fx_roar": "ytaun:roar_mist",
+        "fx_chest_glow": "ytaun:chest_glow"
       }
     }
   }

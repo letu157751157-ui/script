@@ -7,9 +7,11 @@
 //   tier 2 = chiêu thường theo khoảng cách (chọn ngẫu nhiên)
 //   first = số tick phải chờ trước lần dùng đầu tiên (tránh xả hết chiêu ngay khi vừa gặp)
 // Giữa 2 chiêu luôn có hồi chiêu chung (gcd), và không dùng chiêu khi đang thi triển chiêu khác.
+// Mục tiêu: mob / người chơi vừa đánh nhau với boss, nếu không có thì đối thủ gần nhất (yeti_fx.pickTarget).
+// Khi Yeti đi, mỗi bước chân để lại vết băng trên mặt đất.
 
 import { world, system } from '@minecraft/server';
-import { DIMENSIONS, isBusy, nearestPlayer, dist2D, clearEntity, shatter, sound, fx, FX } from './yeti_fx';
+import { DIMENSIONS, isBusy, pickTarget, dist2D, clearEntity, impact, groundAt, rightOf, flatDir, sound, fx, FX } from './yeti_fx';
 
 function healthPercent(entity) {
     try {
@@ -35,15 +37,28 @@ export function createBoss(cfg) {
         return st;
     }
 
+    function footprints(yeti, st, tick) {
+        if (tick % 8 !== 0) return;
+        const loc = yeti.location;
+        const last = st.data.lastStep;
+        st.data.lastStep = { x: loc.x, y: loc.y, z: loc.z };
+        if (!last || dist2D(last, loc) < 0.5 || Math.abs(last.y - loc.y) > 1) return;
+        st.data.stepSide = -(st.data.stepSide ?? 1);
+        const side = rightOf(flatDir(last, loc));
+        const foot = { x: loc.x + side.x * 0.6 * st.data.stepSide, y: loc.y + 0.5, z: loc.z + side.z * 0.6 * st.data.stepSide };
+        fx(yeti.dimension, FX.footprint, groundAt(yeti.dimension, foot));
+    }
+
     function think(yeti) {
         if (!yeti.isValid) return;
         const st = stateOf(yeti);
         const tick = system.currentTick;
+        try { footprints(yeti, st, tick); } catch (_) {}
         if (cfg.onTick) {
             try { cfg.onTick(yeti, st, tick); } catch (e) { console.warn(`[${cfg.label}] onTick`, e); }
         }
         if (isBusy(yeti) || tick < st.nextCast) return;
-        const target = nearestPlayer(yeti, cfg.detectRange);
+        const target = pickTarget(yeti, cfg.detectRange);
         if (!target) return;
 
         const ctx = { yeti, target, d: dist2D(yeti.location, target.location), hp: healthPercent(yeti), tick, st };
@@ -74,7 +89,7 @@ export function createBoss(cfg) {
         clearEntity(dead.id);
         try {
             if (cfg.onDeath) cfg.onDeath(dead);
-            shatter(dead.dimension, dead.location, 4);
+            impact(dead.dimension, dead.location, 4);
             fx(dead.dimension, FX.beam, dead.location);
             sound(dead.dimension, 'random.glass', dead.location, 3, 0.5);
             sound(dead.dimension, 'random.explode', dead.location, 2, 0.8);

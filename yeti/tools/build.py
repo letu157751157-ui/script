@@ -32,6 +32,16 @@ def load_json(path):
         return json.load(f)
 
 
+def geometry_bones(path):
+    data = load_json(path)
+    if "minecraft:geometry" in data:
+        geo = data["minecraft:geometry"][0]
+    else:
+        geo = data[[k for k in data if k.startswith("geometry")][0]]
+    bones = geo["bones"]
+    return {b["name"] for b in bones}, {n for b in bones for n in b.get("locators", {})}
+
+
 def validate():
     errors, warnings = [], []
     for path in glob.glob(os.path.join(ROOT, "boss-YETI_*", "**", "*.json"), recursive=True):
@@ -48,30 +58,71 @@ def validate():
         if not os.path.exists(os.path.join(RP, tex + ".png")):
             errors.append(f"missing texture {tex} for {data['description']['identifier']}")
 
-    anim_ids = set()
+    anims = {}
     for path in glob.glob(os.path.join(RP, "animations", "*.json")):
-        anim_ids |= set(load_json(path)["animations"])
+        anims.update(load_json(path)["animations"])
+    controllers = {}
+    for path in glob.glob(os.path.join(RP, "animation_controllers", "*.json")):
+        controllers.update((load_json(path) or {}).get("animation_controllers") or {})
 
     scripts = ""
     for path in glob.glob(os.path.join(BP, "scripts", "**", "*.js"), recursive=True):
         with open(path, encoding="utf-8") as f:
             scripts += f.read()
+    used_particles = set()
     for pid in sorted(set(re.findall(r"'((?:ytaun|snow|minecraft):[a-z_]+)'", scripts))):
         if pid.startswith("minecraft:") and pid not in VANILLA_PARTICLES:
             continue  # entity / effect ids
         if pid.startswith("ytaun:") and pid not in particle_ids:
             continue  # entity ids such as ytaun:yeti_1
+        used_particles.add(pid)
         if pid not in particle_ids and pid not in VANILLA_PARTICLES:
             errors.append(f"script uses unknown particle {pid}")
     for name in sorted(set(re.findall(r"'(animation\.[a-z0-9_.]+)'", scripts))):
-        if name not in anim_ids:
+        if name not in anims:
             errors.append(f"script uses unknown animation {name}")
+
+    # client entities: animations, controllers, particle effects, and bones / locators they need
+    models = {}
+    for path in glob.glob(os.path.join(RP, "models", "entity", "*.json")):
+        data = load_json(path)
+        ident = data["minecraft:geometry"][0]["description"]["identifier"] if "minecraft:geometry" in data else \
+            [k for k in data if k.startswith("geometry")][0]
+        models[ident] = geometry_bones(path)
     for path in glob.glob(os.path.join(RP, "entity", "*.json")):
         desc = load_json(path)["minecraft:client_entity"]["description"]
+        name = os.path.basename(path)
+        fxmap = desc.get("particle_effects", {})
+        used_particles |= set(fxmap.values())
+        for pid in fxmap.values():
+            if pid not in particle_ids:
+                errors.append(f"{name}: unknown particle {pid}")
+        geo = desc.get("geometry", {}).get("default")
+        bones, locators = models.get(geo, (set(), set()))
         for short, full in desc.get("animations", {}).items():
-            if full.startswith("animation.") and full not in anim_ids and not full.startswith("animation.common"):
-                # only a warning: the original ice spike entity lists a few unused vanilla-style animations
-                warnings.append(f"{os.path.basename(path)} references unknown animation {full}")
+            if full.startswith("controller."):
+                if full not in controllers:
+                    errors.append(f"{name}: unknown controller {full}")
+                continue
+            if full not in anims:
+                if not full.startswith("animation.common"):
+                    warnings.append(f"{name} references unknown animation {full}")
+                continue
+            if not name.startswith("ytaun_yeti_"):
+                continue
+            anim = anims[full]
+            for bone in anim.get("bones", {}):
+                if bone not in bones:
+                    errors.append(f"{name}: {full} animates missing bone {bone}")
+            for key, fxs in anim.get("particle_effects", {}).items():
+                for e in fxs if isinstance(fxs, list) else [fxs]:
+                    if e["effect"] not in fxmap:
+                        errors.append(f"{name}: {full} uses particle effect {e['effect']} not mapped in the entity")
+                    if e.get("locator") and e["locator"] not in locators:
+                        errors.append(f"{name}: {full} uses missing locator {e['locator']}")
+    for pid in sorted(set(particle_ids) - used_particles):
+        if pid.startswith("ytaun:"):
+            warnings.append(f"particle {pid} is never used")
     return errors, warnings
 
 

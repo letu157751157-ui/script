@@ -17,15 +17,13 @@
         "default": "geometry.ytaun_yeti_1_default"
       },
       "animations": {
-        "walk_to_target": "animation.ytaun_yeti_1.walk_to_target",
-        "attack": "animation.ytaun_yeti_1.attack",
-        "flower": "animation.ytaun_yeti_1.flower",
         "look_at_target": "animation.common.look_at_target",
-        "move_to_target": "animation.ytaun_yeti_1.move",
-        "move": "animation.ytaun_yeti_1.move",
-        "move_controller": "controller.animation.ytaun_yeti_1.move",
-        "arm_controller": "controller.animation.ytaun_yeti_1.arm_movement",
-        "walk": "animation.ytaun_yeti_1.walk",
+        "idle": "animation.ytaun_yeti.idle",
+        "walk": "animation.ytaun_yeti.walk",
+        "attack": "animation.ytaun_yeti.attack",
+        "attack_controller": "controller.animation.ytaun_yeti.attack",
+        "skill_ground_punch": "animation.ytaun_yeti.ground_punch",
+        "skill_charge": "animation.ytaun_yeti.charge",
         "skill_roar": "animation.ytaun_yeti.roar",
         "skill_slam": "animation.ytaun_yeti.slam",
         "skill_leap": "animation.ytaun_yeti.leap",
@@ -37,20 +35,33 @@
         "skill_chest_beat": "animation.ytaun_yeti.chest_beat",
         "skill_spin": "animation.ytaun_yeti.spin",
         "skill_cast": "animation.ytaun_yeti.cast",
-        "skill_phase_intro": "animation.ytaun_yeti.phase_intro"
+        "skill_phase_intro": "animation.ytaun_yeti.phase_intro",
+        "skill_combo": "animation.ytaun_yeti.combo",
+        "skill_howl": "animation.ytaun_yeti.howl"
+      },
+      "particle_effects": {
+        "fx_eye": "ytaun:eye_glow",
+        "fx_breath_puff": "ytaun:breath_puff",
+        "fx_roar": "ytaun:roar_mist",
+        "fx_hand_glow": "ytaun:hand_glow",
+        "fx_claw_trail": "ytaun:claw_trail",
+        "fx_step": "ytaun:snow_step",
+        "fx_boulder_held": "ytaun:boulder_held",
+        "fx_chest_glow": "ytaun:chest_glow",
+        "fx_breath_core": "ytaun:breath_core"
       },
       "render_controllers": [
         "controller.render.iron_golem",
         "controller.render.iron_golem_cracks"
       ],
       "scripts": {
-        "pre_animation": [
-          "variable.modified_tcos0 = Math.clamp(((Math.cos(query.modified_distance_moved * 13.5) * Math.min(query.modified_move_speed, 0.6) / variable.gliding_speed_value) * 25.0), -12.5, 12.5);"
-        ],
         "animate": [
           "look_at_target",
-          "move_controller",
-          "arm_controller"
+          "idle",
+          {
+            "walk": "math.min(1, query.modified_move_speed * 4)"
+          },
+          "attack_controller"
         ]
       },
       "spawn_egg": {

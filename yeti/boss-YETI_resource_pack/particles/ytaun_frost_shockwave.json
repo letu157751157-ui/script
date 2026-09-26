@@ -23,7 +23,7 @@
         ]
       },
       "minecraft:particle_lifetime_expression": {
-        "max_lifetime": 0.6
+        "max_lifetime": 0.65
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
@@ -32,22 +32,22 @@
         ],
         "facing_camera_mode": "emitter_transform_xz",
         "uv": {
-          "texture_width": 256,
-          "texture_height": 256,
+          "texture_width": 512,
+          "texture_height": 512,
           "flipbook": {
             "base_UV": [
               0,
               0
             ],
             "size_UV": [
-              32,
-              32
+              64,
+              64
             ],
             "step_UV": [
-              32,
+              64,
               0
             ],
-            "max_frame": 4,
+            "max_frame": 6,
             "stretch_to_lifetime": true,
             "loop": false,
             "frames_per_second": 12

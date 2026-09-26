@@ -35,6 +35,16 @@
         ],
         "linear_drag_coefficient": 1.5
       },
+      "minecraft:particle_appearance_tinting": {
+        "color": {
+          "interpolant": "v.particle_age / v.particle_lifetime",
+          "gradient": {
+            "0.0": "#FFA8FFE8",
+            "0.6": "#FFA8FFE8",
+            "1.0": "#00A8FFE8"
+          }
+        }
+      },
       "minecraft:particle_appearance_billboard": {
         "size": [
           0.2,
@@ -42,12 +52,12 @@
         ],
         "facing_camera_mode": "rotate_xyz",
         "uv": {
-          "texture_width": 256,
-          "texture_height": 256,
+          "texture_width": 512,
+          "texture_height": 512,
           "flipbook": {
             "base_UV": [
-              64,
-              96
+              192,
+              144
             ],
             "size_UV": [
               16,
@@ -61,16 +71,6 @@
             "stretch_to_lifetime": true,
             "loop": false,
             "frames_per_second": 12
-          }
-        }
-      },
-      "minecraft:particle_appearance_tinting": {
-        "color": {
-          "interpolant": "v.particle_age / v.particle_lifetime",
-          "gradient": {
-            "0.0": "#FFA8FFE8",
-            "0.6": "#FFA8FFE8",
-            "1.0": "#00A8FFE8"
           }
         }
       }

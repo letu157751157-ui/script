@@ -1,10 +1,12 @@
 // File: scripts/custom/yeti_fx.js
-// Tiện ích dùng chung cho mọi skill của Yeti (v1.3):
-// - Tên animation mới (animation.ytaun_yeti.*) và particle mới (ytaun:*)
-// - Phát particle kèm biến Molang (bán kính, thời gian, hướng) qua MolangVariableMap
-// - Vòng cảnh báo dưới đất (telegraph) để người chơi kịp né
-// - Khóa thi triển (1 lần chỉ 1 chiêu, không chồng animation), đứng yên khi thi triển
-// - Sát thương có ghi nhớ Yeti nào gây ra (để nội tại "hồi máu khi hạ gục" tính cả chiêu)
+// Tiện ích dùng chung cho mọi skill của Yeti (v1.4):
+// - Tên animation (animation.ytaun_yeti.*) và particle (ytaun:*)
+// - Hiệu ứng nhiều lớp: chớp sáng + sóng xung kích + khối vụn + mảnh băng + sương + vết nứt
+// - Gai băng bằng particle (thay cho mob gai băng cũ)
+// - Vòng cảnh báo: vòng ngoài + lớp phủ lớn dần, chạm vòng ngoài đúng lúc đòn đánh xuống
+// - Mục tiêu: người chơi + mob mà boss đang đánh (chó, mèo, cáo, sói, dân làng, hoglin, golem...
+//   và bất kỳ mob nào vừa đánh boss). Không đánh quái do boss triệu hồi và thú cưng của boss.
+// - Khóa thi triển (1 lúc chỉ 1 chiêu), sát thương có ghi nhớ Yeti nào gây ra
 
 import { world, system, MolangVariableMap, GameMode } from '@minecraft/server';
 
@@ -17,13 +19,14 @@ export const ANIM = {
     summon: 'animation.ytaun_yeti.summon',
     regen: 'animation.ytaun_yeti.regen',
     swipe: 'animation.ytaun_yeti.swipe',
+    combo: 'animation.ytaun_yeti.combo',
     chestBeat: 'animation.ytaun_yeti.chest_beat',
     spin: 'animation.ytaun_yeti.spin',
     cast: 'animation.ytaun_yeti.cast',
+    howl: 'animation.ytaun_yeti.howl',
+    groundPunch: 'animation.ytaun_yeti.ground_punch',
+    charge: 'animation.ytaun_yeti.charge',
     phaseIntro: 'animation.ytaun_yeti.phase_intro',
-    iceSpike: 'animation.ytaun_yeti_1_default.ice_spike',
-    charge: 'animation.ytaun_yeti_1_default.attack_2',
-    chargeHit: 'animation.ytaun_yeti_1.attack',
     deathPulse: 'animation.ytaun_yeti_death.pulse'
 };
 
@@ -34,12 +37,19 @@ export const ANIM_TIMING = {
     leapTakeoff: 7,     // bật khỏi mặt đất
     leapLanding: 22,    // tiếp đất
     throwRelease: 12,   // buông tảng băng
-    breathStart: 11,    // bắt đầu phun
+    breathStart: 12,    // bắt đầu phun
     breathEnd: 42,      // ngừng phun
     summonImpact: 24,   // đập 2 tay xuống đất
+    howlPeak: 14,       // bắt đầu hú
     swipeHit1: 8,       // vuốt tay phải
     swipeHit2: 16,      // vuốt tay trái
-    castRelease: 11     // đẩy 2 tay ra trước
+    comboHit1: 7,       // combo: vuốt phải
+    comboHit2: 15,      // combo: vuốt trái
+    comboHit3: 27,      // combo: đập 2 tay
+    castRelease: 11,    // đẩy 2 tay ra trước
+    punchImpact: 12,    // đấm xuống đất (gọi gai băng)
+    chargeDash: 5,      // bắt đầu lao
+    chargeTicks: 14     // thời gian lao
 };
 
 // Lượng xoay thân (độ, dương = sang phải Yeti) trong animation "breath", để hướng luồng băng khớp với hình
@@ -48,20 +58,34 @@ export const BREATH_SWEEP = [[12, 0], [22, -20], [32, 20], [42, 0]];
 export const FX = {
     shockwave: 'ytaun:frost_shockwave',
     telegraph: 'ytaun:telegraph',
+    telegraphFill: 'ytaun:telegraph_fill',
     danger: 'ytaun:telegraph_danger',
+    dangerFill: 'ytaun:telegraph_danger_fill',
     crack: 'ytaun:ground_crack',
+    rune: 'ytaun:rune_circle',
+    footprint: 'ytaun:footprint',
     shards: 'ytaun:ice_shards',
+    debris: 'ytaun:ice_debris',
     snow: 'ytaun:snow_burst',
+    mist: 'ytaun:ground_mist',
+    flash: 'ytaun:ice_flash',
+    spike: 'ytaun:ice_spike',
     breath: 'ytaun:frost_breath',
     claw: 'ytaun:claw_slash',
     beam: 'ytaun:phase_beam',
     swirl: 'ytaun:blizzard_swirl',
-    trail: 'ytaun:ice_trail',
-    boulder: 'ytaun:ice_boulder',
-    icicle: 'ytaun:icicle_fall',
-    prison: 'ytaun:ice_prison',
+    tornado: 'ytaun:snow_tornado',
+    snowfall: 'ytaun:snowfall',
     aura: 'ytaun:frost_aura',
-    heal: 'ytaun:frost_heal'
+    flame: 'ytaun:frost_flame',
+    heal: 'ytaun:frost_heal',
+    frozen: 'ytaun:frozen_block',
+    prison: 'ytaun:ice_prison',
+    trail: 'ytaun:ice_trail',
+    spark: 'ytaun:beam_spark',
+    boulder: 'ytaun:ice_boulder',
+    comet: 'ytaun:comet',
+    icicle: 'ytaun:icicle_fall'
 };
 
 export const DIMENSIONS = ['overworld', 'nether', 'the_end'];
@@ -91,7 +115,7 @@ export function playAnim(entity, name, blendOutTime = 0.25) {
     try { entity.playAnimation(name, { blendOutTime }); } catch (_) {}
 }
 
-// Tìm mặt đất ngay dưới 1 vị trí (để vòng cảnh báo / vết nứt nằm sát đất)
+// Tìm mặt đất ngay dưới 1 vị trí (để vòng cảnh báo / vết nứt / gai băng nằm sát đất)
 export function groundAt(dimension, loc, maxDown = 10) {
     const x = Math.floor(loc.x), z = Math.floor(loc.z);
     let y = Math.floor(loc.y);
@@ -112,18 +136,50 @@ export function groundAt(dimension, loc, maxDown = 10) {
     return { x: loc.x, y, z: loc.z };
 }
 
-// Vòng cảnh báo dưới đất: xanh = chiêu thường, đỏ = đòn nặng
+// Vòng cảnh báo dưới đất: xanh = chiêu thường, đỏ = đòn nặng.
+// Lớp phủ bên trong lớn dần và chạm vòng ngoài đúng lúc đòn đánh xuống.
 export function telegraph(dimension, loc, radius, seconds, danger = false) {
-    fx(dimension, danger ? FX.danger : FX.telegraph, groundAt(dimension, loc), { radius, duration: seconds });
+    const ground = groundAt(dimension, loc);
+    fx(dimension, danger ? FX.danger : FX.telegraph, ground, { radius, duration: seconds });
+    fx(dimension, danger ? FX.dangerFill : FX.telegraphFill, ground, { radius, duration: seconds });
 }
 
-// Combo hiệu ứng vỡ băng: sóng xung kích + mảnh băng + bụi tuyết + vết nứt
+// Va chạm nhiều lớp: chớp sáng, sóng xung kích, khối vụn, mảnh băng, bụi tuyết, sương lan, vết nứt
+export function impact(dimension, loc, size = 2, options = {}) {
+    const ground = groundAt(dimension, loc);
+    fx(dimension, FX.flash, ground, { radius: Math.min(4, 1 + size * 0.6) });
+    fx(dimension, FX.shockwave, ground, { radius: size * 1.8 });
+    fx(dimension, FX.shards, ground, { radius: size });
+    fx(dimension, FX.snow, ground, { radius: size });
+    if (size >= 1.5) fx(dimension, FX.debris, ground, { radius: size });
+    if (size >= 2 || options.mist) fx(dimension, FX.mist, ground, { radius: size * 1.4 });
+    if (options.crack !== false) fx(dimension, FX.crack, ground, { radius: Math.min(7, size * 1.3) });
+}
+
+// Hiệu ứng vỡ băng nhẹ (không có chớp sáng / sương)
 export function shatter(dimension, loc, size = 2, crack = true) {
     const ground = groundAt(dimension, loc);
     fx(dimension, FX.shockwave, ground, { radius: size * 1.6 });
     fx(dimension, FX.shards, ground, { radius: size });
     fx(dimension, FX.snow, ground, { radius: size });
     if (crack) fx(dimension, FX.crack, ground, { radius: Math.min(6, size * 1.2) });
+}
+
+// Gai băng mọc lên từ mặt đất (particle, thay cho mob gai băng cũ). size ~ chiều cao / 2.5 block
+export function iceSpike(dimension, loc, size = 1, seconds = 1.6) {
+    const ground = groundAt(dimension, loc);
+    fx(dimension, FX.spike, ground, { radius: size, duration: seconds });
+    fx(dimension, FX.shards, ground, { radius: size * 0.6 });
+    fx(dimension, FX.snow, ground, { radius: size * 0.5 });
+}
+
+// Vòng gai băng mọc quanh 1 điểm
+export function spikeRing(dimension, center, radius, count, size = 1, seconds = 1.6, phase = 0) {
+    for (let i = 0; i < count; i++) {
+        const a = phase + (Math.PI * 2 * i) / count;
+        iceSpike(dimension, { x: center.x + Math.cos(a) * radius, y: center.y + 1, z: center.z + Math.sin(a) * radius },
+            size * (0.8 + Math.random() * 0.4), seconds);
+    }
 }
 
 // -------------------- Hình học --------------------
@@ -157,25 +213,108 @@ export function inCone(origin, dir, loc, range, halfAngleDeg) {
     return cos >= Math.cos(halfAngleDeg * Math.PI / 180);
 }
 
-// -------------------- Người chơi --------------------
+// -------------------- Mục tiêu --------------------
 
-export function playersNear(dimension, loc, radius, minDistance) {
+// Các họ mob mà boss chủ động tấn công (khớp với minecraft:behavior.nearest_attackable_target của boss)
+const TARGET_FAMILIES = ['player', 'brown_dog', 'white_dog', 'cat', 'fox', 'wolf', 'villager', 'farmer', 'hoglin', 'zoglin', 'irongolem', 'snowgolem'];
+const IGNORE_TYPES = ['minecraft:item', 'minecraft:xp_orb', 'minecraft:arrow', 'minecraft:snowball', 'minecraft:armor_stand', 'minecraft:painting'];
+export const MINION_TAG = 'yeti_minion';
+
+const aggro = new Map(); // boss.id -> Map(entity.id -> tick gần nhất đánh nhau với boss)
+
+export function isBoss(entity) {
+    return entity.typeId.startsWith('ytaun:yeti');
+}
+
+function noteAggro(boss, other) {
+    if (!boss || !other || !isBoss(boss) || other.typeId.startsWith('ytaun:')) return;
+    let m = aggro.get(boss.id);
+    if (!m) aggro.set(boss.id, (m = new Map()));
+    m.set(other.id, system.currentTick);
+}
+
+// Boss bị đánh -> kẻ đánh thành mục tiêu; boss đánh trúng ai -> người đó là mục tiêu
+world.afterEvents.entityHurt.subscribe(e => {
+    try {
+        const src = e.damageSource?.damagingEntity;
+        if (src && isBoss(e.hurtEntity)) noteAggro(e.hurtEntity, src);
+    } catch (_) {}
+});
+world.afterEvents.entityHitEntity.subscribe(e => {
+    try {
+        if (e.damagingEntity && e.hitEntity && isBoss(e.damagingEntity)) noteAggro(e.damagingEntity, e.hitEntity);
+    } catch (_) {}
+});
+
+export function forgetBoss(bossId) {
+    aggro.delete(bossId);
+}
+
+function isPlayer(entity) {
+    return entity.typeId === 'minecraft:player';
+}
+
+// Có phải đối thủ của boss không (người chơi, mob boss nhắm tới, mob vừa đánh nhau với boss)
+export function isEnemy(entity, boss) {
+    try {
+        if (!entity || !entity.isValid || entity.id === boss?.id) return false;
+        const id = entity.typeId;
+        if (id.startsWith('ytaun:') || IGNORE_TYPES.includes(id)) return false;
+        if (isPlayer(entity)) {
+            try { if (SPECTATOR && entity.getGameMode() === SPECTATOR) return false; } catch (_) {}
+            return true;
+        }
+        if (entity.hasTag(MINION_TAG) || !entity.getComponent('minecraft:health')) return false;
+        const fought = boss && aggro.get(boss.id)?.get(entity.id);
+        if (fought !== undefined && system.currentTick - fought < 600) return true;
+        const fam = entity.getComponent('minecraft:type_family');
+        return !!fam && TARGET_FAMILIES.some(f => fam.hasTypeFamily(f));
+    } catch (_) {
+        return false;
+    }
+}
+
+// Mọi đối thủ trong bán kính (skill gây sát thương lên tất cả)
+export function enemiesNear(dimension, loc, radius, boss, minDistance) {
+    try {
+        const options = { location: loc, maxDistance: radius };
+        if (minDistance !== undefined) options.minDistance = Math.max(0, minDistance);
+        return dimension.getEntities(options).filter(e => isEnemy(e, boss));
+    } catch (_) {
+        return [];
+    }
+}
+
+// Người chơi quanh 1 điểm (dùng cho rung màn hình, tiêu đề)
+export function playersNear(dimension, loc, radius) {
     try {
         const options = { location: loc, maxDistance: radius };
         if (SPECTATOR) options.excludeGameModes = [SPECTATOR];
-        if (minDistance !== undefined) options.minDistance = Math.max(0, minDistance);
         return dimension.getPlayers(options);
     } catch (_) {
         return [];
     }
 }
 
-export function nearestPlayer(entity, radius) {
-    const players = playersNear(entity.dimension, entity.location, radius);
+// Mục tiêu của boss: mob / người vừa đánh nhau với boss (mới nhất), nếu không thì đối thủ gần nhất
+export function pickTarget(boss, radius) {
+    const m = aggro.get(boss.id);
+    if (m) {
+        let best, bestTick = -1;
+        for (const [id, tick] of m) {
+            if (system.currentTick - tick > 300) { m.delete(id); continue; }
+            if (tick <= bestTick) continue;
+            let e;
+            try { e = world.getEntity(id); } catch (_) {}
+            if (!e || !e.isValid || e.dimension.id !== boss.dimension.id || dist2D(e.location, boss.location) > radius) continue;
+            best = e; bestTick = tick;
+        }
+        if (best) return best;
+    }
     let best, bestDist = Infinity;
-    for (const p of players) {
-        const d = dist2D(p.location, entity.location);
-        if (d < bestDist) { bestDist = d; best = p; }
+    for (const e of enemiesNear(boss.dimension, boss.location, radius, boss)) {
+        const d = dist2D(e.location, boss.location);
+        if (d < bestDist) { bestDist = d; best = e; }
     }
     return best;
 }
@@ -185,7 +324,7 @@ const lastSkillHit = new Map(); // player.id -> { yetiId, tick }
 export function hurt(target, amount, source) {
     try {
         target.applyDamage(amount);
-        if (source && target.typeId === 'minecraft:player') lastSkillHit.set(target.id, { yetiId: source.id, tick: system.currentTick });
+        if (source && isPlayer(target)) lastSkillHit.set(target.id, { yetiId: source.id, tick: system.currentTick });
     } catch (_) {}
 }
 
@@ -228,6 +367,7 @@ export function lockCast(entity, ticks, root = true) {
 
 export function clearEntity(entityId) {
     busyUntil.delete(entityId);
+    forgetBoss(entityId);
 }
 
 export function safeTeleport(entity, loc, options) {
@@ -236,4 +376,8 @@ export function safeTeleport(entity, loc, options) {
 
 export function later(ticks, fn) {
     return system.runTimeout(() => { try { fn(); } catch (e) { console.warn('[Yeti FX]', e); } }, Math.max(0, Math.round(ticks)));
+}
+
+export function alive(entity) {
+    try { return !!entity && entity.isValid; } catch (_) { return false; }
 }

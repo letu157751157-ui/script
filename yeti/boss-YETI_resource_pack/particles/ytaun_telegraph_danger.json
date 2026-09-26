@@ -27,29 +27,33 @@
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          "(v.radius > 0 ? v.radius : 3) * math.min(1, 0.3 + v.particle_age * 5)",
-          "(v.radius > 0 ? v.radius : 3) * math.min(1, 0.3 + v.particle_age * 5)"
+          "(v.radius > 0 ? v.radius : 3) * math.min(1, 0.3 + v.particle_age * 6)",
+          "(v.radius > 0 ? v.radius : 3) * math.min(1, 0.3 + v.particle_age * 6)"
         ],
         "facing_camera_mode": "emitter_transform_xz",
         "uv": {
-          "texture_width": 256,
-          "texture_height": 256,
+          "texture_width": 512,
+          "texture_height": 512,
           "uv": [
-            0,
-            32
+            384,
+            0
           ],
           "uv_size": [
-            32,
-            32
+            64,
+            64
           ]
         }
+      },
+      "minecraft:particle_initial_spin": {
+        "rotation": 0,
+        "rotation_rate": 25
       },
       "minecraft:particle_appearance_tinting": {
         "color": [
           1.0,
-          0.353,
           0.29,
-          "0.55 + 0.35 * math.sin(v.particle_age * 900)"
+          0.227,
+          "0.6 + 0.35 * math.sin(v.particle_age * 900)"
         ]
       }
     }

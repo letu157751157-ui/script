@@ -1,0 +1,73 @@
+{
+  "format_version": "1.10.0",
+  "particle_effect": {
+    "description": {
+      "identifier": "ytaun:hand_glow",
+      "basic_render_parameters": {
+        "material": "particles_add",
+        "texture": "textures/particle/ytaun_yeti_fx"
+      }
+    },
+    "components": {
+      "minecraft:emitter_local_space": {
+        "position": true,
+        "rotation": false
+      },
+      "minecraft:emitter_rate_steady": {
+        "spawn_rate": 26,
+        "max_particles": 30
+      },
+      "minecraft:emitter_lifetime_once": {
+        "active_time": 0.8
+      },
+      "minecraft:emitter_shape_sphere": {
+        "radius": 0.6,
+        "surface_only": true,
+        "direction": "inwards"
+      },
+      "minecraft:particle_lifetime_expression": {
+        "max_lifetime": 0.45
+      },
+      "minecraft:particle_initial_speed": 1.3,
+      "minecraft:particle_appearance_tinting": {
+        "color": {
+          "interpolant": "v.particle_age / v.particle_lifetime",
+          "gradient": {
+            "0.0": "#FFB0F0FF",
+            "0.5": "#FFB0F0FF",
+            "1.0": "#00B0F0FF"
+          }
+        }
+      },
+      "minecraft:particle_appearance_billboard": {
+        "size": [
+          "0.08 + v.particle_random_1 * 0.07",
+          "0.08 + v.particle_random_1 * 0.07"
+        ],
+        "facing_camera_mode": "rotate_xyz",
+        "uv": {
+          "texture_width": 512,
+          "texture_height": 512,
+          "flipbook": {
+            "base_UV": [
+              192,
+              128
+            ],
+            "size_UV": [
+              16,
+              16
+            ],
+            "step_UV": [
+              16,
+              0
+            ],
+            "max_frame": 4,
+            "stretch_to_lifetime": true,
+            "loop": false,
+            "frames_per_second": 12
+          }
+        }
+      }
+    }
+  }
+}

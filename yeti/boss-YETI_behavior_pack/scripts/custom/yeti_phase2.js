@@ -1,34 +1,21 @@
 // File: scripts/custom/yeti_phase2.js
 // Skills cho Yeti Phase 2 (ytaun:yeti_2) - Yeti Trưởng Thành
 //
-// v1.3 (nâng cấp skill):
-// - Mọi chiêu có animation riêng + particle băng mới + vòng cảnh báo trước đòn nặng
-// - Blizzard Rain -> Mưa Băng Nhọn (băng nhọn rơi đúng vào vòng đỏ, nhắm cả người chơi)
-// - Frost Spike -> Rãnh Băng (vết nứt chạy tới mục tiêu, cột băng hất tung, mỗi người chỉ trúng 1 lần)
-// - Ice Ball -> Ném Tảng Băng
-// - Cú Nhảy Nghiền Băng: trước đây có code nhưng chưa bao giờ được dùng, nay đã dùng
-// - MỚI: Hơi Thở Băng Giá (phun băng hình nón, trúng 4 lần liên tiếp thì bị đóng băng)
-// - MỚI: Vuốt Băng Kép
-// - Sửa: Elite Army / Earthquake trước đây được tung cùng lúc với chiêu khác và tung ngay khi
-//   vừa gặp người chơi; nay có hồi chiêu chung + chờ lần đầu
-// Giữ nguyên: identifier "ytaun:yeti_2", máu 500, các ngưỡng máu và hồi chiêu gốc
+// v1.4: làm lại hình ảnh toàn bộ chiêu (animation theo khớp model đã sửa, particle mới nhiều lớp),
+// Gai Băng là particle (bỏ mob gai băng), chiêu đánh cả mob mà boss đang nhắm, Vuốt Băng thành combo
+// 3 đòn (vuốt - vuốt - đập đất). Cơ chế giữ như v1.3.
 
 import { createBoss } from './yeti_brain';
 import * as S from './yeti_skills';
-import { castIceSpike, castChargeAttack } from './yeti_spike_charge';
 
 const SPIKE_CHARGE_CONFIG = {
     laneCount: 3,
     spikeDamage: 5,
-    windupTicks: 20,
-    dashTicks: 14,
+    spikeStep: 2,
     meleeDamage: 18,
     knockbackStrength: 1.8,
     slownessAmplifier: 3,
-    freezeDurationTicks: 140,
-    animIceSpike: 'animation.ytaun_yeti_1_default.ice_spike',
-    animAttack2: 'animation.ytaun_yeti_1_default.attack_2',
-    animAttackHit: 'animation.ytaun_yeti_1.attack'
+    freezeDurationTicks: 140
 };
 
 createBoss({
@@ -76,14 +63,14 @@ createBoss({
         },
         {
             name: 'iceSpike', tier: 1, cd: 485, first: 80,
-            cast: c => castIceSpike(c.yeti, c.target, SPIKE_CHARGE_CONFIG)
+            cast: c => S.castIceSpike(c.yeti, c.target, SPIKE_CHARGE_CONFIG)
         },
         {
             name: 'chargeAttack', tier: 1, cd: 350, first: 140, when: c => c.d >= 4,
-            cast: c => castChargeAttack(c.yeti, c.target, SPIKE_CHARGE_CONFIG, (hit, finalTarget) => {
+            cast: c => S.castChargeAttack(c.yeti, c.target, SPIKE_CHARGE_CONFIG, (hit, finalTarget) => {
                 if (!hit && finalTarget && c.yeti.isValid) {
                     c.st.cd.iceSpike = c.tick + 485;
-                    castIceSpike(c.yeti, finalTarget, SPIKE_CHARGE_CONFIG);
+                    S.castIceSpike(c.yeti, finalTarget, SPIKE_CHARGE_CONFIG);
                 }
             })
         },
@@ -94,7 +81,7 @@ createBoss({
         },
         {
             name: 'frostClaws', tier: 2, cd: 120, when: c => c.d <= 5.5,
-            cast: c => S.frostClaws(c.yeti, c.target, { range: 5, halfAngle: 60, damage: 10, slow: [50, 2], knock: [1.3, 0.35] })
+            cast: c => S.frostClaws(c.yeti, c.target, { range: 5, halfAngle: 60, damage: 10, slow: [50, 2], knock: [1.3, 0.35], combo: true })
         },
         {
             name: 'icicleRain', tier: 2, cd: 470, when: c => c.d > 14,

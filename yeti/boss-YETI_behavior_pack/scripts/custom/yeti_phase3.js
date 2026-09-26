@@ -1,19 +1,13 @@
 // File: scripts/custom/yeti_phase3.js
 // Skills cho Yeti Phase 3 (ytaun:yeti_3) - Yeti Cổ Đại
 //
-// v1.3 (nâng cấp skill):
-// - Mọi chiêu có animation riêng + particle băng mới + vòng cảnh báo trước đòn nặng
-// - Crystal Barrage -> Mưa Tảng Băng (ném liên tiếp 6 tảng băng vào người chơi)
-// - Ice Chains: trói 5 giây rồi GIẬT mục tiêu về phía Yeti (trước: trói 10 giây)
-// - MỚI: Ngục Băng (nhốt mục tiêu trong cột băng nếu không kịp chạy khỏi vòng đỏ)
-// - MỚI: Hơi Thở Băng Giá, Vuốt Băng Kép
-// - MỚI: Cuồng Nộ - khi còn dưới 35% máu (1 lần): tăng tốc + sức mạnh, mọi chiêu hồi nhanh hơn 25%
-// Giữ nguyên: identifier "ytaun:yeti_3", máu 500, Giáp Băng phản 30% sát thương, các ngưỡng máu gốc
+// v1.4: làm lại hình ảnh toàn bộ chiêu (animation theo khớp model đã sửa, particle mới nhiều lớp),
+// Gai Băng là particle (bỏ mob gai băng), chiêu đánh cả mob mà boss đang nhắm, Vuốt Băng thành combo
+// 3 đòn, Cuồng Nộ có lửa băng bao quanh. Cơ chế giữ như v1.3 (Giáp Băng phản 30% sát thương...).
 
 import { world, system } from '@minecraft/server';
 import { createBoss } from './yeti_brain';
 import * as S from './yeti_skills';
-import { castIceSpike, castChargeAttack } from './yeti_spike_charge';
 import { FX, fx, effect } from './yeti_fx';
 
 const ID = 'ytaun:yeti_3';
@@ -23,15 +17,11 @@ const prisonActive = new Map(); // player.id -> đang bị nhốt trong Ngục B
 const SPIKE_CHARGE_CONFIG = {
     laneCount: 4,
     spikeDamage: 6,
-    windupTicks: 16,
-    dashTicks: 14,
+    spikeStep: 2,
     meleeDamage: 20,
     knockbackStrength: 2.0,
     slownessAmplifier: 4,
-    freezeDurationTicks: 160,
-    animIceSpike: 'animation.ytaun_yeti_1_default.ice_spike',
-    animAttack2: 'animation.ytaun_yeti_1_default.attack_2',
-    animAttackHit: 'animation.ytaun_yeti_1.attack'
+    freezeDurationTicks: 160
 };
 
 createBoss({
@@ -42,8 +32,8 @@ createBoss({
     openingDelay: 60,
     cooldownScale: st => (st.data.enraged ? 0.75 : 1),
     onTick: (yeti, st, tick) => {
-        // hào quang băng quanh Yeti khi đang Cuồng Nộ
-        if (st.data.enraged && tick % 20 === 0) fx(yeti.dimension, FX.aura, yeti.location, { radius: 2 });
+        // lửa băng bùng quanh Yeti khi đang Cuồng Nộ
+        if (st.data.enraged && tick % 20 === 0) fx(yeti.dimension, FX.flame, yeti.location, { radius: 1.2 });
     },
     skills: [
         // ---- Khẩn cấp theo máu ----
@@ -94,14 +84,14 @@ createBoss({
         },
         {
             name: 'iceSpike', tier: 1, cd: 425, first: 60,
-            cast: c => castIceSpike(c.yeti, c.target, SPIKE_CHARGE_CONFIG)
+            cast: c => S.castIceSpike(c.yeti, c.target, SPIKE_CHARGE_CONFIG)
         },
         {
             name: 'chargeAttack', tier: 1, cd: 320, first: 120, when: c => c.d >= 4,
-            cast: c => castChargeAttack(c.yeti, c.target, SPIKE_CHARGE_CONFIG, (hit, finalTarget) => {
+            cast: c => S.castChargeAttack(c.yeti, c.target, SPIKE_CHARGE_CONFIG, (hit, finalTarget) => {
                 if (!hit && finalTarget && c.yeti.isValid) {
                     c.st.cd.iceSpike = c.tick + 425;
-                    castIceSpike(c.yeti, finalTarget, SPIKE_CHARGE_CONFIG);
+                    S.castIceSpike(c.yeti, finalTarget, SPIKE_CHARGE_CONFIG);
                 }
             })
         },
@@ -116,7 +106,7 @@ createBoss({
         },
         {
             name: 'frostClaws', tier: 2, cd: 100, when: c => c.d <= 6,
-            cast: c => S.frostClaws(c.yeti, c.target, { range: 5.5, halfAngle: 65, damage: 13, slow: [60, 3], knock: [1.6, 0.4] })
+            cast: c => S.frostClaws(c.yeti, c.target, { range: 5.5, halfAngle: 65, damage: 13, slow: [60, 3], knock: [1.6, 0.4], combo: true })
         },
         {
             name: 'icicleRain', tier: 2, cd: 600, when: c => c.d > 16,
@@ -124,7 +114,7 @@ createBoss({
         },
         {
             name: 'boulderBarrage', tier: 2, cd: 432, when: c => c.d > 12,
-            cast: c => S.boulderBarrage(c.yeti, { count: 6, interval: 14, area: 30, damage: 12, radius: 3, flightTicks: 12, slow: [60, 2], arc: 5 })
+            cast: c => S.boulderBarrage(c.yeti, { count: 6, interval: 14, area: 30, damage: 12, radius: 3, flightTicks: 12, slow: [60, 2], arc: 5, comet: true })
         },
         {
             name: 'glacierRift', tier: 2, cd: 380, when: c => c.d > 12,

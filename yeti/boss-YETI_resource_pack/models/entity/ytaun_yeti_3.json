@@ -94,7 +94,14 @@
               74
             ]
           }
-        ]
+        ],
+        "locators": {
+          "foot_r": [
+            -4.6,
+            0.5,
+            -4
+          ]
+        }
       },
       {
         "name": "bone43",
@@ -508,7 +515,14 @@
               99
             ]
           }
-        ]
+        ],
+        "locators": {
+          "foot_l": [
+            4.6,
+            0.5,
+            -4
+          ]
+        }
       },
       {
         "name": "bone40",
@@ -609,7 +623,14 @@
             ],
             "inflate": 0.5
           }
-        ]
+        ],
+        "locators": {
+          "chest": [
+            0,
+            33,
+            -10.5
+          ]
+        }
       },
       {
         "name": "bone28",
@@ -1053,14 +1074,7 @@
           0,
           44.06915,
           -9.16933
-        ],
-        "locators": {
-          "lead": [
-            0,
-            44.8541,
-            -1.09521
-          ]
-        }
+        ]
       },
       {
         "name": "bone46",
@@ -1069,7 +1083,14 @@
           0,
           43.8541,
           -9.09521
-        ]
+        ],
+        "locators": {
+          "mouth": [
+            0,
+            44,
+            -19.5
+          ]
+        }
       },
       {
         "name": "bone66",
@@ -1171,9 +1192,21 @@
         "parent": "head",
         "pivot": [
           0,
-          44.8541,
-          -1.09521
-        ]
+          44.5,
+          -10.5
+        ],
+        "locators": {
+          "eye_r": [
+            -3.5,
+            47.5,
+            -20.2
+          ],
+          "eye_l": [
+            3.5,
+            47.5,
+            -20.2
+          ]
+        }
       },
       {
         "name": "bone53",
@@ -1416,6 +1449,31 @@
         ]
       },
       {
+        "name": "elbow_r",
+        "parent": "arm0",
+        "pivot": [
+          -19.232,
+          26.359,
+          -2.626
+        ]
+      },
+      {
+        "name": "wrist_r",
+        "parent": "elbow_r",
+        "pivot": [
+          -19.732,
+          11.359,
+          -2.126
+        ],
+        "locators": {
+          "hand_r": [
+            -19.2,
+            9,
+            -2.7
+          ]
+        }
+      },
+      {
         "name": "bone75",
         "parent": "arm0",
         "pivot": [
@@ -1484,17 +1542,8 @@
         ]
       },
       {
-        "name": "bone17",
-        "parent": "bone75",
-        "pivot": [
-          -11.73194,
-          28.85864,
-          -2.62584
-        ]
-      },
-      {
         "name": "bone10",
-        "parent": "bone17",
+        "parent": "elbow_r",
         "pivot": [
           -5.73194,
           39.85864,
@@ -1526,7 +1575,7 @@
       },
       {
         "name": "bone9",
-        "parent": "bone17",
+        "parent": "elbow_r",
         "pivot": [
           -11.73194,
           45.85864,
@@ -1552,17 +1601,8 @@
         ]
       },
       {
-        "name": "bone16",
-        "parent": "bone17",
-        "pivot": [
-          -22.73194,
-          7.85864,
-          -6.62584
-        ]
-      },
-      {
         "name": "bone15",
-        "parent": "bone16",
+        "parent": "wrist_r",
         "pivot": [
           -11.73194,
           46.25122,
@@ -1589,7 +1629,7 @@
       },
       {
         "name": "bone13",
-        "parent": "bone16",
+        "parent": "wrist_r",
         "pivot": [
           -16.73194,
           12.25122,
@@ -1621,7 +1661,7 @@
       },
       {
         "name": "bone12",
-        "parent": "bone16",
+        "parent": "wrist_r",
         "pivot": [
           -12.73194,
           12.25122,
@@ -1653,7 +1693,7 @@
       },
       {
         "name": "bone11",
-        "parent": "bone16",
+        "parent": "wrist_r",
         "pivot": [
           -20.73194,
           12.25122,
@@ -1691,6 +1731,31 @@
           46.06915,
           0.83067
         ]
+      },
+      {
+        "name": "elbow_l",
+        "parent": "arm1",
+        "pivot": [
+          20.204,
+          26.328,
+          -0.89
+        ]
+      },
+      {
+        "name": "wrist_l",
+        "parent": "elbow_l",
+        "pivot": [
+          20.704,
+          11.329,
+          -0.39
+        ],
+        "locators": {
+          "hand_l": [
+            20.2,
+            7,
+            -1
+          ]
+        }
       },
       {
         "name": "bone18",
@@ -1763,17 +1828,8 @@
         ]
       },
       {
-        "name": "bone26",
-        "parent": "bone18",
-        "pivot": [
-          19.70433,
-          25.8285,
-          4.11046
-        ]
-      },
-      {
         "name": "bone27",
-        "parent": "bone26",
+        "parent": "elbow_l",
         "pivot": [
           6.70433,
           39.8285,
@@ -1806,7 +1862,7 @@
       },
       {
         "name": "bone76",
-        "parent": "bone26",
+        "parent": "elbow_l",
         "pivot": [
           12.70433,
           45.8285,
@@ -1833,17 +1889,8 @@
         ]
       },
       {
-        "name": "bone21",
-        "parent": "bone26",
-        "pivot": [
-          12.70433,
-          45.8285,
-          4.11046
-        ]
-      },
-      {
         "name": "bone22",
-        "parent": "bone21",
+        "parent": "wrist_l",
         "pivot": [
           18.70433,
           9.8285,
@@ -1871,7 +1918,7 @@
       },
       {
         "name": "bone23",
-        "parent": "bone21",
+        "parent": "wrist_l",
         "pivot": [
           17.70433,
           11.8285,
@@ -1904,7 +1951,7 @@
       },
       {
         "name": "bone24",
-        "parent": "bone21",
+        "parent": "wrist_l",
         "pivot": [
           23.70433,
           7.8285,
@@ -1937,7 +1984,7 @@
       },
       {
         "name": "bone25",
-        "parent": "bone21",
+        "parent": "wrist_l",
         "pivot": [
           24.70433,
           11.8285,

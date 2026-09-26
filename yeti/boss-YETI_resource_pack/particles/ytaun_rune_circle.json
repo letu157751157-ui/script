@@ -1,0 +1,64 @@
+{
+  "format_version": "1.10.0",
+  "particle_effect": {
+    "description": {
+      "identifier": "ytaun:rune_circle",
+      "basic_render_parameters": {
+        "material": "particles_add",
+        "texture": "textures/particle/ytaun_yeti_fx"
+      }
+    },
+    "components": {
+      "minecraft:emitter_rate_instant": {
+        "num_particles": 1
+      },
+      "minecraft:emitter_lifetime_once": {
+        "active_time": 0.05
+      },
+      "minecraft:emitter_shape_point": {
+        "offset": [
+          0,
+          0.1,
+          0
+        ]
+      },
+      "minecraft:particle_lifetime_expression": {
+        "max_lifetime": "(v.duration > 0 ? v.duration : 2)"
+      },
+      "minecraft:particle_appearance_billboard": {
+        "size": [
+          "(v.radius > 0 ? v.radius : 5) * math.min(1, v.particle_age * 3)",
+          "(v.radius > 0 ? v.radius : 5) * math.min(1, v.particle_age * 3)"
+        ],
+        "facing_camera_mode": "emitter_transform_xz",
+        "uv": {
+          "texture_width": 512,
+          "texture_height": 512,
+          "uv": [
+            448,
+            0
+          ],
+          "uv_size": [
+            64,
+            64
+          ]
+        }
+      },
+      "minecraft:particle_initial_spin": {
+        "rotation": 0,
+        "rotation_rate": 45
+      },
+      "minecraft:particle_appearance_tinting": {
+        "color": {
+          "interpolant": "v.particle_age / v.particle_lifetime",
+          "gradient": {
+            "0.0": "#00A8E8FF",
+            "0.1": "#FFA8E8FF",
+            "0.8": "#FFA8E8FF",
+            "1.0": "#00A8E8FF"
+          }
+        }
+      }
+    }
+  }
+}

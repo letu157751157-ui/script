@@ -38,12 +38,12 @@
         ],
         "facing_camera_mode": "rotate_xyz",
         "uv": {
-          "texture_width": 256,
-          "texture_height": 256,
+          "texture_width": 512,
+          "texture_height": 512,
           "flipbook": {
             "base_UV": [
-              0,
-              80
+              192,
+              128
             ],
             "size_UV": [
               16,

@@ -1,31 +1,20 @@
 // File: scripts/custom/yeti_phase1.js
 // Skills cho Yeti Phase 1 (ytaun:yeti_1) - Giai đoạn đầu (dễ hơn)
 //
-// v1.3 (nâng cấp skill):
-// - Mọi chiêu có animation riêng + particle băng mới + vòng cảnh báo trước đòn nặng
-// - Ice Ball -> Ném Tảng Băng (ném vòng cung, vòng đỏ báo chỗ rơi)
-// - Ice Jump -> Cú Nhảy Nghiền Băng (bay vòng cung thật sự thay vì dịch chuyển tức thời)
-// - Freeze Ground -> Băng Địa (vùng băng hiện rõ trên mặt đất, 20 giây)
-// - MỚI: Vuốt Băng Kép (2 cú vuốt tầm gần)
-// - Có hồi chiêu chung giữa các chiêu, không xả nhiều chiêu cùng lúc khi vừa gặp người chơi
-// Giữ nguyên từ bản trước: identifier "ytaun:yeti_1", Gai Băng + Lao Đánh (module yeti_spike_charge.js)
+// v1.4: làm lại hình ảnh toàn bộ chiêu (animation theo khớp model đã sửa, particle mới nhiều lớp),
+// Gai Băng là particle (bỏ mob gai băng), chiêu đánh cả mob mà boss đang nhắm. Cơ chế giữ như v1.3.
 
 import { createBoss } from './yeti_brain';
 import * as S from './yeti_skills';
-import { castIceSpike, castChargeAttack } from './yeti_spike_charge';
 
 const SPIKE_CHARGE_CONFIG = {
     laneCount: 3,
     spikeDamage: 4,
-    windupTicks: 25,
-    dashTicks: 14,
+    spikeStep: 3,
     meleeDamage: 15,
     knockbackStrength: 1.6,
     slownessAmplifier: 3,
-    freezeDurationTicks: 120,
-    animIceSpike: 'animation.ytaun_yeti_1_default.ice_spike',
-    animAttack2: 'animation.ytaun_yeti_1_default.attack_2',
-    animAttackHit: 'animation.ytaun_yeti_1.attack'
+    freezeDurationTicks: 120
 };
 
 createBoss({
@@ -51,15 +40,15 @@ createBoss({
         // ---- Chiêu đặc trưng ----
         {
             name: 'iceSpike', tier: 1, cd: 360, first: 100,
-            cast: c => castIceSpike(c.yeti, c.target, SPIKE_CHARGE_CONFIG)
+            cast: c => S.castIceSpike(c.yeti, c.target, SPIKE_CHARGE_CONFIG)
         },
         {
             name: 'chargeAttack', tier: 1, cd: 380, first: 160, when: c => c.d >= 4,
-            cast: c => castChargeAttack(c.yeti, c.target, SPIKE_CHARGE_CONFIG, (hit, finalTarget) => {
+            cast: c => S.castChargeAttack(c.yeti, c.target, SPIKE_CHARGE_CONFIG, (hit, finalTarget) => {
                 // lao trượt -> tung Gai Băng ngay lập tức
                 if (!hit && finalTarget && c.yeti.isValid) {
                     c.st.cd.iceSpike = c.tick + 360;
-                    castIceSpike(c.yeti, finalTarget, SPIKE_CHARGE_CONFIG);
+                    S.castIceSpike(c.yeti, finalTarget, SPIKE_CHARGE_CONFIG);
                 }
             })
         },

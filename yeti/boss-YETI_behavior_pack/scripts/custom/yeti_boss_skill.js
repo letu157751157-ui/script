@@ -1,5 +1,5 @@
 import { world, system } from '@minecraft/server';
-import { ANIM, FX, fx, playAnim, shatter, telegraph, groundAt, recentSkillAttacker } from './yeti_fx';
+import { ANIM, FX, fx, playAnim, impact, spikeRing, telegraph, groundAt, recentSkillAttacker, enemiesNear, isEnemy, playersNear } from './yeti_fx';
 import { phaseIntro } from './yeti_skills';
 
 // === YETI BOSS - SKILL THEO PHA (yeti_1 → yeti_2 → yeti_3 → yeti_death) ===
@@ -11,6 +11,8 @@ import { phaseIntro } from './yeti_skills';
 // FIX: tìm Yeti quanh từng người chơi (giống frozen_sword_skill.js) thay vì quét
 // toàn bộ dimension theo type - cách cũ có thể không trả kết quả trên một số server.
 //
+// v1.4: chiêu của yeti_death và nội tại tác động cả mob mà boss đang đánh (không chỉ người chơi),
+// hiệu ứng nhiều lớp mới (chớp sáng, gai băng, sương lan...).
 // v1.3: particle băng mới cho các chiêu của yeti_death và nội tại, animation giật mình
 // (animation.ytaun_yeti_death.pulse) khi yeti_death tung chiêu, màn xuất hiện hoành tráng
 // khi mỗi pha mới được triệu hồi, và tính cả chiêu (không chỉ đòn đánh thường) cho nội tại
@@ -102,16 +104,9 @@ function ringParticle(dimension, center, radius, count, particleId, yOffset = 0.
     }
 }
 
-function getNearbyPlayers(yeti, radius) {
-    try {
-        return yeti.dimension.getEntities({
-            location: yeti.location,
-            maxDistance: radius,
-            type: 'minecraft:player'
-        });
-    } catch (_) {
-        return [];
-    }
+// Đối thủ quanh Yeti: người chơi + mob mà boss đang nhắm / vừa đánh nhau (yeti_fx.isEnemy)
+function getNearbyEnemies(yeti, radius) {
+    return enemiesNear(yeti.dimension, yeti.location, radius, yeti);
 }
 
 function applyKnockback(yeti, target, strength = 1.2) {
@@ -159,15 +154,15 @@ function castIceStomp(yeti) {
     try {
         const loc = yeti.location;
         playAnim(yeti, ANIM.deathPulse, 0.2);
-        shatter(yeti.dimension, loc, 3);
+        impact(yeti.dimension, loc, 3);
         fx(yeti.dimension, FX.shockwave, groundAt(yeti.dimension, loc), { radius: 4.5 });
-        ringParticle(yeti.dimension, loc, 2.0, 12, 'minecraft:snowflake_particle');
+        spikeRing(yeti.dimension, loc, 3.2, 7, 0.9, 1.2);
         yeti.dimension.playSound('ambient.weather.thunder', loc, { pitch: 1.4, volume: 1.0 });
 
-        for (const player of getNearbyPlayers(yeti, 4.5)) {
+        for (const player of getNearbyEnemies(yeti, 4.5)) {
             player.addEffect('slowness', 60, { amplifier: 2, showParticles: true });
             applyKnockback(yeti, player, 1.0);
-            try { player.runCommand('camerashake add @s 0.4 0.3 positional'); } catch (_) {}
+            try { if (player.typeId === 'minecraft:player') player.runCommand('camerashake add @s 0.4 0.3 positional'); } catch (_) {}
         }
     } catch (e) {
         console.warn('[Yeti Boss] IceStomp error:', e);
@@ -180,18 +175,20 @@ function castFrostNova(yeti) {
         const loc = yeti.location;
         playAnim(yeti, ANIM.deathPulse, 0.2);
         fx(yeti.dimension, FX.beam, loc);
+        fx(yeti.dimension, FX.rune, groundAt(yeti.dimension, loc), { radius: 6, duration: 1.2 });
         telegraph(yeti.dimension, loc, 6, 0.6, true);
         for (let r = 2; r <= 6; r += 2) {
             system.runTimeout(() => {
                 try {
                     fx(yeti.dimension, FX.shockwave, groundAt(yeti.dimension, loc), { radius: r });
+                    fx(yeti.dimension, FX.mist, groundAt(yeti.dimension, loc), { radius: r * 0.6 });
                     ringParticle(yeti.dimension, loc, r, 4 + r, 'minecraft:snowflake_particle', 0.6);
                 } catch (_) {}
             }, r * 2);
         }
         yeti.dimension.playSound('ambient.weather.thunder', loc, { pitch: 1.6, volume: 0.8 });
 
-        for (const player of getNearbyPlayers(yeti, 6)) {
+        for (const player of getNearbyEnemies(yeti, 6)) {
             player.addEffect('mining_fatigue', 100, { amplifier: 1, showParticles: false });
             try { player.applyDamage(3); } catch (_) {}
         }
@@ -208,6 +205,7 @@ function castBlizzardFury(yeti) {
         playAnim(yeti, ANIM.deathPulse, 0.2);
         telegraph(yeti.dimension, loc, 7, 2.2, false);
         fx(yeti.dimension, FX.swirl, loc, { radius: 6 });
+        fx(yeti.dimension, FX.tornado, loc, { radius: 2 });
         fx(yeti.dimension, FX.snow, loc, { radius: 3 });
 
         let tick = 0;
@@ -216,12 +214,12 @@ function castBlizzardFury(yeti) {
             try {
                 if (!yeti.isValid) { system.clearRun(blizzardTimer); return; }
                 fx(yeti.dimension, FX.swirl, yeti.location, { radius: 3 + tick });
-                ringParticle(yeti.dimension, yeti.location, 6, 16, 'minecraft:snowflake_particle', 1.0);
-                for (const player of getNearbyPlayers(yeti, 7)) {
+                fx(yeti.dimension, FX.snowfall, yeti.location, { radius: 7 });
+                for (const player of getNearbyEnemies(yeti, 7)) {
                     player.addEffect('slowness', 40, { amplifier: 3, showParticles: true });
                     player.addEffect('blindness', 30, { amplifier: 0, showParticles: false });
                     try { player.applyDamage(2); } catch (_) {}
-                    try { player.runCommand('camerashake add @s 0.3 0.4 positional'); } catch (_) {}
+                    try { if (player.typeId === 'minecraft:player') player.runCommand('camerashake add @s 0.3 0.4 positional'); } catch (_) {}
                 }
             } catch (_) {}
             if (tick >= 4) system.clearRun(blizzardTimer);
@@ -281,11 +279,11 @@ function tickChillAura(yetis) {
             const cfg = CHILL_AURA_CONFIG[yeti.typeId];
             if (!cfg) continue;
 
-            const players = getNearbyPlayers(yeti, cfg.radius + 8);
+            const players = getNearbyEnemies(yeti, cfg.radius + 8);
             if (players.length === 0) continue;
-            // vòng hạt băng bay lên ở rìa vùng Sát Khí Lạnh (chỉ hiện khi có người chơi ở gần)
+            // vòng hạt băng bay lên ở rìa vùng Sát Khí Lạnh (chỉ hiện khi có đối thủ ở gần)
             fx(yeti.dimension, FX.aura, yeti.location, { radius: cfg.radius });
-            for (const player of getNearbyPlayers(yeti, cfg.radius)) {
+            for (const player of getNearbyEnemies(yeti, cfg.radius)) {
                 player.addEffect('slowness', 40, { amplifier: cfg.amplifier, showParticles: false });
             }
         } catch (e) {
@@ -359,17 +357,18 @@ world.afterEvents.entityHitEntity.subscribe(event => {
         const attacker = event.damagingEntity;
         const target = event.hitEntity;
         if (!attacker || !target) return;
-        if (target.typeId !== 'minecraft:player') return;
 
         const config = PHASE_CONFIG[attacker.typeId];
-        if (!config) return;
+        if (!config || !isEnemy(target, attacker)) return;
 
         for (const [effectName, opts] of Object.entries(config.onHit)) {
             target.addEffect(effectName, opts.duration, { amplifier: opts.amplifier, showParticles: true });
         }
 
-        fx(target.dimension, FX.shards, target.location, { radius: 0.6 });
-        fx(target.dimension, 'minecraft:snowflake_particle', target.location);
+        // đòn đánh thường: chớp sáng + mảnh băng + bụi tuyết ở chỗ trúng
+        fx(target.dimension, FX.flash, target.location, { radius: 1.3 });
+        fx(target.dimension, FX.shards, target.location, { radius: 0.8 });
+        fx(target.dimension, FX.snow, target.location, { radius: 0.6 });
         // (Đã bỏ thông báo actionbar theo yêu cầu)
     } catch (e) {
         console.warn('[Yeti Boss] onHit error:', e);
@@ -444,8 +443,8 @@ world.afterEvents.entitySpawn.subscribe(event => {
                     if (!entity.isValid) return;
                     playAnim(entity, ANIM.deathPulse, 0.2);
                     fx(entity.dimension, FX.beam, entity.location);
-                    shatter(entity.dimension, entity.location, 3);
-                    for (const p of getNearbyPlayers(entity, 64)) {
+                    impact(entity.dimension, entity.location, 3);
+                    for (const p of playersNear(entity.dimension, entity.location, 64)) {
                         p.onScreenDisplay.setTitle('§4§lYETI', { subtitle: '§7Nó vẫn chưa chết hẳn...', fadeInDuration: 10, stayDuration: 50, fadeOutDuration: 20 });
                     }
                 } catch (_) {}
