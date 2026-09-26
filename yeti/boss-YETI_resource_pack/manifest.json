@@ -1,12 +1,12 @@
 {
   "format_version": 2,
   "header": {
-    "description": "Boss Yeti v2.5 - 3 phases + last stand, 23 skills with ground warnings, no knock-up, 3 ice minions, particle ice spikes",
+    "description": "Boss Yeti v2.6 - 3 phases + last stand, 23 skills with ground warnings, no knock-up, 3 ice minions, particle ice spikes",
     "name": "boss-YETI",
-    "uuid": "8be1f74b-c9ab-4b75-9529-c5e10b0c8ed8",
+    "uuid": "071f4d43-2bf7-41ce-9da0-e19d1f153faa",
     "version": [
       2,
-      5,
+      6,
       0
     ],
     "min_engine_version": [
@@ -19,20 +19,20 @@
     {
       "description": "Boss Yeti resource pack",
       "type": "resources",
-      "uuid": "7322f770-6d31-40d5-a4f1-a616367b9cdf",
+      "uuid": "ede97228-b890-4cec-a2d9-475af666b1ad",
       "version": [
         2,
-        5,
+        6,
         0
       ]
     }
   ],
   "dependencies": [
     {
-      "uuid": "2122fa61-cd1f-4f09-a0e5-6212488828ae",
+      "uuid": "43a0a452-7e85-4f8f-adb6-12e5adad6cd6",
       "version": [
         2,
-        5,
+        6,
         0
       ]
     }

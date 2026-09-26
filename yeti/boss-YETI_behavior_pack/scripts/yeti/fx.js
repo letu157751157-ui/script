@@ -53,7 +53,7 @@ export function lerp(a, b, t) {
 
 /**
  * Phát 1 particle, kèm biến Molang (không bắt buộc): mỗi khoá thành variable.<khoá>
- * (radius, life (giây), yaw (độ), spin (độ), variant, speed, base, sides, shade...), riêng dir {x,y,z} thành dir_x/y/z.
+ * (radius, life (giây), yaw (độ), spin (độ), variant, speed...), riêng dir {x,y,z} thành dir_x/y/z.
  */
 export function emit(dimension, id, loc, vars) {
     try {
@@ -239,48 +239,33 @@ export function iceImpact(dimension, loc, size = 2, crack = true) {
 /** Gai băng to hơn bao nhiêu so với số `height` truyền vào (v2.4: gai to và dày hơn). */
 export const SPIKE_SCALE = 1.3;
 let spikeTick = { tick: -1, count: 0 }; // số gai đã mọc trong tick hiện tại
-/** Hướng ánh sáng giả để tô sáng/tối từng mặt gai (như mặt trên/mặt bên của block). */
-const SPIKE_LIGHT = normalize({ x: -0.5, y: 0.8, z: -0.3 });
 
-/**
- * 1 gai băng 3D dựng bằng particle: `sides` mặt tam giác, mỗi mặt là 1 particle nghiêng đúng độ dốc của mặt đó,
- * khép lại thành khối chóp; mặt quay về phía ánh sáng sáng hơn, mặt khuất tối hơn.
- */
-function spike3d(dimension, at, height, base, sides, life) {
-    const yaw0 = Math.random() * 360;
+/** 1 gai: 2 tấm particle cùng hình, quay theo trục X và trục Z nên nhìn từ trên xuống thành dấu "+". */
+function crossedSpike(dimension, at, height, life) {
     const variant = Math.floor(Math.random() * 2);
-    const apothem = base * Math.cos(Math.PI / sides);
-    const slant = Math.hypot(height, apothem);
-    for (let k = 0; k < sides; k++) {
-        const yaw = yaw0 + (360 * k) / sides;
-        const r = yaw * Math.PI / 180;
-        const lit = Math.max(0, (height * Math.cos(r) * SPIKE_LIGHT.x + apothem * SPIKE_LIGHT.y + height * Math.sin(r) * SPIKE_LIGHT.z) / slant);
-        emit(dimension, "yeti:ice_spike", at,
-            { radius: height, base, sides, yaw, life, shade: 0.62 + 0.38 * lit, variant: (variant + k) % 2 });
-    }
+    for (const yaw of [0, 90]) emit(dimension, "yeti:ice_spike", at, { radius: height, life, yaw, variant });
 }
 
 /**
- * Gai băng (v2.5: khối 3D thật dựng từ particle): chóp băng 6 mặt to, dày, đâm lên từ lòng đất, mỗi mặt có vân băng,
- * vết nứt, bọt khí và sáng tối riêng nên nhìn như model 3D; nền đất nứt dưới chân; hết `lifeTicks` tick thì vỡ vụn.
+ * Gai băng (particle, v2.6): gai băng pixel art đơn giản kiểu vanilla vẽ trên 2 tấm bắt chéo hình dấu "+"
+ * (như cây cỏ trong game), đâm lên từ lòng đất đúng kích thước thật rồi hết `lifeTicks` tick thì vỡ vụn.
  * Có âm thanh riêng khi mọc và khi vỡ.
- * height = chiều cao (block, trước khi nhân SPIKE_SCALE); cluster = thêm 2 gai 5 mặt nhỏ hơn mọc sát gốc.
+ * height = chiều cao (block, trước khi nhân SPIKE_SCALE); cluster = thêm 2 gai nhỏ mọc sát gốc.
  */
 export function spike(dimension, loc, height = 2, lifeTicks = 40, cluster = true) {
     const h = height * SPIKE_SCALE;
     const life = Math.max(0.2, lifeTicks / TICKS);
-    const base = h * 0.24;
-    // chiêu mọc cả chục gai cùng tick: từ gai thứ 5 bỏ cụm gai phụ + sương, từ gai thứ 9 dùng chóp 5 mặt, bỏ vết nứt (đỡ lag)
+    // chiêu mọc cả chục gai cùng tick: từ gai thứ 5 bỏ gai phụ + sương, từ gai thứ 9 bỏ vết nứt (đỡ lag)
     const now = system.currentTick;
     spikeTick = spikeTick.tick === now ? { tick: now, count: spikeTick.count + 1 } : { tick: now, count: 1 };
-    spike3d(dimension, loc, h, base, spikeTick.count > 8 ? 5 : 6, life);
+    crossedSpike(dimension, loc, h, life);
     if (cluster && spikeTick.count <= 4) {
         const a0 = Math.random() * Math.PI * 2;
         for (let i = 0; i < 2; i++) {
             const a = a0 + i * (Math.PI * (0.7 + Math.random() * 0.6));
             const hs = h * (0.42 + Math.random() * 0.2);
-            const d = base + hs * 0.12;
-            spike3d(dimension, { x: loc.x + Math.cos(a) * d, y: loc.y, z: loc.z + Math.sin(a) * d }, hs, hs * 0.28, 5, life);
+            const d = h * 0.3;
+            crossedSpike(dimension, { x: loc.x + Math.cos(a) * d, y: loc.y, z: loc.z + Math.sin(a) * d }, hs, life);
         }
     }
     if (spikeTick.count <= 8) emit(dimension, "yeti:ice_crack", { x: loc.x, y: loc.y + 0.04, z: loc.z }, { radius: Math.max(0.8, h * 0.45) });

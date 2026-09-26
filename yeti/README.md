@@ -3,9 +3,9 @@
 Bản nâng cấp toàn diện cho addon **boss-YETI v1.2** (tác giả gốc: YTAUN): viết lại bộ kỹ năng của boss,
 thêm bộ particle băng tự vẽ, animation riêng cho từng chiêu và 3 loại đệ băng mới.
 
-- **Tải về:** [`dist/boss-YETI_v2_5.mcaddon`](dist/boss-YETI_v2_5.mcaddon), mở file là Minecraft tự nhập cả 2 pack.
+- **Tải về:** [`dist/boss-YETI_v2_6.mcaddon`](dist/boss-YETI_v2_6.mcaddon), mở file là Minecraft tự nhập cả 2 pack.
 - **Mỗi bản phát hành có UUID mới và số phiên bản tăng thêm 1** (2.1 → 2.2 → ...), nên Minecraft luôn coi đó là
-  pack mới, không lẫn với bản cũ đã lưu. Khi nâng cấp: trong thế giới, gỡ pack boss-YETI cũ rồi bật bản **2.5.0**
+  pack mới, không lẫn với bản cũ đã lưu. Khi nâng cấp: trong thế giới, gỡ pack boss-YETI cũ rồi bật bản **2.6.0**
   (có thể vào **Cài đặt → Bộ nhớ** xoá các bản cũ cho gọn).
 - Yêu cầu giống bản v1.2: Script API `@minecraft/server` 2.7.0, không cần bật Experiments.
 
@@ -16,7 +16,7 @@ thêm bộ particle băng tự vẽ, animation riêng cho từng chiêu và 3 lo
 | Chiêu của boss | Nhiều chiêu có thể nổ **cùng 1 tick**, không báo trước, gây sát thương ngay | Mỗi lần 1 chiêu, **có vòng/ô cảnh báo đỏ** trên đất, né được |
 | Ai dính chiêu | Chỉ người chơi | **Mọi sinh vật** không thuộc phe Yeti: người chơi, dân làng, golem sắt, sói, pet, cả quái khác |
 | Bị hất tung | Đánh thường + tiếng gầm hất người chơi lên trời | **Không hất tung**: vẫn giữ lõi iron golem và đòn vung tay gốc, nhưng mọi đòn chỉ đẩy lùi theo phương ngang |
-| Gai băng | Là mob (entity) mọc lên | **Thuần particle nhưng là khối 3D**: chóp băng 6 mặt dựng từ particle, mỗi mặt sáng tối riêng, đâm lên từ lòng đất rồi vỡ vụn |
+| Gai băng | Là mob (entity) mọc lên | **Thuần particle**: gai băng pixel art đơn giản trên 2 tấm bắt chéo hình dấu "+", to, đâm lên từ lòng đất rồi vỡ vụn |
 | Âm thanh | Âm vanilla (thuỷ tinh vỡ, nổ, gấu Bắc Cực...) | **21 âm thanh tự làm** (45 file): gầm, gai băng mọc/vỡ, đập băng, nổ lớn, gió bão, phép băng, tiếng bước chân... |
 | Mục tiêu của chiêu | Người chơi gần nhất | **Con mà Yeti đang đánh** (hoặc đang đánh Yeti), không có thì con mồi gần nhất |
 | Đệ | Zombie / skeleton / stray vanilla | **Sói Băng, Hồn Băng, Golem Băng** — model, texture, animation, kỹ năng riêng |
@@ -103,7 +103,7 @@ phần lớn là flipbook nhiều khung hình:
 |---|---|
 | Cảnh báo | `warning_circle` (viền đỏ nhấp nháy nhanh dần), `warning_fill` (mảng đỏ lan tới viền), `warning_tile`, `dome_edge` (tường băng của Absolute Zero) |
 | Va chạm | `ice_burst` (ngôi sao băng), `frost_ring` (sóng băng 3 khung: dày → mỏng → vỡ), `ice_crack` (đất nứt), `ice_shard` (mảnh băng rơi, nảy trên đất), `snow_dust`, `frost_mist`, `hit_spark`, `ice_pillar`, `light_beam` |
-| Chiêu | `ice_spike` (1 mặt của gai băng 3D) + `spike_shatter` (gai vỡ vụn), `boulder` (tảng đất 4 loại), `rock_debris`, `shockwave` (sóng bụi tuyết), `aurora` (cực quang), `frost_orb` + `orb_trail`, `snowball` (cầu tuyết lăn), `crystal`, `icicle`, `chain_link`, `breath`, `blizzard`, `vortex`, `charge_gather`, `rune_circle`, `glyph`, `heal`, `frost_field`, `frozen_mark` |
+| Chiêu | `ice_spike` (gai băng, 2 tấm bắt chéo "+") + `spike_shatter` (gai vỡ vụn), `boulder` (tảng đất 4 loại), `rock_debris`, `shockwave` (sóng bụi tuyết), `aurora` (cực quang), `frost_orb` + `orb_trail`, `snowball` (cầu tuyết lăn), `crystal`, `icicle`, `chain_link`, `breath`, `blizzard`, `vortex`, `charge_gather`, `rune_circle`, `glyph`, `heal`, `frost_field`, `frozen_mark` |
 | Quanh boss (phía client) | `aura` (tuyết xoay quanh người), `aura_enraged` (lửa băng khi dưới 35% máu), `breath_puff` (hơi thở phả ra từ miệng — locator `mouth` mới trên hàm) |
 
 ## Animation
@@ -116,13 +116,12 @@ nên chuyển động cong và mượt. Mốc va chạm trong animation khớp �
 
 - **Khom người bốc đất - nâng qua đầu - ném**, **bật lên trời lơ lửng rồi lao xuống**. Đánh thường dùng đòn vung tay
   gốc của lõi iron golem (v2.3).
-- **Gai băng 3D bằng particle** (v2.5): mỗi gai là một **khối chóp băng 6 mặt** thật sự. Mỗi mặt là 1 particle hình tam
-  giác được nghiêng đúng độ dốc của mặt đó (chế độ `direction_z`) và đặt đúng chỗ, nên các mặt khép lại thành khối,
-  đi vòng quanh vẫn thấy hình chóp. Mặt quay về phía ánh sáng sáng hơn, mặt khuất tối hơn (như mặt bên của block),
-  gai tối đi theo ánh sáng thế giới (ban đêm, trong hang). Texture từng mặt: băng pixel art có vệt sáng/tối, vết nứt,
-  bọt khí, đầu phủ sương, gốc băng dày màu đậm và tuyết. Gai đâm lên từ lòng đất (đất che phần chưa trồi lên), đất nứt
-  dưới chân, kèm 2 gai 5 mặt nhỏ hơn; hết thời gian thì **vỡ vụn**. Chiêu mọc cả chục gai cùng lúc tự bớt gai phụ để
-  đỡ lag. Độ to chung chỉnh bằng `SPIKE_SCALE` trong `scripts/yeti/fx.js`.
+- **Gai băng** (particle, v2.6): gai băng **pixel art đơn giản kiểu vanilla** (16×32, ít màu: viền xanh đậm bậc thang,
+  mặt trái sáng có vệt bóng, sống giữa trắng, mặt phải xanh đậm dần, đầu phủ sương, dải tuyết ở gốc), vẽ trên
+  **2 tấm bắt chéo hình dấu "+"** (nhìn từ trên xuống) giống cây cỏ trong game, nên đi vòng quanh vẫn thấy khối. Gai đâm
+  lên từ lòng đất đúng kích thước thật (không bị kéo giãn), đất nứt dưới chân, kèm 2 gai nhỏ; hết thời gian thì
+  **vỡ vụn**. Chiêu mọc cả chục gai cùng lúc tự bớt gai phụ để đỡ lag. Độ to chung chỉnh bằng `SPIKE_SCALE` trong
+  `scripts/yeti/fx.js`.
 - **Yeti hấp hối** có animation thở dốc, lắc đầu, đấm xuống băng (bản cũ đứng im).
 - Đệ băng có animation đi/đứng (theo tốc độ) và animation kỹ năng: sói vồ/cắn, hồn băng niệm phép/cào, golem đập đất/đấm.
 - Ảnh trên được vẽ từ chính model bằng `tools/preview_anim.py` (không cần mở game).
@@ -171,8 +170,8 @@ Nội tại của Frozen Sword (cầm 20 giây / ngồi 4 giây) dùng hiệu �
   ngang, mọi chiêu chỉ đẩy ngang. **v2.3 trả lại lõi iron golem** (`runtime_identifier`, `offer_flower`) để giữ đòn
   vung tay gốc; cú hất lên trời của golem bị script ghi đè ngay trong tick trúng đòn và tick sau (đẩy lùi ngang nhẹ +
   ấn xuống đất), nên mục tiêu không bay lên.
-- **Gai băng particle xấu** (v2.3): bản 2.2 là 1 hình phẳng xoay theo camera và bị kéo giãn khi mọc. Đã vẽ lại;
-  v2.5 dựng thành khối chóp 3D từ particle (xem mục Animation).
+- **Gai băng particle xấu** (v2.3): bản 2.2 là 1 hình phẳng xoay theo camera và bị kéo giãn khi mọc. Đã vẽ lại
+  thành gai pixel art đơn giản trên 2 tấm bắt chéo hình "+" (v2.6, xem mục Animation).
 - **Tràn pet boss** (v2.2): `yeti_2` gọi 4 pet mỗi lần đổi mục tiêu; `yeti_1`/`yeti_2` đẻ 10 pet khi xuất hiện;
   dạng hấp hối gọi 1 pet MỖI đòn bị đánh. Giờ: không gọi khi đổi mục tiêu, 2 pet khi xuất hiện, dạng hấp hối
   tối đa 1 pet / 12 giây (không quá 2 con).
