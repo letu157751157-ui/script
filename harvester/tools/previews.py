@@ -37,8 +37,9 @@ SKILL_POSES = [
 
 # how grayscale sprites are tinted in game (representative colours)
 TINTS = {
-    "miasma": (168, 201, 74), "splash": (168, 201, 74), "slash": (124, 255, 212), "ring": (124, 255, 212),
-    "rune_circle": (168, 201, 74), "tile": (90, 255, 204), "spark": (124, 255, 212), "drop": (60, 80, 30),
+    "miasma": (168, 201, 74), "splash": (168, 201, 74), "ring": (124, 255, 212),
+    "rune_circle": (168, 201, 74), "tile": (90, 255, 204), "spark": (124, 255, 212), "drop": (140, 180, 58),
+    "wave": (168, 201, 74),
 }
 
 
@@ -73,12 +74,12 @@ def particles_sheet(path):
                 f[..., :3] = f[..., :3] * np.array(TINTS[name]) / 255.0
             tinted.append(f.astype(np.uint8))
         items.append((name, tinted))
-    cols_w = 900
+    cols_w = 1000
     x = y = 8
     row_h = 0
     placements = []
     def scale_of(frames):
-        return 8 if max(frames[0].shape[:2]) <= 16 else 4
+        return 6 if max(frames[0].shape[:2]) <= 16 else 4 if max(frames[0].shape[:2]) <= 32 else 2
 
     for name, frames in items:
         scale = scale_of(frames)

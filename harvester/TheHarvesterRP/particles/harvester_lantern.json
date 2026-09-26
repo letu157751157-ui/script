@@ -28,8 +28,8 @@
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          0.22,
-          0.22
+          0.28,
+          0.28
         ],
         "facing_camera_mode": "lookat_y",
         "uv": {
@@ -37,15 +37,15 @@
           "texture_height": 256,
           "flipbook": {
             "base_UV": [
-              88,
-              42
+              112,
+              128
             ],
             "size_UV": [
-              8,
-              8
+              16,
+              16
             ],
             "step_UV": [
-              8,
+              16,
               0
             ],
             "frames_per_second": 5,

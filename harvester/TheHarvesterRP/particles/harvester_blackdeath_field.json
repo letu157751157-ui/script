@@ -48,8 +48,8 @@
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          "0.7 + 0.3 * v.particle_random_2",
-          "0.7 + 0.3 * v.particle_random_2"
+          "0.9 + 0.3 * v.particle_random_2",
+          "0.9 + 0.3 * v.particle_random_2"
         ],
         "facing_camera_mode": "rotate_xyz",
         "uv": {
@@ -57,18 +57,18 @@
           "texture_height": 256,
           "flipbook": {
             "base_UV": [
-              80,
-              32
+              128,
+              112
             ],
             "size_UV": [
-              8,
-              8
+              16,
+              16
             ],
             "step_UV": [
-              8,
+              16,
               0
             ],
-            "max_frame": 8,
+            "max_frame": 4,
             "loop": false,
             "stretch_to_lifetime": true
           }

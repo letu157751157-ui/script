@@ -1,12 +1,12 @@
-# The Harvester v1.3.2 — Thần Chết × Bác sĩ Dịch hạch
+# The Harvester v1.3.3 — Thần Chết × Bác sĩ Dịch hạch
 
 Boss **The Harvester** (`pa:harvester`) được làm lại theo ý tưởng **Thần Chết** (lưỡi hái, linh hồn, đồng hồ cát, bia mộ)
 kết hợp **Bác sĩ Dịch hạch** (mặt nạ mỏ chim, bình thuốc dịch, khí độc, bầy quạ).
 Bản này đổi toàn bộ bộ chiêu, thêm 17 animation và 35 particle mới, và sửa nhiều lỗi của bản 1.2.
 
-- Cài đặt: mở [`dist/TheHarvester_v1.3.2.mcaddon`](dist/TheHarvester_v1.3.2.mcaddon) (Minecraft tự nhập cả 2 pack).
-  Nếu đã cài bản cũ (1.2 / 1.3.x): vào **Cài đặt → Bộ nhớ**, xoá các pack *The Harvester* cũ, nhập file 1.3.2,
-  rồi trong thế giới bật lại cả Behavior Pack lẫn Resource Pack **1.3.2**.
+- Cài đặt: mở [`dist/TheHarvester_v1.3.3.mcaddon`](dist/TheHarvester_v1.3.3.mcaddon) (Minecraft tự nhập cả 2 pack).
+  Nếu đã cài bản cũ (1.2 / 1.3.x): vào **Cài đặt → Bộ nhớ**, xoá các pack *The Harvester* cũ, nhập file 1.3.3,
+  rồi trong thế giới bật lại cả Behavior Pack lẫn Resource Pack **1.3.3**.
 - Kiểm tra nhanh: thanh máu của boss phải ghi *The Harvester — Doctor of the Dead*. Nếu vẫn là tên cũ thì thế giới còn dùng pack cũ.
 - Yêu cầu: Minecraft Bedrock **1.21.90+** (giống bản gốc), không cần bật Experiments.
 - Gọi boss: `/summon pa:harvester`, hoặc gặp tự nhiên ở The End như trước.
@@ -78,8 +78,10 @@ và boss **đứng yên** trong lúc vung chiêu nên người chơi có thể n
 
 ![Sprite của các particle mới](previews/particles.png)
 
-Vẽ theo **phong cách particle vanilla**: phần lớn là sprite 8×8 như `particles.png` của Minecraft (đầu lâu, mặt nạ, lưỡi hái 16×16,
-vòng tròn 32×32 nét 1 pixel), mỗi sprite chỉ 2–4 màu phẳng, không đổ bóng mịn. Khói/khí dịch là 8 khung tròn nhỏ dần giống khói vanilla.
+Vẽ **cùng phong cách với các addon khác trong repo** (Darkin Blade của Aatrox, Toji, Giant Zombie): pixel cạnh sắc,
+mỗi hiệu ứng một dải 4–5 màu (linh hồn: trắng → xanh ngọc → xanh đậm; dịch hạch: vàng lục → xanh rêu), tô theo "độ nóng"
+thành từng dải phẳng, và flipbook vỡ vụn thành pixel rời ở các khung cuối. Vệt chém/sóng 32×32, phần lớn sprite 16×16,
+mảnh vụn 8×8, vòng rune 64×64. Khói, vòng, ô cảnh báo là sprite xám được tô màu trong JSON (giống atlas của Giant Zombie).
 
 Tất cả nằm trong `TheHarvesterRP/particles/harvester_*.json`, dùng chung atlas `textures/particle/harvester_particles.png`:
 linh hồn (`soul_wisp`, `soul_burst`, `soul_stream`, `soul_pillar`), vệt lưỡi hái (`scythe_trail`, `scythe_trail_big`, `spectral_scythe`),
@@ -97,6 +99,12 @@ Giữ nguyên chỉ số, chỉ sửa lỗi và đổi hiệu ứng:
   **không còn đánh dân làng, thương nhân, giáp đứng hay thú đã thuần**.
 - Kill bằng chiêu của lưỡi hái giờ cũng tính cho Dark Blessing.
 - Khi đang đánh Harvester, action bar hiện thông tin boss thay vì hồi chiêu lưỡi hái.
+
+## Bản 1.3.3 — particle theo phong cách các addon khác
+
+Vẽ lại 35 particle theo cách vẽ của Aatrox / Toji / Giant Zombie: vệt chém lưỡi liềm có mép trắng rồi vỡ thành tia,
+khói phồng ra rồi tan thành pixel, sóng xung kích dày → mỏng → vỡ, lửa linh hồn 16×16 lắc lư, hồn ma, đầu lâu, lưỡi hái ma,
+quạ ánh tím, bình thuốc thủy tinh, đồng hồ cát, đèn lồng linh hồn, bia mộ, mặt nạ bác sĩ dịch hạch. Chiêu và thời gian không đổi.
 
 ## Bản 1.3.2 — particle đơn giản kiểu Minecraft
 
@@ -155,7 +163,7 @@ harvester/
 │   ├── previews.py     ảnh trong previews/
 │   ├── cleanup.py      liệt kê (hoặc xoá với --apply) file không dùng tới
 │   └── simulate.mjs    chạy thử script trên mock @minecraft/server qua cả trận đấu
-└── dist/TheHarvester_v1.3.2.mcaddon
+└── dist/TheHarvester_v1.3.3.mcaddon
 ```
 
 - `python3 build.py` (cần `pip install pillow numpy`), thêm `--previews` để vẽ lại ảnh xem trước.

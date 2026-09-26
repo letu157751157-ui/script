@@ -38,11 +38,11 @@
               0
             ],
             "size_UV": [
-              16,
-              16
+              32,
+              32
             ],
             "step_UV": [
-              16,
+              32,
               0
             ],
             "max_frame": 4,
@@ -55,9 +55,9 @@
         "color": {
           "interpolant": "v.particle_age / v.particle_lifetime",
           "gradient": {
-            "0.0": "#FFE6FFF7",
-            "0.3": "#FF7CFFD4",
-            "1.0": "#002FD6A8"
+            "0.0": "#FFFFFFFF",
+            "0.7": "#FFFFFFFF",
+            "1.0": "#00FFFFFF"
           }
         }
       }

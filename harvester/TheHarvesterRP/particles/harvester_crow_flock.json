@@ -37,8 +37,8 @@
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          0.22,
-          0.22
+          0.28,
+          0.28
         ],
         "facing_camera_mode": "rotate_xyz",
         "uv": {
@@ -47,14 +47,14 @@
           "flipbook": {
             "base_UV": [
               0,
-              42
+              128
             ],
             "size_UV": [
-              8,
-              8
+              16,
+              16
             ],
             "step_UV": [
-              8,
+              16,
               0
             ],
             "frames_per_second": 14,

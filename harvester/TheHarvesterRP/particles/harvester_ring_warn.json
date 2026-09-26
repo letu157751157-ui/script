@@ -29,8 +29,8 @@
           "texture_width": 256,
           "texture_height": 256,
           "uv": [
-            0,
-            0
+            96,
+            64
           ],
           "uv_size": [
             32,

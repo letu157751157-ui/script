@@ -28,14 +28,23 @@
         "uv": {
           "texture_width": 256,
           "texture_height": 256,
-          "uv": [
-            0,
-            0
-          ],
-          "uv_size": [
-            32,
-            32
-          ]
+          "flipbook": {
+            "base_UV": [
+              0,
+              64
+            ],
+            "size_UV": [
+              32,
+              32
+            ],
+            "step_UV": [
+              32,
+              0
+            ],
+            "max_frame": 3,
+            "loop": false,
+            "stretch_to_lifetime": true
+          }
         }
       },
       "minecraft:particle_appearance_tinting": {
