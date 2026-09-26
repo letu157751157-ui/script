@@ -255,3 +255,33 @@ def write_preview(write_png):
     ANIMS.update({name: fn().to_json() for name, fn in animations.BOSS_ANIMATIONS.items()})
     render(write_png, os.path.join(ROOT, "preview_animation.png"))
     print("Rendered preview_animation.png")
+
+
+MINION_FRAMES = [
+    ("frost_wolf", 5.0, [("", None, 0, -35), ("side", None, 0, -90), ("pounce", "pounce", 0.15, -90), ("bite", "bite", 0.12, -35)]),
+    ("frost_wraith", 3.2, [("", None, 0, -35), ("side", None, 0, -90), ("cast", "cast", 0.35, -35), ("slash", "slash", 0.28, -35)]),
+    ("frost_golem", 3.0, [("", None, 0, -35), ("side", None, 0, -90), ("slam", "slam", 0.5, -35), ("punch", "punch", 0.28, -35)]),
+]
+
+
+def write_minion_preview(write_png, minion_anims):
+    """preview_minions.png: every new minion from the front and side, plus its skill poses."""
+    global SCALE
+    geos = {g["description"]["identifier"]: g
+            for g in json.load(open(os.path.join(RP, "models/entity/yeti_minions.geo.json")))["minecraft:geometry"]}
+    w, h = 200, 180
+    img = [[BG] * (w * 4) for _ in range(h * len(MINION_FRAMES))]
+    for r, (ident, scale, frames) in enumerate(MINION_FRAMES):
+        geo = geos[f"geometry.ytaun.{ident}"]
+        tex = read_png(os.path.join(RP, f"textures/entity/minions/{ident}.png"))
+        SCALE = scale
+        for c, (label, anim, t, yaw) in enumerate(frames):
+            pose = pose_at(minion_anims.get(f"animation.ytaun.{ident}.{anim}") if anim else None, t)
+            faces = quads(geo, tex, pose, yaw=yaw)
+            faces.sort(key=lambda f: -f[0])
+            cx, cy = c * w, r * h
+            for _, pts, color in faces:
+                fill(img, pts, color, cx + w / 2, cy + h - 24, (cx, cy, cx + w, cy + h))
+            text(img, f"{ident.replace('_', ' ')} {label}".strip(), cx + 4, cy + h - 14)
+    write_png(os.path.join(ROOT, "preview_minions.png"), img)
+    print("Rendered preview_minions.png")

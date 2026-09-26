@@ -1,10 +1,18 @@
-"""Generate the Yeti ice particles and skill animations, then package dist/boss-YETI_v2_0.mcaddon.
+"""Generate the Yeti particles, animations and minions, then package dist/boss-YETI_v<major>_<minor>.mcaddon.
 
-Run: python3 build.py
+Run: python3 build.py            release build: NEW UUIDs for both packs + version +1 (2.1 -> 2.2 -> ...)
+     python3 build.py --no-bump  rebuild the current version (same UUIDs), for testing
+
+Every release gets fresh UUIDs and a higher version so Minecraft never mixes it up with an
+older copy of the pack it has cached (worlds must remove the old pack and add the new one).
 """
+import glob
+import json
 import os
+import re
 import struct
 import sys
+import uuid
 import zipfile
 import zlib
 
@@ -12,12 +20,12 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 
 import animations  # noqa: E402
+import minions  # noqa: E402
 import particles  # noqa: E402
 import preview_anim  # noqa: E402
 
 BP = "boss-YETI_behavior_pack"
 RP = "boss-YETI_resource_pack"
-OUT = "dist/boss-YETI_v2_0.mcaddon"
 
 
 def write_png(path, grid):
@@ -48,22 +56,71 @@ def write_preview():
     write_png(os.path.join(ROOT, "preview_particles.png"), rows)
 
 
-def build_addon():
-    out = os.path.join(ROOT, OUT)
+def release(bump):
+    """New UUIDs + version bump in both manifests (when bump), returns the version list."""
+    paths = {pack: os.path.join(ROOT, pack, "manifest.json") for pack in (BP, RP)}
+    manifests = {pack: json.load(open(path, encoding="utf-8")) for pack, path in paths.items()}
+    version = manifests[BP]["header"]["version"]
+    if bump:
+        version = [version[0], version[1] + 1, 0]
+        heads = {pack: str(uuid.uuid4()) for pack in (BP, RP)}
+        for pack, other in ((BP, RP), (RP, BP)):
+            m = manifests[pack]
+            m["header"]["uuid"] = heads[pack]
+            for module in m["modules"]:
+                module["uuid"] = str(uuid.uuid4())
+            for dep in m["dependencies"]:
+                if "uuid" in dep:
+                    dep["uuid"] = heads[other]
+    for m in manifests.values():
+        m["header"]["version"] = list(version)
+        m["header"]["description"] = re.sub(r"^Boss Yeti v[\d.]+", f"Boss Yeti v{version[0]}.{version[1]}",
+                                            m["header"]["description"])
+        for module in m["modules"]:
+            module["version"] = list(version)
+        for dep in m["dependencies"]:
+            if "uuid" in dep:
+                dep["version"] = list(version)
+    for pack, path in paths.items():
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(manifests[pack], f, indent=2, ensure_ascii=False)
+            f.write("\n")
+    with open(os.path.join(ROOT, BP, "scripts/yeti/version.js"), "w", encoding="utf-8") as f:
+        f.write("// Tự động ghi bởi build.py mỗi lần đóng gói (đừng sửa tay).\n")
+        f.write(f'export const VERSION = "{version[0]}.{version[1]}.{version[2]}";\n')
+    return version
+
+
+def build_addon(version):
+    name = f"boss-YETI_v{version[0]}_{version[1]}.mcaddon"
+    out = os.path.join(ROOT, "dist", name)
     os.makedirs(os.path.dirname(out), exist_ok=True)
+    for old in glob.glob(os.path.join(ROOT, "dist", "*.mcaddon")):
+        if os.path.basename(old) != name:
+            os.remove(old)
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
         for pack in (BP, RP):
             for folder, dirs, files in os.walk(os.path.join(ROOT, pack)):
                 dirs.sort()
-                for name in sorted(files):
-                    full = os.path.join(folder, name)
+                for name_ in sorted(files):
+                    full = os.path.join(folder, name_)
                     zf.write(full, os.path.relpath(full, ROOT))
-    print("Built", OUT)
+    readme = os.path.join(ROOT, "README.md")
+    text = open(readme, encoding="utf-8").read()
+    text = re.sub(r"dist/boss-YETI_v\d+_\d+\.mcaddon", f"dist/{name}", text)
+    text = re.sub(r"bật bản \*\*[\d.]+\*\*", f"bật bản **{version[0]}.{version[1]}.{version[2]}**", text)
+    with open(readme, "w", encoding="utf-8") as f:
+        f.write(text)
+    print("Built", os.path.relpath(out, ROOT))
 
 
 if __name__ == "__main__":
+    version = release(bump="--no-bump" not in sys.argv)
+    print("Version", ".".join(map(str, version)))
     particles.write_particles(os.path.join(ROOT, RP), write_png)
     animations.write_animations(os.path.join(ROOT, RP))
+    minions.write_minions(os.path.join(ROOT, BP), os.path.join(ROOT, RP), write_png)
     write_preview()
     preview_anim.write_preview(write_png)
-    build_addon()
+    preview_anim.write_minion_preview(write_png, minions.minion_animations())
+    build_addon(version)

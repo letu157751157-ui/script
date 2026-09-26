@@ -1,0 +1,38 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "ytaun:frost_wraith",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/minions/frost_wraith"
+      },
+      "geometry": {
+        "default": "geometry.ytaun.frost_wraith"
+      },
+      "animations": {
+        "look_at_target": "animation.common.look_at_target",
+        "float": "animation.ytaun.frost_wraith.float",
+        "move": "animation.ytaun.frost_wraith.move"
+      },
+      "scripts": {
+        "animate": [
+          "look_at_target",
+          "float",
+          {
+            "move": "q.modified_move_speed"
+          }
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#23355E",
+        "overlay_color": "#8FE8FF"
+      }
+    }
+  }
+}

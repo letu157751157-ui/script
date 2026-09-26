@@ -1,0 +1,38 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "ytaun:frost_golem",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/minions/frost_golem"
+      },
+      "geometry": {
+        "default": "geometry.ytaun.frost_golem"
+      },
+      "animations": {
+        "look_at_target": "animation.common.look_at_target",
+        "walk": "animation.ytaun.frost_golem.walk",
+        "idle": "animation.ytaun.frost_golem.idle"
+      },
+      "scripts": {
+        "animate": [
+          "look_at_target",
+          {
+            "walk": "q.modified_move_speed"
+          },
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#6FB6EA",
+        "overlay_color": "#E9F6FF"
+      }
+    }
+  }
+}

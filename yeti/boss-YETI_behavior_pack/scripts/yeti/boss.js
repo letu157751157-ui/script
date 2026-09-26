@@ -1,11 +1,13 @@
 // File: scripts/yeti/boss.js
-// "Bộ não" Yeti Boss v2.0 - thay cho yeti_phase1/2/3.js + yeti_boss_skill.js + yeti_spike_charge.js cũ.
+// "Bộ não" Yeti Boss v2 - thay cho yeti_phase1/2/3.js + yeti_boss_skill.js + yeti_spike_charge.js cũ.
 //
 // Cách hoạt động:
 // - Quét Yeti quanh người chơi (mọi dimension) mỗi 10 tick, suy nghĩ mỗi 2 tick.
 // - Mỗi lần chỉ thi triển 1 chiêu (khoá "bận" theo độ dài chiêu) + nghỉ ngắn giữa 2 chiêu,
 //   nên chiêu không còn chồng chéo loạn xạ như bản cũ (bản cũ có thể tung 4-5 chiêu cùng 1 tick).
 // - Chọn chiêu theo khoảng cách tới mục tiêu, % máu, hồi chiêu và trọng số (tránh lặp lại chiêu vừa dùng).
+// - v2.1: mục tiêu là con mà Yeti đang đánh / đang đánh Yeti (người chơi HOẶC mob: golem sắt, dân làng,
+//   sói, pet...), không có thì con mồi gần nhất. Chiêu trúng mọi sinh vật không thuộc phe Yeti.
 // - Chiêu "ưu tiên" (hồi máu, giáp băng, Absolute Zero) được dùng ngay khi đủ điều kiện.
 // - Chuyển pha: Yeti mới trồi lên + gầm (bất tử 3 giây), hiện tiêu đề cho người chơi xung quanh.
 // - Dưới 35% máu: NỔI GIẬN (ra chiêu nhanh hơn, hồi chiêu ngắn hơn, lửa băng xanh quanh người).
@@ -15,6 +17,8 @@
 import { world, system, EntityDamageCause, EntityInitializationCause } from "@minecraft/server";
 import * as fx from "./fx";
 import * as S from "./skills";
+import * as T from "./targets";
+import { VERSION } from "./version";
 
 // ---------------------------------------------------------------- cấu hình từng pha
 
@@ -35,11 +39,12 @@ const PHASES = {
         kit: [
             { id: "frost_orb", fn: S.frostOrb, cd: 150, min: 6, max: 28, weight: 3 },
             { id: "leap_slam", fn: S.leapSlam, cd: 240, min: 8, max: 22, weight: 3 },
-            { id: "frost_roar", fn: S.frostRoar, cd: 260, min: 0, max: 9, weight: 2 },
-            { id: "freeze_ground", fn: S.freezeGround, cd: 280, min: 0, max: 6, weight: 2 },
-            { id: "ice_spikes", fn: S.iceSpikes, cd: 240, min: 4, max: 16, weight: 3 },
+            { id: "glacial_prison", fn: S.glacialPrison, cd: 260, min: 0, max: 18, weight: 3 },
+            { id: "avalanche", fn: S.avalanche, cd: 280, min: 3, max: 18, weight: 3 },
+            { id: "frost_nova", fn: S.frostNova, cd: 300, min: 0, max: 5, weight: 3 },
+            { id: "ice_spikes", fn: S.iceSpikes, cd: 240, min: 2, max: 16, weight: 3 },
             { id: "glacial_charge", fn: S.glacialCharge, cd: 260, min: 6, max: 16, weight: 3 },
-            { id: "summon", fn: S.summonMinions, cd: 900, min: 0, max: 28, weight: 2, hp: 0.6 },
+            { id: "summon", fn: S.summonMinions, cd: 900, min: 0, max: 28, weight: 2, hp: 0.7 },
             { id: "ice_regen", fn: S.iceRegen, cd: 900, min: 0, max: 28, hp: 0.4, priority: true },
         ],
     },
@@ -57,14 +62,17 @@ const PHASES = {
         kit: [
             { id: "frost_orb", fn: S.frostOrb, cd: 150, min: 7, max: 30, weight: 3 },
             { id: "leap_slam", fn: S.leapSlam, cd: 220, min: 8, max: 22, weight: 2 },
-            { id: "frost_roar", fn: S.frostRoar, cd: 260, min: 0, max: 9, weight: 2 },
-            { id: "ice_spikes", fn: S.iceSpikes, cd: 240, min: 4, max: 16, weight: 2 },
+            { id: "glacial_prison", fn: S.glacialPrison, cd: 260, min: 0, max: 20, weight: 2 },
+            { id: "avalanche", fn: S.avalanche, cd: 280, min: 3, max: 18, weight: 3 },
+            { id: "frost_nova", fn: S.frostNova, cd: 300, min: 0, max: 6, weight: 3 },
+            { id: "ice_spikes", fn: S.iceSpikes, cd: 240, min: 2, max: 16, weight: 2 },
             { id: "glacial_charge", fn: S.glacialCharge, cd: 240, min: 6, max: 16, weight: 3 },
             { id: "glacier_rift", fn: S.glacierRift, cd: 240, min: 6, max: 20, weight: 3 },
             { id: "glacial_wave", fn: S.glacialWave, cd: 300, min: 0, max: 14, weight: 3 },
-            { id: "earthquake", fn: S.earthquake, cd: 360, min: 0, max: 10, weight: 2 },
+            { id: "ice_meteor", fn: S.iceMeteor, cd: 380, min: 0, max: 30, weight: 3 },
             { id: "blizzard", fn: S.blizzard, cd: 520, min: 0, max: 22, weight: 2 },
             { id: "polar_vortex", fn: S.polarVortex, cd: 600, min: 4, max: 13, weight: 2, hp: 0.7 },
+            { id: "summon", fn: S.summonMinions, cd: 900, min: 0, max: 35, weight: 2 },
             { id: "elite_army", fn: S.eliteArmy, cd: 1100, min: 0, max: 35, weight: 2, hp: 0.6 },
             { id: "ice_regen", fn: S.iceRegen, cd: 1400, min: 0, max: 35, hp: 0.3, priority: true },
             { id: "absolute_zero", fn: S.absoluteZero, cd: 2400, min: 0, max: 20, hp: 0.25, priority: true },
@@ -84,18 +92,20 @@ const PHASES = {
         kit: [
             { id: "frost_orb", fn: S.frostOrb, cd: 160, min: 8, max: 30, weight: 2 },
             { id: "leap_slam", fn: S.leapSlam, cd: 220, min: 8, max: 22, weight: 2 },
-            { id: "ice_spikes", fn: S.iceSpikes, cd: 240, min: 4, max: 16, weight: 2 },
+            { id: "ice_spikes", fn: S.iceSpikes, cd: 240, min: 2, max: 16, weight: 2 },
             { id: "glacial_charge", fn: S.glacialCharge, cd: 240, min: 6, max: 16, weight: 2 },
             { id: "glacier_rift", fn: S.glacierRift, cd: 260, min: 6, max: 20, weight: 2 },
             { id: "glacial_wave", fn: S.glacialWave, cd: 320, min: 0, max: 16, weight: 2 },
-            { id: "earthquake", fn: S.earthquake, cd: 380, min: 0, max: 11, weight: 1 },
+            { id: "ice_meteor", fn: S.iceMeteor, cd: 360, min: 0, max: 32, weight: 3 },
+            { id: "glacial_prison", fn: S.glacialPrison, cd: 260, min: 0, max: 20, weight: 2 },
+            { id: "avalanche", fn: S.avalanche, cd: 300, min: 3, max: 18, weight: 2 },
             { id: "blizzard", fn: S.blizzard, cd: 560, min: 0, max: 24, weight: 2 },
             { id: "polar_vortex", fn: S.polarVortex, cd: 640, min: 4, max: 14, weight: 1 },
             { id: "ice_chains", fn: S.iceChains, cd: 280, min: 6, max: 16, weight: 3 },
             { id: "crystal_barrage", fn: S.crystalBarrage, cd: 320, min: 8, max: 26, weight: 3 },
             { id: "frost_nova", fn: S.frostNova, cd: 300, min: 0, max: 6, weight: 3 },
             { id: "frost_breath", fn: S.frostBreath, cd: 280, min: 3, max: 12, weight: 3 },
-            { id: "frost_roar", fn: S.frostRoar, cd: 320, min: 0, max: 9, weight: 1 },
+            { id: "summon", fn: S.summonMinions, cd: 900, min: 0, max: 40, weight: 2 },
             { id: "elite_army", fn: S.eliteArmy, cd: 1200, min: 0, max: 40, weight: 2, hp: 0.7 },
             { id: "frost_armor", fn: S.frostArmor, cd: 900, min: 0, max: 40, hp: 0.6, priority: true },
             { id: "ice_regen", fn: S.iceRegen, cd: 2000, min: 0, max: 40, hp: 0.3, priority: true },
@@ -120,6 +130,7 @@ const PHASES = {
             { id: "nova", fn: S.lastStandNova, cd: 160, min: 0, max: 8, weight: 2 },
             { id: "blizzard", fn: S.lastStandBlizzard, cd: 200, min: 0, max: 24, weight: 2 },
             { id: "frost_orb", fn: S.frostOrb, cd: 90, min: 5, max: 24, weight: 3 },
+            { id: "ice_meteor", fn: S.iceMeteor, cd: 240, min: 0, max: 24, weight: 2 },
         ],
     },
 };
@@ -137,7 +148,7 @@ function stateOf(boss) {
     let st = states.get(boss.id);
     if (!st) {
         const now = system.currentTick;
-        st = { cds: {}, busyUntil: now, nextCast: now + 40, introUntil: 0, lastHurt: 0, lastPassive: 0,
+        st = { cds: {}, busyUntil: now, nextCast: now + 40, introUntil: 0, lastHurt: 0, lastPassive: 0, aggro: undefined, aggroAt: 0,
                engaged: false, enraged: false, last: undefined, regen: undefined, armor: undefined };
         states.set(boss.id, st);
     }
@@ -184,13 +195,33 @@ function refreshBosses() {
     }
 }
 
-function pickTarget(boss, cfg) {
-    const list = S.victims(boss.dimension, boss.location, cfg.range);
+const AGGRO_TICKS = 300; // nhớ kẻ vừa đánh nhau với Yeti trong 15 giây
+
+/**
+ * Mục tiêu của chiêu = mục tiêu của Yeti:
+ * 1. con vừa đánh Yeti hoặc vừa bị Yeti đánh (người chơi, golem sắt, sói, pet... bất kỳ), còn trong tầm;
+ * 2. nếu không có: con mồi gần nhất (người chơi, dân làng, golem, sói, mèo, cáo, pet của người chơi).
+ */
+function pickTarget(boss, cfg, st, now) {
+    const aggro = st.aggro;
+    if (aggro && now - st.aggroAt <= AGGRO_TICKS && T.isEnemy(aggro) && aggro.dimension.id === boss.dimension.id
+        && fx.dist2D(aggro.location, boss.location) <= cfg.range + 8) {
+        return aggro;
+    }
+    st.aggro = undefined;
+    const list = S.victims(boss.dimension, boss.location, cfg.range).filter(T.isPrey);
     if (list.length === 0) return undefined;
     list.sort((a, b) => fx.dist2D(a.location, boss.location) - fx.dist2D(b.location, boss.location));
-    // nhiều người chơi: thỉnh thoảng nhắm người khác để không ai được "núp" sau đồng đội
+    // nhiều mục tiêu: thỉnh thoảng nhắm con khác để không ai được "núp" sau đồng đội
     if (list.length > 1 && Math.random() < 0.25) return list[1 + Math.floor(Math.random() * (list.length - 1))];
     return list[0];
+}
+
+function setAggro(boss, entity) {
+    if (!T.isEnemy(entity)) return;
+    const st = stateOf(boss);
+    st.aggro = entity;
+    st.aggroAt = system.currentTick;
 }
 
 function chooseSkill(cfg, st, distance, hpRatio, now) {
@@ -224,7 +255,7 @@ function think(boss, now) {
     }
     if (now < st.busyUntil || now < st.nextCast) return;
 
-    const target = pickTarget(boss, cfg);
+    const target = pickTarget(boss, cfg, st, now);
     if (!target) return;
     const hp = healthOf(boss);
     const ratio = hp ? hp.ratio : 1;
@@ -292,7 +323,7 @@ system.runInterval(() => {
 
 function passives(boss, cfg, st, now) {
     const dim = boss.dimension;
-    // Nội tại 1 - Sát Khí Lạnh: người chơi đứng gần bị làm chậm liên tục
+    // Nội tại 1 - Sát Khí Lạnh: kẻ địch đứng gần (người chơi hay mob) bị làm chậm liên tục
     for (const p of S.victims(dim, boss.location, cfg.chill.radius)) {
         try { p.addEffect("slowness", 40, { amplifier: cfg.chill.amplifier, showParticles: false }); } catch (_) {}
         fx.emit(dim, "yeti:snowflake", fx.add(p.location, { x: 0, y: 1.2, z: 0 }));
@@ -355,7 +386,7 @@ function phaseIntro(boss) {
     }, cfg.lastStand ? 14 : 30);
 }
 
-/** Yeti hấp hối bị hạ: băng vỡ tung, tiêu đề chiến thắng, lính băng tan biến. */
+/** Yeti hấp hối bị hạ: băng vỡ tung, tiêu đề chiến thắng, đệ băng xung quanh tan biến. */
 function finale(dim, loc) {
     fx.title(dim, loc, 64, "§b§l❄ CHIẾN THẮNG ❄", "§fYeti đã bị đánh bại!");
     fx.flash(dim, loc, 32, 0.3);
@@ -369,7 +400,7 @@ function finale(dim, loc) {
     fx.sound(dim, "mob.irongolem.death", loc, 2, 0.5);
     for (const p of fx.playersNear(dim, loc, 64)) fx.sound(dim, "random.levelup", p.location, 1, 0.8);
     let minions = [];
-    try { minions = dim.getEntities({ location: loc, maxDistance: 48, tags: [S.MINION_TAG] }); } catch (_) {}
+    try { minions = dim.getEntities({ location: loc, maxDistance: 48, families: ["yeti_minion"] }); } catch (_) {}
     minions.forEach((m, i) => {
         system.runTimeout(() => {
             if (!m.isValid) return;
@@ -421,6 +452,8 @@ world.afterEvents.entityHurt.subscribe((event) => {
     const st = stateOf(boss);
     st.lastHurt = system.currentTick;
     bosses.set(boss.id, boss);
+    const source = event.damageSource?.damagingEntity;
+    if (source && source.id !== boss.id) setAggro(boss, source);
     const attacker = attackerOf(event.damageSource);
     if (!attacker || event.damage <= 0) return;
 
@@ -451,11 +484,12 @@ world.afterEvents.entityHurt.subscribe((event) => {
     }
 });
 
-// Đánh thường (cận chiến vanilla) trúng người chơi: hiệu ứng theo pha + mảnh băng
+// Đánh thường (cận chiến vanilla) trúng bất kỳ kẻ địch nào: hiệu ứng theo pha + mảnh băng, ghi nhớ mục tiêu
 world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
     try {
         const cfg = PHASES[damagingEntity?.typeId];
-        if (!cfg || hitEntity?.typeId !== "minecraft:player") return;
+        if (!cfg || !T.isEnemy(hitEntity)) return;
+        setAggro(damagingEntity, hitEntity);
         for (const [effect, [amplifier, duration]] of Object.entries(cfg.onHit)) {
             hitEntity.addEffect(effect, duration, { amplifier, showParticles: true });
         }
@@ -493,7 +527,7 @@ world.afterEvents.entityDie.subscribe(({ deadEntity, damageSource }) => {
 world.afterEvents.entityRemove.subscribe(({ removedEntityId }) => forget(removedEntityId));
 
 system.run(() => {
-    try { world.sendMessage("§b§l[Yeti Boss v2.0] §rĐã tải bộ kỹ năng nâng cấp!"); } catch (_) {}
+    try { world.sendMessage(`§b§l[Yeti Boss v${VERSION}] §rĐã tải bộ kỹ năng nâng cấp!`); } catch (_) {}
 });
 
-console.warn("[Yeti Boss] v2.0 loaded!");
+console.warn(`[Yeti Boss] v${VERSION} loaded!`);

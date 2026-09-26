@@ -53,7 +53,7 @@ export function lerp(a, b, t) {
 
 /**
  * Phát 1 particle, kèm biến Molang (không bắt buộc):
- * radius, life (giây), yaw (độ), speed, dir {x,y,z}.
+ * radius, life (giây), yaw (độ), spin (độ), speed, dir {x,y,z}.
  */
 export function emit(dimension, id, loc, vars) {
     try {
@@ -66,6 +66,7 @@ export function emit(dimension, id, loc, vars) {
         if (vars.life !== undefined) molang.setFloat("variable.life", vars.life);
         if (vars.yaw !== undefined) molang.setFloat("variable.yaw", vars.yaw);
         if (vars.speed !== undefined) molang.setFloat("variable.speed", vars.speed);
+        if (vars.spin !== undefined) molang.setFloat("variable.spin", vars.spin);
         if (vars.dir) {
             molang.setFloat("variable.dir_x", vars.dir.x);
             molang.setFloat("variable.dir_y", vars.dir.y);

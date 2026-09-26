@@ -12,6 +12,7 @@ Variables the script passes through MolangVariableMap:
 - v.life     lifetime of telegraphs / portals (seconds), so the warning ends exactly on impact
 - v.yaw      rotation of a ground tile (degrees), lined up with a charge path / spike lane
 - v.dir_x/y/z, v.speed   direction and speed of breath / thrown shards
+- v.spin     rotation of a rolling snowball (degrees)
 """
 import json
 import math
@@ -363,6 +364,21 @@ def crystal():
     return grid(8, 16, pixel)
 
 
+def snowball():
+    """16x16 giant snowball: packed snow lit from the top left, darker chunks, blue shadow at the rim."""
+    def pixel(x, y):
+        px, py = x + 0.5 - 8, y + 0.5 - 8
+        d = math.hypot(px, py)
+        if d > 7.6:
+            return "."
+        if d > 6.7:
+            return "D" if px + py > 1 else "G"
+        light = 1 - math.hypot(px + 3, py + 3) / 12.5 + (hash01(x // 2, y // 2, 140) - 0.5) * 0.3
+        return "W" if light > 0.55 else ("S" if light > 0.3 else "G")
+
+    return grid(16, 16, pixel)
+
+
 SPRITES = {
     "ring": (0, 0, [ring_frame(i) for i in range(3)], ICE),
     "crack": (96, 0, [ground_crack()], ICE),
@@ -386,6 +402,7 @@ SPRITES = {
     "pillar": (0, 64, [pillar()], ICE),
     "icicle": (8, 64, [icicle()], ICE),
     "crystal": (16, 64, [crystal()], ICE),
+    "snowball": (32, 64, [snowball()], SNOW),
 }
 
 
@@ -663,6 +680,16 @@ PARTICLES = {
         "minecraft:particle_lifetime_expression": {"max_lifetime": 0.1},
         "minecraft:particle_appearance_billboard": {
             "size": [0.18, 0.36], "facing_camera_mode": "lookat_y", "uv": uv("crystal"),
+        },
+    }),
+    # Giant rolling snowball (Avalanche): respawned every tick, grows via v.radius, rolls via v.spin
+    "snowball": particle("snowball", "particles_alpha", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.1},
+        "minecraft:particle_initial_spin": {"rotation": "v.spin"},
+        "minecraft:particle_appearance_billboard": {
+            "size": ["v.radius", "v.radius"], "facing_camera_mode": "rotate_xyz", "uv": uv("snowball"),
         },
     }),
     # Icicle falling from the sky (Blizzard); disappears when it hits the ground
