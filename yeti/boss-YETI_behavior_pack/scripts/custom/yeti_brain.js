@@ -6,12 +6,12 @@
 //   tier 1 = chiêu lớn / đặc trưng (chọn ngẫu nhiên trong các chiêu đã hồi)
 //   tier 2 = chiêu thường theo khoảng cách (chọn ngẫu nhiên)
 //   first = số tick phải chờ trước lần dùng đầu tiên (tránh xả hết chiêu ngay khi vừa gặp)
-// Giữa 2 chiêu luôn có hồi chiêu chung (gcd), và không dùng chiêu khi đang thi triển chiêu khác.
+// Giữa 2 chiêu luôn có hồi chiêu chung (gcd, tính từ khi chiêu trước kết thúc), và không dùng chiêu khi đang thi triển chiêu khác.
 // Mục tiêu: mob / người chơi vừa đánh nhau với boss, nếu không có thì đối thủ gần nhất (yeti_fx.pickTarget).
 // Khi Yeti đi, mỗi bước chân để lại vết băng trên mặt đất.
 
 import { world, system } from '@minecraft/server';
-import { DIMENSIONS, isBusy, pickTarget, dist2D, clearEntity, impact, groundAt, rightOf, flatDir, sound, fx, FX } from './yeti_fx';
+import { DIMENSIONS, isBusy, busyEnd, pickTarget, dist2D, clearEntity, impact, groundAt, rightOf, flatDir, sound, fx, FX } from './yeti_fx';
 
 function healthPercent(entity) {
     try {
@@ -68,8 +68,9 @@ export function createBoss(cfg) {
             if (ready.length === 0) continue;
             const skill = tier === 0 ? ready[0] : ready[Math.floor(Math.random() * ready.length)];
             st.cd[skill.name] = tick + Math.round(skill.cd * scale);
-            st.nextCast = tick + Math.round(cfg.gcd * scale);
             try { skill.cast(ctx); } catch (e) { console.warn(`[${cfg.label}] ${skill.name}`, e); }
+            // hồi chiêu chung tính từ lúc ra chiêu XONG, để giữa 2 chiêu Yeti có thời gian đi / đuổi / đánh thường
+            st.nextCast = Math.max(tick, busyEnd(yeti)) + Math.round(cfg.gcd * scale);
             return;
         }
     }

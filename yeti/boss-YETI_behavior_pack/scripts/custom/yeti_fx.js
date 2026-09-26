@@ -21,12 +21,7 @@ export const ANIM = {
     swipe: 'animation.ytaun_yeti.swipe',
     combo: 'animation.ytaun_yeti.combo',
     chestBeat: 'animation.ytaun_yeti.chest_beat',
-    spin: 'animation.ytaun_yeti.spin',
-    cast: 'animation.ytaun_yeti.cast',
     howl: 'animation.ytaun_yeti.howl',
-    slide: 'animation.ytaun_yeti.slide',
-    dance: 'animation.ytaun_yeti.dance',
-    beamSweep: 'animation.ytaun_yeti.beam_sweep',
     groundPunch: 'animation.ytaun_yeti.ground_punch',
     charge: 'animation.ytaun_yeti.charge',
     phaseIntro: 'animation.ytaun_yeti.phase_intro',
@@ -365,10 +360,16 @@ export function isBusy(entity) {
     return (busyUntil.get(entity.id) ?? 0) > system.currentTick;
 }
 
-// Khóa không cho dùng chiêu khác trong "ticks" tick. root = đứng yên (làm chậm ẩn) trong lúc đó.
-export function lockCast(entity, ticks, root = true) {
+// Khóa không cho dùng chiêu khác trong "ticks" tick.
+// root = giữ đứng yên (làm chậm ẩn) nhưng chỉ trong "rootTicks" tick đầu (khoảnh khắc ra đòn),
+// sau đó Yeti lại đi / đuổi theo bình thường.
+export function lockCast(entity, ticks, root = true, rootTicks = Math.min(ticks, 16)) {
     busyUntil.set(entity.id, Math.max(busyUntil.get(entity.id) ?? 0, system.currentTick + ticks));
-    if (root) effect(entity, 'slowness', ticks, 6, false);
+    if (root && rootTicks > 0) effect(entity, 'slowness', rootTicks, 4, false);
+}
+
+export function busyEnd(entity) {
+    return busyUntil.get(entity.id) ?? 0;
 }
 
 export function clearEntity(entityId) {

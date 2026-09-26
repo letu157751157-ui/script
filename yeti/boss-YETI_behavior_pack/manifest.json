@@ -4,11 +4,7 @@
     "description": "Boss Yeti v1.4 - 3 evolution phases, fixed model joints, redone skills with detailed animations and layered ice particles",
     "name": "boss-YETI",
     "uuid": "783c33f4-f383-4068-955f-222cbd7016e5",
-    "version": [
-      1,
-      6,
-      0
-    ],
+    "version": [1, 7, 0],
     "min_engine_version": [
       1,
       17,
@@ -20,20 +16,12 @@
       "description": "Boss Yeti behavior data",
       "type": "data",
       "uuid": "7f74a821-3318-4850-a1a4-d6ce6788d59f",
-      "version": [
-        1,
-        6,
-        0
-      ]
+      "version": [1, 7, 0]
     },
     {
       "type": "script",
       "uuid": "f6c85397-dc37-4ed4-a43f-0682cd2b5fea",
-      "version": [
-        1,
-        6,
-        0
-      ],
+      "version": [1, 7, 0],
       "entry": "scripts/main.js",
       "language": "javascript"
     }
@@ -41,11 +29,7 @@
   "dependencies": [
     {
       "uuid": "65d381f3-0626-4781-9f38-2c86c65cfa21",
-      "version": [
-        1,
-        6,
-        0
-      ]
+      "version": [1, 7, 0]
     },
     {
       "version": "2.7.0",

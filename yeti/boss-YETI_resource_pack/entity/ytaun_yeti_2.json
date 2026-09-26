@@ -33,14 +33,9 @@
         "skill_regen": "animation.ytaun_yeti.regen",
         "skill_swipe": "animation.ytaun_yeti.swipe",
         "skill_chest_beat": "animation.ytaun_yeti.chest_beat",
-        "skill_spin": "animation.ytaun_yeti.spin",
-        "skill_cast": "animation.ytaun_yeti.cast",
         "skill_phase_intro": "animation.ytaun_yeti.phase_intro",
         "skill_combo": "animation.ytaun_yeti.combo",
-        "skill_howl": "animation.ytaun_yeti.howl",
-        "skill_slide": "animation.ytaun_yeti.slide",
-        "skill_dance": "animation.ytaun_yeti.dance",
-        "skill_beam_sweep": "animation.ytaun_yeti.beam_sweep"
+        "skill_howl": "animation.ytaun_yeti.howl"
       },
       "particle_effects": {
         "fx_eye": "ytaun:eye_glow",

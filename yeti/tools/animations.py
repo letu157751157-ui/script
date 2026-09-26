@@ -3,7 +3,7 @@
 Shared by yeti_1, yeti_2 and yeti_3: the three models have the same main bones, so one set works for
 every phase. Each animation is written pose-to-pose: a list of full key poses, then every bone
 channel is interpolated with a monotone cubic curve (no overshoot past the key poses, holds stay
-still) and baked every 0.04 s. Trembling is layered on top as small sine noise.
+still) and baked every 0.08 s. Trembling is layered on top as small sine noise.
 
 Bones used (Bedrock names -> meaning):
   body (root: position only), bone79 torso, bone14 chest (scale = breathing), bone30 back hump,
@@ -25,7 +25,7 @@ import json
 import math
 import os
 
-STEP = 0.04
+STEP = 0.08
 
 BONES = {
     "torso": "bone79", "chest": "bone14", "back": "bone30", "head": "head", "skull": "bone45", "jaw": "bone46",
@@ -543,9 +543,6 @@ def death_pulse():
 
 SKILLS = {
     "idle": idle,
-    "slide": slide,
-    "dance": dance,
-    "beam_sweep": beam_sweep,
     "walk": walk,
     "attack": attack,
     "ground_punch": ground_punch,
@@ -559,8 +556,6 @@ SKILLS = {
     "regen": regen,
     "swipe": swipe,
     "chest_beat": chest_beat,
-    "spin": spin,
-    "cast": cast,
     "phase_intro": phase_intro,
     "combo": combo,
     "howl": howl,
