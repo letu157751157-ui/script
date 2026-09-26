@@ -1,5 +1,179 @@
 {
   "entity_sounds": {
-    "entities": {}
+    "entities": {
+      "ytaun:yeti_1": {
+        "volume": 1.0,
+        "pitch": 1.1,
+        "events": {
+          "ambient": {
+            "sound": "yeti.growl",
+            "volume": 1.0,
+            "pitch": [
+              0.9,
+              1.05
+            ]
+          },
+          "hurt": {
+            "sound": "yeti.hurt",
+            "volume": 1.0,
+            "pitch": [
+              0.9,
+              1.1
+            ]
+          },
+          "death": {
+            "sound": "yeti.hurt",
+            "volume": 1.5
+          },
+          "step": {
+            "sound": "yeti.step",
+            "volume": 0.5,
+            "pitch": [
+              0.9,
+              1.1
+            ]
+          }
+        }
+      },
+      "ytaun:yeti_2": {
+        "volume": 1.0,
+        "pitch": 1.0,
+        "events": {
+          "ambient": {
+            "sound": "yeti.growl",
+            "volume": 1.0,
+            "pitch": [
+              0.9,
+              1.05
+            ]
+          },
+          "hurt": {
+            "sound": "yeti.hurt",
+            "volume": 1.0,
+            "pitch": [
+              0.9,
+              1.1
+            ]
+          },
+          "death": {
+            "sound": "yeti.hurt",
+            "volume": 1.5
+          },
+          "step": {
+            "sound": "yeti.step",
+            "volume": 0.5,
+            "pitch": [
+              0.9,
+              1.1
+            ]
+          }
+        }
+      },
+      "ytaun:yeti_3": {
+        "volume": 1.1,
+        "pitch": 0.9,
+        "events": {
+          "ambient": {
+            "sound": "yeti.growl",
+            "volume": 1.0,
+            "pitch": [
+              0.9,
+              1.05
+            ]
+          },
+          "hurt": {
+            "sound": "yeti.hurt",
+            "volume": 1.0,
+            "pitch": [
+              0.9,
+              1.1
+            ]
+          },
+          "death": {
+            "sound": "yeti.hurt",
+            "volume": 1.5
+          },
+          "step": {
+            "sound": "yeti.step",
+            "volume": 0.5,
+            "pitch": [
+              0.9,
+              1.1
+            ]
+          }
+        }
+      },
+      "ytaun:yeti_death": {
+        "volume": 1.1,
+        "pitch": 0.8,
+        "events": {
+          "ambient": {
+            "sound": "yeti.growl",
+            "volume": 1.0,
+            "pitch": [
+              0.9,
+              1.05
+            ]
+          },
+          "hurt": {
+            "sound": "yeti.hurt",
+            "volume": 1.0,
+            "pitch": [
+              0.9,
+              1.1
+            ]
+          },
+          "death": {
+            "sound": "yeti.death",
+            "volume": 1.5,
+            "pitch": 1.0
+          },
+          "step": {
+            "sound": "yeti.step",
+            "volume": 0.3
+          }
+        }
+      },
+      "ytaun:frost_wolf": {
+        "volume": 1.0,
+        "pitch": [
+          0.75,
+          0.85
+        ],
+        "events": {
+          "ambient": "mob.wolf.growl",
+          "hurt": "mob.wolf.hurt",
+          "death": "mob.wolf.death",
+          "step": "mob.wolf.step"
+        }
+      },
+      "ytaun:frost_wraith": {
+        "volume": 0.9,
+        "pitch": [
+          0.6,
+          0.7
+        ],
+        "events": {
+          "ambient": "mob.vex.ambient",
+          "hurt": "mob.vex.hurt",
+          "death": "mob.vex.death"
+        }
+      },
+      "ytaun:frost_golem": {
+        "volume": 1.0,
+        "pitch": [
+          0.7,
+          0.8
+        ],
+        "events": {
+          "hurt": "mob.irongolem.hit",
+          "death": "mob.irongolem.death",
+          "step": {
+            "sound": "yeti.step",
+            "volume": 0.4
+          }
+        }
+      }
+    }
   }
 }

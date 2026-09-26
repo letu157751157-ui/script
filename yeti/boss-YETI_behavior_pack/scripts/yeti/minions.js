@@ -83,12 +83,12 @@ function pounce(wolf, target) {
 function frostBolt(wraith, target) {
     const dim = wraith.dimension;
     play(wraith, "animation.ytaun.frost_wraith.cast");
-    fx.sound(dim, "mob.evocation_illager.prepare_attack", wraith.location, 0.8, 1.6);
+    fx.sound(dim, "yeti.frost.charge", wraith.location, 0.8, 1.6);
     fx.emit(dim, "yeti:charge_gather", fx.add(wraith.location, { x: 0, y: 1.6, z: 0 }));
     system.runTimeout(() => {
         if (!wraith.isValid || !target.isValid) return;
         let pos = fx.add(wraith.location, { x: 0, y: 1.8, z: 0 });
-        fx.sound(dim, "mob.blaze.shoot", pos, 0.8, 1.6);
+        fx.sound(dim, "yeti.frost.shoot", pos, 0.8, 1.6);
         let tick = 0;
         const handle = system.runInterval(() => {
             tick++;
@@ -106,7 +106,7 @@ function frostBolt(wraith, target) {
                     fx.emit(dim, "yeti:ice_shard", pos);
                     fx.emit(dim, "yeti:frost_ring", pos, { radius: 1.6 });
                     fx.emit(dim, "yeti:frost_mist", pos);
-                    fx.sound(dim, "random.glass", pos, 0.8, 1.5);
+                    fx.sound(dim, "yeti.ice.shatter", pos, 0.8, 1.5);
                     for (const e of hit) {
                         hurt(wraith, e, 4);
                         chill(e, 40, 1);
@@ -128,7 +128,7 @@ function groundSlam(golem, target) {
     const center = fx.groundAt(dim, golem.location);
     play(golem, "animation.ytaun.frost_golem.slam");
     fx.warnCircle(dim, center, radius, 14);
-    fx.sound(dim, "mob.irongolem.throw", golem.location, 1, 0.6);
+    fx.sound(dim, "yeti.whoosh", golem.location, 1, 0.6);
     try { golem.addEffect("slowness", 26, { amplifier: 8, showParticles: false }); } catch (_) {}
     system.runTimeout(() => {
         if (!golem.isValid) return;
@@ -140,7 +140,7 @@ function groundSlam(golem, target) {
             fx.spike(dim, fx.groundAt(dim, { x: c.x + Math.cos(a) * radius, y: c.y, z: c.z + Math.sin(a) * radius }), 1.4, 26, false);
         }
         fx.shake(dim, c, 10, 0.35, 0.3);
-        fx.sound(dim, "random.explode", c, 0.9, 1.1);
+        fx.sound(dim, "yeti.ice.impact", c, 0.9, 1.1);
         for (const e of T.victims(dim, c, radius)) {
             if (Math.abs(e.location.y - c.y) > 2.5) continue;
             hurt(golem, e, 7);
@@ -214,6 +214,6 @@ world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
         fx.emit(dim, "yeti:ice_shard", l);
         fx.emit(dim, "yeti:frost_mist", l);
         fx.emit(dim, "yeti:snowflake", l);
-        fx.sound(dim, "random.glass", l, 1, 1.2);
+        fx.sound(dim, "yeti.ice.shatter", l, 1, 1.2);
     } catch (_) {}
 });

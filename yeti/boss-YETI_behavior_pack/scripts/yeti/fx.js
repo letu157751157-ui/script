@@ -111,8 +111,27 @@ export function blocked(dimension, from, dir, distance) {
 
 // ---------------------------------------------------------------- âm thanh, màn hình
 
+/** Âm phát theo nốt nhạc (chuỗi chuông băng lên dần): giữ nguyên độ cao. */
+const MUSICAL = new Set(["yeti.chime"]);
+
+/**
+ * Phát âm tại vị trí. Âm "yeti.*" (v2.4) đã được làm trầm và nặng sẵn, còn độ cao ở các chiêu vốn chỉnh cho âm vanilla
+ * (0.4-1.8), nên độ cao được thu về gần 1 một nửa: âm vẫn trầm/bổng theo chiêu mà không bị kéo chậm méo tiếng.
+ */
 export function sound(dimension, id, loc, volume = 1, pitch = 1) {
+    if (id.startsWith("yeti.") && !MUSICAL.has(id)) pitch = 1 + (pitch - 1) * 0.5;
     try { dimension.playSound(id, loc, { volume, pitch }); } catch (_) {}
+}
+
+const soundBudget = new Map(); // id -> { tick, count }
+
+/** Như sound() nhưng mỗi âm chỉ phát tối đa `perTick` lần trong 1 tick (hàng chục gai mọc cùng lúc không bị rè). */
+export function limitedSound(dimension, id, loc, perTick, volume = 1, pitch = 1) {
+    const now = system.currentTick;
+    const used = soundBudget.get(id);
+    if (used && used.tick === now && used.count >= perTick) return;
+    soundBudget.set(id, used && used.tick === now ? { tick: now, count: used.count + 1 } : { tick: now, count: 1 });
+    sound(dimension, id, loc, volume, pitch);
 }
 
 export function playersNear(dimension, loc, radius) {
@@ -218,31 +237,39 @@ export function iceImpact(dimension, loc, size = 2, crack = true) {
     }
 }
 
+/** Gai băng to hơn bao nhiêu so với số `height` truyền vào (v2.4: gai to và dày hơn). */
+export const SPIKE_SCALE = 1.3;
+
 /**
- * Gai băng (particle, vẽ lại ở v2.3): cụm tinh thể băng nhiều mặt đâm lên từ lòng đất đúng kích thước thật
- * (không còn bị kéo giãn), vẽ trên 2 mặt phẳng bắt chéo nên nhìn hướng nào cũng thấy khối như cụm thạch anh tím,
- * hết `lifeTicks` tick thì vỡ vụn thành mảnh băng.
- * height = chiều cao (block); cluster = thêm 2 gai nhỏ mọc quanh gốc.
+ * Gai băng (particle, vẽ lại ở v2.3, to và dày hơn ở v2.4): cụm tinh thể băng mập nhiều mặt đâm lên từ lòng đất
+ * đúng kích thước thật (không bị kéo giãn), vẽ trên 2 mặt phẳng bắt chéo nên nhìn hướng nào cũng thấy khối như cụm
+ * thạch anh tím, hết `lifeTicks` tick thì vỡ vụn thành mảnh băng. Có âm thanh riêng khi mọc và khi vỡ.
+ * height = chiều cao (block, trước khi nhân SPIKE_SCALE); cluster = thêm 2 cụm nhỏ mọc quanh gốc.
  */
 export function spike(dimension, loc, height = 2, lifeTicks = 40, cluster = true) {
+    const h = height * SPIKE_SCALE;
     const life = Math.max(0.2, lifeTicks / TICKS);
-    const crystal = (at, h) => {
+    const crystal = (at, size) => {
         const yaw = Math.random() * 90;
         for (const turn of [0, 90]) {
             emit(dimension, "yeti:ice_spike", at,
-                { radius: h, life, yaw: yaw + turn, spin: (Math.random() - 0.5) * 14, variant: Math.floor(Math.random() * 2) });
+                { radius: size, life, yaw: yaw + turn, spin: (Math.random() - 0.5) * 12, variant: Math.floor(Math.random() * 2) });
         }
     };
-    crystal(loc, height);
+    crystal(loc, h);
     if (cluster) {
         for (let i = 0; i < 2; i++) {
             const a = Math.random() * Math.PI * 2;
-            crystal({ x: loc.x + Math.cos(a) * height * 0.3, y: loc.y, z: loc.z + Math.sin(a) * height * 0.3 },
-                height * (0.4 + Math.random() * 0.2));
+            crystal({ x: loc.x + Math.cos(a) * h * 0.32, y: loc.y, z: loc.z + Math.sin(a) * h * 0.32 }, h * (0.45 + Math.random() * 0.2));
         }
     }
     emit(dimension, "yeti:snow_dust", loc);
-    system.runTimeout(() => emit(dimension, "yeti:spike_shatter", loc, { radius: height }), Math.round(life * TICKS));
+    if (h >= 2.5) emit(dimension, "yeti:frost_mist", { x: loc.x, y: loc.y + 0.4, z: loc.z });
+    limitedSound(dimension, "yeti.spike.erupt", loc, 2, Math.min(1.6, 0.7 + h * 0.2), 1.25 - Math.min(0.45, h * 0.1) + Math.random() * 0.1);
+    system.runTimeout(() => {
+        emit(dimension, "yeti:spike_shatter", loc, { radius: h });
+        limitedSound(dimension, "yeti.ice.shatter", loc, 2, Math.min(1.4, 0.6 + h * 0.15), 0.9 + Math.random() * 0.3);
+    }, Math.round(life * TICKS));
 }
 
 /** Hiệu ứng trúng đòn trên người chơi. */

@@ -39,8 +39,8 @@ function frostStep(player) {
   fx.emit(dim, 'yeti:ice_burst', fx.add(loc, { x: 0, y: 1, z: 0 }));
   fx.emit(dim, 'yeti:frost_ring', fx.add(loc, { x: 0, y: 0.1, z: 0 }), { radius: 3 });
   fx.emit(dim, 'yeti:snow_dust', loc);
-  fx.sound(dim, 'random.glass', loc, 1, 1.6);
-  fx.sound(dim, 'random.bow', loc, 1, 0.6);
+  fx.sound(dim, 'yeti.ice.shatter', loc, 1, 1.6);
+  fx.sound(dim, 'yeti.whoosh', loc, 1, 0.6);
   try { player.onScreenDisplay.setActionBar('§b❄ Bước Băng!'); } catch (_) {}
   fx.repeat(40, 3, (i) => {
     if (!player.isValid) return;
@@ -78,7 +78,7 @@ function frostbiteHit(attacker, target) {
     } catch (_) {}
     fx.emit(target.dimension, 'yeti:ice_burst', l);
     fx.emit(target.dimension, 'yeti:ice_shard', l);
-    fx.sound(target.dimension, 'random.glass', l, 1.2, 1.2);
+    fx.sound(target.dimension, 'yeti.ice.shatter', l, 1.2, 1.2);
     if (attacker?.typeId === 'minecraft:player') {
       try { attacker.onScreenDisplay.setActionBar('§b§l❄ Băng vỡ!'); } catch (_) {}
     }
@@ -94,8 +94,8 @@ function frostGuardians(player) {
   try { player.runCommand('function yeti_paticle_frozen_scythe'); } catch (_) {}
   fx.emit(dim, 'yeti:frost_ring', fx.add(loc, { x: 0, y: 0.1, z: 0 }), { radius: 5 });
   fx.emit(dim, 'yeti:ice_burst', fx.add(loc, { x: 0, y: 1, z: 0 }));
-  fx.sound(dim, 'mob.evocation_illager.cast_spell', loc, 1.2, 1.2);
-  fx.sound(dim, 'random.glass', loc, 1, 1.4);
+  fx.sound(dim, 'yeti.frost.cast', loc, 1.2, 1.2);
+  fx.sound(dim, 'yeti.ice.shatter', loc, 1, 1.4);
   for (const m of monstersNear(dim, loc, 5)) {
     effect(m, 'slowness', 60, 2);
     fx.emit(dim, 'yeti:snowflake', fx.add(m.location, { x: 0, y: 1, z: 0 }));
@@ -141,8 +141,8 @@ function iceBastion(player) {
   const radius = 4;
   effect(player, 'resistance', 100, 1);
   try { player.runCommand('particle frozendd_scythe ~ ~ ~'); } catch (_) {}
-  fx.sound(dim, 'beacon.activate', center, 1.2, 1.4);
-  fx.sound(dim, 'random.glass', center, 1, 0.8);
+  fx.sound(dim, 'yeti.frost.cast', center, 1.2, 1.4);
+  fx.sound(dim, 'yeti.ice.shatter', center, 1, 0.8);
   fx.emit(dim, 'yeti:frost_ring', fx.add(center, { x: 0, y: 0.1, z: 0 }), { radius: radius + 1 });
   for (const wave of [0, 60]) {
     system.runTimeout(() => {

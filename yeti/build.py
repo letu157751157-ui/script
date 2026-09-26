@@ -2,6 +2,8 @@
 
 Run: python3 build.py            release build: NEW UUIDs for both packs + version +1 (2.1 -> 2.2 -> ...)
      python3 build.py --no-bump  rebuild the current version (same UUIDs), for testing
+     add --sounds to re-synthesize every custom sound (needs `oggenc` from vorbis-tools); without it only
+     missing sound files are rendered and the .ogg files already in the pack are kept
 
 Every release gets fresh UUIDs and a higher version so Minecraft never mixes it up with an
 older copy of the pack it has cached (worlds must remove the old pack and add the new one).
@@ -23,6 +25,7 @@ import animations  # noqa: E402
 import minions  # noqa: E402
 import particles  # noqa: E402
 import preview_anim  # noqa: E402
+import sounds  # noqa: E402
 
 BP = "boss-YETI_behavior_pack"
 RP = "boss-YETI_resource_pack"
@@ -120,6 +123,8 @@ if __name__ == "__main__":
     particles.write_particles(os.path.join(ROOT, RP), write_png)
     animations.write_animations(os.path.join(ROOT, RP))
     minions.write_minions(os.path.join(ROOT, BP), os.path.join(ROOT, RP), write_png)
+    events, files = sounds.write_sounds(os.path.join(ROOT, RP), render_all="--sounds" in sys.argv)
+    print(f"Sounds: {events} events, {files} files")
     write_preview()
     preview_anim.write_preview(write_png)
     preview_anim.write_minion_preview(write_png, minions.minion_animations())

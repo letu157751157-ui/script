@@ -1,0 +1,377 @@
+{
+  "format_version": "1.20.20",
+  "sound_definitions": {
+    "yeti.spike.erupt": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 40.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/spike_erupt_1",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/spike_erupt_2",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/spike_erupt_3",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.ice.shatter": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 40.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/ice_shatter_1",
+          "volume": 0.9,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/ice_shatter_2",
+          "volume": 0.9,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/ice_shatter_3",
+          "volume": 0.9,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.ice.impact": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 64.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/ice_impact_1",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/ice_impact_2",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/ice_impact_3",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.boom": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 96.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/boom",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.roar": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 96.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/roar_1",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/roar_2",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.roar.short": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 64.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/roar_short_1",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/roar_short_2",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.growl": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 24.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/growl_1",
+          "volume": 0.8,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/growl_2",
+          "volume": 0.8,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/growl_3",
+          "volume": 0.8,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.hurt": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/hurt_1",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/hurt_2",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/hurt_3",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.death": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 96.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/death",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.snow.crunch": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/snow_crunch_1",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/snow_crunch_2",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/snow_crunch_3",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.whoosh": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/whoosh_1",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/whoosh_2",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.wind.gust": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 48.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/wind_gust_1",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/wind_gust_2",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.frost.charge": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 48.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/frost_charge",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.frost.cast": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 48.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/frost_cast_1",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/frost_cast_2",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.frost.shoot": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 40.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/frost_shoot_1",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/frost_shoot_2",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.frost.thunder": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 96.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/frost_thunder",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.chime": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 48.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/chime",
+          "volume": 0.9,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.frost.breath": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 40.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/frost_breath",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.stomp": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 48.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/stomp_1",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/stomp_2",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/stomp_3",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.hit": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/hit_1",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/hit_2",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/hit_3",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "yeti.step": {
+      "category": "hostile",
+      "min_distance": 2.0,
+      "max_distance": 20.0,
+      "sounds": [
+        {
+          "name": "sounds/yeti/step_1",
+          "volume": 0.6,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/step_2",
+          "volume": 0.6,
+          "load_on_low_memory": true
+        },
+        {
+          "name": "sounds/yeti/step_3",
+          "volume": 0.6,
+          "load_on_low_memory": true
+        }
+      ]
+    }
+  }
+}

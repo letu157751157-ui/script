@@ -420,24 +420,26 @@ DEBRIS = [
 ]
 
 
-# Crystal cluster layouts for the ice spike: (base x, base width, length, lean in degrees), back to front
+# Crystal cluster layouts for the ice spike: (base x, base width, length, lean in degrees), back to front.
+# v2.4: chunkier crystals on a square 48x48 sprite (bigger and thicker spikes in game).
 SPIKE_LAYOUTS = [
-    [(10.0, 7.0, 25, -17), (22.5, 7.0, 30, 14), (16.0, 11.0, 46, -2), (11.5, 5.0, 14, -34), (21.0, 5.0, 12, 32)],
-    [(11.0, 8.0, 34, -10), (22.0, 6.0, 22, 22), (17.5, 10.0, 44, 4), (9.0, 5.0, 12, -34), (24.0, 4.5, 11, 36)],
+    [(14.0, 13.0, 30, -16), (34.5, 13.0, 35, 16), (24.0, 19.0, 47, -2), (14.0, 9.0, 16, -38), (34.0, 8.5, 14, 36)],
+    [(14.5, 14.0, 37, -11), (35.0, 12.0, 26, 22), (26.0, 18.0, 45, 4), (10.5, 8.5, 15, -40), (38.5, 7.5, 12, 42)],
 ]
-SPIKE_W, SPIKE_TEX_H = 32, 48
+SPIKE_W, SPIKE_TEX_H = 48, 48
 ICE_SPIKE_PALETTE = {**ICE, "S": (220, 234, 246), "G": (150, 176, 204)}
 
 
 def ice_spike(variant):
-    """32x48 faceted crystal cluster (drawn on 2 crossed quads in game, like amethyst / dripstone).
+    """48x48 faceted crystal cluster (drawn on 2 crossed quads in game, like amethyst / dripstone).
 
     Every crystal is a hexagonal prism with a pointed tip: a lit left facet with a white ridge,
-    an aqua front facet, a dark right facet, navy outline, frost towards the tip, snow at the base.
+    an aqua front facet with light streaks inside, a dark right facet, navy outline,
+    frost towards the tip, a darker core at the base, snow around the base.
     """
     c = blank(SPIKE_W, SPIKE_TEX_H)
     base_y = SPIKE_TEX_H - 1.5
-    for cx, width, length, lean in SPIKE_LAYOUTS[variant]:
+    for k, (cx, width, length, lean) in enumerate(SPIKE_LAYOUTS[variant]):
         ax, ay = math.sin(math.radians(lean)), -math.cos(math.radians(lean))  # axis, base -> tip
         nx, ny = -ay, ax                                                        # across, left -> right
         for y in range(SPIKE_TEX_H):
@@ -448,22 +450,30 @@ def ice_spike(variant):
                 if along < -1.5 or along > length:
                     continue
                 t = along / length
-                half = width / 2 * (1 if t < 0.66 else (1 - t) / 0.34)
+                half = width / 2 * (1 if t < 0.58 else (1 - t) / 0.42)
                 if abs(across) > half + 0.35:
                     continue
                 u = across / max(half, 0.01)               # -1 left edge .. 1 right edge
-                if abs(across) > half - 0.75 or along > length - 1.2:
+                streak = (along * 0.55 - across * 1.1 + k * 3.7) % 9  # diagonal light streaks in the ice
+                if abs(across) > half - 0.85 or along > length - 1.3:
                     ch = "N" if u > -0.2 else "D"          # outline, a bit lighter on the lit side
-                elif abs(u + 0.5) < 0.17:
+                elif abs(u + 0.52) < 0.13:
                     ch = "W"                                # ridge between the lit and front facet
-                elif u < -0.5:
-                    ch = "W" if t > 0.78 else "C"           # lit facet, frosted near the tip
-                elif abs(u - 0.28) < 0.12:
+                elif u < -0.52:
+                    ch = "W" if t > 0.8 else ("C" if t > 0.12 else "A")   # lit facet, frosted near the tip
+                elif abs(u - 0.3) < 0.09:
                     ch = "B"                                # edge between the front and dark facet
-                elif u < 0.28:
-                    ch = "C" if t > 0.8 else ("A" if hash01(x, y // 4, 200 + variant) > 0.1 else "C")
+                elif u < 0.3:
+                    if t > 0.84:
+                        ch = "C"
+                    elif t < 0.14:
+                        ch = "B"                            # darker core where it comes out of the ground
+                    elif streak < 1.1:
+                        ch = "C"
+                    else:
+                        ch = "A"
                 else:
-                    ch = "D" if u > 0.72 and t < 0.6 else "B"
+                    ch = "D" if (u > 0.74 and t < 0.65) or t < 0.1 else "B"
                 c[y][x] = ch
     # sparkles on the lit facets
     for y in range(SPIKE_TEX_H):
@@ -471,15 +481,16 @@ def ice_spike(variant):
             if c[y][x] == "C" and hash01(x, y, 210 + variant) < 0.05:
                 c[y][x] = "W"
     # snow clump around the base
-    for y in range(SPIKE_TEX_H - 5, SPIKE_TEX_H):
+    mid, reach = SPIKE_W / 2, SPIKE_W * 0.42
+    for y in range(SPIKE_TEX_H - 6, SPIKE_TEX_H):
         for x in range(SPIKE_W):
-            dx = x + 0.5 - 16
-            top = SPIKE_TEX_H - 4.2 + 1.6 * (abs(dx) / 11) ** 2 - math.sin(x * 1.3 + variant) * 0.7
-            if abs(dx) > 12.5 or y + 0.5 < top:
+            dx = x + 0.5 - mid
+            top = SPIKE_TEX_H - 5.2 + 2.2 * (abs(dx) / reach) ** 2 - math.sin(x * 0.9 + variant) * 0.8
+            if abs(dx) > reach + 0.5 or y + 0.5 < top:
                 continue
             if y + 0.5 < top + 1:
                 ch = "W"
-            elif abs(dx) > 11.5 or y == SPIKE_TEX_H - 1:
+            elif abs(dx) > reach - 0.5 or y == SPIKE_TEX_H - 1:
                 ch = "G"
             else:
                 ch = "S" if hash01(x, y, 220 + variant) > 0.2 else "W"
@@ -853,7 +864,7 @@ PARTICLES = {
             "rotation": "v.spin",
         },
         "minecraft:particle_appearance_billboard": {
-            "size": ["v.radius / 3", "v.radius / 2"], "facing_camera_mode": "direction_z",
+            "size": [f"v.radius / 2 * {SPIKE_W / SPIKE_TEX_H:g}", "v.radius / 2"], "facing_camera_mode": "direction_z",
             "uv": {"texture_width": ATLAS, "texture_height": ATLAS,
                    "uv": [f"{SPRITES['spike'][0]} + math.floor(v.variant) * {SPIKE_W}", SPRITES["spike"][1]],
                    "uv_size": [SPIKE_W, SPIKE_TEX_H]},

@@ -3,9 +3,9 @@
 Bản nâng cấp toàn diện cho addon **boss-YETI v1.2** (tác giả gốc: YTAUN): viết lại bộ kỹ năng của boss,
 thêm bộ particle băng tự vẽ, animation riêng cho từng chiêu và 3 loại đệ băng mới.
 
-- **Tải về:** [`dist/boss-YETI_v2_3.mcaddon`](dist/boss-YETI_v2_3.mcaddon), mở file là Minecraft tự nhập cả 2 pack.
+- **Tải về:** [`dist/boss-YETI_v2_4.mcaddon`](dist/boss-YETI_v2_4.mcaddon), mở file là Minecraft tự nhập cả 2 pack.
 - **Mỗi bản phát hành có UUID mới và số phiên bản tăng thêm 1** (2.1 → 2.2 → ...), nên Minecraft luôn coi đó là
-  pack mới, không lẫn với bản cũ đã lưu. Khi nâng cấp: trong thế giới, gỡ pack boss-YETI cũ rồi bật bản **2.3.0**
+  pack mới, không lẫn với bản cũ đã lưu. Khi nâng cấp: trong thế giới, gỡ pack boss-YETI cũ rồi bật bản **2.4.0**
   (có thể vào **Cài đặt → Bộ nhớ** xoá các bản cũ cho gọn).
 - Yêu cầu giống bản v1.2: Script API `@minecraft/server` 2.7.0, không cần bật Experiments.
 
@@ -16,7 +16,8 @@ thêm bộ particle băng tự vẽ, animation riêng cho từng chiêu và 3 lo
 | Chiêu của boss | Nhiều chiêu có thể nổ **cùng 1 tick**, không báo trước, gây sát thương ngay | Mỗi lần 1 chiêu, **có vòng/ô cảnh báo đỏ** trên đất, né được |
 | Ai dính chiêu | Chỉ người chơi | **Mọi sinh vật** không thuộc phe Yeti: người chơi, dân làng, golem sắt, sói, pet, cả quái khác |
 | Bị hất tung | Đánh thường + tiếng gầm hất người chơi lên trời | **Không hất tung**: vẫn giữ lõi iron golem và đòn vung tay gốc, nhưng mọi đòn chỉ đẩy lùi theo phương ngang |
-| Gai băng | Là mob (entity) mọc lên | **Thuần particle**: cụm tinh thể băng nhiều mặt trên 2 mặt phẳng bắt chéo, đâm lên từ lòng đất rồi vỡ vụn |
+| Gai băng | Là mob (entity) mọc lên | **Thuần particle**: cụm tinh thể băng to, dày, nhiều mặt trên 2 mặt phẳng bắt chéo, đâm lên từ lòng đất rồi vỡ vụn |
+| Âm thanh | Âm vanilla (thuỷ tinh vỡ, nổ, gấu Bắc Cực...) | **21 âm thanh tự làm** (45 file): gầm, gai băng mọc/vỡ, đập băng, nổ lớn, gió bão, phép băng, tiếng bước chân... |
 | Mục tiêu của chiêu | Người chơi gần nhất | **Con mà Yeti đang đánh** (hoặc đang đánh Yeti), không có thì con mồi gần nhất |
 | Đệ | Zombie / skeleton / stray vanilla | **Sói Băng, Hồn Băng, Golem Băng** — model, texture, animation, kỹ năng riêng |
 | Particle | Particle vanilla (snowflake, explosion...) | **39 particle băng** tự vẽ (pixel art) + particle vanilla |
@@ -115,12 +116,33 @@ nên chuyển động cong và mượt. Mốc va chạm trong animation khớp �
 
 - **Khom người bốc đất - nâng qua đầu - ném**, **bật lên trời lơ lửng rồi lao xuống**. Đánh thường dùng đòn vung tay
   gốc của lõi iron golem (v2.3).
-- **Gai băng** (particle, vẽ lại ở v2.3): cụm tinh thể băng nhiều mặt (mặt sáng, mặt giữa, mặt tối, viền, tuyết ở gốc),
-  vẽ trên **2 mặt phẳng bắt chéo** như cụm thạch anh tím nên nhìn hướng nào cũng thấy khối; đâm lên từ lòng đất đúng
-  kích thước thật (không bị kéo giãn), hơi nghiêng ngẫu nhiên, 2 kiểu dáng, hết thời gian thì **vỡ vụn** thành mảnh băng.
+- **Gai băng** (particle, vẽ lại ở v2.3, **to và dày hơn ở v2.4**): cụm tinh thể băng mập nhiều mặt (mặt sáng, mặt giữa
+  có vệt sáng, mặt tối, lõi tối ở gốc, viền, tuyết ở gốc), vẽ trên **2 mặt phẳng bắt chéo** như cụm thạch anh tím nên
+  nhìn hướng nào cũng thấy khối; đâm lên từ lòng đất đúng kích thước thật (không bị kéo giãn), hơi nghiêng ngẫu nhiên,
+  2 kiểu dáng, hết thời gian thì **vỡ vụn** thành mảnh băng. Độ to chung chỉnh bằng `SPIKE_SCALE` trong `scripts/yeti/fx.js`.
 - **Yeti hấp hối** có animation thở dốc, lắc đầu, đấm xuống băng (bản cũ đứng im).
 - Đệ băng có animation đi/đứng (theo tốc độ) và animation kỹ năng: sói vồ/cắn, hồn băng niệm phép/cào, golem đập đất/đấm.
 - Ảnh trên được vẽ từ chính model bằng `tools/preview_anim.py` (không cần mở game).
+
+## Âm thanh
+
+21 âm thanh riêng của Yeti (`yeti.*`, 45 file `.ogg` trong `boss-YETI_resource_pack/sounds/yeti/`), **tự tổng hợp
+từ đầu** bằng `tools/sounds.py` (không dùng file âm thanh của ai): tiếng nứt là tiếng ồn lọc cao, tiếng nổ là sóng sin
+trầm trượt xuống, tiếng băng ngân là các hoạ âm lệch như chuông, tiếng gầm là giọng quái vật (sóng răng cưa rung +
+tiếng khàn + bộ lọc nguyên âm), thêm tiếng vang. Phần lớn âm có 2-3 biến thể, game chọn ngẫu nhiên nên không lặp lại
+y hệt.
+
+| Âm | Dùng ở |
+|---|---|
+| `yeti.roar`, `yeti.roar.short` | Thức tỉnh, nổi giận, chuyển pha, gầm báo trước khi ra chiêu |
+| `yeti.growl`, `yeti.hurt`, `yeti.death`, `yeti.step` | Tiếng của chính Yeti: gầm gừ khi đứng, bị đánh, chết, bước chân nặng |
+| `yeti.spike.erupt`, `yeti.ice.shatter` | Gai băng đâm lên / vỡ vụn, băng vỡ (vỏ băng, giáp băng, mảnh băng) |
+| `yeti.ice.impact`, `yeti.boom`, `yeti.stomp`, `yeti.hit` | Đập đất, thiên thạch, nổ cực lớn (Absolute Zero, Băng Hà Giáng Thế, lúc hạ gục Yeti), dậm chân, đòn đánh thường trúng |
+| `yeti.frost.charge`, `yeti.frost.cast`, `yeti.frost.shoot`, `yeti.chime` | Tụ phép, phóng phép, bắn cầu băng / tia băng, chuông băng |
+| `yeti.frost.thunder`, `yeti.wind.gust`, `yeti.frost.breath`, `yeti.whoosh`, `yeti.snow.crunch` | Sấm băng, gió bão, hơi thở băng, vung tay / ném, tuyết vỡ |
+
+Đệ băng không còn im lặng: Sói Băng dùng tiếng sói trầm, Hồn Băng tiếng vex trầm, Golem Băng tiếng golem sắt + bước chân
+Yeti. Vũ khí (Frozen Sword, Frozen Scythe, Ice Bar) cũng dùng âm băng mới.
 
 ## Vũ khí
 
@@ -180,11 +202,12 @@ yeti/
 │   └── item_trigger.js  kỹ năng vũ khí
 ├── boss-YETI_resource_pack/
 │   ├── particles/yeti_*.json, textures/particle/yeti_particles.png   (sinh bởi tools/particles.py)
+│   ├── sounds/yeti/*.ogg, sounds/sound_definitions.json, sounds.json (sinh bởi tools/sounds.py)
 │   ├── animations/yeti_skills.animation.json                         (sinh bởi tools/animations.py)
 │   ├── models/entity/yeti_minions.geo.json, textures/entity/minions/  (sinh bởi tools/minions.py,
 │   │   cùng entity/animation của đệ ở cả 2 pack)
 │   └── animation_controllers/yeti_fx.animation_controllers.json      (hào quang, hơi thở, nổi giận)
-├── tools/               particles.py, animations.py, minions.py, preview_anim.py
+├── tools/               particles.py, animations.py, minions.py, sounds.py, preview_anim.py
 └── build.py             sinh mọi thứ ở trên + ảnh xem trước, đóng gói dist/boss-YETI_v<phiên bản>.mcaddon
 ```
 
@@ -192,3 +215,5 @@ Sửa particle/animation/đệ thì sửa file trong `tools/` rồi chạy (Pyth
 
 - `python3 build.py` — **bản phát hành**: tạo UUID mới cho cả 2 pack, tăng phiên bản thêm 1, đóng gói file mới.
 - `python3 build.py --no-bump` — đóng gói lại đúng phiên bản hiện tại (giữ UUID), dùng khi thử nghiệm.
+- Thêm `--sounds` để tổng hợp lại toàn bộ âm thanh sau khi sửa `tools/sounds.py` (cần `oggenc` của gói vorbis-tools
+  để nén sang .ogg). Không có cờ này thì build giữ nguyên các file .ogg đã có, chỉ tạo file còn thiếu.

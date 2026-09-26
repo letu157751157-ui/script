@@ -375,8 +375,8 @@ function phaseIntro(boss) {
     fx.emit(dim, "yeti:light_beam", fx.add(loc, { x: 0, y: 6, z: 0 }), { radius: 16 });
     fx.emit(dim, "yeti:rune_circle", { x: loc.x, y: loc.y + 0.06, z: loc.z }, { radius: 5, life: 3 });
     fx.iceImpact(dim, loc, 5);
-    fx.sound(dim, "mob.enderdragon.growl", loc, 2, 0.6);
-    fx.sound(dim, "beacon.power", loc, 2, 0.6);
+    fx.sound(dim, "yeti.growl", loc, 2.5, 0.8);
+    fx.sound(dim, "yeti.frost.charge", loc, 2, 0.6);
     fx.repeat(5, 6, () => {
         if (!boss.isValid) return;
         fx.ring(dim, boss.location, 3.5, 8, "yeti:ice_pillar", 0.1);
@@ -386,7 +386,7 @@ function phaseIntro(boss) {
     system.runTimeout(() => {
         if (!boss.isValid) return;
         const c = boss.location;
-        fx.sound(dim, "mob.ravager.roar", c, 3, 0.6);
+        fx.sound(dim, "yeti.roar", c, 3, 0.6);
         fx.shake(dim, c, 32, 0.8, 1.2);
         for (const r of [5, 9, 13]) fx.emit(dim, "yeti:frost_ring", { x: c.x, y: c.y + 0.1, z: c.z }, { radius: r });
         fx.ring(dim, c, 6, 12, "yeti:frost_mist", 1);
@@ -406,8 +406,8 @@ function finale(dim, loc) {
         fx.emit(dim, "yeti:ice_shard", fx.add(loc, { x: 0, y: 1 + i, z: 0 }));
         fx.emit(dim, "yeti:light_beam", fx.add(loc, { x: Math.cos(i * 1.57) * 3, y: 5, z: Math.sin(i * 1.57) * 3 }), { radius: 12 });
     }
-    fx.sound(dim, "random.glass", loc, 3, 0.5);
-    fx.sound(dim, "mob.irongolem.death", loc, 2, 0.5);
+    fx.sound(dim, "yeti.ice.shatter", loc, 3, 0.5);
+    fx.sound(dim, "yeti.boom", loc, 3, 0.8);
     for (const p of fx.playersNear(dim, loc, 64)) fx.sound(dim, "random.levelup", p.location, 1, 0.8);
     let minions = [];
     try { minions = dim.getEntities({ location: loc, maxDistance: 48, families: ["yeti_minion"] }); } catch (_) {}
@@ -539,6 +539,7 @@ world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
         if (!cfg || !T.isEnemy(hitEntity)) return;
         pinDown(damagingEntity, hitEntity);
         setAggro(damagingEntity, hitEntity);
+        fx.sound(hitEntity.dimension, "yeti.hit", hitEntity.location, 1.3, 0.85 + Math.random() * 0.3);
         for (const [effect, [amplifier, duration]] of Object.entries(cfg.onHit)) {
             hitEntity.addEffect(effect, duration, { amplifier, showParticles: true });
         }
@@ -553,7 +554,7 @@ world.afterEvents.entityDie.subscribe(({ deadEntity, damageSource }) => {
             const dim = deadEntity.dimension, loc = deadEntity.location;
             forget(deadEntity.id);
             fx.iceImpact(dim, loc, 4);
-            fx.sound(dim, "random.glass", loc, 2, 0.6);
+            fx.sound(dim, "yeti.ice.shatter", loc, 2, 0.6);
             if (cfg.lastStand) finale(dim, loc);
             return;
         }
