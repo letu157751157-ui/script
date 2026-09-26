@@ -2,43 +2,44 @@
   "format_version": "1.10.0",
   "particle_effect": {
     "description": {
-      "identifier": "harvester:crow_flock",
+      "identifier": "harvester:soul_flames",
       "basic_render_parameters": {
-        "material": "particles_alpha",
+        "material": "particles_add",
         "texture": "textures/particle/harvester_particles"
       }
     },
     "components": {
       "minecraft:emitter_rate_instant": {
-        "num_particles": 8
+        "num_particles": 12
       },
       "minecraft:emitter_lifetime_once": {
         "active_time": 0.05
       },
-      "minecraft:emitter_shape_sphere": {
-        "radius": 1.2,
+      "minecraft:emitter_shape_disc": {
+        "radius": 0.6,
+        "plane_normal": "y",
         "direction": [
-          "math.random(-1, 1)",
-          "math.random(0.3, 1)",
-          "math.random(-1, 1)"
+          "math.random(-0.3, 0.3)",
+          1,
+          "math.random(-0.3, 0.3)"
         ]
       },
       "minecraft:particle_lifetime_expression": {
-        "max_lifetime": "math.random(1.2, 1.8)"
+        "max_lifetime": "math.random(0.5, 0.9)"
       },
-      "minecraft:particle_initial_speed": "math.random(3, 4.5)",
+      "minecraft:particle_initial_speed": "math.random(4, 7)",
       "minecraft:particle_motion_dynamic": {
         "linear_acceleration": [
           0,
-          1.2,
+          0,
           0
         ],
-        "linear_drag_coefficient": 0.8
+        "linear_drag_coefficient": 2.2
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          0.28,
-          0.28
+          "0.26 * (1 - 0.5 * v.particle_age / v.particle_lifetime)",
+          "0.26 * (1 - 0.5 * v.particle_age / v.particle_lifetime)"
         ],
         "facing_camera_mode": "rotate_xyz",
         "uv": {
@@ -47,7 +48,7 @@
           "flipbook": {
             "base_UV": [
               0,
-              128
+              144
             ],
             "size_UV": [
               16,
@@ -57,9 +58,19 @@
               16,
               0
             ],
-            "frames_per_second": 14,
+            "frames_per_second": 12,
             "max_frame": 4,
             "loop": true
+          }
+        }
+      },
+      "minecraft:particle_appearance_tinting": {
+        "color": {
+          "interpolant": "v.particle_age / v.particle_lifetime",
+          "gradient": {
+            "0.0": "#FFFFFFFF",
+            "0.6": "#E6FFFFFF",
+            "1.0": "#00FFFFFF"
           }
         }
       }

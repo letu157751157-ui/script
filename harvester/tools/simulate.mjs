@@ -4,11 +4,13 @@
 //
 // Loads the whole behavior pack script graph (scripts/main.js) against a mock of
 // @minecraft/server that only offers the events of the API version declared in manifest.json,
-// plays a full boss fight (spawn -> phase 2 -> phase 3 -> enrage -> death) and reports:
+// plays a full boss fight (spawn -> phase 2 -> phase 3 -> enrage -> death), a boss fighting an
+// iron golem with no player around, and reports:
 //   * scripts that fail to load (e.g. subscribing to an event the declared API version lacks),
 //   * uncaught errors in timers/events, and exceptions swallowed by the Harvester try/catch blocks,
 //   * particles spawned that don't exist or miss Molang variables they read,
-//   * animations played that aren't defined in the resource pack.
+//   * animations played that aren't defined in the resource pack,
+//   * action bar text or titles other than the skill warnings / victory title.
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -18,6 +20,9 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.dirname(HERE);
 const BP = process.env.HARVESTER_BP || path.join(ROOT, "TheHarvesterBP");
 const RP = path.join(ROOT, "TheHarvesterRP");
+const BOSS_HP = JSON.parse(fs.readFileSync(path.join(BP, "entities/pa_harvester.json"), "utf8"))["minecraft:entity"].components["minecraft:health"].max;
+// the only titles the boss may show: warnings for its big mechanics and the victory title
+const ALLOWED_TITLES = ["SENTENCED", "THE BLACK DEATH", "FINAL HARVEST", "THE HARVESTER FALLS"];
 
 // ---------------------------------------------------------------- resource pack facts
 const BUILTIN = new Set(["particle_age", "particle_lifetime", "particle_random_1", "particle_random_2",
@@ -51,7 +56,7 @@ function problem(kind, detail) {
     const key = kind + ": " + detail;
     problems.set(key, (problems.get(key) ?? 0) + 1);
 }
-const stats = { particles: {}, animations: {}, sounds: 0, damage: 0, casts: {} };
+const stats = { particles: {}, animations: {}, sounds: 0, damage: 0, casts: {}, mobDamage: 0, titles: new Set(), actionBar: 0 };
 
 const mock = `
 export const __hooks = globalThis.__harvesterMock;
@@ -164,6 +169,7 @@ class MockEntity {
         if (!Number.isFinite(amount)) problem("damage", "non-finite " + amount);
         if (this.gameMode === "creative" || this.gameMode === "spectator") return false; // invulnerable, like in game
         if (this.typeId === "minecraft:player") stats.damage += amount;
+        else if (this.typeId !== "pa:harvester" && opts?.damagingEntity?.typeId === "pa:harvester" && !opts.__melee) stats.mobDamage += amount;
         const mitigated = (this.effects.resistance?.until > tick && this.effects.resistance.amp >= 4) ? 0 : amount;
         this.hp -= mitigated;
         world._afterQueue.push(() => after.entityHurt.fire({ hurtEntity: this, damage: amount, damageSource: { cause: opts?.cause ?? "none", damagingEntity: opts?.damagingEntity } }));
@@ -221,8 +227,13 @@ class MockPlayer extends MockEntity {
         this.selectedSlotIndex = 0;
         this.gameMode = "survival";
         this.onScreenDisplay = {
-            setTitle(t, o) { if (o && (o.fadeInDuration === undefined || o.stayDuration === undefined || o.fadeOutDuration === undefined)) problem("api", "setTitle options need fadeIn/stay/fadeOut in 1.14"); },
-            updateSubtitle() {}, setActionBar() {},
+            setTitle(t, o) {
+                if (o && (o.fadeInDuration === undefined || o.stayDuration === undefined || o.fadeOutDuration === undefined)) problem("api", "setTitle options need fadeIn/stay/fadeOut in 1.14");
+                stats.titles.add(t);
+                if (!ALLOWED_TITLES.some((a) => t.includes(a))) problem("ui", "unexpected title " + JSON.stringify(t));
+            },
+            updateSubtitle() {},
+            setActionBar(t) { stats.actionBar++; problem("ui", "action bar text " + JSON.stringify(t)); },
         };
     }
     sendMessage() {}
@@ -339,7 +350,7 @@ for (const file of fs.readdirSync(path.join(BP, "items"))) {
     }
 }
 const ow = dims.overworld;
-const boss = new MockEntity("pa:harvester", ow, { x: 0, y: 64, z: 0 }, 600);
+const boss = new MockEntity("pa:harvester", ow, { x: 0, y: 64, z: 0 }, BOSS_HP);
 after.entitySpawn.fire({ entity: boss, cause: "Spawned" });
 const heroes = [
     new MockPlayer("Near", ow, { x: 3, y: 64, z: 2 }),
@@ -365,11 +376,11 @@ for (let i = 0; i < TOTAL && boss.valid; i++) {
     }
     // players chip at the boss: phase 2 around 2.5 min, phase 3 around 4 min, enrage at 5 min
     if (tick % 20 === 0 && tick > 100) {
-        const dmg = tick < 20 * 330 ? 1.9 : 12;
+        const dmg = BOSS_HP * (tick < 20 * 330 ? 0.0036 : 0.02);
         boss.applyDamage(dmg, { cause: "entityAttack", damagingEntity: heroes[tick % 3] });
     }
     // the boss hits someone in melee now and then
-    if (tick % 57 === 0) heroes[0].applyDamage(3, { cause: "entityAttack", damagingEntity: boss });
+    if (tick % 57 === 0) heroes[0].applyDamage(3, { cause: "entityAttack", damagingEntity: boss, __melee: true });
     // scythe skills
     if (tick % 300 === 10) after.itemUse.fire({ source: heroes[0], itemStack: { typeId: "pa:harvester_scythe" } });
     if (tick % 400 === 20) {
@@ -382,10 +393,12 @@ for (let i = 0; i < TOTAL && boss.valid; i++) {
 }
 for (let i = 0; i < 200; i++) step(); // let death effects play out
 const firstDefeated = !boss.valid;
+const roars = stats.animations["animation.pa_harvester.phase_roar"] ?? 0;
+if (roars < 2) problem("scenario", `first fight reached only ${roars} phase change(s) instead of 2`);
 
 // scenario 2: a boss already in phase 3 (exercises Death Sentence / Black Death / Final Harvest)
-const boss2 = new MockEntity("pa:harvester", ow, { x: 100, y: 64, z: 100 }, 600);
-boss2.hp = 150;
+const boss2 = new MockEntity("pa:harvester", ow, { x: 100, y: 64, z: 100 }, BOSS_HP);
+boss2.hp = BOSS_HP * 0.25;
 after.entitySpawn.fire({ entity: boss2, cause: "Loaded" });
 for (let i = 0; i < 20 * 150; i++) {
     for (const [k, p] of heroes.entries()) {
@@ -397,8 +410,8 @@ for (let i = 0; i < 20 * 150; i++) {
     }
     step();
 }
-boss2.applyDamage(1000, { cause: "entityAttack", damagingEntity: heroes[0] });
-const lonely = new MockEntity("pa:harvester", ow, { x: -400, y: 64, z: -400 }, 600);
+boss2.applyDamage(BOSS_HP, { cause: "entityAttack", damagingEntity: heroes[0] });
+const lonely = new MockEntity("pa:harvester", ow, { x: -400, y: 64, z: -400 }, BOSS_HP);
 for (let i = 0; i < 20 * 60 * 6; i++) step();
 if (lonely.nameTag.includes("ENRAGED")) problem("scenario", "idle boss enraged before anyone fought it");
 for (const p of heroes) p.location = { x: -398, y: 64, z: -398 };
@@ -410,17 +423,40 @@ lonely.remove();
 // only a spectator nearby -> it ignores them
 for (const p of heroes) p.location = { x: 5000, y: 64, z: 5000 };
 creative.location = { x: 802, y: 64, z: 800 };
-const tester = new MockEntity("pa:harvester", ow, { x: 800, y: 64, z: 800 }, 600);
+const tester = new MockEntity("pa:harvester", ow, { x: 800, y: 64, z: 800 }, BOSS_HP);
 const castsBefore = Object.values(stats.casts).reduce((a, b) => a + b, 0);
 for (let i = 0; i < 20 * 20; i++) step();
 if (Object.values(stats.casts).reduce((a, b) => a + b, 0) === castsBefore) problem("scenario", "boss cast nothing with a creative player next to it");
 tester.remove();
 creative.gameMode = "spectator";
-const watcher = new MockEntity("pa:harvester", ow, { x: 800, y: 64, z: 800 }, 600);
+const watcher = new MockEntity("pa:harvester", ow, { x: 800, y: 64, z: 800 }, BOSS_HP);
 const castsSpectator = Object.values(stats.casts).reduce((a, b) => a + b, 0);
 for (let i = 0; i < 20 * 20; i++) step();
 if (Object.values(stats.casts).reduce((a, b) => a + b, 0) !== castsSpectator) problem("scenario", "boss attacked a spectator");
 watcher.remove();
+
+// scenario 5: an iron golem picks a fight, no player within reach -> the boss turns on the golem
+// and its skills land on it (not only on players)
+const golem = new MockEntity("minecraft:iron_golem", ow, { x: 1206, y: 64, z: 1200 }, 400);
+const duel = new MockEntity("pa:harvester", ow, { x: 1200, y: 64, z: 1200 }, BOSS_HP);
+const castsDuel = Object.values(stats.casts).reduce((a, b) => a + b, 0);
+for (let i = 0; i < 20 * 90; i++) {
+    if (i === 20 * 45) duel.hp = BOSS_HP * 0.25; // second half: the phase 3 kit against the golem
+    const a = tick / 50;
+    if (golem.valid) {
+        golem.location = { x: duel.location.x + Math.cos(a) * 4, y: 64, z: duel.location.z + Math.sin(a) * 4 };
+        if (tick % 30 === 0) duel.applyDamage(4, { cause: "entityAttack", damagingEntity: golem });
+        if (tick % 40 === 0) golem.applyDamage(5, { cause: "entityAttack", damagingEntity: duel, __melee: true });
+        if (golem.hp < 60) golem.hp = 400;
+    }
+    step();
+}
+if (Object.values(stats.casts).reduce((a, b) => a + b, 0) === castsDuel) problem("scenario", "boss cast nothing at the iron golem attacking it");
+if (stats.mobDamage === 0) problem("scenario", "no boss skill ever damaged the iron golem it was fighting");
+console.log("Skill damage dealt to the iron golem:", stats.mobDamage.toFixed(0));
+golem.kill();
+for (let i = 0; i < 20 * 5; i++) step(); // target dies -> boss calms down without errors
+duel.remove();
 for (let i = 0; i < 100; i++) step();
 if (boss2.valid) problem("scenario", "second boss did not die");
 after.playerLeave.fire({ playerId: heroes[2].id, playerName: "Far" });
@@ -433,6 +469,7 @@ if (!firstDefeated) problem("scenario", "first boss survived the scripted damage
 console.log("Skill casts:", JSON.stringify(stats.casts));
 console.log("Animations:", Object.keys(stats.animations).length, "distinct;", "particles:", Object.keys(stats.particles).filter((p) => p.startsWith("harvester:")).length, "distinct harvester ids;", "damage dealt to players:", stats.damage.toFixed(0));
 const unused = Object.keys(particles).filter((p) => p.startsWith("harvester:") && !stats.particles[p]);
+console.log("Titles shown:", [...stats.titles].map((t) => t.replace(/§./g, "")).join(" / ") || "none", "| action bar updates:", stats.actionBar);
 console.log("Particles never spawned by script (animation-only or unused):", unused.join(", ") || "none");
 
 if (problems.size === 0) {

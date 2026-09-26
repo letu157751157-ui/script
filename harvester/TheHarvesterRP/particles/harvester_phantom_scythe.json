@@ -2,56 +2,61 @@
   "format_version": "1.10.0",
   "particle_effect": {
     "description": {
-      "identifier": "harvester:feathers",
+      "identifier": "harvester:phantom_scythe",
       "basic_render_parameters": {
-        "material": "particles_alpha",
+        "material": "particles_add",
         "texture": "textures/particle/harvester_particles"
       }
     },
     "components": {
       "minecraft:emitter_rate_instant": {
-        "num_particles": 8
+        "num_particles": 1
       },
       "minecraft:emitter_lifetime_once": {
         "active_time": 0.05
       },
-      "minecraft:emitter_shape_sphere": {
-        "radius": 0.4,
-        "direction": "outwards"
+      "minecraft:emitter_shape_point": {
+        "direction": [
+          "v.dir_x",
+          "v.dir_y",
+          "v.dir_z"
+        ]
       },
       "minecraft:particle_lifetime_expression": {
-        "max_lifetime": "math.random(1.2, 1.8)"
+        "max_lifetime": "v.life"
       },
-      "minecraft:particle_initial_speed": 2,
-      "minecraft:particle_motion_dynamic": {
-        "linear_acceleration": [
-          0,
-          -1.8,
-          0
-        ],
-        "linear_drag_coefficient": 1.8
-      },
+      "minecraft:particle_initial_speed": "v.speed",
       "minecraft:particle_initial_spin": {
         "rotation": "math.random(0, 360)",
-        "rotation_rate": "math.random(-300, 300)"
+        "rotation_rate": 1080
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          0.09,
-          0.09
+          0.85,
+          0.85
         ],
         "facing_camera_mode": "rotate_xyz",
         "uv": {
           "texture_width": 256,
           "texture_height": 256,
           "uv": [
-            8,
-            144
+            128,
+            96
           ],
           "uv_size": [
-            8,
-            8
+            32,
+            32
           ]
+        }
+      },
+      "minecraft:particle_appearance_tinting": {
+        "color": {
+          "interpolant": "v.particle_age / v.particle_lifetime",
+          "gradient": {
+            "0.0": "#FFFFFFFF",
+            "0.85": "#FFFFFFFF",
+            "1.0": "#00FFFFFF"
+          }
         }
       }
     }

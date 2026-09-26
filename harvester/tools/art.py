@@ -22,7 +22,6 @@ PLAGUE = {"W": (242, 250, 206), "Y": (204, 232, 112), "G": (140, 180, 58), "M": 
 GRAY = {"#": (255, 255, 255), "+": (185, 185, 185), "-": (120, 120, 120)}
 SMOKE = {"H": (255, 255, 255), "A": (212, 212, 212), "B": (156, 156, 156), "C": (104, 104, 104)}
 BONE = {"W": (240, 236, 220), "L": (205, 198, 176), "M": (150, 142, 120), "K": (28, 26, 32), "T": (78, 234, 196)}
-CROW = {"K": (18, 16, 24), "D": (42, 36, 56), "V": (86, 72, 114), "Y": (216, 240, 106), "G": (120, 120, 128)}
 GLASS = {"W": (255, 255, 255), "L": (206, 240, 246), "B": (126, 194, 208), "D": (62, 110, 128)}
 WOOD = {"K": (48, 30, 18), "M": (92, 62, 36), "L": (138, 98, 58)}
 STONE = {"L": (160, 164, 170), "M": (118, 122, 130), "D": (78, 82, 90), "K": (44, 46, 52)}
@@ -361,63 +360,8 @@ def scythe_sprite():
 
 
 # ---------------------------------------------------------------------------
-# Crows and feathers
-# ---------------------------------------------------------------------------
-
-CROW_FRAMES = [
-    ["................", "..K..........K..", "..KK........KK..", "...KV......VK...",
-     "...KVV....VVK...", "....KVDKKDVK....", ".....KDKKDK.....", "......KYYK......",
-     "......KDDK......", ".......DD.......", "......KDDK......", ".....K.KK.K.....",
-     "................", "................", "................", "................"],
-    ["................", "................", "................", "................",
-     "................", "KKVVV..KK..VVVKK", ".KKDDVKKKKVDDKK.", "..KKDDKYYKDDKK..",
-     "......KDDK......", ".......DD.......", "......KDDK......", ".....K.KK.K.....",
-     "................", "................", "................", "................"],
-    ["................", "................", "................", "................",
-     "................", ".......KK.......", "......KYYK......", ".....KDKKDK.....",
-     "....KDVKKVDK....", "...KDV.DD.VDK...", "..KDV.KDDK.VDK..", "..KK..K..K..KK..",
-     ".K............K.", "................", "................", "................"],
-]
-
-
-def crow_frame(frame):
-    return to_rgba(CROW_FRAMES[[0, 1, 2, 1][frame]], CROW)
-
-
-FEATHER = ["......VK", ".....VDK", "....VDK.", "...VDK..", "..VDK...", ".VDK....", "GK......", "G......."]
-
-
-def feather_sprite():
-    return to_rgba(FEATHER, CROW)
-
-
-# ---------------------------------------------------------------------------
 # Plague doctor props
 # ---------------------------------------------------------------------------
-
-FLASK = ["................", "......KK........", "......LM........", ".....BWWB.......",
-         ".....B..B.......", "....B....B......", "...B......B.....", "..BWYYGGGGMB....",
-         "..BYYGGGGGMB....", "..BWGGGGGMMB....", "..BGGGGGMMMB....", "...BGGMMMMB.....",
-         "....BMMMMB......", ".....BBBB.......", "................", "................"]
-
-
-def flask_sprite():
-    pal = {**PLAGUE, "B": GLASS["B"], "K": WOOD["K"], "L": WOOD["L"]}
-    pal["M"] = PLAGUE["M"]
-    pal["W"] = GLASS["W"]
-    return to_rgba(FLASK, pal)
-
-
-SHARDS = [
-    ["...W....", "..WLL...", ".WLLBB..", "WLLBBBD.", ".LBBBD..", "..BBD...", "...D....", "........"],
-    ["........", ".WW.....", ".WLLL...", "..LLBB..", "...BBBD.", "....BDD.", ".....D..", "........"],
-    ["........", "........", "..W.....", "...L....", "....B...", ".....D..", "........", "........"],
-]
-
-
-def shard_frame(frame):
-    return to_rgba(SHARDS[frame], GLASS)
-
 
 DEBRIS = [
     ["........", "..KSS...", ".KSLLS..", ".KSSLSK.", ".KKSSSK.", "..KKKK..", "........", "........"],
@@ -556,6 +500,182 @@ def beak_sprite():
     return to_rgba(grid(32, 32, pixel), {**LEATHER, "Y": PLAGUE["Y"], "W": PLAGUE["W"]})
 
 
+# ---------------------------------------------------------------------------
+# Underworld (v1.4 Death skills)
+# ---------------------------------------------------------------------------
+
+VOID = {"K": (8, 6, 14), "D": (28, 20, 42), "V": (70, 44, 108), "T": SOUL["T"], "L": SOUL["L"], "W": SOUL["W"]}
+SHADE = {"K": (14, 10, 22), "D": (36, 26, 54), "V": (78, 60, 112), "T": SOUL["T"], "L": SOUL["L"], "W": SOUL["W"]}
+IRON = {"K": (26, 30, 36), "D": (58, 66, 76), "M": (104, 116, 128), "T": SOUL["T"], "L": SOUL["L"]}
+
+CHAIN_V = [
+    "..KDDK..",
+    ".KM..DK.",
+    ".KM..DK.",
+    "..KDDK..",
+    "...TL...",
+    "...TL...",
+    "..KDDK..",
+    ".KM..DK.",
+    ".KM..DK.",
+    "..KDDK..",
+    "...TL...",
+    "...TL...",
+    "..KDDK..",
+    ".KM..DK.",
+    ".KM..DK.",
+    "..KDDK..",
+]
+
+
+def chain_column_sprite():
+    """8x16 vertical underworld chain: iron links held together by soul light."""
+    return to_rgba(CHAIN_V, IRON)
+
+
+HAND_FRAMES = [
+    # fingertips clawing out of the ground
+    ["................", "................", "................", "................",
+     "................", "................", "................", "................",
+     "....W..W..W.....", "....L..W..W..W..", "...LW.LW.LW..L..", "...LW.LW.LW.LW..",
+     "...MLLMLLMLLML..", "..SSSSSSSSSSSSS.", ".SKSSKSSSKSSKSS.", "................"],
+    # open hand reaching up
+    ["....W..W........", "....L..W..W.....", "....W..L..W..W..", "...LW.LW.LW..L..",
+     "...LW.LW.LW.LW..", "...LW.LW.LW.LW..", "...LWLLWLLWLLW.W", "...LWWWWWWWWWLWL",
+     "...LWWWKWWKWWLL.", "...MLWWWWWWWLM..", "....MLWWWWWLM...", ".....MLWWWLM....",
+     ".....MLWKWLM....", "..SSSMLWWWLMSSS.", ".SKSSKSSSKSSKSS.", "................"],
+    # clenched fist
+    ["................", "................", "................", "................",
+     "................", "....LLLLLLLL....", "...LWWLWWLWWL...", "...LWWWWWWWWWL..",
+     "...LWKWWKWWKWL..", "...MLWWWWWWWLM..", "....MLWWWWWLM...", ".....MLWWWLM....",
+     ".....MLWKWLM....", "..SSSMLWWWLMSSS.", ".SKSSKSSSKSSKSS.", "................"],
+]
+
+
+def hand_frame(frame):
+    """16x16 skeletal hand bursting from the ground: claws -> open hand -> fist."""
+    return to_rgba(HAND_FRAMES[frame], {**BONE, "S": EARTH["S"], "K": EARTH["K"]})
+
+
+def void_frame(frame):
+    """32x32 underworld rift on the ground: opens, swirls, then cracks apart."""
+    radius, holes = ((8.5, 0.0), (13.5, 0.0), (14.5, 0.4))[frame]
+
+    def pixel(x, y):
+        px, py = x + 0.5 - 16, y + 0.5 - 16
+        d = math.hypot(px, py)
+        if d > radius or hash01(x, y, 130 + frame) < holes:
+            return "."
+        a = math.atan2(py, px)
+        swirl = math.sin(a * 3 + d * 0.55 + frame) > 0.55
+        rim = radius - d
+        if rim < 1.2:
+            return "L" if hash01(x, y, 140) < 0.5 else "T"
+        if rim < 2.4:
+            return "V"
+        if swirl and d > 3:
+            return "D"
+        return "K"
+
+    return to_rgba(grid(32, 32, pixel), VOID)
+
+
+REAPER_BODY = [
+    "................",
+    "................",
+    "................",
+    "................",
+    "......KKK.......",
+    ".....KDDDK......",
+    "....KDKKKDK.....",
+    "....KDTKTDK.....",
+    "....KDKKKDK.....",
+    "...KKDDDDDKK....",
+    "..KDDDDDDDDDK...",
+    "..KDDVDDDDVDD...",
+    ".KDDDVDDDDDVDK..",
+    ".KDDDVDDDDDDVK..",
+    ".KDDVDDDDDDDDK..",
+    ".KDDVDDDDDDDDK..",
+    ".KDDDDDDDDDDDK..",
+    "KDDDVDDDDDDDDK..",
+    "KDDDVDDDDDDDDDK.",
+    "KDDDDDDDDDDDDDK.",
+    "KDDVDDDDDDVDDDK.",
+    "KDDVDDDDDDVDDDK.",
+    ".KDDDDDDDDDDDK..",
+    ".KDVDDDDDDDVDK..",
+    ".KDVDDDDDDDVDK..",
+    "..KDDDDDDDDDK...",
+    "..KDKDDKDDKDK...",
+    "...K.KK.KK.K....",
+    "................",
+    "................",
+    "................",
+    "................",
+]
+
+
+def reaper_sprite():
+    """16x32 phantom reaper: hooded shade with glowing eyes holding a tall soul scythe."""
+    rows = [list(r) for r in REAPER_BODY]
+    for y in range(1, 24):            # snath on the right, in front of the robe
+        rows[y][13] = "V" if y % 5 == 0 else "D"
+    blade = {1: range(4, 13), 2: (2, 3), 3: (1,)}
+    for y, xs in blade.items():
+        for x in xs:
+            rows[y][x] = "W" if y == 1 and x < 7 else "L" if y == 1 else "T"
+    rows[2][12] = "L"
+    return to_rgba(["".join(r) for r in rows], SHADE)
+
+
+def x_slash_frame(frame):
+    """32x32 crossed scythe cuts: first stroke -> both strokes -> breaking apart."""
+    fade, holes = ((1.0, 0.0), (1.0, 0.0), (0.7, 0.4))[frame]
+
+    def stroke(dx, dy, sign):
+        along = (dx + sign * dy) / math.sqrt(2)
+        across = abs(dx - sign * dy) / math.sqrt(2)
+        if abs(along) > 13:
+            return 0.0
+        thick = 2.3 * (1 - (along / 13) ** 2)
+        return max(0.0, 1 - across / thick) if thick > 0 else 0.0
+
+    def pixel(x, y):
+        dx, dy = x + 0.5 - 16, y + 0.5 - 16
+        heat = stroke(dx, dy, 1)
+        if frame:
+            heat = max(heat, stroke(dx, dy, -1))
+        if hash01(x, y, 110 + frame) < holes:
+            return "."
+        return soul_char(heat * fade)
+
+    return to_rgba(grid(32, 32, pixel), SOUL)
+
+
+def crack_sprite():
+    """32x32 cracked ground, soul light glowing in the deepest cracks."""
+    cells = {}
+    for i in range(9):
+        angle = i / 9 * 2 * math.pi + hash01(i, 1, 9) * 0.5
+        x, y = 16.0, 16.0
+        for step in range(15):
+            angle += (hash01(i, step, 11) - 0.5) * 0.9
+            x += math.cos(angle)
+            y += math.sin(angle)
+            ix, iy = int(x), int(y)
+            if 0 <= ix < 32 and 0 <= iy < 32:
+                cells[(ix, iy)] = "T" if step < 4 else "K" if step < 11 else "D"
+                if step < 6 and 0 <= ix + 1 < 32:
+                    cells.setdefault((ix + 1, iy), "K")
+    for x in range(13, 19):
+        for y in range(13, 19):
+            if math.hypot(x - 15.5, y - 15.5) < 3:
+                cells[(x, y)] = "L" if math.hypot(x - 15.5, y - 15.5) < 1.6 else "K"
+    return to_rgba(grid(32, 32, lambda x, y: cells.get((x, y), ".")),
+                   {"K": (22, 18, 26), "D": (60, 54, 62), "T": SOUL["T"], "L": SOUL["L"]})
+
+
 SPRITES = {
     "soul": [soul_frame(f) for f in range(4)],
     "wraith": [wraith_frame(f) for f in range(4)],
@@ -570,10 +690,6 @@ SPRITES = {
     "drop": [drop_sprite()],
     "skull": [skull_sprite()],
     "scythe": [scythe_sprite()],
-    "crow": [crow_frame(f) for f in range(4)],
-    "feather": [feather_sprite()],
-    "flask": [flask_sprite()],
-    "shard": [shard_frame(f) for f in range(3)],
     "dirt": [dirt_frame(f) for f in range(3)],
     "hourglass": [hourglass_frame(f) for f in range(8)],
     "lantern": [lantern_frame(f) for f in range(2)],
@@ -581,4 +697,10 @@ SPRITES = {
     "grave": [grave_sprite()],
     "chain": [chain_sprite()],
     "beak": [beak_sprite()],
+    "chain_v": [chain_column_sprite()],
+    "hand": [hand_frame(f) for f in range(3)],
+    "void": [void_frame(f) for f in range(3)],
+    "reaper": [reaper_sprite()],
+    "x_slash": [x_slash_frame(f) for f in range(3)],
+    "crack": [crack_sprite()],
 }

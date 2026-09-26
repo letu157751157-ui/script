@@ -233,12 +233,6 @@ def effects():
         **dynamic((0, 0.25, 0), 0.6), **spin("math.random(0, 360)", "math.random(-40, 40)"),
         **billboard(["0.4 + 0.12 * v.particle_random_2"] * 2, flipbook("miasma", stretch=True, loop=False)), **tint(PLAGUE_GAS),
     })
-    E["miasma_field"] = ("particles_blend", {
-        **steady("v.radius * 7", 90, "v.duration"), **disc("v.radius", [0, 1, 0], [0, 0.25, 0]),
-        **life("math.random(2.0, 3.0)"), **speed(0.25), **dynamic((0, 0.1, 0), 0.5),
-        **spin("math.random(0, 360)", "math.random(-30, 30)"),
-        **billboard(["0.7 + 0.25 * v.particle_random_2"] * 2, flipbook("miasma", stretch=True, loop=False)), **tint(PLAGUE_GAS),
-    })
     E["blackdeath_field"] = ("particles_blend", {
         **steady("v.radius * 9", 160, "v.duration"), **disc("v.radius", [0, 1, 0], [0, 0.3, 0]),
         **life("math.random(2.0, 3.2)"), **speed(0.4), **dynamic((0, 0.2, 0), 0.4),
@@ -263,20 +257,10 @@ def effects():
         **tint({"0.0": "#C02B3A14", "1.0": "#A0141A0A"}),
     })
 
-    # ---------------------------------------------------------------- flask
-    E["flask"] = ("particles_blend", {
-        **once(1), **point(["v.dir_x", "v.dir_y", "v.dir_z"]), **life("v.life"), **speed("v.speed"),
-        **dynamic((0, "-v.grav", 0), 0), **spin(0, 720),
-        **billboard(0.22, still("flask")),
-    })
+    # ---------------------------------------------------------------- plague liquid
     E["plague_drip"] = ("particles_blend", {
         **once(1), **point([0, -1, 0]), **life(0.5), **speed(0.5), **dynamic((0, -9, 0), 0.5),
         **billboard(0.06, still("drop")), **tint(PLAGUE_BRIGHT),
-    })
-    E["glass_shards"] = ("particles_alpha", {
-        **once(9), **sphere(0.2), **life("math.random(0.6, 0.9)"), **speed("math.random(2.5, 4.5)"),
-        **dynamic((0, -14, 0), 0.5), **spin("math.random(0, 360)", "math.random(-600, 600)"),
-        **billboard(0.08, still("shard", "math.floor(v.particle_random_1 * 3)")),
     })
     E["plague_splash"] = ("particles_blend", {
         **once(1), **point(), **life(0.45),
@@ -344,26 +328,59 @@ def effects():
         **billboard(0.28, flipbook("lantern", 5), "lookat_y"), **tint(fade_in_out(0.1, 0.85)),
     })
 
-    # ---------------------------------------------------------------- crows
-    E["crow"] = ("particles_alpha", {
-        **once(1), **point(["v.dir_x", "v.dir_y", "v.dir_z"]), **life("v.life"), **speed("v.speed"),
-        **billboard(0.3, flipbook("crow", 14)),
-    })
-    E["crow_flock"] = ("particles_alpha", {
-        **once(8), **sphere(1.2, ["math.random(-1, 1)", "math.random(0.3, 1)", "math.random(-1, 1)"]),
-        **life("math.random(1.2, 1.8)"), **speed("math.random(3, 4.5)"), **dynamic((0, 1.2, 0), 0.8),
-        **billboard(0.28, flipbook("crow", 14)),
-    })
-    E["feathers"] = ("particles_alpha", {
-        **once(8), **sphere(0.4), **life("math.random(1.2, 1.8)"), **speed(2),
-        **dynamic((0, -1.8, 0), 1.8), **spin("math.random(0, 360)", "math.random(-300, 300)"),
-        **billboard(0.09, still("feather")),
-    })
-
     # ---------------------------------------------------------------- tethers
     E["chain_link"] = ("particles_blend", {
         **once(1), **point(), **life(0.2), **spin("math.random(0, 360)"),
         **billboard(0.1, still("chain")),
+    })
+
+    # ---------------------------------------------------------------- underworld (v1.4 Death skills)
+    E["phantom_scythe"] = ("particles_add", {
+        **once(1), **point(["v.dir_x", "v.dir_y", "v.dir_z"]), **life("v.life"), **speed("v.speed"),
+        **spin("math.random(0, 360)", 1080),
+        **billboard(0.85, still("scythe")),
+        **tint({"0.0": "#FFFFFFFF", "0.85": "#FFFFFFFF", "1.0": "#00FFFFFF"}),
+    })
+    E["chain_rise"] = ("particles_blend", {
+        **once(1), **point(), **life("v.life"),
+        **parametric([0, "-0.7 + math.min(v.particle_age * 5, 1) * 0.7", 0]),
+        **billboard([0.18, 0.36], still("chain_v"), "lookat_y"),
+        **tint(fade_in_out(0.05, 0.85)),
+    })
+    E["bone_hand"] = ("particles_blend", {
+        **once(1), **point(), **life("v.life"),
+        **parametric([0, "-0.35 + math.min(v.particle_age * 4, 1) * 0.35", 0]),
+        **billboard(0.38, flipbook("hand", stretch=True, loop=False), "lookat_y"),
+        **tint({"0.0": "#FFFFFFFF", "0.85": "#FFFFFFFF", "1.0": "#00FFFFFF"}),
+    })
+    E["void_rift"] = ("particles_blend", {
+        **once(1), **point(), **life("v.life"), **spin("math.random(0, 360)", 45),
+        **billboard("v.radius", flipbook("void", stretch=True, loop=False), "emitter_transform_xz"),
+        **tint(fade_in_out(0.08, 0.9)),
+    })
+    E["phantom_reaper"] = ("particles_blend", {
+        **once(1), **point(["v.dir_x", 0, "v.dir_z"]), **life("v.life"), **speed("v.speed"),
+        **billboard([0.6, 1.2], still("reaper"), "lookat_y"),
+        **tint({"0.0": "#00FFFFFF", "0.15": "#E6FFFFFF", "0.8": "#E6FFFFFF", "1.0": "#00FFFFFF"}),
+    })
+    E["x_slash"] = ("particles_add", {
+        **once(1), **point(), **life(0.4), **spin("v.spin"),
+        **billboard(["1.3 + 0.4 * %s" % T] * 2, flipbook("x_slash", stretch=True, loop=False)),
+        **tint(WHITE_FADE),
+    })
+    E["ground_crack"] = ("particles_blend", {
+        **once(1), **point(), **life("v.life"), **spin("math.random(0, 360)"),
+        **billboard("v.radius", still("crack"), "emitter_transform_xz"),
+        **tint({"0.0": "#FFFFFFFF", "0.8": "#FFFFFFFF", "1.0": "#00FFFFFF"}),
+    })
+    E["death_mark"] = ("particles_blend", {
+        **once(1), **point(), **life(0.3),
+        **billboard(0.2, still("skull"), "lookat_y"),
+    })
+    E["soul_flames"] = ("particles_add", {
+        **once(12), **disc(0.6, ["math.random(-0.3, 0.3)", 1, "math.random(-0.3, 0.3)"]),
+        **life("math.random(0.5, 0.9)"), **speed("math.random(4, 7)"), **dynamic((0, 0, 0), 2.2),
+        **billboard(["0.26 * (1 - 0.5 * %s)" % T] * 2, flipbook("soul", 12)), **tint(SOUL_FADE),
     })
     return E
 

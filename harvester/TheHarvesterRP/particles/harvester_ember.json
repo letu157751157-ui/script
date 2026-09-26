@@ -42,8 +42,8 @@
           "texture_height": 256,
           "flipbook": {
             "base_UV": [
-              64,
-              128
+              0,
+              160
             ],
             "size_UV": [
               16,

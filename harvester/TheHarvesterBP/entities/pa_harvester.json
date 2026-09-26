@@ -81,20 +81,8 @@
         "width": 1.4
       },
       "minecraft:health": {
-        "value": 600,
-        "max": 600
-      },
-      "minecraft:hurt_on_condition": {
-        "damage_conditions": [
-          {
-            "filters": {
-              "test": "in_lava",
-              "subject": "self"
-            },
-            "cause": "lava",
-            "damage_per_tick": 4
-          }
-        ]
+        "value": 1000,
+        "max": 1000
       },
       "minecraft:movement": {
         "value": 0.28
@@ -135,11 +123,59 @@
           {
             "cause": "fall",
             "deals_damage": "no"
+          },
+          {
+            "cause": "lava",
+            "deals_damage": "no"
+          },
+          {
+            "cause": "fire",
+            "deals_damage": "no"
+          },
+          {
+            "cause": "fire_tick",
+            "deals_damage": "no"
+          },
+          {
+            "cause": "magma",
+            "deals_damage": "no"
+          },
+          {
+            "cause": "drowning",
+            "deals_damage": "no"
+          },
+          {
+            "cause": "suffocation",
+            "deals_damage": "no"
+          },
+          {
+            "cause": "wither",
+            "deals_damage": "no"
+          },
+          {
+            "cause": "freezing",
+            "deals_damage": "no"
+          },
+          {
+            "cause": "contact",
+            "deals_damage": "no"
+          },
+          {
+            "cause": "projectile",
+            "damage_multiplier": 0.6
+          },
+          {
+            "cause": "entity_explosion",
+            "damage_multiplier": 0.5
+          },
+          {
+            "cause": "block_explosion",
+            "damage_multiplier": 0.5
           }
         ]
       },
       "minecraft:knockback_resistance": {
-        "value": 0.8
+        "value": 1.0
       },
       "minecraft:leashable": {},
       "minecraft:leashable_to": {},

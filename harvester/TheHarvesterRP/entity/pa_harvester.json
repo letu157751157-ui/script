@@ -48,11 +48,8 @@
         "eye": "harvester:eye_glow",
         "ember": "harvester:ember",
         "smoke": "harvester:black_smoke",
-        "miasma": "harvester:miasma",
         "souls": "harvester:soul_burst",
         "wisp": "harvester:soul_wisp",
-        "crows": "harvester:crow_flock",
-        "feathers": "harvester:feathers",
         "dirt": "harvester:dirt_burst"
       }
     }

@@ -1,5 +1,4 @@
 import { world, system, MolangVariableMap } from "@minecraft/server";
-import { inHarvesterFight } from "./harvester";
 
 const scytheStates = new Map();
 
@@ -376,20 +375,6 @@ system.runInterval(() => {
                 }
             }
         } catch {}
-
-        // Action bar HUD (the boss HUD takes priority during a Harvester fight)
-        if (inHarvesterFight(player)) continue;
-        const reapCd   = Math.max(0, Math.ceil((CONFIG.skills.reap.cd    - (now - state.lastReap))    / 1000));
-        const hvstCd   = Math.max(0, Math.ceil((CONFIG.skills.harvest.cd - (now - state.lastHarvest)) / 1000));
-        const explodCd = Math.max(0, Math.ceil((CONFIG.passive.soulExplosion.cd - (now - state.lastExplosion)) / 1000));
-
-        const reapStr   = reapCd  === 0 ? "§a§lREADY" : `§f${reapCd}s`;
-        const hvstStr   = hvstCd  === 0 ? "§a§lREADY" : `§f${hvstCd}s`;
-        const expStr    = explodCd === 0 ? "§a§lREADY" : `§f${explodCd}s`;
-
-        player.onScreenDisplay.setActionBar(
-            `§5☠ §7Reap:${reapStr} §7| §5Harvest:${hvstStr} §7| §cExplosion:${expStr}`
-        );
     }
 }, 10);
 

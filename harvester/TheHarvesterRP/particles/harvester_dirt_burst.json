@@ -46,8 +46,8 @@
           "texture_width": 256,
           "texture_height": 256,
           "uv": [
-            "232 + math.clamp(math.floor(v.particle_random_1 * 3), 0, 2) * 8",
-            128
+            "184 + math.clamp(math.floor(v.particle_random_1 * 3), 0, 2) * 8",
+            160
           ],
           "uv_size": [
             8,

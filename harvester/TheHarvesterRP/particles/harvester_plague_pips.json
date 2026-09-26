@@ -30,7 +30,7 @@
           "texture_height": 256,
           "uv": [
             "128 + math.clamp(v.stacks - 1, 0, 4) * 16",
-            96
+            128
           ],
           "uv_size": [
             16,
