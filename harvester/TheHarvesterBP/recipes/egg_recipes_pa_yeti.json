@@ -1,0 +1,42 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "recipes_a54a6e92"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "ABC",
+      "CDC",
+      "CEC"
+    ],
+    "key": {
+      "A": {
+        "item": "minecraft:powder_snow_bucket",
+        "data": 0
+      },
+      "B": {
+        "item": "minecraft:diamond_block",
+        "data": 0
+      },
+      "C": {
+        "item": "pa:big_yeti_fur",
+        "data": 0
+      },
+      "D": {
+        "item": "pa:frozen_heart",
+        "data": 0
+      },
+      "E": {
+        "item": "minecraft:netherite_ingot",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "pa:yeti_spawn_egg",
+      "count": 1
+    }
+  }
+}

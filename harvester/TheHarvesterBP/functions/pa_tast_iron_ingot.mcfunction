@@ -1,0 +1,1 @@
+give @s pa:tast_iron_ingot

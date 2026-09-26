@@ -1,0 +1,1 @@
+give @s pa:dark_soul_apple

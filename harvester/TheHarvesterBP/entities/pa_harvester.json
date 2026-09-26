@@ -1,0 +1,567 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "pa:harvester",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "is_experimental": false
+    },
+    "component_groups": {
+      "minecraft:player_created": {
+        "minecraft:behavior.hurt_by_target": {
+          "priority": 2,
+          "entity_types": {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "operator": "not",
+                  "value": "player"
+                },
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "operator": "not",
+                  "value": "creeper"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "minecraft:village_created": {
+        "minecraft:behavior.defend_village_target": {
+          "priority": 1,
+          "must_reach": true,
+          "attack_chance": 0.05,
+          "entity_types": {
+            "filters": {
+              "any_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "mob"
+                },
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "player"
+                }
+              ]
+            }
+          }
+        },
+        "minecraft:dweller": {
+          "dwelling_type": "village",
+          "dweller_role": "defender",
+          "update_interval_base": 60,
+          "update_interval_variant": 40,
+          "can_find_poi": false,
+          "can_migrate": true,
+          "first_founding_reward": 0
+        }
+      }
+    },
+    "components": {
+      "minecraft:is_hidden_when_invisible": {},
+      "minecraft:type_family": {
+        "family": [
+          "enderman",
+          "monster"
+        ]
+      },
+      "minecraft:nameable": {
+        "allow_name_tag_renaming": true,
+        "always_show": false
+      },
+      "minecraft:collision_box": {
+        "height": 3.4,
+        "width": 1.4
+      },
+      "minecraft:health": {
+        "value": 600,
+        "max": 600
+      },
+      "minecraft:hurt_on_condition": {
+        "damage_conditions": [
+          {
+            "filters": {
+              "test": "in_lava",
+              "subject": "self"
+            },
+            "cause": "lava",
+            "damage_per_tick": 4
+          }
+        ]
+      },
+      "minecraft:movement": {
+        "value": 0.28
+      },
+      "minecraft:navigation.walk": {
+        "can_path_over_water": false,
+        "avoid_water": true,
+        "avoid_damage_blocks": true,
+        "avoid_portals": false,
+        "avoid_sun": false,
+        "blocks_to_avoid": [],
+        "can_breach": false,
+        "can_break_doors": false,
+        "can_jump": true,
+        "can_open_doors": false,
+        "can_open_iron_doors": false,
+        "can_pass_doors": true,
+        "can_path_from_air": false,
+        "can_path_over_lava": false,
+        "can_sink": true,
+        "can_swim": false,
+        "can_walk": true,
+        "can_walk_in_lava": false,
+        "is_amphibious": false
+      },
+      "minecraft:movement.basic": {},
+      "minecraft:jump.static": {
+        "jump_power": 0.42
+      },
+      "minecraft:can_climb": {},
+      "minecraft:interact": {
+        "interactions": [
+          {
+            "on_interact": {
+              "filters": {
+                "all_of": [
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "value": "player"
+                  },
+                  {
+                    "test": "has_equipment",
+                    "domain": "hand",
+                    "subject": "other",
+                    "value": "iron_ingot"
+                  },
+                  {
+                    "test": "is_missing_health"
+                  }
+                ]
+              }
+            },
+            "use_item": true,
+            "health_amount": 25,
+            "play_sounds": "irongolem.repair",
+            "interact_text": "action.interact.repair"
+          }
+        ]
+      },
+      "minecraft:attack": {
+        "damage": 15,
+        "effect_name": "wither",
+        "effect_duration": 3.0
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "fall",
+            "deals_damage": "no"
+          }
+        ]
+      },
+      "minecraft:knockback_resistance": {
+        "value": 0.8
+      },
+      "minecraft:leashable": {},
+      "minecraft:leashable_to": {},
+      "minecraft:preferred_path": {
+        "max_fall_blocks": 1,
+        "jump_cost": 5,
+        "default_block_cost": 1.5,
+        "preferred_path_blocks": [
+          {
+            "cost": 0,
+            "blocks": [
+              "grass_path"
+            ]
+          },
+          {
+            "cost": 1,
+            "blocks": [
+              "cobblestone",
+              "stone",
+              "granite",
+              "polished_granite",
+              "diorite",
+              "polished_diorite",
+              "andesite",
+              "polished_andesite",
+              "stone_bricks",
+              "mossy_stone_bricks",
+              "cracked_stone_bricks",
+              "chiseled_stone_bricks",
+              "sandstone",
+              "cut_sandstone",
+              "chiseled_sandstone",
+              "smooth_sandstone",
+              "mossy_cobblestone",
+              "smooth_stone_slab",
+              "sandstone_slab",
+              "cobblestone_slab",
+              "brick_slab",
+              "stone_brick_slab",
+              "quartz_slab",
+              "nether_brick_slab",
+              "red_sandstone_slab",
+              "purpur_slab",
+              "prismarine_slab",
+              "dark_prismarine_slab",
+              "prismarine_brick_slab",
+              "mossy_cobblestone_slab",
+              "smooth_sandstone_slab",
+              "red_nether_brick_slab",
+              "end_stone_brick_slab",
+              "smooth_red_sandstone_slab",
+              "polished_andesite_slab",
+              "andesite_slab",
+              "diorite_slab",
+              "polished_diorite_slab",
+              "granite_slab",
+              "polished_granite_slab",
+              "mossy_stone_brick_slab",
+              "smooth_quartz_slab",
+              "normal_stone_slab",
+              "cut_sandstone_slab",
+              "cut_red_sandstone_slab",
+              "smooth_stone_double_slab",
+              "sandstone_double_slab",
+              "cobblestone_double_slab",
+              "brick_double_slab",
+              "stone_brick_double_slab",
+              "quartz_double_slab",
+              "nether_brick_double_slab",
+              "red_sandstone_double_slab",
+              "purpur_double_slab",
+              "prismarine_double_slab",
+              "dark_prismarine_double_slab",
+              "prismarine_brick_double_slab",
+              "mossy_cobblestone_double_slab",
+              "smooth_sandstone_double_slab",
+              "red_nether_brick_double_slab",
+              "end_stone_brick_double_slab",
+              "smooth_red_sandstone_double_slab",
+              "polished_andesite_double_slab",
+              "andesite_double_slab",
+              "diorite_double_slab",
+              "polished_diorite_double_slab",
+              "granite_double_slab",
+              "polished_granite_double_slab",
+              "mossy_stone_brick_double_slab",
+              "smooth_quartz_double_slab",
+              "normal_stone_double_slab",
+              "cut_sandstone_double_slab",
+              "cut_red_sandstone_double_slab",
+              "oak_slab",
+              "spruce_slab",
+              "birch_slab",
+              "jungle_slab",
+              "acacia_slab",
+              "dark_oak_slab",
+              "oak_double_slab",
+              "spruce_double_slab",
+              "birch_double_slab",
+              "jungle_double_slab",
+              "acacia_double_slab",
+              "dark_oak_double_slab",
+              "oak_planks",
+              "spruce_planks",
+              "birch_planks",
+              "jungle_planks",
+              "acacia_planks",
+              "dark_oak_planks",
+              "brick_block",
+              "nether_brick",
+              "red_nether_brick",
+              "end_bricks",
+              "red_sandstone",
+              "cut_red_sandstone",
+              "chiseled_red_sandstone",
+              "smooth_red_sandstone",
+              "white_stained_glass",
+              "orange_stained_glass",
+              "magenta_stained_glass",
+              "light_blue_stained_glass",
+              "yellow_stained_glass",
+              "lime_stained_glass",
+              "pink_stained_glass",
+              "gray_stained_glass",
+              "light_gray_stained_glass",
+              "cyan_stained_glass",
+              "purple_stained_glass",
+              "blue_stained_glass",
+              "brown_stained_glass",
+              "green_stained_glass",
+              "red_stained_glass",
+              "black_stained_glass",
+              "glass",
+              "glowstone",
+              "prismarine",
+              "emerald_block",
+              "diamond_block",
+              "lapis_block",
+              "gold_block",
+              "redstone_block",
+              "purple_glazed_terracotta",
+              "white_glazed_terracotta",
+              "orange_glazed_terracotta",
+              "magenta_glazed_terracotta",
+              "light_blue_glazed_terracotta",
+              "yellow_glazed_terracotta",
+              "lime_glazed_terracotta",
+              "pink_glazed_terracotta",
+              "gray_glazed_terracotta",
+              "silver_glazed_terracotta",
+              "cyan_glazed_terracotta",
+              "blue_glazed_terracotta",
+              "brown_glazed_terracotta",
+              "green_glazed_terracotta",
+              "red_glazed_terracotta",
+              "black_glazed_terracotta"
+            ]
+          },
+          {
+            "cost": 50,
+            "blocks": [
+              "bed",
+              "lectern",
+              "composter",
+              "grindstone",
+              "blast_furnace",
+              "smoker",
+              "fletching_table",
+              "cartography_table",
+              "brewing_stand",
+              "smithing_table",
+              "cauldron",
+              "barrel",
+              "loom",
+              "stonecutter"
+            ]
+          }
+        ]
+      },
+      "minecraft:behavior.target_when_pushed": {
+        "priority": 1,
+        "percent_chance": 5,
+        "entity_types": [
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "monster"
+                },
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "operator": "not",
+                  "value": "creeper"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "minecraft:behavior.melee_box_attack": {
+        "priority": 1,
+        "track_target": true
+      },
+      "minecraft:behavior.move_towards_target": {
+        "priority": 2,
+        "speed_multiplier": 0.9,
+        "within_radius": 32
+      },
+      "minecraft:behavior.move_through_village": {
+        "priority": 3,
+        "speed_multiplier": 0.6,
+        "only_at_night": true
+      },
+      "minecraft:behavior.move_towards_dwelling_restriction": {
+        "priority": 4,
+        "speed_multiplier": 1
+      },
+      "minecraft:behavior.offer_flower": {
+        "priority": 5,
+        "filters": {
+          "test": "is_daytime"
+        }
+      },
+      "minecraft:behavior.random_stroll": {
+        "priority": 6,
+        "speed_multiplier": 0.6,
+        "xz_dist": 16
+      },
+      "minecraft:behavior.look_at_player": {
+        "priority": 7,
+        "look_distance": 6,
+        "probability": 0.02
+      },
+      "minecraft:behavior.random_look_around": {
+        "priority": 8
+      },
+      "minecraft:behavior.nearest_attackable_target": {
+        "priority": 3,
+        "must_reach": true,
+        "must_see": true,
+        "entity_types": [
+          {
+            "filters": {
+              "any_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "player"
+                }
+              ]
+            },
+            "must_see": true,
+            "max_dist": 16.0
+          }
+        ],
+        "attack_owner": false,
+        "must_see_forget_duration": 3.0,
+        "persist_time": 0.0,
+        "reselect_targets": false,
+        "scan_interval": 10,
+        "set_persistent": false,
+        "target_invisible_multiplier": 0.7,
+        "target_search_height": -1.0,
+        "target_sneak_visibility_multiplier": 0.8,
+        "within_radius": 0
+      },
+      "minecraft:behavior.hurt_by_target": {
+        "priority": 2,
+        "alert_same_type": false,
+        "hurt_owner": false
+      },
+      "minecraft:persistent": {},
+      "minecraft:physics": {
+        "has_collision": true,
+        "has_gravity": true,
+        "push_towards_closest_space": true
+      },
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:follow_range": {
+        "value": 80
+      },
+      "minecraft:conditional_bandwidth_optimization": {},
+      "minecraft:boss": {
+        "hud_range": 55,
+        "name": "\u00a7l\u00a78THE HARVESTER",
+        "should_darken_sky": true
+      },
+      "minecraft:experience_reward": {
+        "on_death": "query.last_hit_by_player ? 500 : 0"
+      },
+      "minecraft:behavior.equip_item": {},
+      "minecraft:shooter": {
+        "def": "minecraft:wither_skull_dangerous",
+        "magic": true,
+        "power": 1.2,
+        "projectiles_per_shot": 1,
+        "shot_offset": [
+          0,
+          1.8,
+          0
+        ],
+        "sound": "mob.wither.shoot"
+      },
+      "minecraft:loot": {
+        "table": "loot_tables/entities/pa_harvester.json"
+      },
+      "minecraft:behavior.ranged_attack": {
+        "priority": 2,
+        "burst_shots": 1,
+        "burst_interval": 0.1,
+        "charge_charged_trigger": 0,
+        "charge_shoot_trigger": 0,
+        "attack_interval_min": 4.0,
+        "attack_interval_max": 6.0,
+        "attack_radius": 20.0,
+        "swing": false
+      },
+      "minecraft:spawn_entity": {
+        "entities": [
+          {
+            "min_wait_time": 30,
+            "max_wait_time": 60,
+            "spawn_sound": "mob.wither.spawn",
+            "spawn_item": "egg",
+            "filters": {
+              "test": "is_family",
+              "subject": "self",
+              "value": "monster"
+            },
+            "num_to_spawn": 2,
+            "should_leash": false,
+            "entity_type": "minecraft:wither_skeleton"
+          }
+        ]
+      }
+    },
+    "events": {
+      "minecraft:from_player": {
+        "add": {
+          "component_groups": [
+            "minecraft:player_created"
+          ]
+        }
+      },
+      "minecraft:from_village": {
+        "add": {
+          "component_groups": [
+            "minecraft:village_created"
+          ]
+        }
+      },
+      "on:death": {
+        "queue_command": {
+          "command": []
+        }
+      },
+      "on:hurt": {
+        "queue_command": {
+          "command": []
+        }
+      },
+      "on:hurt_by_player": {
+        "queue_command": {
+          "command": []
+        }
+      },
+      "on:ignite": {
+        "queue_command": {
+          "command": []
+        }
+      },
+      "on:target_acquired": {
+        "queue_command": {
+          "command": []
+        }
+      },
+      "on:target_escape": {
+        "queue_command": {
+          "command": []
+        }
+      },
+      "on:wake_with_owner": {
+        "queue_command": {
+          "command": []
+        }
+      }
+    }
+  }
+}

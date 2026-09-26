@@ -1,0 +1,39 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.pa_harvester_scythe.first_person": {
+      "loop": true,
+      "bones": {
+        "rightitem": {
+          "rotation": [
+            -453.5031840626,
+            89.6948367566,
+            -273.496424861
+          ],
+          "position": [
+            -5,
+            22,
+            -2.5
+          ]
+        }
+      }
+    },
+    "animation.pa_harvester_scythe.third_person": {
+      "loop": true,
+      "bones": {
+        "rightitem": {
+          "rotation": [
+            85.068539694,
+            0.344568035,
+            2.475645304
+          ],
+          "position": [
+            0,
+            1,
+            8
+          ]
+        }
+      }
+    }
+  }
+}

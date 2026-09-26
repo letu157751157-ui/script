@@ -1,0 +1,1 @@
+give @s pa:big_yeti_fur

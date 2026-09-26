@@ -1,0 +1,1 @@
+give @s pa:super_smithing_update

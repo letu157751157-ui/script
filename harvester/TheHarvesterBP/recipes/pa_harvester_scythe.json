@@ -1,0 +1,46 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "harvester_scythe_38dff224"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "ABA",
+      "CDC",
+      "EFE"
+    ],
+    "key": {
+      "A": {
+        "item": "pa:dark_soul_ingot",
+        "data": 0
+      },
+      "B": {
+        "item": "pa:reaper_skull",
+        "data": 0
+      },
+      "C": {
+        "item": "pa:soul",
+        "data": 0
+      },
+      "D": {
+        "item": "minecraft:netherite_sword",
+        "data": 0
+      },
+      "E": {
+        "item": "pa:dark_night_ingot",
+        "data": 0
+      },
+      "F": {
+        "item": "pa:super_smithing_update",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "pa:harvester_scythe",
+      "count": 1
+    }
+  }
+}

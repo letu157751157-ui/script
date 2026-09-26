@@ -1,0 +1,40 @@
+{
+    "format_version": 2,
+    "header": {
+        "description": "The Harvester addon - Boss chiến đấu cùng set Dark Knight.\nTác giả: YTAUN",
+        "name": "The Harvester",
+        "uuid": "0f54d1b1-1c1e-4b2d-bca7-4c470a01c6c0",
+        "version": [
+            1,
+            2,
+            0
+        ],
+        "min_engine_version": [
+            1,
+            17,
+            0
+        ]
+    },
+    "modules": [
+        {
+            "description": "The Harvester addon - Boss chiến đấu cùng set Dark Knight.\nTác giả: YTAUN",
+            "type": "resources",
+            "uuid": "fa063c16-da05-4cc8-a8b9-051d21d1c60e",
+            "version": [
+                1,
+                2,
+                0
+            ]
+        }
+    ],
+    "dependencies": [
+        {
+            "uuid": "d3349a89-5713-49d8-bc07-a14008dad004",
+            "version": [
+                0,
+                0,
+                1
+            ]
+        }
+    ]
+}

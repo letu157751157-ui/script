@@ -1,0 +1,33 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "pa:super_smithing_update",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:hand_equipped": false,
+      "minecraft:max_stack_size": 64,
+      "minecraft:glint": false,
+      "minecraft:use_modifiers": {
+        "movement_modifier": 1,
+        "use_duration": 0
+      },
+      "minecraft:allow_off_hand": false,
+      "minecraft:icon": "pa:super_smithing_update",
+      "minecraft:display_name": {
+        "value": "§eSuper Smithing Update§0"
+      },
+      "minecraft:tags": {
+        "tags": [
+          "minecraft:transform_materials"
+        ]
+      },
+      "minecraft:custom_components": [
+        "pa_super_smithing_update:trigger"
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+effect @p poison 10 5

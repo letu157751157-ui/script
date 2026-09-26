@@ -1,0 +1,38 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "dark_night_helmet_60a46b8e"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "A A",
+      "BCB",
+      " D "
+    ],
+    "key": {
+      "A": {
+        "item": "pa:dark_soul_ingot",
+        "data": 0
+      },
+      "B": {
+        "item": "pa:dark_night_ingot",
+        "data": 0
+      },
+      "C": {
+        "item": "minecraft:netherite_helmet",
+        "data": 0
+      },
+      "D": {
+        "item": "pa:super_smithing_update",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "pa:dark_night_helmet",
+      "count": 1
+    }
+  }
+}

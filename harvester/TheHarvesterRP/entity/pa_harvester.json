@@ -1,0 +1,50 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "pa:harvester",
+      "materials": {
+        "default": "iron_golem"
+      },
+      "textures": {
+        "default": "textures/entity/pamobile/pa_harvester",
+        "cracked_high": "textures/entity/pamobile/pa_harvester",
+        "cracked_med": "textures/entity/pamobile/pa_harvester",
+        "cracked_low": "textures/entity/pamobile/pa_harvester",
+        "cracked_none": "textures/entity/pamobile/pa_harvester"
+      },
+      "geometry": {
+        "default": "geometry.pa_harvester_default"
+      },
+      "animations": {
+        "walk": "animation.pa_harvester.walk",
+        "move": "animation.pa_harvester.move",
+        "attack": "animation.pa_harvester.attack",
+        "flower": "animation.pa_harvester.flower",
+        "look_at_target": "animation.pa_harvester.look_at_target",
+        "walk_to_target": "animation.pa_harvester.walk_to_target",
+        "move_to_target": "animation.pa_harvester.move_to_target",
+        "move_controller": "controller.animation.pa_harvester.move",
+        "arm_controller": "controller.animation.pa_harvester.arm_movement"
+      },
+      "render_controllers": [
+        "controller.render.iron_golem",
+        "controller.render.iron_golem_cracks"
+      ],
+      "scripts": {
+        "pre_animation": [
+          "variable.modified_tcos0 = Math.clamp(((Math.cos(query.modified_distance_moved * 13.5) * Math.min(query.modified_move_speed, 0.6) / variable.gliding_speed_value) * 25.0), -12.5, 12.5);"
+        ],
+        "animate": [
+          "look_at_target",
+          "move_controller",
+          "arm_controller"
+        ]
+      },
+      "spawn_egg": {
+        "base_color": "#000000",
+        "overlay_color": "#40FFA4"
+      }
+    }
+  }
+}

@@ -1,0 +1,1 @@
+give @s pa:crab_hand

@@ -1,0 +1,1 @@
+effect @s slowness 3 2

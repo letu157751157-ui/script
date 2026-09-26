@@ -1,0 +1,190 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.pa_thrownhdbrbr",
+        "texture_width": 32,
+        "texture_height": 32,
+        "visible_bounds_width": 5,
+        "visible_bounds_height": 3.5,
+        "visible_bounds_offset": [
+          0,
+          1.25,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "body",
+          "pivot": [
+            0,
+            0,
+            3
+          ],
+          "binding": "q.item_slot_to_bone_name(c.item_slot)",
+          "cubes": [
+            {
+              "origin": [
+                0,
+                -1.5,
+                0
+              ],
+              "size": [
+                0,
+                1,
+                6
+              ],
+              "pivot": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                -180
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    0,
+                    2
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    2,
+                    2
+                  ],
+                  "uv_size": [
+                    6,
+                    2
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    0,
+                    2
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    0,
+                    6
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    0,
+                    6
+                  ],
+                  "uv_size": [
+                    0,
+                    -6
+                  ]
+                }
+              }
+            },
+            {
+              "origin": [
+                -0.25,
+                -1.21447,
+                2.69975
+              ],
+              "size": [
+                0.5,
+                0.5,
+                7.75
+              ],
+              "pivot": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                -180
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    11,
+                    0
+                  ],
+                  "uv_size": [
+                    1,
+                    2
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    5,
+                    0
+                  ],
+                  "uv_size": [
+                    2,
+                    2
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    9,
+                    0
+                  ],
+                  "uv_size": [
+                    1,
+                    2
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    5,
+                    0
+                  ],
+                  "uv_size": [
+                    2,
+                    2
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    20,
+                    0
+                  ],
+                  "uv_size": [
+                    1,
+                    2
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    18,
+                    2
+                  ],
+                  "uv_size": [
+                    1,
+                    -2
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

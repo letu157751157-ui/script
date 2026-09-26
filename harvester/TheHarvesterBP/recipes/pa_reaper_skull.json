@@ -1,0 +1,30 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "reaper_skull_2e9d3250"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "AAA",
+      "ABA",
+      "AAA"
+    ],
+    "key": {
+      "A": {
+        "item": "pa:soul",
+        "data": 0
+      },
+      "B": {
+        "item": "minecraft:skeleton_skull",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "pa:reaper_skull",
+      "count": 1
+    }
+  }
+}

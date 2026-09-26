@@ -1,0 +1,38 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "dark_night_legging_433a6516"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "ABA",
+      "ACA",
+      " D "
+    ],
+    "key": {
+      "A": {
+        "item": "pa:dark_night_ingot",
+        "data": 0
+      },
+      "B": {
+        "item": "pa:dark_soul_ingot",
+        "data": 0
+      },
+      "C": {
+        "item": "minecraft:netherite_leggings",
+        "data": 0
+      },
+      "D": {
+        "item": "pa:super_smithing_update",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "pa:dark_night_legging",
+      "count": 1
+    }
+  }
+}

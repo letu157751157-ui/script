@@ -1,0 +1,165 @@
+item.pa:dark_night_apple.name=§5Dark Night Apple
+item.pa:dark_night_apple=§5Dark Night Apple
+item.pa:dark_night_boot.name=§l§5Dark Night Boot
+item.pa:dark_night_boot=§l§5Dark Night Boot
+item.pa:dark_night_chestplate.name=§l§5Dark Night Chestplate
+item.pa:dark_night_chestplate=§l§5Dark Night Chestplate
+item.pa:dark_night_helmet.name=§l§5Dark Night Helmet
+item.pa:dark_night_helmet=§l§5Dark Night Helmet
+item.pa:dark_night_ingot.name=Dark Night Ingot
+item.pa:dark_night_ingot=Dark Night Ingot
+item.pa:dark_night_legging.name=§l§5Dark Night Legging
+item.pa:dark_night_legging=§l§5Dark Night Legging
+item.pa:dark_soul_apple.name=§dDark Soul Apple
+item.pa:dark_soul_apple=§dDark Soul Apple
+item.pa:dark_soul_ingot.name=Dark Soul Ingot
+item.pa:dark_soul_ingot=Dark Soul Ingot
+item.pa:harvester_scythe.name=§8Harvester Scythe
+item.pa:harvester_scythe=§8Harvester Scythe
+item.spawn_egg.entity.pa:harvester.name=Spawn §l§0Harvester
+entity.pa:harvester.name=§l§0Harvester
+item.pa:raw_rast_iron.name=Raw rast iron
+item.pa:raw_rast_iron=Raw rast iron
+item.pa:raw_steel.name=Raw Steel
+item.pa:raw_steel=Raw Steel
+item.pa:reaper_skull.name=§l§3Reaper Skull 
+item.pa:reaper_skull=§l§3Reaper Skull 
+item.pa:soul.name=Soul
+item.pa:soul=Soul
+item.pa:steel_ingot.name= Steel Ingot
+item.pa:steel_ingot= Steel Ingot
+item.pa:steel_stick.name= Steel Stick
+item.pa:steel_stick= Steel Stick
+item.pa:steel_sword.name=Steel Sword
+item.pa:steel_sword=Steel Sword
+item.pa:super_smithing_update.name=§eSuper Smithing Update§0
+item.pa:super_smithing_update=§eSuper Smithing Update§0
+item.pa:tast_iron_ingot.name=Rast Ingot Ingot
+item.pa:tast_iron_ingot=Rast Ingot Ingot
+## Comments can be added anywhere on a valid line by starting with '##'
+##
+## Note, trailing spaces will NOT be trimmed. If you want room between the end of the string and the start of a
+## comment on the same line, use TABs.
+accessibility.disableTTS=Text To Speech disabled
+accessibility.enableTTS=Text To Speech enabled
+
+
+
+entity.lamborghini:gallardo_yellow.name=Lamborghini Gallardo Yellow
+item.spawn_egg.entity.lamborghini:gallardo_yellow.name=Lamborghini Gallardo Yellow
+
+entity.lamborghini:gallardo_red.name=Lamborghini Gallardo Red
+item.spawn_egg.entity.lamborghini:gallardo_red.name=Lamborghini Gallardo Red
+
+entity.lamborghini:gallardo_blue.name=Lamborghini Gallardo Blue
+item.spawn_egg.entity.lamborghini:gallardo_blue.name=Lamborghini Gallardo Blue
+
+entity.lamborghini:gallardo_green.name=Lamborghini Gallardo Green
+item.spawn_egg.entity.lamborghini:gallardo_green.name=Lamborghini Gallardo Green
+
+entity.lamborghini:gallardo_black.name=Lamborghini Gallardo Black
+item.spawn_egg.entity.lamborghini:gallardo_black.name=Lamborghini Gallardo Black
+
+entity.lamborghini:gallardo_white.name=Lamborghini Gallardo White
+item.spawn_egg.entity.lamborghini:gallardo_white.name=Lamborghini Gallardo White
+
+entity.lamborghini:gallardo_orange.name=Lamborghini Gallardo Orange
+item.spawn_egg.entity.lamborghini:gallardo_orange.name=Lamborghini Gallardo Orange
+
+entity.lamborghini:gallardo_purple.name=Lamborghini Gallardo Purple
+item.spawn_egg.entity.lamborghini:gallardo_purple.name=Lamborghini Gallardo Purple
+
+entity.lamborghini:gallardo_cyan.name=Lamborghini Gallardo Cyan
+item.spawn_egg.entity.lamborghini:gallardo_cyan.name=Lamborghini Gallardo Cyan
+
+##Items
+
+item.compound.salt.name=Ivory Tusk
+item.compound.sodiumoxide.name=Stinky Cheese
+
+##Spawn Eggs
+
+item.spawn_egg.entity.animal:bear.name=Spawn Bear
+item.spawn_egg.entity.animal:buffalo.name=Spawn Buffalo
+item.spawn_egg.entity.animal:camel.name=Spawn Camel
+item.spawn_egg.entity.animal:duck.name=Spawn Duck
+item.spawn_egg.entity.animal:penguin.name=Spawn Penguin
+item.spawn_egg.entity.animal:steve.name=Spawn Steve (NPC)
+item.spawn_egg.entity.animal:alex.name=Spawn Alex (NPC)
+item.spawn_egg.entity.animal:lion.name=Spawn Lion
+item.spawn_egg.entity.animal:hamster.name=Spawn Hamster
+item.spawn_egg.entity.animal:hippo.name=Spawn Hippopotamus
+item.spawn_egg.entity.animal:chameleon.name=Spawn Chameleon
+item.spawn_egg.entity.animal:mouse.name=Spawn Mouse
+item.spawn_egg.entity.animal:deer.name=Spawn Deer
+item.spawn_egg.entity.animal:elephant.name=Spawn Elephant
+item.spawn_egg.entity.animal:frog.name=Spawn Frog
+item.spawn_egg.entity.animal:bumblebee.name=Spawn Bumblebee
+item.spawn_egg.entity.animal:tortoise.name=Spawn Tortoise
+item.spawn_egg.entity.animal:frozen_beast.name=Spawn Frozen Beast
+item.spawn_egg.entity.animal:crocodile.name=Spawn Crocodile
+item.spawn_egg.entity.animal:zushroom.name=Spawn Zushroom
+item.spawn_egg.entity.animal:starfish.name=Spawn Starfish
+item.spawn_egg.entity.animal:panther.name=Spawn Panther
+item.spawn_egg.entity.animal:brown_mooshroom.name=Spawn Brown Mooshroom
+item.spawn_egg.entity.mooshroom.name=Spawn Red Mooshroom
+item.spawn_egg.entity.animal:emerged.name=Spawn Emerged
+item.spawn_egg.entity.animal:corrupted_skeleton.name=Spawn Corrupted Skeleton
+item.spawn_egg.entity.animal:welter.name=Spawn Welter
+item.spawn_egg.entity.animal:npc.name=Spawn NPC
+item.spawn_egg.entity.animal:npc_scientist.name=Spawn NPC Scientist
+item.spawn_egg.entity.animal:nether_creeper.name=Spawn Nether Creeper
+item.spawn_egg.entity.animal:flea.name=Spawn Flea
+item.spawn_egg.entity.animal:bird.name=Spawn Bird
+item.spawn_egg.entity.animal:tiger.name=Spawn Tiger
+item.spawn_egg.entity.animal:ender_creeper.name=Spawn Ender Creeper
+item.spawn_egg.entity.animal:ender_skeleton.name=Spawn Ender Skeleton
+
+##Entities
+
+entity.animal:bear.name=Bear
+entity.animal:buffalo.name=Buffalo
+entity.animal:camel.name=Camel
+entity.animal:duck.name=Duck
+entity.animal:penguin.name=Penguin
+entity.animal:steve.name=Steve
+entity.animal:alex.name=Alex
+entity.animal:lion.name=Lion
+entity.animal:hamster.name=Hamster
+entity.animal:hippo.name=Hippopotamus
+entity.animal:chameleon.name=Chameleon
+entity.animal:mouse.name=Mouse
+entity.animal:deer.name=Deer
+entity.animal:elephant.name=Elephant
+entity.animal:frog.name=Frog
+entity.animal:bumblebee.name=Bumblebee
+entity.animal:tortoise.name=Tortoise
+entity.animal:frozen_beast.name=Frozen Beast
+entity.animal:crocodile.name=Crocodile
+entity.animal:zushroom.name=Zushroom
+entity.animal:starfish.name=Starfish
+entity.animal:panther.name=Panther
+entity.animal:brown_mooshroom.name=Brown Mooshroom
+entity.mooshroom.name=Red Mooshroom
+entity.animal:emerged.name=Emerged
+entity.animal:corrupted_skeleton.name=Corrupted Skeleton
+entity.animal:welter.name=Welter
+entity.animal:npc.name=NPC
+entity.animal:npc_scientist.name=NPC Scientist
+entity.animal:nether_creeper.name=Nether Creeper
+entity.animal:flea.name=Flea
+entity.animal:bird.name=Bird
+entity.animal:tiger.name=Tiger
+entity.animal:ender_creeper.name=Ender Creeper
+entity.animal:ender_skeleton.name=Ender Skeleton
+
+##new furni
+action.hint.exit.cat=Now you can rotate it	#
+action.hint.exit.unknown=Now you can rotate it	#
+action.interact.rotar=Rotate	#
+action.interact.patitas=Open#
+action.interact.conducir=Dive	#
+action.interact.sit = Sit	#
+
+entity.unknown.name=PA inventory
+

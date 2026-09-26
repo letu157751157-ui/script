@@ -1,0 +1,184 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.pa_ice_bar",
+        "texture_width": 128,
+        "texture_height": 128,
+        "visible_bounds_width": 6,
+        "visible_bounds_height": 6,
+        "visible_bounds_offset": [
+          0,
+          1,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "rightitem",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            87.5,
+            0
+          ],
+          "binding": "q.item_slot_to_bone_name(c.item_slot)"
+        },
+        {
+          "name": "bone80",
+          "parent": "rightitem",
+          "pivot": [
+            -1.73194,
+            11.85864,
+            0.37416
+          ],
+          "rotation": [
+            -90,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "bone81",
+          "parent": "bone80",
+          "pivot": [
+            2.26806,
+            9.85864,
+            0.37416
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2.73194,
+                8.85864,
+                -7.62584
+              ],
+              "size": [
+                6,
+                6,
+                16
+              ],
+              "uv": [
+                0,
+                34
+              ]
+            }
+          ]
+        },
+        {
+          "name": "bone83",
+          "parent": "bone80",
+          "pivot": [
+            2.26806,
+            9.85864,
+            0.37416
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -1.73194,
+                9.85864,
+                7.37416
+              ],
+              "size": [
+                4,
+                4,
+                9
+              ],
+              "uv": [
+                30,
+                56
+              ]
+            }
+          ]
+        },
+        {
+          "name": "bone84",
+          "parent": "bone80",
+          "pivot": [
+            -1.73194,
+            11.85864,
+            16.37416
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -0.73194,
+                10.85864,
+                15.37416
+              ],
+              "size": [
+                2,
+                2,
+                13
+              ],
+              "uv": [
+                0,
+                56
+              ]
+            }
+          ]
+        },
+        {
+          "name": "bone85",
+          "parent": "bone80",
+          "pivot": [
+            -1.73194,
+            11.85864,
+            0.37416
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -4.73194,
+                7.85864,
+                -20.62584
+              ],
+              "size": [
+                9,
+                9,
+                13
+              ],
+              "uv": [
+                44,
+                34
+              ]
+            }
+          ]
+        },
+        {
+          "name": "bone86",
+          "parent": "bone80",
+          "pivot": [
+            -1.73194,
+            11.85864,
+            0.37416
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -5.73194,
+                6.85864,
+                -43.62584
+              ],
+              "size": [
+                11,
+                11,
+                23
+              ],
+              "uv": [
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

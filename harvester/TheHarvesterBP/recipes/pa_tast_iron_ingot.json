@@ -1,0 +1,11 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_furnace": {
+    "description": {
+      "identifier": "pa_smelt_tast_iron_ingot"
+    },
+    "tags": ["furnace", "blast_furnace"],
+    "input": "pa:raw_rast_iron",
+    "output": "pa:tast_iron_ingot"
+  }
+}

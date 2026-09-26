@@ -1,0 +1,1 @@
+effect @s wither 5 1

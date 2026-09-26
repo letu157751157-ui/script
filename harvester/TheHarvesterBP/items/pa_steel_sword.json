@@ -1,0 +1,54 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "pa:steel_sword",
+      "menu_category": {
+        "category": "equipment",
+        "group": "minecraft:itemGroup.name.sword"
+      }
+    },
+    "components": {
+      "minecraft:icon": "pa_steel_sword",
+      "minecraft:max_stack_size": 1,
+      "minecraft:stacked_by_data": true,
+      "minecraft:glint": false,
+      "minecraft:hand_equipped": true,
+      "minecraft:damage": 7,
+      "minecraft:enchantable": {
+        "slot": "sword",
+        "value": 10
+      },
+      "minecraft:durability": {
+        "max_durability": 1600
+      },
+      "minecraft:mining_speed": 1,
+      "minecraft:repairable": {
+        "repair_items": [
+          {
+            "items": [
+              "minecraft:emerald"
+            ],
+            "repair_amount": 10
+          },
+          {
+            "items": [
+              "pa:steel_sword"
+            ],
+            "repair_amount": "context.other->query.remaining_durability + 0.2 * context.other->query.max_durability"
+          }
+        ]
+      },
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:tags": {
+        "tags": [
+          "minecraft:is_sword"
+        ]
+      },
+      "minecraft:allow_off_hand": false,
+      "minecraft:custom_components": [
+        "item:has_durability"
+      ]
+    }
+  }
+}

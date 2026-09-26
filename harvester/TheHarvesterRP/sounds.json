@@ -1,0 +1,128 @@
+{
+  "entity_sounds": {
+    "entities": {
+      "pa:diamond_golem": {
+        "volume": 1.0,
+        "pitch": [
+          0.8,
+          1.2
+        ],
+        "events": {
+          "ambient": "mob.irongolem.say",
+          "death": "mob.irongolem.death",
+          "hurt": "mob.irongolem.hit",
+          "irongolem.crack": "mob.irongolem.crack",
+          "irongolem.repair": "mob.irongolem.repair",
+          "step": {
+            "sound": "mob.irongolem.walk",
+            "volume": 1.0,
+            "pitch": 1.0
+          },
+          "throw": {
+            "sound": "mob.irongolem.throw",
+            "volume": 1.0,
+            "pitch": 1.0
+          }
+        }
+      },
+      "pa:iceron_golem": {
+        "volume": 1.0,
+        "pitch": [
+          0.8,
+          1.2
+        ],
+        "events": {
+          "ambient": "mob.irongolem.say",
+          "hurt": "mob.irongolem.hit",
+          "death": {
+            "sound": "mob.pa_iceron_golem.death",
+            "volume": [
+              0.9909999999999999,
+              7.129
+            ],
+            "pitch": [
+              0.7875,
+              1.348
+            ]
+          },
+          "step": {
+            "sound": "mob.irongolem.walk",
+            "volume": 1.0,
+            "pitch": 1.0
+          },
+          "throw": {
+            "sound": "mob.irongolem.throw",
+            "volume": 1.0,
+            "pitch": 1.0
+          }
+        }
+      },
+      "pa:vtwoiceron_golem": {
+        "volume": 1.0,
+        "pitch": [
+          0.8,
+          1.2
+        ],
+        "events": {
+          "ambient": "mob.irongolem.say",
+          "hurt": "mob.irongolem.hit",
+          "death": {
+            "sound": "mob.pa_vtwoiceron_golem.death",
+            "volume": [
+              0.9909999999999999,
+              3.7630000000000003
+            ],
+            "pitch": [
+              0.7875,
+              1.938
+            ]
+          },
+          "step": {
+            "sound": "mob.irongolem.walk",
+            "volume": 1.0,
+            "pitch": 1.0
+          },
+          "throw": {
+            "sound": "mob.irongolem.throw",
+            "volume": 1.0,
+            "pitch": 1.0
+          }
+        }
+      },
+      "pa:yeti": {
+        "volume": 1.0,
+        "pitch": [
+          0.8,
+          1.2
+        ],
+        "events": {
+          "ambient": "mob.irongolem.say",
+          "death": "mob.irongolem.death",
+          "hurt": {
+            "sound": "mob.pa_yeti.hit",
+            "volume": [
+              0.9909999999999999,
+              2.08
+            ],
+            "pitch": [
+              0.8,
+              1.2
+            ]
+          },
+          "irongolem.crack": "mob.irongolem.crack",
+          "irongolem.repair": "mob.irongolem.repair",
+          "step": {
+            "sound": "mob.irongolem.walk",
+            "volume": 1.0,
+            "pitch": 1.0
+          },
+          "throw": {
+            "sound": "mob.irongolem.throw",
+            "volume": 1.0,
+            "pitch": 1.0
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,247 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.pa_dark_night_boot",
+        "texture_width": 112.0,
+        "texture_height": 112.0,
+        "visible_bounds_height": 2.0,
+        "visible_bounds_offset": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "visible_bounds_width": 2.0
+      },
+      "bones": [
+        {
+          "name": "waist",
+          "pivot": [
+            0,
+            14.1,
+            0
+          ]
+        },
+        {
+          "name": "body",
+          "parent": "waist",
+          "pivot": [
+            0,
+            27.9,
+            0
+          ]
+        },
+        {
+          "name": "Boots",
+          "parent": "body",
+          "pivot": [
+            0,
+            7.2,
+            0
+          ]
+        },
+        {
+          "name": "rightLeg",
+          "parent": "Boots",
+          "pivot": [
+            -2.3,
+            14.1,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -4.6375,
+                0.2625,
+                -2.3375
+              ],
+              "size": [
+                4.675,
+                8.125,
+                4.675
+              ],
+              "inflate": 0.25,
+              "uv": {
+                "north": {
+                  "uv": [
+                    63,
+                    74
+                  ],
+                  "uv_size": [
+                    4,
+                    7
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    59,
+                    74
+                  ],
+                  "uv_size": [
+                    4,
+                    7
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    71,
+                    74
+                  ],
+                  "uv_size": [
+                    4,
+                    7
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    67,
+                    74
+                  ],
+                  "uv_size": [
+                    4,
+                    7
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    63,
+                    70
+                  ],
+                  "uv_size": [
+                    4,
+                    4
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    67,
+                    74
+                  ],
+                  "uv_size": [
+                    4,
+                    -4
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "LeftLegCube",
+          "parent": "rightLeg",
+          "pivot": [
+            -4.6,
+            1.45,
+            -1.15
+          ],
+          "rotation": [
+            -15,
+            -7.5,
+            -17.5
+          ]
+        },
+        {
+          "name": "leftLeg",
+          "parent": "Boots",
+          "pivot": [
+            2.3,
+            14.1,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -0.0375,
+                0.2625,
+                -2.3375
+              ],
+              "size": [
+                4.675,
+                8.125,
+                4.675
+              ],
+              "inflate": 0.25,
+              "uv": {
+                "north": {
+                  "uv": [
+                    21,
+                    76
+                  ],
+                  "uv_size": [
+                    4,
+                    7
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    17,
+                    76
+                  ],
+                  "uv_size": [
+                    4,
+                    7
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    29,
+                    76
+                  ],
+                  "uv_size": [
+                    4,
+                    7
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    25,
+                    76
+                  ],
+                  "uv_size": [
+                    4,
+                    7
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    21,
+                    72
+                  ],
+                  "uv_size": [
+                    4,
+                    4
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    25,
+                    76
+                  ],
+                  "uv_size": [
+                    4,
+                    -4
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "RightlegCube",
+          "parent": "leftLeg",
+          "pivot": [
+            4.6,
+            1.45,
+            -1.15
+          ],
+          "rotation": [
+            -15,
+            7.5,
+            17.5
+          ]
+        }
+      ]
+    }
+  ]
+}

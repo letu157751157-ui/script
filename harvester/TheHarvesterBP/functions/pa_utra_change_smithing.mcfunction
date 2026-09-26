@@ -1,0 +1,1 @@
+give @s pa:utra_change_smithing

@@ -1,0 +1,1 @@
+give @s pa:fire_dust

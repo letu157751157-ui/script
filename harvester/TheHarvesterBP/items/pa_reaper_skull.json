@@ -1,0 +1,27 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "pa:reaper_skull",
+      "menu_category": {
+        "category": "nature"
+      }
+    },
+    "components": {
+      "minecraft:hand_equipped": false,
+      "minecraft:max_stack_size": 1,
+      "minecraft:glint": true,
+      "minecraft:use_modifiers": {
+        "movement_modifier": 1,
+        "use_duration": 0
+      },
+      "minecraft:icon": "pa:reaper_skull",
+      "minecraft:allow_off_hand": false,
+      "minecraft:tags": {
+        "tags": [
+          "minecraft:transform_materials"
+        ]
+      }
+    }
+  }
+}

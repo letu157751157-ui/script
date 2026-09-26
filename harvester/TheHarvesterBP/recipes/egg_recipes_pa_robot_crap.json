@@ -1,0 +1,42 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "recipes_0bc516f9"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "ABA",
+      "CDC",
+      "AEA"
+    ],
+    "key": {
+      "A": {
+        "item": "pa:crab_leg",
+        "data": 0
+      },
+      "B": {
+        "item": "pa:crab_upper_body",
+        "data": 0
+      },
+      "C": {
+        "item": "pa:crab_hand",
+        "data": 0
+      },
+      "D": {
+        "item": "pa:crab_core",
+        "data": 0
+      },
+      "E": {
+        "item": "pa:crab_lower_body",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "pa:robot_crap_spawn_egg",
+      "count": 1
+    }
+  }
+}

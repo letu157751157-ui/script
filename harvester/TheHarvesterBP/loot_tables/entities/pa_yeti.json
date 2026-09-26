@@ -1,0 +1,389 @@
+{
+  "id": "1746434858191",
+  "name": "yeti phase1 2",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "pa:ice_bar",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": 0
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "pa:iceore",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": 0
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:acacia_button",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:birch_button",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:crimson_button",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:dark_oak_button",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:ice",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:blue_ice",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:packed_ice",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:frosted_ice",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:jungle_button",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:polished_blackstone_button",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:snow",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:snow_layer",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:snowball",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:spruce_button",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone_button",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:warped_button",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:wooden_button",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:mangrove_button",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        }
+      ]
+    }
+  ]
+}

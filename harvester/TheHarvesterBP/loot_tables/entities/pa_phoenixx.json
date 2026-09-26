@@ -1,0 +1,67 @@
+{
+  "id": "1716438049612",
+  "name": "phonix",
+  "pools": [
+    {
+      "rolls": 6,
+      "entries": [
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "pa:firefeather",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": 0
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:nether_wart",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:nether_wart_block",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 1
+              }
+            },
+            {
+              "function": "set_data",
+              "data": "0"
+            }
+          ],
+          "data": "0"
+        }
+      ]
+    }
+  ]
+}

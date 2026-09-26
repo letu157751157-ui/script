@@ -1,0 +1,68 @@
+{
+  "resource_pack_name": "vanilla",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "pa_dark_night_helmet": {
+      "textures": [
+        "textures/items/pamobile/pa_dark_night_helmet"
+      ]
+    },
+    "pa_dark_night_chestplate": {
+      "textures": [
+        "textures/items/pamobile/pa_dark_night_chestplate"
+      ]
+    },
+    "pa_dark_night_boot": {
+      "textures": [
+        "textures/items/pamobile/pa_dark_night_boot"
+      ]
+    },
+    "pa_dark_night_legging": {
+      "textures": [
+        "textures/items/pamobile/pa_dark_night_legging"
+      ]
+    },
+    "pa_harvester_scythe": {
+      "textures": "textures/items/pamobile/pa_harvester_scythe"
+    },
+    "pa_steel_sword": {
+      "textures": "textures/items/pamobile/pa_steel_sword"
+    },
+    "pa:dark_night_apple": {
+      "textures": "textures/items/pamobile/pa_dark_night_apple"
+    },
+    "pa:dark_soul_apple": {
+      "textures": "textures/items/pamobile/pa_dark_soul_apple"
+    },
+    "pa:super_smithing_update": {
+      "textures": "textures/items/pamobile/pa_super_smithing_update"
+    },
+    "pa:soul": {
+      "textures": "textures/items/pamobile/pa_soul"
+    },
+    "pa:reaper_skull": {
+      "textures": "textures/items/pamobile/pa_reaper_skull"
+    },
+    "pa:steel_ingot": {
+      "textures": "textures/items/pamobile/pa_steel_ingot"
+    },
+    "pa:tast_iron_ingot": {
+      "textures": "textures/items/pamobile/pa_tast_iron_ingot"
+    },
+    "pa:raw_steel": {
+      "textures": "textures/items/pamobile/pa_raw_steel"
+    },
+    "pa:raw_rast_iron": {
+      "textures": "textures/items/pamobile/pa_raw_rast_iron"
+    },
+    "pa:steel_stick": {
+      "textures": "textures/items/pamobile/pa_steel_stick"
+    },
+    "pa:dark_night_ingot": {
+      "textures": "textures/items/pamobile/pa_dark_night_ingot"
+    },
+    "pa:dark_soul_ingot": {
+      "textures": "textures/items/pamobile/pa_dark_soul_ingot"
+    }
+  }
+}
