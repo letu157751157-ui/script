@@ -1,0 +1,67 @@
+{
+  "format_version": "1.10.0",
+  "particle_effect": {
+    "description": {
+      "identifier": "harvester:black_rain",
+      "basic_render_parameters": {
+        "material": "particles_blend",
+        "texture": "textures/particle/harvester_particles"
+      }
+    },
+    "components": {
+      "minecraft:emitter_rate_steady": {
+        "spawn_rate": "v.radius * 10",
+        "max_particles": 160
+      },
+      "minecraft:emitter_lifetime_once": {
+        "active_time": "v.duration"
+      },
+      "minecraft:emitter_shape_disc": {
+        "radius": "v.radius",
+        "plane_normal": "y",
+        "direction": [
+          0,
+          -1,
+          0
+        ],
+        "offset": [
+          0,
+          7,
+          0
+        ]
+      },
+      "minecraft:particle_lifetime_expression": {
+        "max_lifetime": 0.5
+      },
+      "minecraft:particle_initial_speed": 14,
+      "minecraft:particle_appearance_billboard": {
+        "size": [
+          0.035,
+          0.2
+        ],
+        "facing_camera_mode": "lookat_y",
+        "uv": {
+          "texture_width": 256,
+          "texture_height": 256,
+          "uv": [
+            248,
+            160
+          ],
+          "uv_size": [
+            8,
+            8
+          ]
+        }
+      },
+      "minecraft:particle_appearance_tinting": {
+        "color": {
+          "interpolant": "v.particle_age / v.particle_lifetime",
+          "gradient": {
+            "0.0": "#C02B3A14",
+            "1.0": "#A0141A0A"
+          }
+        }
+      }
+    }
+  }
+}
