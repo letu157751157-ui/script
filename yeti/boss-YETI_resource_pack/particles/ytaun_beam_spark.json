@@ -4,7 +4,7 @@
     "description": {
       "identifier": "ytaun:beam_spark",
       "basic_render_parameters": {
-        "material": "particles_add",
+        "material": "particles_alpha",
         "texture": "textures/particle/ytaun_yeti_fx"
       }
     },

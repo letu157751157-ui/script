@@ -661,6 +661,25 @@ LAYOUT = {
 }
 
 
+def minecraftify(img):
+    """Vanilla Minecraft particle look: chunky pixels (8-16 px sprites), hard alpha, small palette."""
+    w, h = img.size
+    f = 4 if max(w, h) >= 32 else 2
+    small = img.resize((max(1, w // f), max(1, h // f)), Image.BOX)
+    px = small.load()
+    for y in range(small.height):
+        for x in range(small.width):
+            r, g, b, a = px[x, y]
+            if a < 90:
+                px[x, y] = (0, 0, 0, 0)
+            elif abs(r - g) < 8 and abs(g - b) < 8:
+                px[x, y] = (r, g, b, 255)  # gray sprites are tinted in JSON (telegraphs)
+            else:
+                lum = (r + g + b) / 765
+                px[x, y] = rgba(shade(lum * 0.9 + 0.08))
+    return small.resize((w, h), Image.NEAREST)
+
+
 def build_atlas():
     atlas = new(ATLAS, ATLAS)
     used = []
@@ -674,6 +693,7 @@ def build_atlas():
         used.append((name, box))
         for i, frame in enumerate(frames):
             assert frame.size == (w, h), name
+            frame = minecraftify(frame)
             atlas.paste(frame, (x0 + i * w, y0), frame)
     return atlas
 
@@ -756,7 +776,7 @@ def effects():
     fx["ytaun:frost_shockwave"] = merge(once(), {"minecraft:emitter_shape_point": {"offset": [0, 0.12, 0]},
                                                  "minecraft:particle_lifetime_expression": {"max_lifetime": 0.65}},
                                         flat([grow, grow], uv_flip("shockwave", 6)),
-                                        {"minecraft:particle_appearance_tinting": fade(0.55)}), "particles_blend"
+                                        {"minecraft:particle_appearance_tinting": fade(0.55)}), "particles_alpha"
 
     for name, color in (("ytaun:telegraph", "8FD8FF"), ("ytaun:telegraph_danger", "FF4A3A")):
         rgb = [round(int(color[i:i + 2], 16) / 255, 3) for i in (0, 2, 4)]
@@ -764,29 +784,29 @@ def effects():
                                   "minecraft:particle_lifetime_expression": {"max_lifetime": DURATION.format(d=1)}},
                          flat([f"{R(d=3)} * math.min(1, 0.3 + v.particle_age * 6)"] * 2, uv_static("telegraph"),
                               {"rotation": 0, "rotation_rate": 25}),
-                         {"minecraft:particle_appearance_tinting": {"color": rgb + ["0.6 + 0.35 * math.sin(v.particle_age * 900)"]}}), "particles_blend"
+                         {"minecraft:particle_appearance_tinting": {"color": rgb + ["0.6 + 0.35 * math.sin(v.particle_age * 900)"]}}), "particles_alpha"
         # the fill grows from the centre and reaches the ring exactly when the hit lands
         fill = name + "_fill"
         fx[fill] = merge(once(), {"minecraft:emitter_shape_point": {"offset": [0, 0.07, 0]},
                                   "minecraft:particle_lifetime_expression": {"max_lifetime": DURATION.format(d=1)}},
                          flat([f"{R(d=3)} * 0.93 * v.particle_age / v.particle_lifetime"] * 2, uv_static("fill")),
-                         {"minecraft:particle_appearance_tinting": {"color": rgb + [0.75]}}), "particles_blend"
+                         {"minecraft:particle_appearance_tinting": {"color": rgb + [0.75]}}), "particles_alpha"
 
     fx["ytaun:ground_crack"] = merge(once(), {"minecraft:emitter_shape_point": {"offset": [0, 0.06, 0]},
                                               "minecraft:particle_lifetime_expression": {"max_lifetime": 3.5}},
                                      flat([R(d=2.5), R(d=2.5)], uv_static("crack"), {"rotation": "v.particle_random_1 * 360"}),
-                                     {"minecraft:particle_appearance_tinting": fade(0.7)}), "particles_blend"
+                                     {"minecraft:particle_appearance_tinting": fade(0.7)}), "particles_alpha"
 
     fx["ytaun:rune_circle"] = merge(once(), {"minecraft:emitter_shape_point": {"offset": [0, 0.1, 0]},
                                              "minecraft:particle_lifetime_expression": {"max_lifetime": DURATION.format(d=2)}},
                                     flat([f"{R(d=5)} * math.min(1, v.particle_age * 3)"] * 2, uv_static("rune"),
                                          {"rotation": 0, "rotation_rate": 45}),
-                                    {"minecraft:particle_appearance_tinting": fade_in_out("A8E8FF")}), "particles_add"
+                                    {"minecraft:particle_appearance_tinting": fade_in_out("A8E8FF")}), "particles_alpha"
 
     fx["ytaun:footprint"] = merge(once(), {"minecraft:emitter_shape_point": {"offset": [0, 0.05, 0]},
                                            "minecraft:particle_lifetime_expression": {"max_lifetime": 4}},
                                   flat([0.45, 0.45], uv_static("footprint"), {"rotation": "v.particle_random_1 * 360"}),
-                                  {"minecraft:particle_appearance_tinting": fade(0.6)}), "particles_blend"
+                                  {"minecraft:particle_appearance_tinting": fade(0.6)}), "particles_alpha"
 
     # ---------------- bursts ----------------
     fx["ytaun:ice_shards"] = merge(once("10 + v.radius * 3"), {
@@ -806,7 +826,7 @@ def effects():
         "minecraft:particle_initial_spin": {"rotation": "v.particle_random_1 * 360", "rotation_rate": "(v.particle_random_4 - 0.5) * 600"},
         "minecraft:particle_motion_collision": {"collision_drag": 8, "coefficient_of_restitution": 0.35, "collision_radius": 0.15},
         "minecraft:particle_appearance_tinting": fade(0.75)},
-        board(["0.18 + v.particle_random_3 * 0.16"] * 2, uv_static("debris", 4))), "particles_blend"
+        board(["0.18 + v.particle_random_3 * 0.16"] * 2, uv_static("debris", 4))), "particles_alpha"
 
     fx["ytaun:snow_burst"] = merge(once("8 + v.radius * 3"), {
         "minecraft:emitter_shape_disc": {"offset": [0, 0.3, 0], "radius": "0.5 + v.radius * 0.4", "direction": "outwards"},
@@ -814,7 +834,7 @@ def effects():
         "minecraft:particle_initial_speed": "2 + v.particle_random_2 * 3 + v.radius * 0.6",
         "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, 1.2, 0], "linear_drag_coefficient": 3.5},
         "minecraft:particle_appearance_tinting": fade(0.5)},
-        board(["0.35 + v.particle_random_3 * 0.35"] * 2, uv_flip("puff", 4))), "particles_blend"
+        board(["0.35 + v.particle_random_3 * 0.35"] * 2, uv_flip("puff", 4))), "particles_alpha"
 
     fx["ytaun:ground_mist"] = merge(once("14 + v.radius * 4"), {
         "minecraft:emitter_shape_disc": {"offset": [0, 0.4, 0], "radius": "0.4 + v.radius * 0.25", "direction": "outwards"},
@@ -823,12 +843,12 @@ def effects():
         "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, 0.4, 0], "linear_drag_coefficient": 1.6},
         "minecraft:particle_initial_spin": {"rotation": "v.particle_random_4 * 360", "rotation_rate": 30},
         "minecraft:particle_appearance_tinting": fade_in_out("E6F6FF", 0.8)},
-        board(["0.7 + v.particle_age * 0.9", "0.7 + v.particle_age * 0.9"], uv_flip("mist", 4))), "particles_blend"
+        board(["0.7 + v.particle_age * 0.9", "0.7 + v.particle_age * 0.9"], uv_flip("mist", 4))), "particles_alpha"
 
     fx["ytaun:ice_flash"] = merge(once(), {"minecraft:emitter_shape_point": {"offset": [0, 1, 0]},
                                            "minecraft:particle_lifetime_expression": {"max_lifetime": 0.3},
                                            "minecraft:particle_initial_spin": {"rotation": "v.particle_random_1 * 90"}},
-                                  board([R(d=2), R(d=2)], uv_flip("flash", 4), "lookat_xyz")), "particles_add"
+                                  board([R(d=2), R(d=2)], uv_flip("flash", 4), "lookat_xyz")), "particles_alpha"
 
     fx["ytaun:ice_spike"] = merge(once(), {"minecraft:emitter_shape_point": {},
                                            "minecraft:particle_lifetime_expression": {"max_lifetime": DURATION.format(d=1.6)},
@@ -841,13 +861,13 @@ def effects():
     fx["ytaun:claw_slash"] = merge(once(), {"minecraft:emitter_shape_point": {},
                                             "minecraft:particle_lifetime_expression": {"max_lifetime": 0.35},
                                             "minecraft:particle_initial_spin": {"rotation": "(v.particle_random_1 - 0.5) * 50"}},
-                                   board([R(d=1.8), R(d=1.8)], uv_flip("claw", 4), "lookat_xyz")), "particles_blend"
+                                   board([R(d=1.8), R(d=1.8)], uv_flip("claw", 4), "lookat_xyz")), "particles_alpha"
 
     fx["ytaun:phase_beam"] = merge(once(), {"minecraft:emitter_shape_point": {"offset": [0, 5, 0]},
                                             "minecraft:particle_lifetime_expression": {"max_lifetime": 1.6},
                                             "minecraft:particle_appearance_tinting": fade(0.4)},
                                    board(["1.6 * (1 - math.pow(v.particle_age / v.particle_lifetime, 2)) + 0.1", "5.5"],
-                                         uv_static("beam"), "lookat_y")), "particles_add"
+                                         uv_static("beam"), "lookat_y")), "particles_alpha"
 
     # ---------------- area / auras ----------------
     swirl_pos = [f"math.cos(v.particle_random_1 * 360 + v.particle_age * 400) * {R(d=4)} * (0.4 + v.particle_random_2 * 0.6)",
@@ -867,7 +887,7 @@ def effects():
                                                              "minecraft:particle_motion_parametric": {"relative_position": tornado},
                                                              "minecraft:particle_initial_spin": {"rotation": "v.particle_random_4 * 360", "rotation_rate": 160},
                                                              "minecraft:particle_appearance_tinting": fade_in_out("F0FAFF", 0.9)},
-                                     board(["0.25 + v.particle_age * 0.35"] * 2, uv_flip("puff", 4))), "particles_blend"
+                                     board(["0.25 + v.particle_age * 0.35"] * 2, uv_flip("puff", 4))), "particles_alpha"
 
     fx["ytaun:snowfall"] = merge(steady(50, 160, 1.0), {
         "minecraft:emitter_shape_disc": {"offset": [0, 7, 0], "radius": R(d=10)},
@@ -883,7 +903,7 @@ def effects():
         "minecraft:particle_initial_speed": 0,
         "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, "2.5 + v.particle_random_2 * 2", 0], "linear_drag_coefficient": 1.2},
         "minecraft:particle_appearance_tinting": fade(0.6, "9FE6FF")},
-        board(["0.1 + v.particle_random_3 * 0.12"] * 2, uv_flip("glint", 4, fps=10, stretch=False, loop=True))), "particles_add"
+        board(["0.1 + v.particle_random_3 * 0.12"] * 2, uv_flip("glint", 4, fps=10, stretch=False, loop=True))), "particles_alpha"
 
     fx["ytaun:frost_flame"] = merge(steady(28, 50, 1.0), {
         "minecraft:emitter_shape_box": {"offset": [0, 2.2, 0], "half_dimensions": [R(d=1.1), 2.2, R(d=1.1)], "surface_only": False},
@@ -891,7 +911,7 @@ def effects():
         "minecraft:particle_initial_speed": 0,
         "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, 3, 0], "linear_drag_coefficient": 1.5},
         "minecraft:particle_appearance_tinting": fade(0.5, "B8ECFF")},
-        board(["0.22 + v.particle_random_3 * 0.12", "0.44 + v.particle_random_3 * 0.24"], uv_flip("flame", 6), "lookat_y")), "particles_add"
+        board(["0.22 + v.particle_random_3 * 0.12", "0.44 + v.particle_random_3 * 0.24"], uv_flip("flame", 6), "lookat_y")), "particles_alpha"
 
     fx["ytaun:frost_heal"] = merge(once(8), {
         "minecraft:emitter_shape_disc": {"radius": R(d=1.5), "offset": [0, 0.5, 0]},
@@ -899,12 +919,12 @@ def effects():
         "minecraft:particle_initial_speed": 0,
         "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, 3, 0], "linear_drag_coefficient": 1.5},
         "minecraft:particle_appearance_tinting": fade(0.6, "A8FFE8")},
-        board([0.2, 0.2], uv_flip("heal", 4))), "particles_blend"
+        board([0.2, 0.2], uv_flip("heal", 4))), "particles_alpha"
 
     fx["ytaun:frozen_block"] = merge(once(), {"minecraft:emitter_shape_point": {"offset": [0, 1, 0]},
                                               "minecraft:particle_lifetime_expression": {"max_lifetime": DURATION.format(d=2)},
                                               "minecraft:particle_appearance_tinting": fade(0.85)},
-                                     board([0.75, 1.05], uv_static("block"), "lookat_xyz")), "particles_blend"
+                                     board([0.75, 1.05], uv_static("block"), "lookat_xyz")), "particles_alpha"
 
     fx["ytaun:ice_prison"] = merge(once(10), {
         "minecraft:emitter_shape_disc": {"offset": [0, 1.2, 0], "radius": R(d=1.3), "surface_only": True, "direction": "outwards"},
@@ -919,11 +939,11 @@ def effects():
         "minecraft:particle_lifetime_expression": {"max_lifetime": "0.4 + v.particle_random_1 * 0.3"},
         "minecraft:particle_initial_speed": 0.6,
         "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -0.8, 0], "linear_drag_coefficient": 1.5}},
-        board(["0.12 + v.particle_random_2 * 0.1"] * 2, uv_flip("glint", 4))), "particles_add"
+        board(["0.12 + v.particle_random_2 * 0.1"] * 2, uv_flip("glint", 4))), "particles_alpha"
 
     fx["ytaun:beam_spark"] = merge(once(), {"minecraft:emitter_shape_point": {},
                                             "minecraft:particle_lifetime_expression": {"max_lifetime": 0.22}},
-                                   board([0.2, 0.2], uv_flip("orb", 4))), "particles_add"
+                                   board([0.2, 0.2], uv_flip("orb", 4))), "particles_alpha"
 
     fx["ytaun:ice_boulder"] = merge(once(), {"minecraft:emitter_shape_point": {},
                                              "minecraft:particle_lifetime_expression": {"max_lifetime": 0.1},
@@ -932,7 +952,7 @@ def effects():
 
     fx["ytaun:comet"] = merge(once(), {"minecraft:emitter_shape_point": {},
                                        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.1}},
-                              board([1.1, 1.1], uv_static("comet", 2), "lookat_xyz")), "particles_add"
+                              board([1.1, 1.1], uv_static("comet", 2), "lookat_xyz")), "particles_alpha"
 
     fx["ytaun:icicle_fall"] = merge(once(), {"minecraft:emitter_shape_point": {"direction": [0, -1, 0]},
                                              "minecraft:particle_lifetime_expression": {"max_lifetime": 0.88},
@@ -949,19 +969,19 @@ def effects():
         "minecraft:particle_motion_dynamic": {"linear_drag_coefficient": 1.2, "linear_acceleration": [0, -1.5, 0]},
         "minecraft:particle_initial_spin": {"rotation": "v.particle_random_2 * 360", "rotation_rate": 120},
         "minecraft:particle_appearance_tinting": fade(0.45)},
-        board(["0.25 + v.particle_age * 1.6"] * 2, uv_flip("mist", 4))), "particles_blend"
+        board(["0.25 + v.particle_age * 1.6"] * 2, uv_flip("mist", 4))), "particles_alpha"
 
     # ---------------- attached to model locators (animations) ----------------
     fx["ytaun:eye_glow"] = merge(LOCAL, once(), {"minecraft:emitter_shape_point": {},
                                                  "minecraft:particle_lifetime_expression": {"max_lifetime": 3.2},
                                                  "minecraft:particle_appearance_tinting": {"color": [0.65, 0.95, 1, 1]}},
                                  board(["0.09 + math.sin(v.particle_age * 360) * 0.015"] * 2,
-                                       uv_flip("orb", 4, fps=6, stretch=False, loop=True), "lookat_xyz")), "particles_add"
+                                       uv_flip("orb", 4, fps=6, stretch=False, loop=True), "lookat_xyz")), "particles_alpha"
     fx["ytaun:eye_glow_red"] = merge(LOCAL, once(), {"minecraft:emitter_shape_point": {},
                                                      "minecraft:particle_lifetime_expression": {"max_lifetime": 3.2},
                                                      "minecraft:particle_appearance_tinting": {"color": [1, 0.35, 0.3, 1]}},
                                      board(["0.1 + math.sin(v.particle_age * 360) * 0.015"] * 2,
-                                           uv_flip("orb", 4, fps=6, stretch=False, loop=True), "lookat_xyz")), "particles_add"
+                                           uv_flip("orb", 4, fps=6, stretch=False, loop=True), "lookat_xyz")), "particles_alpha"
 
     fx["ytaun:breath_puff"] = merge(once(5), {
         "minecraft:emitter_shape_sphere": {"radius": 0.15, "direction": "outwards"},
@@ -969,7 +989,7 @@ def effects():
         "minecraft:particle_initial_speed": 0.5,
         "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, 0.5, 0], "linear_drag_coefficient": 1.5},
         "minecraft:particle_appearance_tinting": fade_in_out("F2FBFF", 0.7)},
-        board(["0.15 + v.particle_age * 0.3"] * 2, uv_flip("mist", 4))), "particles_blend"
+        board(["0.15 + v.particle_age * 0.3"] * 2, uv_flip("mist", 4))), "particles_alpha"
 
     fx["ytaun:roar_mist"] = merge(once(16), {
         "minecraft:emitter_shape_sphere": {"radius": 0.3, "direction": "outwards"},
@@ -978,35 +998,35 @@ def effects():
         "minecraft:particle_motion_dynamic": {"linear_drag_coefficient": 2.5},
         "minecraft:particle_initial_spin": {"rotation": "v.particle_random_3 * 360", "rotation_rate": 90},
         "minecraft:particle_appearance_tinting": fade(0.4)},
-        board(["0.2 + v.particle_age * 0.8"] * 2, uv_flip("mist", 4))), "particles_blend"
+        board(["0.2 + v.particle_age * 0.8"] * 2, uv_flip("mist", 4))), "particles_alpha"
 
     fx["ytaun:hand_glow"] = merge(LOCAL, steady(26, 30, 0.8), {
         "minecraft:emitter_shape_sphere": {"radius": 0.6, "surface_only": True, "direction": "inwards"},
         "minecraft:particle_lifetime_expression": {"max_lifetime": 0.45},
         "minecraft:particle_initial_speed": 1.3,
         "minecraft:particle_appearance_tinting": fade(0.5, "B0F0FF")},
-        board(["0.08 + v.particle_random_1 * 0.07"] * 2, uv_flip("glint", 4))), "particles_add"
+        board(["0.08 + v.particle_random_1 * 0.07"] * 2, uv_flip("glint", 4))), "particles_alpha"
 
     fx["ytaun:chest_glow"] = merge(LOCAL, steady(10, 12, 1.2), {
         "minecraft:emitter_shape_sphere": {"radius": 0.3},
         "minecraft:particle_lifetime_expression": {"max_lifetime": 0.8},
         "minecraft:particle_initial_speed": 0,
         "minecraft:particle_appearance_tinting": fade_in_out("9FE6FF", 0.9)},
-        board(["0.3 + v.particle_random_1 * 0.25"] * 2, uv_flip("orb", 4), "lookat_xyz")), "particles_add"
+        board(["0.3 + v.particle_random_1 * 0.25"] * 2, uv_flip("orb", 4), "lookat_xyz")), "particles_alpha"
 
     fx["ytaun:breath_core"] = merge(LOCAL, steady(24, 20, 0.6), {
         "minecraft:emitter_shape_sphere": {"radius": 0.25, "direction": "outwards"},
         "minecraft:particle_lifetime_expression": {"max_lifetime": 0.35},
         "minecraft:particle_initial_speed": 0.9,
         "minecraft:particle_appearance_tinting": fade(0.3, "E6FAFF")},
-        board(["0.18 + v.particle_random_1 * 0.12"] * 2, uv_flip("orb", 4), "lookat_xyz")), "particles_add"
+        board(["0.18 + v.particle_random_1 * 0.12"] * 2, uv_flip("orb", 4), "lookat_xyz")), "particles_alpha"
 
     fx["ytaun:claw_trail"] = merge(steady(70, 40, 0.3), {
         "minecraft:emitter_shape_sphere": {"radius": 0.25},
         "minecraft:particle_lifetime_expression": {"max_lifetime": 0.35},
         "minecraft:particle_initial_speed": 0,
         "minecraft:particle_appearance_tinting": fade(0.2, "D8F6FF")},
-        board(["0.14 + v.particle_random_1 * 0.08"] * 2, uv_flip("glint", 4))), "particles_add"
+        board(["0.14 + v.particle_random_1 * 0.08"] * 2, uv_flip("glint", 4))), "particles_alpha"
 
     fx["ytaun:snow_step"] = merge(once(8), {
         "minecraft:emitter_shape_disc": {"radius": 0.3, "direction": "outwards"},
@@ -1014,7 +1034,7 @@ def effects():
         "minecraft:particle_initial_speed": "2 + v.particle_random_2 * 2",
         "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, 1, 0], "linear_drag_coefficient": 3},
         "minecraft:particle_appearance_tinting": fade(0.5)},
-        board(["0.25 + v.particle_random_3 * 0.2"] * 2, uv_flip("puff", 4))), "particles_blend"
+        board(["0.25 + v.particle_random_3 * 0.2"] * 2, uv_flip("puff", 4))), "particles_alpha"
 
     fx["ytaun:boulder_held"] = merge(LOCAL, once(), {"minecraft:emitter_shape_point": {"offset": [0, -0.2, 0]},
                                                      "minecraft:particle_lifetime_expression": {"max_lifetime": 0.36},
