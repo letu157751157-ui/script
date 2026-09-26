@@ -381,15 +381,6 @@ def death_pound():
     return a
 
 
-def melee():
-    """Club swing, 0.7 s, played by the script when a normal attack lands (the old iron golem swing is gone)."""
-    a = Anim(0.7)
-    a.key(0.1, {TORSO: {"r": (-8, 22, 0)}, HEAD: {"r": (-6, -8, 0)}}, {LARM: {"r": (-150, 0, 22)}})
-    a.key(0.25, {TORSO: {"r": (26, -16, 0)}, HEAD: {"r": (10, 6, 0)}, JAW: {"r": (22, 0, 0)}}, {LARM: {"r": (-38, 0, 2)}})
-    a.key(0.42, {TORSO: {"r": (18, -12, 0)}}, {LARM: {"r": (-28, 0, 4)}})
-    return a
-
-
 def lift_throw():
     """Boulder Hurl, 2.3 s. Bend down and dig both hands into the ground (grab at 12 ticks), heave the chunk
     overhead (21 ticks), lean back and hurl it forward (release at 30 ticks)."""
@@ -427,7 +418,7 @@ def cataclysm():
 
 
 BOSS_ANIMATIONS = {
-    "melee": melee, "lift_throw": lift_throw, "cataclysm": cataclysm,
+    "lift_throw": lift_throw, "cataclysm": cataclysm,
     "roar": roar, "leap_slam": leap_slam, "throw": throw, "stomp": stomp, "double_slam": double_slam,
     "summon": summon, "channel": channel, "breath": breath, "spin": spin, "charge": charge,
     "chain_throw": chain_throw, "chain_pull": chain_pull, "stagger": stagger, "phase_rise": phase_rise,

@@ -47,7 +47,7 @@ def write_png(path, grid):
 def write_preview():
     """Particle atlas scaled up 3x on a dark background, for the README (preview_particles.png)."""
     atlas = particles.build_atlas()
-    scale, used_h = 3, 128
+    scale, used_h = 3, 176
     bg = (24, 30, 44, 255)
     rows = []
     for y in range(used_h * scale):

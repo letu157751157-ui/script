@@ -213,9 +213,36 @@ export function iceImpact(dimension, loc, size = 2, crack = true) {
             const a = (Math.PI * 2 * i) / spikes + Math.random() * 0.3;
             const r = size * (0.75 + Math.random() * 0.2);
             const at = groundAt(dimension, { x: loc.x + Math.cos(a) * r, y: loc.y, z: loc.z + Math.sin(a) * r });
-            emit(dimension, "yeti:ice_spike", at, { radius: 0.5 + Math.random() * 0.35, life: 1.4 });
+            spike(dimension, at, 1 + Math.random() * 0.7, 28, false);
         }
     }
+}
+
+/**
+ * Gai băng (particle, vẽ lại ở v2.3): cụm tinh thể băng nhiều mặt đâm lên từ lòng đất đúng kích thước thật
+ * (không còn bị kéo giãn), vẽ trên 2 mặt phẳng bắt chéo nên nhìn hướng nào cũng thấy khối như cụm thạch anh tím,
+ * hết `lifeTicks` tick thì vỡ vụn thành mảnh băng.
+ * height = chiều cao (block); cluster = thêm 2 gai nhỏ mọc quanh gốc.
+ */
+export function spike(dimension, loc, height = 2, lifeTicks = 40, cluster = true) {
+    const life = Math.max(0.2, lifeTicks / TICKS);
+    const crystal = (at, h) => {
+        const yaw = Math.random() * 90;
+        for (const turn of [0, 90]) {
+            emit(dimension, "yeti:ice_spike", at,
+                { radius: h, life, yaw: yaw + turn, spin: (Math.random() - 0.5) * 14, variant: Math.floor(Math.random() * 2) });
+        }
+    };
+    crystal(loc, height);
+    if (cluster) {
+        for (let i = 0; i < 2; i++) {
+            const a = Math.random() * Math.PI * 2;
+            crystal({ x: loc.x + Math.cos(a) * height * 0.3, y: loc.y, z: loc.z + Math.sin(a) * height * 0.3 },
+                height * (0.4 + Math.random() * 0.2));
+        }
+    }
+    emit(dimension, "yeti:snow_dust", loc);
+    system.runTimeout(() => emit(dimension, "yeti:spike_shatter", loc, { radius: height }), Math.round(life * TICKS));
 }
 
 /** Hiệu ứng trúng đòn trên người chơi. */

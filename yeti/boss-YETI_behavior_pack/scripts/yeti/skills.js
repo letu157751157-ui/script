@@ -116,20 +116,6 @@ function nearestVictim(ctx, radius) {
     return T.nearest(victims(ctx.boss.dimension, ctx.boss.location, radius), ctx.boss.location);
 }
 
-/**
- * Cụm gai băng thuần particle (v2.2 bỏ hẳn gai băng dạng mob): 1 gai lớn + 2 gai nhỏ mọc lên, rung, rồi lún xuống.
- * height 1 ~ cao 1.9 block.
- */
-function spikeFx(dimension, loc, height = 1, lifeTicks = 60) {
-    const life = lifeTicks / 20;
-    fx.emit(dimension, "yeti:ice_spike", loc, { radius: height, life });
-    for (let i = 0; i < 2; i++) {
-        const a = Math.random() * Math.PI * 2;
-        const at = { x: loc.x + Math.cos(a) * 0.45 * height, y: loc.y, z: loc.z + Math.sin(a) * 0.45 * height };
-        fx.emit(dimension, "yeti:ice_spike", at, { radius: height * (0.45 + Math.random() * 0.25), life: life * 0.9 });
-    }
-}
-
 /** Choáng: Yeti đứng khựng, không dùng chiêu trong `ticks` tick (vỡ giáp/vỏ băng, lao vào tường). */
 export function stagger(ctx, ticks = 32) {
     const { boss } = ctx;
@@ -312,7 +298,7 @@ function spikeVolley(ctx, points, damage) {
     const dim = ctx.boss.dimension;
     const hit = new Set();
     points.forEach((p, i) => {
-        spikeFx(dim, p, 1.1);
+        fx.spike(dim, p, 2.2, 60);
         fx.emit(dim, "yeti:ice_pillar", p);
         if (i % 2 === 0) fx.sound(dim, "random.glass", p, 1, 0.9 + Math.random() * 0.4);
         spikeHit(ctx, p, damage, hit, { x: 0, y: 0, z: 0 });
@@ -403,7 +389,7 @@ export function glacialPrison(ctx) {
         for (let i = 0; i < 10; i++) {
             const a = (Math.PI * 2 * i) / 10;
             const spot = fx.groundAt(dim, { x: center.x + Math.cos(a) * 2.3, y: center.y, z: center.z + Math.sin(a) * 2.3 });
-            spikeFx(dim, spot, 1.1, crush - close + 14);
+            fx.spike(dim, spot, 2.2, crush - close + 14);
             fx.emit(dim, "yeti:ice_pillar", spot);
         }
         fx.emit(dim, "yeti:frost_field", { x: center.x, y: center.y + 0.05, z: center.z }, { radius, life: (crush - close) / 20 + 0.5 });
@@ -579,7 +565,7 @@ function meteorImpact(ctx, spot, radius) {
     fx.sound(dim, "random.glass", spot, 2.5, 0.5);
     for (let i = 0; i < 6; i++) {
         const a = (Math.PI * 2 * i) / 6 + Math.random() * 0.5;
-        spikeFx(dim, fx.groundAt(dim, { x: spot.x + Math.cos(a) * radius * 0.8, y: spot.y, z: spot.z + Math.sin(a) * radius * 0.8 }), 1.2);
+        fx.spike(dim, fx.groundAt(dim, { x: spot.x + Math.cos(a) * radius * 0.8, y: spot.y, z: spot.z + Math.sin(a) * radius * 0.8 }), 2.4, 60);
     }
     const maxDamage = byTier(ctx, [12, 16, 18]);
     for (const e of victims(dim, spot, radius + 0.5)) {
@@ -637,7 +623,7 @@ export function iceSpikes(ctx, opts = {}) {
             const when = impact + i * 2;
             fx.warnTile(dim, spot, when);
             later(when, () => {
-                spikeFx(dim, spot, 1);
+                fx.spike(dim, spot, 2, 60);
                 fx.emit(dim, "yeti:ice_pillar", spot);
                 fx.emit(dim, "yeti:snow_dust", spot);
                 if (i % 2 === 0) fx.emit(dim, "yeti:ice_crack", { x: spot.x, y: spot.y + 0.04, z: spot.z }, { radius: 1.3 });
@@ -701,7 +687,7 @@ export function glacialCharge(ctx) {
             if (i % 2 === 1) {
                 const side = { x: -dir.z, y: 0, z: dir.x };
                 const at = fx.groundAt(dim, fx.add(fx.add(loc, dir, -1.8), side, i % 4 === 1 ? 1.4 : -1.4));
-                fx.emit(dim, "yeti:ice_spike", at, { radius: 0.8, life: 1.6 });
+                fx.spike(dim, at, 1.6, 32, false);
             }
             if (i % 3 === 0) {
                 fx.sound(dim, "mob.ravager.step", loc, 1.2, 0.7);
@@ -915,7 +901,7 @@ function dropIcicle(ctx, who, damage) {
     later(2, () => fx.emit(dim, "yeti:icicle", fx.add(spot, { x: 0, y: 10.5, z: 0 })));
     later(20, () => {
         fx.iceImpact(dim, spot, 1.8, false);
-        fx.emit(dim, "yeti:ice_spike", spot, { radius: 0.6, life: 1.4 });
+        fx.spike(dim, spot, 1.3, 28, false);
         fx.sound(dim, "random.glass", spot, 1.2, 0.8 + Math.random() * 0.5);
         for (const v of victims(dim, spot, 2)) {
             hurt(ctx, v, damage);
@@ -955,7 +941,7 @@ export function glacierRift(ctx) {
             fx.emit(dim, "yeti:ice_crack", { x: spot.x, y: spot.y + 0.04, z: spot.z }, { radius: 1.1 });
             fx.emit(dim, "yeti:snow_dust", spot);
             if (!pillar) return;
-            spikeFx(dim, spot, 1.4, 50);
+            fx.spike(dim, spot, 2.8, 50);
             fx.emit(dim, "yeti:ice_pillar", spot);
             if (i % 4 === 0) fx.sound(dim, "random.glass", spot, 1.2, 0.7 + Math.random() * 0.4);
             spikeHit(ctx, spot, byTier(ctx, [8, 9, 10]), hit, dir);
@@ -1050,7 +1036,7 @@ export function glacialWave(ctx) {
                 for (let i = 0; i < n; i++) {
                     const a = (Math.PI * 2 * i) / n + k * 0.3;
                     const at = fx.groundAt(dim, { x: center.x + Math.cos(a) * r, y: center.y, z: center.z + Math.sin(a) * r });
-                    fx.emit(dim, "yeti:ice_spike", at, { radius: 0.75, life: 0.9 });
+                    fx.spike(dim, at, 1.5, 18, false);
                 }
             }
             if (k % 3 === 0) fx.sound(dim, "dig.snow", center, 1.5, 0.7);
@@ -1616,7 +1602,7 @@ export function frozenDomain(ctx) {
                 const a = Math.random() * Math.PI * 2, r = Math.random() * radius;
                 const at = fx.groundAt(dim, { x: center.x + Math.cos(a) * r, y: center.y, z: center.z + Math.sin(a) * r });
                 if (zones.some(z => fx.dist2D(z, at) < safeRadius + 0.5)) continue;
-                spikeFx(dim, at, 0.9 + Math.random() * 0.5, 40);
+                fx.spike(dim, at, 1.8 + Math.random(), 40);
             }
             for (const z of zones) fx.ring(dim, z, safeRadius, 8, "yeti:sparkle", 0.6);
             fx.shake(dim, center, radius + 10, 0.6, 0.5);
@@ -1707,7 +1693,7 @@ export function glacialCataclysm(ctx) {
         });
         later(when, () => {
             points.forEach((p, i) => {
-                if (i % 2 === 0) spikeFx(dim, p, 1.1, 36);
+                if (i % 2 === 0) fx.spike(dim, p, 2.2, 36);
                 if (i % 3 === 0) fx.emit(dim, "yeti:ice_burst", fx.add(p, { x: 0, y: 0.8, z: 0 }));
             });
             fx.emit(dim, "yeti:frost_ring", fx.add(center, { x: 0, y: 0.1, z: 0 }), { radius: outer });
@@ -1733,7 +1719,7 @@ export function glacialCataclysm(ctx) {
         for (const [r, n] of [[4, 8], [7, 14]]) {
             for (let k = 0; k < n; k++) {
                 const a = (Math.PI * 2 * k) / n;
-                spikeFx(dim, fx.groundAt(dim, { x: center.x + Math.cos(a) * r, y: center.y, z: center.z + Math.sin(a) * r }), 1.4, 50);
+                fx.spike(dim, fx.groundAt(dim, { x: center.x + Math.cos(a) * r, y: center.y, z: center.z + Math.sin(a) * r }), 2.8, 50);
             }
         }
         for (let k = 0; k < 3; k++) {

@@ -5,7 +5,8 @@
       "identifier": "ytaun:yeti_3",
       "is_spawnable": true,
       "is_summonable": true,
-      "is_experimental": false
+      "is_experimental": false,
+      "runtime_identifier": "minecraft:iron_golem"
     },
     "component_groups": {
       "minecraft:player_created": {
@@ -282,6 +283,9 @@
       "minecraft:behavior.move_towards_dwelling_restriction": {
         "priority": 4,
         "speed_multiplier": 1
+      },
+      "minecraft:behavior.offer_flower": {
+        "priority": 5
       },
       "minecraft:behavior.random_stroll": {
         "priority": 6,

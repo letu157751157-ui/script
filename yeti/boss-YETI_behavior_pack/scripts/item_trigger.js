@@ -149,7 +149,7 @@ function iceBastion(player) {
       for (let i = 0; i < 10; i++) {
         const a = (Math.PI * 2 * i) / 10;
         const spot = fx.groundAt(dim, { x: center.x + Math.cos(a) * radius, y: center.y, z: center.z + Math.sin(a) * radius });
-        fx.emit(dim, 'yeti:ice_spike', spot, { radius: 0.9, life: 3 });
+        fx.spike(dim, spot, 1.8, 60);
         fx.emit(dim, 'yeti:ice_pillar', spot);
       }
     }, wave);

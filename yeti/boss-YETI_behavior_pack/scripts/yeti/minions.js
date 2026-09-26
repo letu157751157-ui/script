@@ -137,8 +137,7 @@ function groundSlam(golem, target) {
         fx.emit(dim, "yeti:shockwave", fx.add(c, { x: 0, y: 0.15, z: 0 }), { radius: radius * 2 });
         for (let i = 0; i < 8; i++) {
             const a = (Math.PI * 2 * i) / 8;
-            fx.emit(dim, "yeti:ice_spike", fx.groundAt(dim, { x: c.x + Math.cos(a) * radius, y: c.y, z: c.z + Math.sin(a) * radius }),
-                { radius: 0.7, life: 1.3 });
+            fx.spike(dim, fx.groundAt(dim, { x: c.x + Math.cos(a) * radius, y: c.y, z: c.z + Math.sin(a) * radius }), 1.4, 26, false);
         }
         fx.shake(dim, c, 10, 0.35, 0.3);
         fx.sound(dim, "random.explode", c, 0.9, 1.1);

@@ -8,8 +8,10 @@
 // - Chọn chiêu theo khoảng cách tới mục tiêu, % máu, hồi chiêu và trọng số (tránh lặp lại chiêu vừa dùng).
 // - v2.1: mục tiêu là con mà Yeti đang đánh / đang đánh Yeti (người chơi HOẶC mob: golem sắt, dân làng,
 //   sói, pet...), không có thì con mồi gần nhất. Chiêu trúng mọi sinh vật không thuộc phe Yeti.
-// - v2.2: Yeti không hất tung ai lên trời (bỏ runtime iron_golem, tiếng gầm vanilla và chiêu chỉ đẩy ngang);
+// - v2.2: Yeti không hất tung ai lên trời (tiếng gầm vanilla và chiêu chỉ đẩy ngang);
 //   gọi đệ / pet ít hơn và thưa hơn.
+// - v2.3: trả lại lõi iron_golem (runtime_identifier) cho đòn vung tay gốc; cú hất lên trời của golem
+//   bị script ghi đè ngay khi đòn trúng (pinDown) nên mục tiêu chỉ bị đẩy lùi ngang.
 // - Chiêu "ưu tiên" (hồi máu, giáp băng, Absolute Zero) được dùng ngay khi đủ điều kiện.
 // - Chuyển pha: Yeti mới trồi lên + gầm (bất tử 3 giây), hiện tiêu đề cho người chơi xung quanh.
 // - Dưới 35% máu: NỔI GIẬN (ra chiêu nhanh hơn, hồi chiêu ngắn hơn, lửa băng xanh quanh người).
@@ -517,15 +519,26 @@ world.afterEvents.entityHurt.subscribe((event) => {
     }
 });
 
-// Đánh thường (cận chiến vanilla) trúng bất kỳ kẻ địch nào: hiệu ứng theo pha + mảnh băng, ghi nhớ mục tiêu
+/**
+ * Lõi iron_golem đánh trúng là hất mục tiêu bay lên trời. Ghi đè vận tốc đó ngay trong tick trúng đòn
+ * (đẩy lùi ngang nhẹ + ấn xuống đất) và thêm lần nữa ở tick sau, phòng khi cú hất của golem áp sau sự kiện.
+ */
+function pinDown(boss, target) {
+    const dir = fx.dirXZ(boss.location, target.location);
+    const push = (force) => {
+        try { if (target.isValid) target.applyKnockback({ x: dir.x * force, z: dir.z * force }, -0.5); } catch (_) {}
+    };
+    push(0.5);
+    system.run(() => push(0.2));
+}
+
+// Đánh thường (cận chiến vanilla) trúng bất kỳ kẻ địch nào: không hất tung, hiệu ứng theo pha + mảnh băng, ghi nhớ mục tiêu
 world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
     try {
         const cfg = PHASES[damagingEntity?.typeId];
         if (!cfg || !T.isEnemy(hitEntity)) return;
+        pinDown(damagingEntity, hitEntity);
         setAggro(damagingEntity, hitEntity);
-        // đánh thường: vung chùy (không còn runtime iron_golem nên không hất tung mục tiêu lên trời)
-        const st = stateOf(damagingEntity);
-        if (system.currentTick >= st.busyUntil && !cfg.lastStand) S.playAnim(damagingEntity, "melee", 0.15);
         for (const [effect, [amplifier, duration]] of Object.entries(cfg.onHit)) {
             hitEntity.addEffect(effect, duration, { amplifier, showParticles: true });
         }

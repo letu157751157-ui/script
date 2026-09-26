@@ -10,10 +10,11 @@ grayscale and colored by tinting, so one sprite serves several colors.
 Variables the script passes through MolangVariableMap:
 - v.radius   size of rings, decals, vortex, blizzard area (blocks)
 - v.life     lifetime of telegraphs / portals (seconds), so the warning ends exactly on impact
-- v.yaw      rotation of a ground tile (degrees), lined up with a charge path / spike lane
+- v.yaw      rotation of a ground tile (degrees), lined up with a charge path / spike lane;
+             for an ice spike quad, the direction it faces (the 2 quads of a spike are 90 degrees apart)
 - v.dir_x/y/z, v.speed   direction and speed of breath / thrown shards
-- v.spin     rotation of a rolling snowball / flying boulder (degrees)
-- v.variant  ground type of a boulder and its debris: 0 snow, 1 ice, 2 stone, 3 dirt
+- v.spin     rotation of a rolling snowball / flying boulder, lean of an ice spike (degrees)
+- v.variant  ground type of a boulder and its debris: 0 snow, 1 ice, 2 stone, 3 dirt; ice spike shape 0/1
 """
 import json
 import math
@@ -419,29 +420,70 @@ DEBRIS = [
 ]
 
 
-def ice_spike():
-    """16x32 crystal cluster: a tall main spike and two smaller ones, lit on the left, dark outline."""
-    c = blank(16, 32)
-    for cx, base_w, height in ((8, 9.0, 31), (3.5, 5.0, 17), (12.5, 5.0, 21)):
-        for y in range(32):
-            h = 31 - y                                             # height above the bottom row
-            if h > height:
-                continue
-            half = base_w / 2 * (1 - h / height) ** 0.85
-            for x in range(16):
-                dx = x + 0.5 - cx
-                if abs(dx) > half:
+# Crystal cluster layouts for the ice spike: (base x, base width, length, lean in degrees), back to front
+SPIKE_LAYOUTS = [
+    [(10.0, 7.0, 25, -17), (22.5, 7.0, 30, 14), (16.0, 11.0, 46, -2), (11.5, 5.0, 14, -34), (21.0, 5.0, 12, 32)],
+    [(11.0, 8.0, 34, -10), (22.0, 6.0, 22, 22), (17.5, 10.0, 44, 4), (9.0, 5.0, 12, -34), (24.0, 4.5, 11, 36)],
+]
+SPIKE_W, SPIKE_TEX_H = 32, 48
+ICE_SPIKE_PALETTE = {**ICE, "S": (220, 234, 246), "G": (150, 176, 204)}
+
+
+def ice_spike(variant):
+    """32x48 faceted crystal cluster (drawn on 2 crossed quads in game, like amethyst / dripstone).
+
+    Every crystal is a hexagonal prism with a pointed tip: a lit left facet with a white ridge,
+    an aqua front facet, a dark right facet, navy outline, frost towards the tip, snow at the base.
+    """
+    c = blank(SPIKE_W, SPIKE_TEX_H)
+    base_y = SPIKE_TEX_H - 1.5
+    for cx, width, length, lean in SPIKE_LAYOUTS[variant]:
+        ax, ay = math.sin(math.radians(lean)), -math.cos(math.radians(lean))  # axis, base -> tip
+        nx, ny = -ay, ax                                                        # across, left -> right
+        for y in range(SPIKE_TEX_H):
+            for x in range(SPIKE_W):
+                px, py = x + 0.5 - cx, y + 0.5 - base_y
+                along = px * ax + py * ay                  # distance from the base along the crystal
+                across = px * nx + py * ny                 # signed distance from the axis
+                if along < -1.5 or along > length:
                     continue
-                if abs(dx) > half - 0.9:
-                    ch = "N" if dx > 0 else "B"
-                elif dx < -half * 0.2:
-                    ch = "W" if h > height * 0.55 else "C"
-                elif dx < half * 0.35:
-                    ch = "A"
+                t = along / length
+                half = width / 2 * (1 if t < 0.66 else (1 - t) / 0.34)
+                if abs(across) > half + 0.35:
+                    continue
+                u = across / max(half, 0.01)               # -1 left edge .. 1 right edge
+                if abs(across) > half - 0.75 or along > length - 1.2:
+                    ch = "N" if u > -0.2 else "D"          # outline, a bit lighter on the lit side
+                elif abs(u + 0.5) < 0.17:
+                    ch = "W"                                # ridge between the lit and front facet
+                elif u < -0.5:
+                    ch = "W" if t > 0.78 else "C"           # lit facet, frosted near the tip
+                elif abs(u - 0.28) < 0.12:
+                    ch = "B"                                # edge between the front and dark facet
+                elif u < 0.28:
+                    ch = "C" if t > 0.8 else ("A" if hash01(x, y // 4, 200 + variant) > 0.1 else "C")
                 else:
-                    ch = "B"
-                if c[y][x] == "." or ch in "WC":
-                    c[y][x] = ch
+                    ch = "D" if u > 0.72 and t < 0.6 else "B"
+                c[y][x] = ch
+    # sparkles on the lit facets
+    for y in range(SPIKE_TEX_H):
+        for x in range(SPIKE_W):
+            if c[y][x] == "C" and hash01(x, y, 210 + variant) < 0.05:
+                c[y][x] = "W"
+    # snow clump around the base
+    for y in range(SPIKE_TEX_H - 5, SPIKE_TEX_H):
+        for x in range(SPIKE_W):
+            dx = x + 0.5 - 16
+            top = SPIKE_TEX_H - 4.2 + 1.6 * (abs(dx) / 11) ** 2 - math.sin(x * 1.3 + variant) * 0.7
+            if abs(dx) > 12.5 or y + 0.5 < top:
+                continue
+            if y + 0.5 < top + 1:
+                ch = "W"
+            elif abs(dx) > 11.5 or y == SPIKE_TEX_H - 1:
+                ch = "G"
+            else:
+                ch = "S" if hash01(x, y, 220 + variant) > 0.2 else "W"
+            c[y][x] = ch
     return rows(c)
 
 
@@ -498,11 +540,11 @@ SPRITES = {
     "icicle": (8, 64, [icicle()], ICE),
     "crystal": (16, 64, [crystal()], ICE),
     "snowball": (32, 64, [snowball()], SNOW),
-    "spike": (48, 64, [ice_spike()], ICE),
     **{f"boulder_{name}": (24 * i, 96, [boulder()], BOULDER_PALETTES[name]) for i, name in enumerate(BOULDER_ORDER)},
     "debris": (96, 96, DEBRIS, GRAY),
     "shockwave": (128, 96, [shockwave()], SNOW),
     "aurora": (160, 96, [aurora_frame(i) for i in range(2)], AURORA),
+    "spike": (0, 128, [ice_spike(v) for v in range(len(SPIKE_LAYOUTS))], ICE_SPIKE_PALETTE),
 }
 
 
@@ -556,10 +598,11 @@ def tint(stops):
 
 
 FADE = tint({"0.0": "#FFFFFFFF", "0.7": "#FFFFFFFF", "1.0": "#00FFFFFF"})
-# Ice spike height over its life: shoots up past full height, settles, then sinks during the last 0.4 s
-SPIKE_H = ("(v.radius * 1.9 * math.min(math.min(v.particle_age / 0.12 * 1.15, "
-           "1.15 - math.clamp((v.particle_age - 0.12) / 0.1, 0, 1) * 0.15), "
-           "math.clamp((v.particle_lifetime - v.particle_age) / 0.4, 0, 1)))")
+# Ice spike rising out of the ground: shoots up past its full height in 0.1 s, settles by 0.2 s.
+# The part still below the surface is hidden by the terrain, so the crystal pushes out of the ground
+# at its real size instead of being stretched.
+SPIKE_RISE = ("math.min(v.particle_age / 0.1 * 1.08, "
+              "1.08 - math.clamp((v.particle_age - 0.1) / 0.1, 0, 1) * 0.08)")
 # Telegraph red: pulses faster and faster, then flashes white right before the impact
 WARN_PULSE = f"(0.55 + 0.45 * math.sin(v.particle_age * (400 + 900 * {AGE})))"
 
@@ -796,15 +839,43 @@ PARTICLES = {
             "size": ["v.radius", "v.radius"], "facing_camera_mode": "rotate_xyz", "uv": uv("snowball"),
         },
     }),
-    # Ice spike erupting from the ground (replaces the old ice spike entity): shoots up with an overshoot, holds,
-    # sinks back at the end of v.life. Height via v.radius (1 = about 1.9 blocks). Faces the camera around Y.
+    # Ice crystal cluster erupting from the ground (v2.3 redesign). The script emits it twice per spike, turned
+    # 90 degrees apart (v.yaw, v.yaw + 90), so the two quads cross like an amethyst cluster / dripstone and the spike
+    # looks solid from every side. v.radius = height in blocks, v.life = seconds before it shatters,
+    # v.spin = lean in degrees, v.variant = cluster shape (0/1). The texture keeps its 2:3 aspect ratio.
     "ice_spike": particle("ice_spike", "particles_alpha", {
         **burst(1),
         "minecraft:emitter_shape_point": {},
         "minecraft:particle_lifetime_expression": {"max_lifetime": "v.life"},
-        "minecraft:particle_motion_parametric": {"relative_position": [0, f"{SPIKE_H} * 0.5", 0]},
+        "minecraft:particle_motion_parametric": {
+            "relative_position": [0, f"v.radius * ({SPIKE_RISE} - 0.5)", 0],
+            "direction": ["math.sin(v.yaw)", 0, "math.cos(v.yaw)"],
+            "rotation": "v.spin",
+        },
         "minecraft:particle_appearance_billboard": {
-            "size": ["0.42 * v.radius", f"{SPIKE_H} * 0.5 + 0.001"], "facing_camera_mode": "lookat_y", "uv": uv("spike"),
+            "size": ["v.radius / 3", "v.radius / 2"], "facing_camera_mode": "direction_z",
+            "uv": {"texture_width": ATLAS, "texture_height": ATLAS,
+                   "uv": [f"{SPRITES['spike'][0]} + math.floor(v.variant) * {SPIKE_W}", SPRITES["spike"][1]],
+                   "uv_size": [SPIKE_W, SPIKE_TEX_H]},
+        },
+    }),
+    # An ice spike shattering at the end of its life: shards along its whole height + a puff of snow;
+    # v.radius = height of the spike
+    "spike_shatter": particle("spike_shatter", "particles_alpha", {
+        **burst(10),
+        "minecraft:emitter_shape_box": {"offset": [0, "v.radius * 0.45", 0],
+                                        "half_dimensions": ["v.radius * 0.12", "v.radius * 0.4", "v.radius * 0.12"],
+                                        "direction": "outwards"},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.6, 1.0)"},
+        "minecraft:particle_initial_speed": "math.random(1.5, 4)",
+        "minecraft:particle_initial_spin": {"rotation": "math.random(0, 360)", "rotation_rate": "math.random(-540, 540)"},
+        "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -16, 0], "linear_drag_coefficient": 0.8,
+                                              "rotation_drag_coefficient": 1.5},
+        "minecraft:particle_motion_collision": {"collision_radius": 0.05, "coefficient_of_restitution": 0.3,
+                                                "collision_drag": 5},
+        "minecraft:particle_appearance_billboard": {
+            "size": ["0.1 + v.particle_random_2 * 0.1", "0.1 + v.particle_random_2 * 0.1"],
+            "facing_camera_mode": "rotate_xyz", "uv": uv_variant("shard"),
         },
     }),
     # Chunk of ground the Yeti rips up and throws (Boulder Hurl): respawned every tick along its flight.
