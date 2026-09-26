@@ -21,36 +21,44 @@
       },
       "minecraft:particle_motion_parametric": {
         "relative_position": [
-          0,
+          "(v.base * math.cos(180 / v.sides)) * 0.5 * math.cos(v.yaw)",
           "v.radius * (math.min(v.particle_age / 0.1 * 1.08, 1.08 - math.clamp((v.particle_age - 0.1) / 0.1, 0, 1) * 0.08) - 0.5)",
-          0
+          "(v.base * math.cos(180 / v.sides)) * 0.5 * math.sin(v.yaw)"
         ],
         "direction": [
-          "math.sin(v.yaw)",
-          0,
-          "math.cos(v.yaw)"
-        ],
-        "rotation": "v.spin"
+          "v.radius * math.cos(v.yaw) / math.sqrt(v.radius * v.radius + (v.base * math.cos(180 / v.sides)) * (v.base * math.cos(180 / v.sides)))",
+          "(v.base * math.cos(180 / v.sides)) / math.sqrt(v.radius * v.radius + (v.base * math.cos(180 / v.sides)) * (v.base * math.cos(180 / v.sides)))",
+          "v.radius * math.sin(v.yaw) / math.sqrt(v.radius * v.radius + (v.base * math.cos(180 / v.sides)) * (v.base * math.cos(180 / v.sides)))"
+        ]
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          "v.radius / 2 * 1",
-          "v.radius / 2"
+          "v.base * math.sin(180 / v.sides)",
+          "math.sqrt(v.radius * v.radius + (v.base * math.cos(180 / v.sides)) * (v.base * math.cos(180 / v.sides))) * 0.5"
         ],
         "facing_camera_mode": "direction_z",
         "uv": {
           "texture_width": 256,
           "texture_height": 256,
           "uv": [
-            "0 + math.floor(v.variant) * 48",
+            "0 + math.floor(v.variant) * 12",
             128
           ],
           "uv_size": [
-            48,
+            12,
             48
           ]
         }
-      }
+      },
+      "minecraft:particle_appearance_tinting": {
+        "color": [
+          "v.shade * 0.9",
+          "v.shade * 0.98",
+          "math.min(1, v.shade + 0.14)",
+          1
+        ]
+      },
+      "minecraft:particle_appearance_lighting": {}
     }
   }
 }
