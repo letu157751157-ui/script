@@ -1,4 +1,5 @@
-import { world, system } from "@minecraft/server";
+import { world, system, MolangVariableMap } from "@minecraft/server";
+import { inHarvesterFight } from "./harvester";
 
 const scytheStates = new Map();
 
@@ -29,6 +30,53 @@ const CONFIG = {
         }
     }
 };
+
+// Harvester particles (TheHarvesterRP/particles/harvester_*.json)
+const P = {
+    wisp: "harvester:soul_wisp",
+    souls: "harvester:soul_burst",
+    stream: "harvester:soul_stream",
+    ember: "harvester:ember",
+    trail: "harvester:scythe_trail_big",
+    runes: "harvester:rune_circle",
+    ring: "harvester:ring_warn",
+    shockwave: "harvester:shockwave",
+    skull: "harvester:skull_sigil",
+    smoke: "harvester:black_smoke"
+};
+const TEAL = { cr: 0.35, cg: 1, cb: 0.8 };
+
+function fx(dim, id, loc, vars) {
+    try {
+        if (!vars) return dim.spawnParticle(id, loc);
+        const map = new MolangVariableMap();
+        for (const key in vars) map.setFloat("variable." + key, vars[key]);
+        dim.spawnParticle(id, loc, map);
+    } catch {}
+}
+
+function soulStream(dim, from, to, life = 0.45) {
+    const d = { x: to.x - from.x, y: to.y - from.y, z: to.z - from.z };
+    const len = Math.hypot(d.x, d.y, d.z);
+    if (len < 0.3) return;
+    fx(dim, P.stream, from, { dir_x: d.x / len, dir_y: d.y / len, dir_z: d.z / len, speed: len / life, life });
+}
+
+// Enemies around the wielder: never players, villagers, traders, armor stands or tamed pets
+function enemiesNear(player, radius) {
+    try {
+        return player.dimension.getEntities({
+            location: player.location,
+            maxDistance: radius,
+            excludeTypes: ["minecraft:item", "minecraft:player", "minecraft:xp_orb", "minecraft:armor_stand"],
+            excludeFamilies: ["inanimate", "villager", "wandering_trader", "player"]
+        }).filter((e) => {
+            try { return !e.getComponent("minecraft:tameable")?.isTamed; } catch { return true; }
+        });
+    } catch {
+        return [];
+    }
+}
 
 function initPlayer(player) {
     const id = player.id;
@@ -65,69 +113,61 @@ function shadowReap(player) {
             return;
         }
 
+        const dim = player.dimension;
+        const r = CONFIG.skills.reap.radius;
         player.sendMessage("§5§l[Scythe] ☠ SHADOW REAP!");
         player.playSound("mob.evocation_illager.cast_spell");
 
-        // Spiral particle wind-up
-        for (let i = 0; i < 36; i++) {
+        // Rune circle + warning ring under the wielder during the wind-up
+        const ground = { x: player.location.x, y: player.location.y + 0.06, z: player.location.z };
+        fx(dim, P.runes, ground, { ...TEAL, radius: r, life: 0.6 });
+        fx(dim, P.ring, ground, { ...TEAL, radius: r, life: 0.35 });
+
+        // Spiral of souls winding up
+        for (let i = 0; i < 18; i++) {
             system.runTimeout(() => {
                 try {
-                    const angle = (i / 36) * Math.PI * 6; // 3 full rotations
-                    const r = (i / 36) * CONFIG.skills.reap.radius;
-                    player.dimension.spawnParticle("minecraft:soul_particle", {
-                        x: player.location.x + Math.cos(angle) * r,
-                        y: player.location.y + 1 + (i / 36) * 2,
-                        z: player.location.z + Math.sin(angle) * r
+                    const angle = (i / 18) * Math.PI * 6; // 3 full rotations
+                    const rr = (i / 18) * r;
+                    fx(dim, P.wisp, {
+                        x: player.location.x + Math.cos(angle) * rr,
+                        y: player.location.y + 1 + (i / 18) * 2,
+                        z: player.location.z + Math.sin(angle) * rr
                     });
                 } catch {}
-            }, i * 8);
+            }, i * 2);
         }
 
-        // Impact at 300ms
+        // Impact at 300ms (6 ticks): a ring of scythe slashes sweeping around the wielder
         system.runTimeout(() => {
             try {
-                // Outer ring burst
-                for (let i = 0; i < 48; i++) {
-                    const angle = (i / 48) * Math.PI * 2;
-                    player.dimension.spawnParticle("minecraft:dragon_breath_fire", {
-                        x: player.location.x + Math.cos(angle) * CONFIG.skills.reap.radius,
-                        y: player.location.y + 1,
-                        z: player.location.z + Math.sin(angle) * CONFIG.skills.reap.radius
-                    });
+                const c = player.location;
+                for (let i = 0; i < 12; i++) {
+                    const angle = (i / 12) * Math.PI * 2;
+                    fx(dim, P.trail, { x: c.x + Math.cos(angle) * r * 0.6, y: c.y + 1, z: c.z + Math.sin(angle) * r * 0.6 }, { spin: (i / 12) * 360 });
                 }
-                // Inner scatter
-                for (let i = 0; i < 40; i++) {
-                    player.dimension.spawnParticle("minecraft:soul_flame_particle", {
-                        x: player.location.x + (Math.random() - 0.5) * CONFIG.skills.reap.radius * 2,
-                        y: player.location.y + Math.random() * 2.5,
-                        z: player.location.z + (Math.random() - 0.5) * CONFIG.skills.reap.radius * 2
-                    });
-                }
+                fx(dim, P.shockwave, { x: c.x, y: c.y + 0.1, z: c.z }, { ...TEAL, radius: r, life: 0.4 });
+                fx(dim, P.souls, { x: c.x, y: c.y + 1.2, z: c.z });
 
-                const entities = player.dimension.getEntities({
-                    location: player.location,
-                    maxDistance: CONFIG.skills.reap.radius,
-                    excludeTypes: ["minecraft:item", "minecraft:player"]
-                });
-
-                for (const e of entities) {
+                for (const e of enemiesNear(player, r)) {
                     try {
-                        e.applyDamage(CONFIG.skills.reap.damage, { cause: "magic" });
+                        e.applyDamage(CONFIG.skills.reap.damage, { cause: "magic", damagingEntity: player });
                         e.addEffect("slowness", 60, { amplifier: 2 });    // Slowness III, 3s
                         e.addEffect("wither", 60, { amplifier: 1 });      // Wither II, 3s
-                        e.addEffect("blindness", 40, { amplifier: 0 });   // NEW: Blindness 2s
+                        e.addEffect("blindness", 40, { amplifier: 0 });   // Blindness 2s
+                        fx(dim, P.ember, { x: e.location.x, y: e.location.y + 1, z: e.location.z });
                     } catch {}
                 }
 
                 player.playSound("mob.wither.shoot");
             } catch {}
-        }, 300);
+        }, 6);
 
         state.lastReap = now;
     } catch {}
 }
 
-// ─── SOUL HARVEST (Attack entity) ────────────────────────────────────────────
+// ─── SOUL HARVEST (Interact with an entity) ──────────────────────────────────
 function soulHarvest(player) {
     try {
         const state = scytheStates.get(player.id);
@@ -139,32 +179,22 @@ function soulHarvest(player) {
             return;
         }
 
-        const entities = player.dimension.getEntities({
-            location: player.location,
-            maxDistance: CONFIG.skills.harvest.radius,
-            excludeTypes: ["minecraft:item", "minecraft:player"]
-        });
-
+        const dim = player.dimension;
+        const entities = enemiesNear(player, CONFIG.skills.harvest.radius);
         let totalDamage = 0;
 
         for (const e of entities) {
             try {
-                e.applyDamage(CONFIG.skills.harvest.damage, { cause: "magic" });
+                e.applyDamage(CONFIG.skills.harvest.damage, { cause: "magic", damagingEntity: player });
                 e.addEffect("slowness", 80, { amplifier: 3 }); // Slowness IV — pull-trapped
                 totalDamage += CONFIG.skills.harvest.damage;
 
-                // Souls flowing toward player
-                for (let i = 0; i < 12; i++) {
+                // Harvested souls fly from each victim into the wielder
+                const from = { x: e.location.x, y: e.location.y + 1, z: e.location.z };
+                for (let i = 0; i < 3; i++) {
                     system.runTimeout(() => {
-                        try {
-                            const t = i / 12;
-                            player.dimension.spawnParticle("minecraft:soul_particle", {
-                                x: e.location.x + (player.location.x - e.location.x) * t,
-                                y: e.location.y + 1 + (player.location.y + 1 - e.location.y) * t,
-                                z: e.location.z + (player.location.z - e.location.z) * t
-                            });
-                        } catch {}
-                    }, i * 4);
+                        try { soulStream(dim, from, { x: player.location.x, y: player.location.y + 1.1, z: player.location.z }); } catch {}
+                    }, 1 + i * 4);
                 }
             } catch {}
         }
@@ -174,21 +204,9 @@ function soulHarvest(player) {
             const heal = totalDamage * CONFIG.skills.harvest.heal;
             health.setCurrentValue(Math.min(health.effectiveMax, health.currentValue + heal));
             player.sendMessage(`§5[Scythe] §aSoul Harvest — Healed §f+${heal.toFixed(1)}§a HP from ${entities.length} enemies!`);
+            system.runTimeout(() => fx(dim, P.souls, { x: player.location.x, y: player.location.y + 1, z: player.location.z }), 12);
         } else {
             player.sendMessage("§5[Scythe] §fSoul Harvest — No enemies in range!");
-        }
-
-        // Green absorption particles on player
-        for (let i = 0; i < 20; i++) {
-            system.runTimeout(() => {
-                try {
-                    player.dimension.spawnParticle("minecraft:heart_particle", {
-                        x: player.location.x + (Math.random() - 0.5),
-                        y: player.location.y + 1 + Math.random(),
-                        z: player.location.z + (Math.random() - 0.5)
-                    });
-                } catch {}
-            }, i * 5);
         }
 
         state.lastHarvest = now;
@@ -205,7 +223,9 @@ world.afterEvents.itemUse.subscribe((event) => {
     shadowReap(player);
 });
 
-// ─── EVENT: Attack entity → Soul Harvest ─────────────────────────────────────
+// ─── EVENT: Interact with an entity → Soul Harvest ───────────────────────────
+// Before-events run in read-only mode (no damage/effects/health changes allowed),
+// so the skill itself runs on the next tick.
 let lastInteract = new Map();
 world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
     const player = event.player;
@@ -213,9 +233,11 @@ world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
     const now = Date.now();
     if (now - (lastInteract.get(player.id) || 0) < 300) return;
     event.cancel = true;
-    initPlayer(player);
-    soulHarvest(player);
     lastInteract.set(player.id, now);
+    system.run(() => {
+        initPlayer(player);
+        soulHarvest(player);
+    });
 });
 
 // ─── PASSIVE 1: Death Mark — hit = mark, marked = +50% dmg + Wither ──────────
@@ -223,6 +245,8 @@ world.afterEvents.entityHurt.subscribe((event) => {
     const attacker = event.damageSource.damagingEntity;
     const victim = event.hurtEntity;
     if (!attacker || attacker.typeId !== "minecraft:player") return;
+    // the scythe's own skill damage (magic) must not re-trigger the mark
+    if (event.damageSource.cause === "magic") return;
     const player = attacker;
     if (!hasScythe(player)) return;
 
@@ -236,17 +260,11 @@ world.afterEvents.entityHurt.subscribe((event) => {
             // Apply mark
             state.markedEntities.add(victim.id);
             victim.addEffect("glowing", CONFIG.passive.deathMark.duration, { amplifier: 0 });
-            victim.addEffect("wither", CONFIG.passive.deathMark.duration, { amplifier: 0 }); // NEW: Wither on mark
+            victim.addEffect("wither", CONFIG.passive.deathMark.duration, { amplifier: 0 });
 
-            // Skull particles on fresh mark
+            // Skull sigil under a freshly marked target
             if (!alreadyMarked) {
-                for (let i = 0; i < 8; i++) {
-                    player.dimension.spawnParticle("minecraft:villager_angry", {
-                        x: victim.location.x + (Math.random() - 0.5),
-                        y: victim.location.y + 1.5 + Math.random(),
-                        z: victim.location.z + (Math.random() - 0.5)
-                    });
-                }
+                fx(player.dimension, P.skull, { x: victim.location.x, y: victim.location.y + 0.07, z: victim.location.z }, { life: 1.2 });
             }
 
             // Reset mark timer
@@ -259,12 +277,8 @@ world.afterEvents.entityHurt.subscribe((event) => {
                 const bonus = event.damage * CONFIG.passive.deathMark.damageBonus;
                 system.runTimeout(() => {
                     try {
-                        victim.applyDamage(bonus, { cause: "magic" });
-                        player.dimension.spawnParticle("minecraft:critical_hit_emitter", {
-                            x: victim.location.x,
-                            y: victim.location.y + 1,
-                            z: victim.location.z
-                        });
+                        victim.applyDamage(bonus, { cause: "magic", damagingEntity: player });
+                        fx(player.dimension, P.ember, { x: victim.location.x, y: victim.location.y + 1, z: victim.location.z });
                         // Small HP drain back to player on mark proc
                         const hp = player.getComponent("minecraft:health");
                         hp.setCurrentValue(Math.min(hp.effectiveMax, hp.currentValue + 1));
@@ -275,7 +289,7 @@ world.afterEvents.entityHurt.subscribe((event) => {
     } catch {}
 });
 
-// ─── PASSIVE 2 (NEW): Dark Blessing — killing grants Speed II + Strength I ───
+// ─── PASSIVE 2: Dark Blessing — killing grants Speed II + Strength I ─────────
 world.afterEvents.entityDie.subscribe((event) => {
     try {
         const killer = event.damageSource?.damagingEntity;
@@ -286,13 +300,10 @@ world.afterEvents.entityDie.subscribe((event) => {
         killer.addEffect("speed", CONFIG.passive.darkBlessing.duration, { amplifier: 1 });
         killer.addEffect("strength", CONFIG.passive.darkBlessing.duration, { amplifier: 0 });
 
-        for (let i = 0; i < 10; i++) {
-            killer.dimension.spawnParticle("minecraft:soul_flame_particle", {
-                x: killer.location.x + (Math.random() - 0.5),
-                y: killer.location.y + 1 + Math.random(),
-                z: killer.location.z + (Math.random() - 0.5)
-            });
-        }
+        const dead = event.deadEntity;
+        soulStream(killer.dimension,
+            { x: dead.location.x, y: dead.location.y + 1, z: dead.location.z },
+            { x: killer.location.x, y: killer.location.y + 1.1, z: killer.location.z });
     } catch {}
 });
 
@@ -304,65 +315,36 @@ system.runInterval(() => {
 
         const state = scytheStates.get(player.id);
         const now = Date.now();
+        const dim = player.dimension;
+        const r = CONFIG.passive.soulExplosion.radius;
 
-        // Soul Explosion auto-trigger
-        if (now - state.lastExplosion >= CONFIG.passive.soulExplosion.cd) {
+        // Soul Explosion auto-trigger (only when there is something to hit)
+        if (now - state.lastExplosion >= CONFIG.passive.soulExplosion.cd && enemiesNear(player, r).length > 0) {
             state.lastExplosion = now;
 
             player.sendMessage("§5§l[Scythe] 💥 SOUL EXPLOSION!");
             player.playSound("random.explode");
 
-            // Warning ring
-            for (let i = 0; i < 36; i++) {
-                system.runTimeout(() => {
-                    try {
-                        const angle = (i / 36) * Math.PI * 2;
-                        const r = CONFIG.passive.soulExplosion.radius;
-                        player.dimension.spawnParticle("minecraft:critical_hit_emitter", {
-                            x: player.location.x + Math.cos(angle) * r,
-                            y: player.location.y + 0.3,
-                            z: player.location.z + Math.sin(angle) * r
-                        });
-                    } catch {}
-                }, i * 10);
-            }
+            // Warning ring (0.9 s) then the blast
+            const ground = { x: player.location.x, y: player.location.y + 0.06, z: player.location.z };
+            fx(dim, P.ring, ground, { ...TEAL, radius: r, life: 0.9 });
+            fx(dim, P.runes, ground, { ...TEAL, radius: r * 0.6, life: 0.9 });
 
-            // Explosion
             system.runTimeout(() => {
                 try {
-                    for (let i = 0; i < 80; i++) {
-                        player.dimension.spawnParticle("minecraft:soul_particle", {
-                            x: player.location.x + (Math.random() - 0.5) * CONFIG.passive.soulExplosion.radius * 2,
-                            y: player.location.y + Math.random() * 3,
-                            z: player.location.z + (Math.random() - 0.5) * CONFIG.passive.soulExplosion.radius * 2
-                        });
+                    const c = player.location;
+                    fx(dim, P.shockwave, { x: c.x, y: c.y + 0.1, z: c.z }, { ...TEAL, radius: r, life: 0.5 });
+                    fx(dim, P.souls, { x: c.x, y: c.y + 1, z: c.z });
+                    for (let i = 0; i < 8; i++) {
+                        const a = (i / 8) * Math.PI * 2;
+                        fx(dim, P.smoke, { x: c.x + Math.cos(a) * r * 0.5, y: c.y + 0.8, z: c.z + Math.sin(a) * r * 0.5 });
                     }
-                    for (let i = 0; i < 60; i++) {
-                        player.dimension.spawnParticle("minecraft:soul_flame_particle", {
-                            x: player.location.x + (Math.random() - 0.5) * CONFIG.passive.soulExplosion.radius * 2,
-                            y: player.location.y + Math.random() * 3,
-                            z: player.location.z + (Math.random() - 0.5) * CONFIG.passive.soulExplosion.radius * 2
-                        });
-                    }
-                    for (let i = 0; i < 30; i++) {
-                        player.dimension.spawnParticle("minecraft:huge_explosion_emitter", {
-                            x: player.location.x + (Math.random() - 0.5) * CONFIG.passive.soulExplosion.radius * 2,
-                            y: player.location.y + Math.random() * 2,
-                            z: player.location.z + (Math.random() - 0.5) * CONFIG.passive.soulExplosion.radius * 2
-                        });
-                    }
-
-                    const entities = player.dimension.getEntities({
-                        location: player.location,
-                        maxDistance: CONFIG.passive.soulExplosion.radius,
-                        excludeTypes: ["minecraft:item", "minecraft:player"]
-                    });
 
                     let hitCount = 0;
                     let totalHeal = 0;
-                    for (const e of entities) {
+                    for (const e of enemiesNear(player, r)) {
                         try {
-                            e.applyDamage(CONFIG.passive.soulExplosion.damage, { cause: "magic" });
+                            e.applyDamage(CONFIG.passive.soulExplosion.damage, { cause: "magic", damagingEntity: player });
                             e.addEffect("wither", 80, { amplifier: 1 });
                             e.addEffect("slowness", 60, { amplifier: 1 });
                             hitCount++;
@@ -378,25 +360,25 @@ system.runInterval(() => {
 
                     player.playSound("random.explode");
                 } catch {}
-            }, 360);
+            }, 18);
         }
 
-        // Orbiting soul aura (2 particles)
+        // Orbiting soul aura (2 wisps)
         const angle = (Date.now() / 400) % (Math.PI * 2);
         try {
-            player.dimension.spawnParticle("minecraft:soul_particle", {
-                x: player.location.x + Math.cos(angle) * 0.9,
-                y: player.location.y + 1,
-                z: player.location.z + Math.sin(angle) * 0.9
-            });
-            player.dimension.spawnParticle("minecraft:soul_particle", {
-                x: player.location.x + Math.cos(angle + Math.PI) * 0.9,
-                y: player.location.y + 1,
-                z: player.location.z + Math.sin(angle + Math.PI) * 0.9
-            });
+            if (system.currentTick % 20 === 0) {
+                for (const a of [angle, angle + Math.PI]) {
+                    fx(dim, P.wisp, {
+                        x: player.location.x + Math.cos(a) * 0.9,
+                        y: player.location.y + 0.6,
+                        z: player.location.z + Math.sin(a) * 0.9
+                    });
+                }
+            }
         } catch {}
 
-        // Action bar HUD
+        // Action bar HUD (the boss HUD takes priority during a Harvester fight)
+        if (inHarvesterFight(player)) continue;
         const reapCd   = Math.max(0, Math.ceil((CONFIG.skills.reap.cd    - (now - state.lastReap))    / 1000));
         const hvstCd   = Math.max(0, Math.ceil((CONFIG.skills.harvest.cd - (now - state.lastHarvest)) / 1000));
         const explodCd = Math.max(0, Math.ceil((CONFIG.passive.soulExplosion.cd - (now - state.lastExplosion)) / 1000));
@@ -412,7 +394,7 @@ system.runInterval(() => {
 }, 10);
 
 world.afterEvents.worldInitialize.subscribe(() => {
-    console.warn("§5[Harvester Scythe v2] §fLoaded!");
-    console.warn("§7Active: Shadow Reap (right-click) | Soul Harvest (sneak-attack)");
+    console.warn("§5[Harvester Scythe v3] §fLoaded!");
+    console.warn("§7Active: Shadow Reap (right-click) | Soul Harvest (interact with a mob)");
     console.warn("§7Passive: Death Mark (+50% dmg) | Soul Explosion (auto 20s) | Dark Blessing (kill→Speed+Strength)");
 });

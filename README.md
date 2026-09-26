@@ -2,6 +2,7 @@
 
 - **Roblox**: hướng dẫn ngay bên dưới (thư mục `AatroxSword/`).
 - **Minecraft Bedrock (addon)**: xem [`bedrock/README.md`](bedrock/README.md).
+- **Minecraft Bedrock — boss The Harvester** (Thần Chết × Bác sĩ Dịch hạch): xem [`harvester/README.md`](harvester/README.md).
 
 ## Roblox
 

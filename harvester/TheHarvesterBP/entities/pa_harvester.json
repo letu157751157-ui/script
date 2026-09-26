@@ -125,36 +125,6 @@
         "jump_power": 0.42
       },
       "minecraft:can_climb": {},
-      "minecraft:interact": {
-        "interactions": [
-          {
-            "on_interact": {
-              "filters": {
-                "all_of": [
-                  {
-                    "test": "is_family",
-                    "subject": "other",
-                    "value": "player"
-                  },
-                  {
-                    "test": "has_equipment",
-                    "domain": "hand",
-                    "subject": "other",
-                    "value": "iron_ingot"
-                  },
-                  {
-                    "test": "is_missing_health"
-                  }
-                ]
-              }
-            },
-            "use_item": true,
-            "health_amount": 25,
-            "play_sounds": "irongolem.repair",
-            "interact_text": "action.interact.repair"
-          }
-        ]
-      },
       "minecraft:attack": {
         "damage": 15,
         "effect_name": "wither",
@@ -390,12 +360,6 @@
         "priority": 4,
         "speed_multiplier": 1
       },
-      "minecraft:behavior.offer_flower": {
-        "priority": 5,
-        "filters": {
-          "test": "is_daytime"
-        }
-      },
       "minecraft:behavior.random_stroll": {
         "priority": 6,
         "speed_multiplier": 0.6,
@@ -460,7 +424,7 @@
       "minecraft:conditional_bandwidth_optimization": {},
       "minecraft:boss": {
         "hud_range": 55,
-        "name": "\u00a7l\u00a78THE HARVESTER",
+        "name": "§l§8THE HARVESTER",
         "should_darken_sky": true
       },
       "minecraft:experience_reward": {
@@ -492,24 +456,6 @@
         "attack_interval_max": 6.0,
         "attack_radius": 20.0,
         "swing": false
-      },
-      "minecraft:spawn_entity": {
-        "entities": [
-          {
-            "min_wait_time": 30,
-            "max_wait_time": 60,
-            "spawn_sound": "mob.wither.spawn",
-            "spawn_item": "egg",
-            "filters": {
-              "test": "is_family",
-              "subject": "self",
-              "value": "monster"
-            },
-            "num_to_spawn": 2,
-            "should_leash": false,
-            "entity_type": "minecraft:wither_skeleton"
-          }
-        ]
       }
     },
     "events": {
