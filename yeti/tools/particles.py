@@ -12,7 +12,8 @@ Variables the script passes through MolangVariableMap:
 - v.life     lifetime of telegraphs / portals (seconds), so the warning ends exactly on impact
 - v.yaw      rotation of a ground tile (degrees), lined up with a charge path / spike lane
 - v.dir_x/y/z, v.speed   direction and speed of breath / thrown shards
-- v.spin     rotation of a rolling snowball (degrees)
+- v.spin     rotation of a rolling snowball / flying boulder (degrees)
+- v.variant  ground type of a boulder and its debris: 0 snow, 1 ice, 2 stone, 3 dirt
 """
 import json
 import math
@@ -379,6 +380,100 @@ def snowball():
     return grid(16, 16, pixel)
 
 
+BOULDER_PALETTES = {
+    # O outline, D dark, M mid, L light, H highlight, T top cap (snow / grass)
+    "snow": {"O": (70, 92, 128), "D": (150, 172, 200), "M": (200, 216, 234), "L": (232, 240, 250), "H": (255, 255, 255), "T": (255, 255, 255)},
+    "ice": {"O": (22, 50, 104), "D": (58, 112, 184), "M": (98, 164, 226), "L": (150, 210, 246), "H": (226, 248, 255), "T": (200, 240, 255)},
+    "stone": {"O": (38, 38, 44), "D": (78, 78, 86), "M": (112, 112, 120), "L": (146, 146, 154), "H": (182, 182, 190), "T": (232, 238, 246)},
+    "dirt": {"O": (44, 28, 16), "D": (88, 58, 34), "M": (118, 82, 50), "L": (146, 106, 68), "H": (170, 128, 86), "T": (96, 160, 64)},
+}
+BOULDER_ORDER = ["snow", "ice", "stone", "dirt"]  # v.variant 0..3
+AURORA = {"G": (110, 255, 180), "C": (100, 225, 255), "V": (170, 140, 255), "W": (225, 255, 240)}
+
+
+def boulder():
+    """24x24 chunk of ground ripped out by the Yeti: lumpy outline, lit top left, cracks, a cap of snow / grass."""
+    def pixel(x, y):
+        px, py = x + 0.5 - 12, y + 0.5 - 12.5
+        angle = math.atan2(py, px)
+        lump = 9.6 + 1.3 * math.sin(angle * 3 + 0.7) + 0.8 * math.sin(angle * 5 + 2.1)
+        d = math.hypot(px, py * 1.08)
+        if d > lump:
+            return "."
+        if d > lump - 1.1:
+            return "O"
+        if py < -lump * 0.45 + math.sin(px * 0.9) * 1.2:
+            return "T" if hash01(x, y, 170) > 0.15 else "L"
+        light = 1 - math.hypot(px + 4, py + 4) / 17 + (hash01(x // 2, y // 2, 171) - 0.5) * 0.3
+        if abs((px * 0.8 + py) - 3) < 0.6 and d < lump - 3:
+            return "D"                                           # crack across the rock
+        return "H" if light > 0.72 else ("L" if light > 0.5 else ("M" if light > 0.28 else "D"))
+
+    return grid(24, 24, pixel)
+
+
+DEBRIS = [
+    ["........", "..##....", ".#++#...", ".++-+#..", "..+--+..", "...++...", "........", "........"],
+    ["........", "........", "...#+...", "..#+-...", "...--...", "........", "........", "........"],
+    ["........", ".#......", ".++#....", "..+-+...", "...+--..", "....-...", "........", "........"],
+]
+
+
+def ice_spike():
+    """16x32 crystal cluster: a tall main spike and two smaller ones, lit on the left, dark outline."""
+    c = blank(16, 32)
+    for cx, base_w, height in ((8, 9.0, 31), (3.5, 5.0, 17), (12.5, 5.0, 21)):
+        for y in range(32):
+            h = 31 - y                                             # height above the bottom row
+            if h > height:
+                continue
+            half = base_w / 2 * (1 - h / height) ** 0.85
+            for x in range(16):
+                dx = x + 0.5 - cx
+                if abs(dx) > half:
+                    continue
+                if abs(dx) > half - 0.9:
+                    ch = "N" if dx > 0 else "B"
+                elif dx < -half * 0.2:
+                    ch = "W" if h > height * 0.55 else "C"
+                elif dx < half * 0.35:
+                    ch = "A"
+                else:
+                    ch = "B"
+                if c[y][x] == "." or ch in "WC":
+                    c[y][x] = ch
+    return rows(c)
+
+
+def shockwave():
+    """32x32 dusty shockwave: soft ragged ring of snow thrown up by a slam."""
+    def pixel(x, y):
+        d = math.hypot(x + 0.5 - 16, y + 0.5 - 16)
+        wobble = (hash01(x // 2, y // 2, 180) - 0.5) * 2.2
+        if abs(d - 13 + wobble * 0.5) > 2.6 + wobble * 0.4 or hash01(x, y, 181) < 0.18:
+            return "."
+        t = abs(d - 13) / 2.6
+        return "W" if t < 0.35 else ("S" if t < 0.7 else "G")
+
+    return grid(32, 32, pixel)
+
+
+def aurora_frame(frame):
+    """16x32 aurora curtain: shimmering vertical rays, green at the bottom to violet at the top."""
+    def pixel(x, y):
+        ray = math.sin(x * 1.3 + frame * 1.7) * 0.5 + 0.5
+        fade = 1 - abs(y - 20) / 20
+        if ray * fade < 0.25 + hash01(x, y, 190 + frame) * 0.2:
+            return "."
+        if y > 22:
+            return "G" if ray > 0.6 else "C"
+        if y > 10:
+            return "W" if ray > 0.9 else "C"
+        return "V"
+
+    return grid(16, 32, pixel)
+
+
 SPRITES = {
     "ring": (0, 0, [ring_frame(i) for i in range(3)], ICE),
     "crack": (96, 0, [ground_crack()], ICE),
@@ -403,6 +498,11 @@ SPRITES = {
     "icicle": (8, 64, [icicle()], ICE),
     "crystal": (16, 64, [crystal()], ICE),
     "snowball": (32, 64, [snowball()], SNOW),
+    "spike": (48, 64, [ice_spike()], ICE),
+    **{f"boulder_{name}": (24 * i, 96, [boulder()], BOULDER_PALETTES[name]) for i, name in enumerate(BOULDER_ORDER)},
+    "debris": (96, 96, DEBRIS, GRAY),
+    "shockwave": (128, 96, [shockwave()], SNOW),
+    "aurora": (160, 96, [aurora_frame(i) for i in range(2)], AURORA),
 }
 
 
@@ -456,6 +556,10 @@ def tint(stops):
 
 
 FADE = tint({"0.0": "#FFFFFFFF", "0.7": "#FFFFFFFF", "1.0": "#00FFFFFF"})
+# Ice spike height over its life: shoots up past full height, settles, then sinks during the last 0.4 s
+SPIKE_H = ("(v.radius * 1.9 * math.min(math.min(v.particle_age / 0.12 * 1.15, "
+           "1.15 - math.clamp((v.particle_age - 0.12) / 0.1, 0, 1) * 0.15), "
+           "math.clamp((v.particle_lifetime - v.particle_age) / 0.4, 0, 1)))")
 # Telegraph red: pulses faster and faster, then flashes white right before the impact
 WARN_PULSE = f"(0.55 + 0.45 * math.sin(v.particle_age * (400 + 900 * {AGE})))"
 
@@ -691,6 +795,71 @@ PARTICLES = {
         "minecraft:particle_appearance_billboard": {
             "size": ["v.radius", "v.radius"], "facing_camera_mode": "rotate_xyz", "uv": uv("snowball"),
         },
+    }),
+    # Ice spike erupting from the ground (replaces the old ice spike entity): shoots up with an overshoot, holds,
+    # sinks back at the end of v.life. Height via v.radius (1 = about 1.9 blocks). Faces the camera around Y.
+    "ice_spike": particle("ice_spike", "particles_alpha", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": "v.life"},
+        "minecraft:particle_motion_parametric": {"relative_position": [0, f"{SPIKE_H} * 0.5", 0]},
+        "minecraft:particle_appearance_billboard": {
+            "size": ["0.42 * v.radius", f"{SPIKE_H} * 0.5 + 0.001"], "facing_camera_mode": "lookat_y", "uv": uv("spike"),
+        },
+    }),
+    # Chunk of ground the Yeti rips up and throws (Boulder Hurl): respawned every tick along its flight.
+    # v.variant picks the ground type (0 snow, 1 ice, 2 stone, 3 dirt/grass), v.radius the size, v.spin the roll.
+    "boulder": particle("boulder", "particles_alpha", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.1},
+        "minecraft:particle_initial_spin": {"rotation": "v.spin"},
+        "minecraft:particle_appearance_billboard": {
+            "size": ["v.radius", "v.radius"], "facing_camera_mode": "rotate_xyz",
+            "uv": {"texture_width": ATLAS, "texture_height": ATLAS, "uv": ["math.floor(v.variant) * 24", 96], "uv_size": [24, 24]},
+        },
+    }),
+    # Rock / snow chunks blasted up, falling and bouncing; colored by v.variant like the boulder
+    "rock_debris": particle("rock_debris", "particles_alpha", {
+        **burst(16),
+        "minecraft:emitter_shape_sphere": {"radius": 0.6, "direction": [
+            "math.random(-1, 1)", "math.random(0.7, 1.8)", "math.random(-1, 1)"]},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.8, 1.4)"},
+        "minecraft:particle_initial_speed": "math.random(3, 7)",
+        "minecraft:particle_initial_spin": {"rotation": "math.random(0, 360)", "rotation_rate": "math.random(-400, 400)"},
+        "minecraft:particle_motion_dynamic": {"linear_acceleration": [0, -18, 0], "linear_drag_coefficient": 0.6},
+        "minecraft:particle_motion_collision": {"collision_radius": 0.08, "coefficient_of_restitution": 0.3,
+                                                "collision_drag": 5},
+        "minecraft:particle_appearance_billboard": {
+            "size": ["0.08 + v.particle_random_2 * 0.12", "0.08 + v.particle_random_2 * 0.12"],
+            "facing_camera_mode": "rotate_xyz", "uv": uv_variant("debris"),
+        },
+        "minecraft:particle_appearance_tinting": {"color": [
+            "v.variant < 0.5 ? 0.95 : (v.variant < 1.5 ? 0.62 : (v.variant < 2.5 ? 0.6 : 0.5))",
+            "v.variant < 0.5 ? 0.97 : (v.variant < 1.5 ? 0.86 : (v.variant < 2.5 ? 0.6 : 0.36))",
+            "v.variant < 0.5 ? 1.0 : (v.variant < 1.5 ? 1.0 : (v.variant < 2.5 ? 0.64 : 0.24))", 1]},
+    }),
+    # Dust shockwave racing along the ground after big slams; v.radius
+    "shockwave": particle("shockwave", "particles_blend", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 0.7},
+        "minecraft:particle_initial_spin": {"rotation": "math.random(0, 360)"},
+        "minecraft:particle_appearance_billboard": flat(
+            f"0.5 + (v.radius - 0.5) * math.sqrt({AGE})", f"0.5 + (v.radius - 0.5) * math.sqrt({AGE})", "shockwave"),
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#F2FFFFFF", "0.5": "#B3F0F8FF", "1.0": "#00E6F0FF"}),
+    }),
+    # Aurora curtain shimmering around the Yeti's grand skills (Frozen Domain wall, Glacial Cataclysm sky)
+    "aurora": particle("aurora", "particles_add", {
+        **burst(1),
+        "minecraft:emitter_shape_point": {},
+        "minecraft:particle_lifetime_expression": {"max_lifetime": 1.2},
+        "minecraft:particle_motion_parametric": {"relative_position": [0, f"math.sin({AGE} * 180) * 0.4", 0]},
+        "minecraft:particle_appearance_billboard": {
+            "size": [0.7, 2.4], "facing_camera_mode": "lookat_y",
+            "uv": {**uv("aurora", 4), "flipbook": {**uv("aurora", 4)["flipbook"], "stretch_to_lifetime": False, "loop": True}},
+        },
+        "minecraft:particle_appearance_tinting": tint({"0.0": "#00FFFFFF", "0.3": "#CCFFFFFF", "0.7": "#CCFFFFFF", "1.0": "#00FFFFFF"}),
     }),
     # Icicle falling from the sky (Blizzard); disappears when it hits the ground
     "icicle": particle("icicle", "particles_alpha", {

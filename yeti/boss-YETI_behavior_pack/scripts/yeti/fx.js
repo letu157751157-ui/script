@@ -53,7 +53,7 @@ export function lerp(a, b, t) {
 
 /**
  * Phát 1 particle, kèm biến Molang (không bắt buộc):
- * radius, life (giây), yaw (độ), spin (độ), speed, dir {x,y,z}.
+ * radius, life (giây), yaw (độ), spin (độ), variant, speed, dir {x,y,z}.
  */
 export function emit(dimension, id, loc, vars) {
     try {
@@ -67,6 +67,7 @@ export function emit(dimension, id, loc, vars) {
         if (vars.yaw !== undefined) molang.setFloat("variable.yaw", vars.yaw);
         if (vars.speed !== undefined) molang.setFloat("variable.speed", vars.speed);
         if (vars.spin !== undefined) molang.setFloat("variable.spin", vars.spin);
+        if (vars.variant !== undefined) molang.setFloat("variable.variant", vars.variant);
         if (vars.dir) {
             molang.setFloat("variable.dir_x", vars.dir.x);
             molang.setFloat("variable.dir_y", vars.dir.y);
@@ -189,7 +190,11 @@ export function warnTile(dimension, loc, ticks, yaw = 0) {
 
 // ---------------------------------------------------------------- tổ hợp hiệu ứng
 
-/** Nổ băng: loé sáng + sóng băng + mảnh băng + tuyết + sương (size ~ bán kính vụ nổ). */
+/**
+ * Nổ băng: loé sáng + sóng băng + mảnh băng + tuyết + sương (size ~ bán kính vụ nổ).
+ * v2.2 hoành tráng hơn: vụ nổ vừa có thêm sóng bụi tuyết lan xa, vụ nổ lớn có thêm đá/tuyết văng
+ * và một vòng gai băng (particle) mọc quanh tâm.
+ */
 export function iceImpact(dimension, loc, size = 2, crack = true) {
     const ground = { x: loc.x, y: loc.y + 0.08, z: loc.z };
     emit(dimension, "yeti:ice_burst", { x: loc.x, y: loc.y + 0.8, z: loc.z });
@@ -198,9 +203,18 @@ export function iceImpact(dimension, loc, size = 2, crack = true) {
     emit(dimension, "yeti:snow_dust", ground);
     emit(dimension, "yeti:frost_mist", { x: loc.x, y: loc.y + 0.5, z: loc.z });
     if (crack) emit(dimension, "yeti:ice_crack", { x: loc.x, y: loc.y + 0.04, z: loc.z }, { radius: Math.max(1.2, size * 0.8) });
+    if (size >= 2.5) emit(dimension, "yeti:shockwave", { x: loc.x, y: loc.y + 0.12, z: loc.z }, { radius: size * 1.7 });
+    if (size >= 3) emit(dimension, "yeti:rock_debris", { x: loc.x, y: loc.y + 0.3, z: loc.z }, { variant: 0 });
     if (size >= 4) {
         emit(dimension, "yeti:ice_shard", { x: loc.x, y: loc.y + 1, z: loc.z });
         ring(dimension, loc, size * 0.6, 6, "yeti:ice_pillar", 0.1);
+        const spikes = Math.min(12, Math.round(size * 1.6));
+        for (let i = 0; i < spikes; i++) {
+            const a = (Math.PI * 2 * i) / spikes + Math.random() * 0.3;
+            const r = size * (0.75 + Math.random() * 0.2);
+            const at = groundAt(dimension, { x: loc.x + Math.cos(a) * r, y: loc.y, z: loc.z + Math.sin(a) * r });
+            emit(dimension, "yeti:ice_spike", at, { radius: 0.5 + Math.random() * 0.35, life: 1.4 });
+        }
     }
 }
 

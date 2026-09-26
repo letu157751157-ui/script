@@ -2,8 +2,9 @@
 // Ai là "kẻ địch" của Yeti và lũ đệ băng.
 //
 // v2.1: chiêu không còn chỉ đánh người chơi. Mọi sinh vật sống đều dính chiêu (người chơi, dân làng,
-// golem sắt, sói, pet của người chơi, cả quái khác...), TRỪ phe Yeti: các pha Yeti, pet boss, gai băng
+// golem sắt, sói, pet của người chơi, cả quái khác...), TRỪ phe Yeti: các pha Yeti, pet boss
 // và đệ băng (Sói Băng, Hồn Băng, Golem Băng, lính được triệu hồi).
+// (v2.2: gai băng giờ thuần particle, không còn là mob.)
 
 import { GameMode } from "@minecraft/server";
 
@@ -12,7 +13,7 @@ export const MINION_TAG = "yeti_minion";
 /** Phe Yeti - không bao giờ bị chiêu của Yeti / đệ băng gây sát thương. */
 export const KIN_TYPES = new Set([
     "ytaun:yeti_1", "ytaun:yeti_2", "ytaun:yeti_3", "ytaun:yeti_death",
-    "ytaun:yeti_boss_pet", "ytaun:yeti_boss_pet_riu", "ytaun:ice_spike_yeti_boss",
+    "ytaun:yeti_boss_pet", "ytaun:yeti_boss_pet_riu",
     "ytaun:frost_wolf", "ytaun:frost_wraith", "ytaun:frost_golem",
 ]);
 

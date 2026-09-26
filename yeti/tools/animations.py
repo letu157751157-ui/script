@@ -381,39 +381,58 @@ def death_pound():
     return a
 
 
+def melee():
+    """Club swing, 0.7 s, played by the script when a normal attack lands (the old iron golem swing is gone)."""
+    a = Anim(0.7)
+    a.key(0.1, {TORSO: {"r": (-8, 22, 0)}, HEAD: {"r": (-6, -8, 0)}}, {LARM: {"r": (-150, 0, 22)}})
+    a.key(0.25, {TORSO: {"r": (26, -16, 0)}, HEAD: {"r": (10, 6, 0)}, JAW: {"r": (22, 0, 0)}}, {LARM: {"r": (-38, 0, 2)}})
+    a.key(0.42, {TORSO: {"r": (18, -12, 0)}}, {LARM: {"r": (-28, 0, 4)}})
+    return a
+
+
+def lift_throw():
+    """Boulder Hurl, 2.3 s. Bend down and dig both hands into the ground (grab at 12 ticks), heave the chunk
+    overhead (21 ticks), lean back and hurl it forward (release at 30 ticks)."""
+    a = Anim(2.3)
+    a.key(0.45, crouch(8), {TORSO: {"r": (68, 0, 0)}, HEAD: {"r": (-35, 0, 0)}}, arms((-18, 0, -6), (-18, 0, 6)))
+    a.key(0.6, crouch(8), {TORSO: {"r": (70, 0, 0)}, HEAD: {"r": (-35, 0, 0)}, JAW: {"r": (12, 0, 0)}},
+          arms((-32, 0, -4), (-32, 0, 4)))
+    a.key(1.05, crouch(2), {TORSO: {"r": (-22, 0, 0)}, HEAD: {"r": (-22, 0, 0)}}, arms((-172, 0, 10), (-172, 0, -10)))
+    a.key(1.3, {TORSO: {"r": (-34, 0, 0)}, HEAD: {"r": (-28, 0, 0)}, JAW: {"r": (25, 0, 0)}},
+          arms((-186, 0, 8), (-186, 0, -8)))
+    a.key(1.5, {TORSO: {"r": (38, 0, 0)}, HEAD: {"r": (10, 0, 0)}, JAW: {"r": (35, 0, 0)}}, arms((-70, 0, 6), (-70, 0, -6)))
+    a.key(1.72, {TORSO: {"r": (42, 0, 0)}}, arms((-40, 0, 8), (-40, 0, -8)))
+    return a
+
+
+def cataclysm():
+    """Glacial Cataclysm, 6.3 s. Crouch and launch (15 ticks), hover in the sky with the arms spread while the
+    rings detonate below (trembling harder and harder), fists overhead, dive and slam at 106 ticks."""
+    a = Anim(6.3)
+    a.key(0.5, crouch(8), {TORSO: {"r": (30, 0, 0)}}, arms((40, 0, 12), (40, 0, -12)))
+    a.key(0.75, {BODY: {"p": (0, 3, 0)}, LLEG: {"r": (12, 0, 0)}, RLEG: {"r": (12, 0, 0)}, TORSO: {"r": (-15, 0, 0)}},
+          arms((-160, 0, 20), (-160, 0, -20)))
+    hover = {LLEG: {"r": (-22, 0, 0)}, RLEG: {"r": (-14, 0, 0)}, LKNEE: {"r": (36, 0, 0)}, RKNEE: {"r": (28, 0, 0)},
+             HEAD: {"r": (-30, 0, 0)}, JAW: {"r": (30, 0, 0)}}
+    a.key(1.5, hover, {TORSO: {"r": (-18, 0, 0)}}, arms((-140, 0, 60), (-140, 0, -60)))
+    a.shake(1.6, 4.7, 0.2, TORSO, "r", (-18, 0, 0), (2.5, 2, 0))
+    a.shake(1.6, 4.7, 0.2, LARM, "r", (-140, 0, 60), (4, 0, 4))
+    a.shake(1.6, 4.7, 0.2, RARM, "r", (-140, 0, -60), (4, 0, -4))
+    a.key(5.0, hover, {TORSO: {"r": (-26, 0, 0)}, JAW: {"r": (44, 0, 0)}}, arms((-178, 0, 8), (-178, 0, -8)))
+    a.key(5.3, crouch(7), {TORSO: {"r": (58, 0, 0)}, HEAD: {"r": (24, 0, 0)}, JAW: {"r": (20, 0, 0)}},
+          arms((-48, 0, 5), (-48, 0, -5)))
+    a.key(5.55, crouch(8), {TORSO: {"r": (60, 0, 0)}}, arms((-40, 0, 7), (-40, 0, -7)))
+    a.key(5.9, crouch(3), {TORSO: {"r": (28, 0, 0)}}, arms((-20, 0, 9), (-20, 0, -9)))
+    return a
+
+
 BOSS_ANIMATIONS = {
+    "melee": melee, "lift_throw": lift_throw, "cataclysm": cataclysm,
     "roar": roar, "leap_slam": leap_slam, "throw": throw, "stomp": stomp, "double_slam": double_slam,
     "summon": summon, "channel": channel, "breath": breath, "spin": spin, "charge": charge,
     "chain_throw": chain_throw, "chain_pull": chain_pull, "stagger": stagger, "phase_rise": phase_rise,
     "armor_up": armor_up, "ultimate": ultimate, "barrage": barrage, "death_pound": death_pound,
 }
-
-
-# ---------------------------------------------------------------------------
-# Ice spike: erupts out of the ground with an overshoot, trembles, then sinks back (3 s, removed at 60 ticks).
-# Every spike gets its own lean and size from the client entity's initialize script (v.tilt_x, v.tilt_z, v.size).
-# ---------------------------------------------------------------------------
-
-
-def spike_erupt():
-    return {
-        "animation_length": 3.0,
-        "bones": {"bone": {
-            "position": {"0.0": [0, -11, 0], "0.12": [0, 1.5, 0], "0.2": [0, -0.5, 0], "0.3": [0, 0, 0],
-                         "2.45": [0, 0, 0], "3.0": [0, -14, 0]},
-            "scale": {
-                "0.0": ["v.size * 0.8", 0.1, "v.size * 0.8"],
-                "0.12": ["v.size * 0.9", "v.size * 1.85", "v.size * 0.9"],
-                "0.22": ["v.size * 1.08", "v.size * 1.35", "v.size * 1.08"],
-                "0.32": ["v.size", "v.size * 1.55", "v.size"],
-                "2.45": ["v.size", "v.size * 1.5", "v.size"],
-                "3.0": ["v.size * 0.7", "v.size * 0.2", "v.size * 0.7"],
-            },
-            "rotation": ["v.tilt_x + (q.anim_time < 0.45 ? math.sin(q.anim_time * 2400) * 5 * (0.45 - q.anim_time) / 0.45 : 0)",
-                         "v.spin",
-                         "v.tilt_z + (q.anim_time < 0.45 ? math.cos(q.anim_time * 2400) * 5 * (0.45 - q.anim_time) / 0.45 : 0)"],
-        }},
-    }
 
 
 # ---------------------------------------------------------------------------
@@ -441,7 +460,6 @@ def fx_controller(breath_locator=True):
 def write_animations(rp_root):
     anims = {f"animation.yeti.{name}": fn().to_json() for name, fn in BOSS_ANIMATIONS.items()}
     anims["animation.yeti.death_struggle"] = death_struggle().to_json()
-    anims["animation.yeti.spike_erupt"] = spike_erupt()
     path = os.path.join(rp_root, "animations/yeti_skills.animation.json")
     with open(path, "w", encoding="utf-8") as f:
         json.dump({"format_version": "1.8.0", "animations": anims}, f, separators=(",", ":"))

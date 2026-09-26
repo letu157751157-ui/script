@@ -28,6 +28,8 @@ FRAMES = [
     ("stagger", "stagger", 0.45), ("phase rise: low", "phase_rise", 0.2), ("phase rise: roar", "phase_rise", 1.5),
     ("armor: guard", "armor_up", 0.4), ("armor: flex", "armor_up", 0.8), ("ultimate: rise", "ultimate", 3.0),
     ("ultimate: slam", "ultimate", 3.2), ("barrage", "barrage", 0.8),
+    ("melee swing", "melee", 0.25), ("boulder: grab", "lift_throw", 0.6), ("boulder: lift", "lift_throw", 1.05),
+    ("boulder: throw", "lift_throw", 1.5), ("cataclysm: hover", "cataclysm", 2.5), ("cataclysm: dive", "cataclysm", 5.3),
 ]
 
 

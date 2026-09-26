@@ -8,6 +8,8 @@
 // - Chọn chiêu theo khoảng cách tới mục tiêu, % máu, hồi chiêu và trọng số (tránh lặp lại chiêu vừa dùng).
 // - v2.1: mục tiêu là con mà Yeti đang đánh / đang đánh Yeti (người chơi HOẶC mob: golem sắt, dân làng,
 //   sói, pet...), không có thì con mồi gần nhất. Chiêu trúng mọi sinh vật không thuộc phe Yeti.
+// - v2.2: Yeti không hất tung ai lên trời (bỏ runtime iron_golem, tiếng gầm vanilla và chiêu chỉ đẩy ngang);
+//   gọi đệ / pet ít hơn và thưa hơn.
 // - Chiêu "ưu tiên" (hồi máu, giáp băng, Absolute Zero) được dùng ngay khi đủ điều kiện.
 // - Chuyển pha: Yeti mới trồi lên + gầm (bất tử 3 giây), hiện tiêu đề cho người chơi xung quanh.
 // - Dưới 35% máu: NỔI GIẬN (ra chiêu nhanh hơn, hồi chiêu ngắn hơn, lửa băng xanh quanh người).
@@ -44,7 +46,8 @@ const PHASES = {
             { id: "frost_nova", fn: S.frostNova, cd: 300, min: 0, max: 5, weight: 3 },
             { id: "ice_spikes", fn: S.iceSpikes, cd: 240, min: 2, max: 16, weight: 3 },
             { id: "glacial_charge", fn: S.glacialCharge, cd: 260, min: 6, max: 16, weight: 3 },
-            { id: "summon", fn: S.summonMinions, cd: 900, min: 0, max: 28, weight: 2, hp: 0.7 },
+            { id: "boulder_hurl", fn: S.boulderHurl, cd: 300, min: 5, max: 26, weight: 3 },
+            { id: "summon", fn: S.summonMinions, cd: 1800, min: 0, max: 28, weight: 1, hp: 0.7 },
             { id: "ice_regen", fn: S.iceRegen, cd: 900, min: 0, max: 28, hp: 0.4, priority: true },
         ],
     },
@@ -72,8 +75,10 @@ const PHASES = {
             { id: "ice_meteor", fn: S.iceMeteor, cd: 380, min: 0, max: 30, weight: 3 },
             { id: "blizzard", fn: S.blizzard, cd: 520, min: 0, max: 22, weight: 2 },
             { id: "polar_vortex", fn: S.polarVortex, cd: 600, min: 4, max: 13, weight: 2, hp: 0.7 },
-            { id: "summon", fn: S.summonMinions, cd: 900, min: 0, max: 35, weight: 2 },
-            { id: "elite_army", fn: S.eliteArmy, cd: 1100, min: 0, max: 35, weight: 2, hp: 0.6 },
+            { id: "boulder_hurl", fn: S.boulderHurl, cd: 280, min: 5, max: 26, weight: 3 },
+            { id: "frozen_domain", fn: S.frozenDomain, cd: 1600, min: 0, max: 18, weight: 3, hp: 0.75 },
+            { id: "summon", fn: S.summonMinions, cd: 1800, min: 0, max: 35, weight: 1, hp: 0.85 },
+            { id: "elite_army", fn: S.eliteArmy, cd: 2600, min: 0, max: 35, weight: 1, hp: 0.5 },
             { id: "ice_regen", fn: S.iceRegen, cd: 1400, min: 0, max: 35, hp: 0.3, priority: true },
             { id: "absolute_zero", fn: S.absoluteZero, cd: 2400, min: 0, max: 20, hp: 0.25, priority: true },
         ],
@@ -105,8 +110,11 @@ const PHASES = {
             { id: "crystal_barrage", fn: S.crystalBarrage, cd: 320, min: 8, max: 26, weight: 3 },
             { id: "frost_nova", fn: S.frostNova, cd: 300, min: 0, max: 6, weight: 3 },
             { id: "frost_breath", fn: S.frostBreath, cd: 280, min: 3, max: 12, weight: 3 },
-            { id: "summon", fn: S.summonMinions, cd: 900, min: 0, max: 40, weight: 2 },
-            { id: "elite_army", fn: S.eliteArmy, cd: 1200, min: 0, max: 40, weight: 2, hp: 0.7 },
+            { id: "boulder_hurl", fn: S.boulderHurl, cd: 260, min: 5, max: 28, weight: 3 },
+            { id: "frozen_domain", fn: S.frozenDomain, cd: 1500, min: 0, max: 20, weight: 3, hp: 0.85 },
+            { id: "glacial_cataclysm", fn: S.glacialCataclysm, cd: 3000, min: 0, max: 24, hp: 0.5, priority: true },
+            { id: "summon", fn: S.summonMinions, cd: 1800, min: 0, max: 40, weight: 1, hp: 0.85 },
+            { id: "elite_army", fn: S.eliteArmy, cd: 2600, min: 0, max: 40, weight: 1, hp: 0.6 },
             { id: "frost_armor", fn: S.frostArmor, cd: 900, min: 0, max: 40, hp: 0.6, priority: true },
             { id: "ice_regen", fn: S.iceRegen, cd: 2000, min: 0, max: 40, hp: 0.3, priority: true },
             { id: "absolute_zero", fn: S.absoluteZero, cd: 1800, min: 0, max: 22, hp: 0.3, priority: true },
@@ -381,7 +389,7 @@ function phaseIntro(boss) {
         for (const r of [5, 9, 13]) fx.emit(dim, "yeti:frost_ring", { x: c.x, y: c.y + 0.1, z: c.z }, { radius: r });
         fx.ring(dim, c, 6, 12, "yeti:frost_mist", 1);
         for (const p of S.victims(dim, c, 7)) {
-            try { p.applyKnockback({ x: fx.dirXZ(c, p.location).x * 2, z: fx.dirXZ(c, p.location).z * 2 }, 0.5); } catch (_) {}
+            try { p.applyKnockback({ x: fx.dirXZ(c, p.location).x * 2, z: fx.dirXZ(c, p.location).z * 2 }, 0); } catch (_) {}
         }
     }, cfg.lastStand ? 14 : 30);
 }
@@ -409,6 +417,29 @@ function finale(dim, loc) {
             try { m.kill(); } catch (_) {}
         }, 10 + i * 3);
     });
+}
+
+/**
+ * Yeti hấp hối bị người chơi đánh: thỉnh thoảng gọi 1 pet boss (bản cũ gọi 1 con MỖI đòn đánh -> tràn pet).
+ * Tối đa 1 con / 12 giây và không quá 2 con quanh nó.
+ */
+const LAST_STAND_PET_COOLDOWN = 240;
+function lastStandPet(boss, st) {
+    const now = system.currentTick;
+    if (now < (st.petAt ?? 0)) return;
+    st.petAt = now + LAST_STAND_PET_COOLDOWN;
+    const dim = boss.dimension;
+    let pets = 0;
+    try { pets = dim.getEntities({ location: boss.location, maxDistance: 16, type: "ytaun:yeti_boss_pet" }).length; } catch (_) {}
+    if (pets >= 2) return;
+    const a = Math.random() * Math.PI * 2;
+    const spot = fx.groundAt(dim, fx.add(boss.location, { x: Math.cos(a), y: 0, z: Math.sin(a) }, 3));
+    fx.emit(dim, "yeti:rune_circle", fx.add(spot, { x: 0, y: 0.06, z: 0 }), { radius: 1.2, life: 1 });
+    system.runTimeout(() => {
+        fx.emit(dim, "yeti:ice_pillar", spot);
+        fx.emit(dim, "yeti:ice_burst", fx.add(spot, { x: 0, y: 1, z: 0 }));
+        try { dim.spawnEntity("ytaun:yeti_boss_pet", spot).addTag(S.MINION_TAG); } catch (_) {}
+    }, 20);
 }
 
 // ---------------------------------------------------------------- sự kiện
@@ -463,6 +494,8 @@ world.afterEvents.entityHurt.subscribe((event) => {
         if (hp) try { hp.component.setCurrentValue(Math.min(hp.max, hp.current + event.damage * cfg.armor)); } catch (_) {}
     }
 
+    if (cfg.lastStand) lastStandPet(boss, st);
+
     const ctx = makeCtx(boss, attacker, cfg, st, "counter");
     // Phá vỏ băng khi Yeti đang hồi máu
     if (st.regen) {
@@ -490,6 +523,9 @@ world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
         const cfg = PHASES[damagingEntity?.typeId];
         if (!cfg || !T.isEnemy(hitEntity)) return;
         setAggro(damagingEntity, hitEntity);
+        // đánh thường: vung chùy (không còn runtime iron_golem nên không hất tung mục tiêu lên trời)
+        const st = stateOf(damagingEntity);
+        if (system.currentTick >= st.busyUntil && !cfg.lastStand) S.playAnim(damagingEntity, "melee", 0.15);
         for (const [effect, [amplifier, duration]] of Object.entries(cfg.onHit)) {
             hitEntity.addEffect(effect, duration, { amplifier, showParticles: true });
         }

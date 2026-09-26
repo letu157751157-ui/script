@@ -5,8 +5,7 @@
       "identifier": "ytaun:yeti_death",
       "is_spawnable": true,
       "is_summonable": true,
-      "is_experimental": false,
-      "runtime_identifier": "minecraft:iron_golem"
+      "is_experimental": false
     },
     "component_groups": {
       "minecraft:player_created": {
@@ -258,9 +257,6 @@
         "priority": 4,
         "speed_multiplier": 1
       },
-      "minecraft:behavior.offer_flower": {
-        "priority": 5
-      },
       "minecraft:behavior.random_stroll": {
         "priority": 6,
         "speed_multiplier": 0.6,
@@ -310,10 +306,10 @@
         "cooldown_time": 2.0,
         "duration": 3.0,
         "knockback_damage": 20.0,
-        "knockback_height_cap": 0.4,
+        "knockback_height_cap": 0.0,
         "knockback_horizontal_strength": 5.0,
         "knockback_range": 6.0,
-        "knockback_vertical_strength": 5.0,
+        "knockback_vertical_strength": 0.0,
         "priority": 1,
         "damage_filters": {
           "test": "is_family",
@@ -361,9 +357,7 @@
       },
       "on:hurt_by_player": {
         "queue_command": {
-          "command": [
-            "function Pet_Yeti_death"
-          ]
+          "command": []
         }
       },
       "on:death": {

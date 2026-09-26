@@ -5,7 +5,7 @@
 //                 (đánh trúng) Tê Cóng: làm chậm như cũ; trúng cùng mục tiêu 3 lần trong 4 giây -> băng vỡ tung.
 // - Frozen Scythe (chuột phải) Vệ Binh Băng: Resistance II 3 giây như cũ + gọi tối đa 3 Yeti con đồng minh
 //                 (tồn tại 60 giây, tối đa 5 con) + sóng băng làm chậm quái xung quanh.
-// - Ice Bar       (chuột phải) Pháo Đài Băng: Resistance II 5 giây như cũ + vòng gai băng 6 giây đẩy lùi quái.
+// - Ice Bar       (chuột phải) Pháo Đài Băng: Resistance II 5 giây như cũ + vòng gai băng (particle) 6 giây đẩy lùi quái.
 // FIX: bản cũ gọi summon "pa:yeti_pet" / "pa:enderpet" (không tồn tại trong addon nên không ra gì),
 //      và dùng @p (người chơi GẦN NHẤT, có thể là người khác) thay vì chính người dùng.
 
@@ -149,10 +149,7 @@ function iceBastion(player) {
       for (let i = 0; i < 10; i++) {
         const a = (Math.PI * 2 * i) / 10;
         const spot = fx.groundAt(dim, { x: center.x + Math.cos(a) * radius, y: center.y, z: center.z + Math.sin(a) * radius });
-        try {
-          const spike = dim.spawnEntity('ytaun:ice_spike_yeti_boss', spot);
-          system.runTimeout(() => { if (spike.isValid) spike.remove(); }, 60);
-        } catch (_) {}
+        fx.emit(dim, 'yeti:ice_spike', spot, { radius: 0.9, life: 3 });
         fx.emit(dim, 'yeti:ice_pillar', spot);
       }
     }, wave);

@@ -19,7 +19,6 @@ import { system, EntityDamageCause } from "@minecraft/server";
 import * as fx from "./fx";
 import * as T from "./targets";
 
-export const ICE_SPIKE_ID = "ytaun:ice_spike_yeti_boss";
 export const MINION_TAG = T.MINION_TAG;
 export const victims = T.victims;
 const SKILL_CONTROLLER = "yeti_skill";
@@ -73,8 +72,9 @@ function hurt(ctx, player, amount) {
     } catch (_) {}
 }
 
-function knock(player, dir, horizontal, vertical) {
-    try { player.applyKnockback({ x: dir.x * horizontal, z: dir.z * horizontal }, vertical); } catch (_) {}
+/** Đẩy lùi theo phương ngang. v2.2: Yeti KHÔNG hất tung ai lên trời nữa (lực dọc luôn = 0). */
+function knock(entity, dir, horizontal) {
+    try { entity.applyKnockback({ x: dir.x * horizontal, z: dir.z * horizontal }, 0); } catch (_) {}
 }
 
 function slow(player, ticks, amplifier) {
@@ -116,12 +116,18 @@ function nearestVictim(ctx, radius) {
     return T.nearest(victims(ctx.boss.dimension, ctx.boss.location, radius), ctx.boss.location);
 }
 
-function spawnSpike(dimension, loc, lifeTicks = 60) {
-    try {
-        const spike = dimension.spawnEntity(ICE_SPIKE_ID, loc);
-        try { spike.setRotation({ x: 0, y: Math.random() * 360 }); } catch (_) {}
-        later(lifeTicks, () => { if (spike.isValid) spike.remove(); });
-    } catch (_) {}
+/**
+ * Cụm gai băng thuần particle (v2.2 bỏ hẳn gai băng dạng mob): 1 gai lớn + 2 gai nhỏ mọc lên, rung, rồi lún xuống.
+ * height 1 ~ cao 1.9 block.
+ */
+function spikeFx(dimension, loc, height = 1, lifeTicks = 60) {
+    const life = lifeTicks / 20;
+    fx.emit(dimension, "yeti:ice_spike", loc, { radius: height, life });
+    for (let i = 0; i < 2; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const at = { x: loc.x + Math.cos(a) * 0.45 * height, y: loc.y, z: loc.z + Math.sin(a) * 0.45 * height };
+        fx.emit(dimension, "yeti:ice_spike", at, { radius: height * (0.45 + Math.random() * 0.25), life: life * 0.9 });
+    }
 }
 
 /** Choáng: Yeti đứng khựng, không dùng chiêu trong `ticks` tick (vỡ giáp/vỏ băng, lao vào tường). */
@@ -274,6 +280,9 @@ function slamDown(ctx, land, radius) {
     fx.iceImpact(dim, land, radius);
     fx.emit(dim, "yeti:ice_crack", { x: land.x, y: land.y + 0.04, z: land.z }, { radius: radius * 0.9 });
     fx.ring(dim, land, radius * 0.5, 8, "yeti:snow_dust", 0.1);
+    fx.emit(dim, "yeti:shockwave", fx.add(land, { x: 0, y: 0.15, z: 0 }), { radius: radius * 2.4 });
+    fx.emit(dim, "yeti:rock_debris", fx.add(land, { x: 0, y: 0.3, z: 0 }), { variant: 0 });
+    fx.emit(dim, "yeti:light_beam", fx.add(land, { x: 0, y: 3, z: 0 }), { radius: 6 });
     fx.shake(dim, land, 20, 0.8, 0.6);
     fx.sound(dim, "random.explode", land, 1.6, 0.6);
     fx.sound(dim, "dig.snow", land, 2, 0.5);
@@ -282,7 +291,7 @@ function slamDown(ctx, land, radius) {
         const d = fx.dist2D(p.location, land);
         if (Math.abs(p.location.y - land.y) > 3.5) continue;
         hurt(ctx, p, fx.lerp(maxDamage, minDamage, Math.min(1, d / radius)));
-        knock(p, fx.dirXZ(land, p.location), byTier(ctx, [1.6, 2.1, 2.5]), 0.5);
+        knock(p, fx.dirXZ(land, p.location), byTier(ctx, [1.6, 2.1, 2.5]));
         slow(p, 40, 1);
         fx.hitFx(dim, p.location);
     }
@@ -303,20 +312,20 @@ function spikeVolley(ctx, points, damage) {
     const dim = ctx.boss.dimension;
     const hit = new Set();
     points.forEach((p, i) => {
-        spawnSpike(dim, p);
+        spikeFx(dim, p, 1.1);
         fx.emit(dim, "yeti:ice_pillar", p);
         if (i % 2 === 0) fx.sound(dim, "random.glass", p, 1, 0.9 + Math.random() * 0.4);
         spikeHit(ctx, p, damage, hit, { x: 0, y: 0, z: 0 });
     });
 }
 
-function spikeHit(ctx, loc, damage, hit, dir, launch = 0.42) {
+function spikeHit(ctx, loc, damage, hit, dir) {
     const dim = ctx.boss.dimension;
     for (const p of victims(dim, loc, 1.7)) {
         if (hit.has(p.id) || Math.abs(p.location.y - loc.y) > 2.5) continue;
         hit.add(p.id);
         hurt(ctx, p, damage);
-        knock(p, dir, 0.3, launch);
+        knock(p, dir, 0.6);
         freeze(p, 60, 2);
         fx.hitFx(dim, p.location);
     }
@@ -356,7 +365,7 @@ export function frostRoar(ctx) {
                     try { p.addEffect("mining_fatigue", 80, { amplifier: 0 }); } catch (_) {}
                     if (ctx.tier >= 2) {
                         hurt(ctx, p, byTier(ctx, [0, 4, 5]));
-                        knock(p, fx.dirXZ(center, p.location), 1.1, 0.3);
+                        knock(p, fx.dirXZ(center, p.location), 1.1);
                     }
                     if (ctx.tier >= 3) {
                         try { p.addEffect("weakness", 80, { amplifier: 0 }); } catch (_) {}
@@ -394,7 +403,7 @@ export function glacialPrison(ctx) {
         for (let i = 0; i < 10; i++) {
             const a = (Math.PI * 2 * i) / 10;
             const spot = fx.groundAt(dim, { x: center.x + Math.cos(a) * 2.3, y: center.y, z: center.z + Math.sin(a) * 2.3 });
-            spawnSpike(dim, spot, crush - close + 14);
+            spikeFx(dim, spot, 1.1, crush - close + 14);
             fx.emit(dim, "yeti:ice_pillar", spot);
         }
         fx.emit(dim, "yeti:frost_field", { x: center.x, y: center.y + 0.05, z: center.z }, { radius, life: (crush - close) / 20 + 0.5 });
@@ -423,7 +432,7 @@ export function glacialPrison(ctx) {
         for (const e of victims(dim, center, radius + 0.6)) {
             if (Math.abs(e.location.y - center.y) > 3) continue;
             hurt(ctx, e, byTier(ctx, [9, 12, 15]));
-            knock(e, fx.dirXZ(center, e.location), 0.4, 0.7);
+            knock(e, fx.dirXZ(center, e.location), 0.4);
             freeze(e, 40, 2);
             fx.hitFx(dim, e.location);
         }
@@ -496,7 +505,7 @@ function rollSnowball(ctx, from, dir, range, damage) {
                 if (hit.has(e.id)) continue;
                 hit.add(e.id);
                 hurt(ctx, e, damage);
-                knock(e, dir, 1.8, 0.5);
+                knock(e, dir, 1.8);
                 freeze(e, 60, 2);
                 fx.hitFx(dim, e.location);
                 fx.sound(dim, "random.explode", e.location, 0.6, 1.4);
@@ -570,14 +579,14 @@ function meteorImpact(ctx, spot, radius) {
     fx.sound(dim, "random.glass", spot, 2.5, 0.5);
     for (let i = 0; i < 6; i++) {
         const a = (Math.PI * 2 * i) / 6 + Math.random() * 0.5;
-        spawnSpike(dim, fx.groundAt(dim, { x: spot.x + Math.cos(a) * radius * 0.8, y: spot.y, z: spot.z + Math.sin(a) * radius * 0.8 }));
+        spikeFx(dim, fx.groundAt(dim, { x: spot.x + Math.cos(a) * radius * 0.8, y: spot.y, z: spot.z + Math.sin(a) * radius * 0.8 }), 1.2);
     }
     const maxDamage = byTier(ctx, [12, 16, 18]);
     for (const e of victims(dim, spot, radius + 0.5)) {
         const d = fx.dist2D(e.location, spot);
         if (d > radius || Math.abs(e.location.y - spot.y) > 4) continue;
         hurt(ctx, e, fx.lerp(maxDamage, 6, d / radius));
-        knock(e, fx.dirXZ(spot, e.location), 1.5, 0.9);
+        knock(e, fx.dirXZ(spot, e.location), 1.5);
         freeze(e, 60, 2);
         fx.hitFx(dim, e.location);
     }
@@ -628,7 +637,7 @@ export function iceSpikes(ctx, opts = {}) {
             const when = impact + i * 2;
             fx.warnTile(dim, spot, when);
             later(when, () => {
-                spawnSpike(dim, spot);
+                spikeFx(dim, spot, 1);
                 fx.emit(dim, "yeti:ice_pillar", spot);
                 fx.emit(dim, "yeti:snow_dust", spot);
                 if (i % 2 === 0) fx.emit(dim, "yeti:ice_crack", { x: spot.x, y: spot.y + 0.04, z: spot.z }, { radius: 1.3 });
@@ -689,6 +698,11 @@ export function glacialCharge(ctx) {
             try { boss.teleport(next, { facingLocation: fx.add(next, dir, 5) }); } catch (_) {}
             fx.emit(dim, "yeti:snow_dust", fx.add(loc, dir, -1));
             if (i % 2 === 0) fx.emit(dim, "yeti:frost_mist", fx.add(loc, { x: 0, y: 1.2, z: 0 }));
+            if (i % 2 === 1) {
+                const side = { x: -dir.z, y: 0, z: dir.x };
+                const at = fx.groundAt(dim, fx.add(fx.add(loc, dir, -1.8), side, i % 4 === 1 ? 1.4 : -1.4));
+                fx.emit(dim, "yeti:ice_spike", at, { radius: 0.8, life: 1.6 });
+            }
             if (i % 3 === 0) {
                 fx.sound(dim, "mob.ravager.step", loc, 1.2, 0.7);
                 fx.shake(dim, loc, 10, 0.2, 0.15);
@@ -698,7 +712,7 @@ export function glacialCharge(ctx) {
                 if (hit.has(p.id) || Math.abs(p.location.y - loc.y) > 3) continue;
                 hit.add(p.id);
                 hurt(ctx, p, byTier(ctx, [10, 12, 14]));
-                knock(p, dir, byTier(ctx, [1.6, 1.8, 2.0]), 0.45);
+                knock(p, dir, byTier(ctx, [1.6, 1.8, 2.0]));
                 freeze(p, byTier(ctx, [100, 120, 140]), byTier(ctx, [3, 3, 4]));
                 fx.hitFx(dim, p.location);
                 fx.emit(dim, "yeti:ice_burst", fx.add(p.location, { x: 0, y: 1, z: 0 }));
@@ -798,14 +812,14 @@ export function breakRegenShell(ctx) {
 
 // Đệ băng mới (thay cho zombie / skeleton / stray vanilla của bản cũ): xem scripts/yeti/minions.js
 const PACKS = {
-    1: ["ytaun:frost_wolf", "ytaun:frost_wolf", "ytaun:frost_wolf"],
-    2: ["ytaun:frost_wolf", "ytaun:frost_wolf", "ytaun:frost_wraith", "ytaun:frost_wraith"],
-    3: ["ytaun:frost_golem", "ytaun:frost_wraith", "ytaun:frost_wraith", "ytaun:frost_wolf", "ytaun:frost_wolf"],
+    1: ["ytaun:frost_wolf", "ytaun:frost_wolf"],
+    2: ["ytaun:frost_wolf", "ytaun:frost_wraith"],
+    3: ["ytaun:frost_golem", "ytaun:frost_wraith"],
 };
 const ELITE_PACKS = {
-    1: ["ytaun:frost_golem", "ytaun:frost_wolf", "ytaun:frost_wolf"],
-    2: ["ytaun:frost_golem", "ytaun:frost_wraith", "ytaun:frost_wraith", "ytaun:frost_wolf"],
-    3: ["ytaun:frost_golem", "ytaun:frost_golem", "ytaun:frost_wraith", "ytaun:frost_wraith", "ytaun:frost_wolf", "ytaun:frost_wolf"],
+    1: ["ytaun:frost_golem", "ytaun:frost_wolf"],
+    2: ["ytaun:frost_golem", "ytaun:frost_wraith", "ytaun:frost_wolf"],
+    3: ["ytaun:frost_golem", "ytaun:frost_wraith", "ytaun:frost_wraith"],
 };
 
 /**
@@ -815,7 +829,7 @@ const ELITE_PACKS = {
 export function summonMinions(ctx, elite = false) {
     const { boss } = ctx;
     const dim = boss.dimension;
-    const cap = byTier(ctx, [6, 8, 10]);
+    const cap = byTier(ctx, [3, 4, 5]); // v2.2: ít đệ hơn (trước 6/8/10)
     let alive = 0;
     try { alive = dim.getEntities({ location: boss.location, maxDistance: 48, families: ["yeti_minion"] }).length; } catch (_) {}
     const pack = (elite ? ELITE_PACKS : PACKS)[Math.min(3, ctx.tier)].slice(0, Math.max(0, cap - alive));
@@ -887,22 +901,28 @@ export function blizzard(ctx, opts = {}) {
     fx.repeat(Math.floor(duration / 8), 8, () => {
         const players = victims(dim, center, radius + 4);
         if (players.length === 0) return;
-        const p = players[Math.floor(Math.random() * players.length)];
-        const a = Math.random() * Math.PI * 2, off = Math.random() * 2.2;
-        const spot = fx.groundAt(dim, { x: p.location.x + Math.cos(a) * off, y: p.location.y, z: p.location.z + Math.sin(a) * off });
-        fx.warnCircle(dim, spot, 1.8, 20);
-        later(2, () => fx.emit(dim, "yeti:icicle", fx.add(spot, { x: 0, y: 10.5, z: 0 })));
-        later(20, () => {
-            fx.iceImpact(dim, spot, 1.8, false);
-            fx.sound(dim, "random.glass", spot, 1.2, 0.8 + Math.random() * 0.5);
-            for (const v of victims(dim, spot, 2)) {
-                hurt(ctx, v, damage);
-                freeze(v, 60, 2);
-                fx.hitFx(dim, v.location);
-            }
-        });
+        dropIcicle(ctx, players[Math.floor(Math.random() * players.length)], damage);
     }, 12);
     return 40;
+}
+
+/** Một cột băng nhọn rơi từ trời xuống cạnh mục tiêu (vòng đỏ báo trước 1 giây), vỡ tung thành gai băng. */
+function dropIcicle(ctx, who, damage) {
+    const dim = ctx.boss.dimension;
+    const a = Math.random() * Math.PI * 2, off = Math.random() * 2.2;
+    const spot = fx.groundAt(dim, { x: who.location.x + Math.cos(a) * off, y: who.location.y, z: who.location.z + Math.sin(a) * off });
+    fx.warnCircle(dim, spot, 1.8, 20);
+    later(2, () => fx.emit(dim, "yeti:icicle", fx.add(spot, { x: 0, y: 10.5, z: 0 })));
+    later(20, () => {
+        fx.iceImpact(dim, spot, 1.8, false);
+        fx.emit(dim, "yeti:ice_spike", spot, { radius: 0.6, life: 1.4 });
+        fx.sound(dim, "random.glass", spot, 1.2, 0.8 + Math.random() * 0.5);
+        for (const v of victims(dim, spot, 2)) {
+            hurt(ctx, v, damage);
+            freeze(v, 60, 2);
+            fx.hitFx(dim, v.location);
+        }
+    });
 }
 
 // ---------------------------------------------------------------- 10. Khe Nứt Sông Băng (Glacier Rift)
@@ -935,10 +955,10 @@ export function glacierRift(ctx) {
             fx.emit(dim, "yeti:ice_crack", { x: spot.x, y: spot.y + 0.04, z: spot.z }, { radius: 1.1 });
             fx.emit(dim, "yeti:snow_dust", spot);
             if (!pillar) return;
-            spawnSpike(dim, spot, 50);
+            spikeFx(dim, spot, 1.4, 50);
             fx.emit(dim, "yeti:ice_pillar", spot);
             if (i % 4 === 0) fx.sound(dim, "random.glass", spot, 1.2, 0.7 + Math.random() * 0.4);
-            spikeHit(ctx, spot, byTier(ctx, [8, 9, 10]), hit, dir, 0.85);
+            spikeHit(ctx, spot, byTier(ctx, [8, 9, 10]), hit, dir);
         });
     }
     return 36;
@@ -971,7 +991,7 @@ export function polarVortex(ctx) {
         if (i % 8 === 0) fx.sound(dim, "mob.enderdragon.flap", c, 1.5, 0.6);
         for (const e of victims(dim, c, radius)) {
             const d = fx.dist2D(e.location, c);
-            if (d > 3) knock(e, fx.dirXZ(e.location, c), byTier(ctx, [0.2, 0.22, 0.26]), 0);
+            if (d > 3) knock(e, fx.dirXZ(e.location, c), byTier(ctx, [0.2, 0.22, 0.26]));
             if (i % 5 === 0 && d <= 4.5) {
                 hurt(ctx, e, byTier(ctx, [4, 5, 6]));
                 slow(e, 30, 2);
@@ -995,7 +1015,7 @@ export function polarVortex(ctx) {
         for (const e of victims(dim, c, blast)) {
             if (Math.abs(e.location.y - c.y) > 4) continue;
             hurt(ctx, e, byTier(ctx, [8, 11, 14]));
-            knock(e, fx.dirXZ(c, e.location), 1.6, 1.0);
+            knock(e, fx.dirXZ(c, e.location), 1.6);
             freeze(e, 60, 3);
             fx.hitFx(dim, e.location);
         }
@@ -1025,13 +1045,21 @@ export function glacialWave(ctx) {
             const points = Math.min(26, Math.round(r * 1.7));
             fx.ring(dim, center, r, points, "yeti:snow_dust", 0.1);
             if (k % 2 === 0) fx.ring(dim, center, r, Math.round(points / 2), "yeti:ice_pillar", 0.1);
+            if (k % 2 === 1) {
+                const n = Math.round(points / 2.5);
+                for (let i = 0; i < n; i++) {
+                    const a = (Math.PI * 2 * i) / n + k * 0.3;
+                    const at = fx.groundAt(dim, { x: center.x + Math.cos(a) * r, y: center.y, z: center.z + Math.sin(a) * r });
+                    fx.emit(dim, "yeti:ice_spike", at, { radius: 0.75, life: 0.9 });
+                }
+            }
             if (k % 3 === 0) fx.sound(dim, "dig.snow", center, 1.5, 0.7);
             for (const p of victims(dim, center, r + 1.4)) {
                 if (hit.has(p.id) || Math.abs(fx.dist2D(p.location, center) - r) > 1.4) continue;
                 if (!p.isOnGround || Math.abs(p.location.y - center.y) > 2.5) continue;
                 hit.add(p.id);
                 hurt(ctx, p, byTier(ctx, [7, 8, 10]));
-                knock(p, fx.dirXZ(center, p.location), 1.7, 0.5);
+                knock(p, fx.dirXZ(center, p.location), 1.7);
                 slow(p, 40, 1);
                 fx.hitFx(dim, p.location);
             }
@@ -1066,6 +1094,7 @@ export function absoluteZero(ctx) {
         fx.emit(dim, "yeti:charge_gather", fx.add(c, { x: 0, y: 4.5, z: 0 }));
         if (i % 2 === 0) fx.emit(dim, "yeti:light_beam", fx.add(c, { x: 0, y: 4, z: 0 }), { radius: 8 });
         fx.ring(dim, center, radius, 12, "yeti:frost_mist", 0.5);
+        if (i % 2 === 1) fx.ring(dim, center, radius, 16, "yeti:aurora", 1.2);
     });
     [3, 2, 1].forEach((n, k) => {
         after(ctx, 4 + k * 20, () => {
@@ -1173,7 +1202,7 @@ function bind(ctx, target, hand, bindRadius, bindTicks) {
             return;
         }
         const dir = fx.dirXZ(target.location, boss.location);
-        knock(target, dir, 2.6, 0.55);
+        knock(target, dir, 2.6);
         hurt(ctx, target, byTier(ctx, [7, 8, 9]));
         freeze(target, 50, 4);
         fx.hitFx(dim, target.location);
@@ -1260,7 +1289,7 @@ export function frostNova(ctx, opts = {}) {
         for (const p of victims(dim, center, radius)) {
             if (Math.abs(p.location.y - center.y) > 4) continue;
             hurt(ctx, p, opts.damage ?? byTier(ctx, [7, 8, 10]));
-            knock(p, fx.dirXZ(center, p.location), 2.4, 0.6);
+            knock(p, fx.dirXZ(center, p.location), 2.4);
             slow(p, 40, 2);
             fx.hitFx(dim, p.location);
         }
@@ -1372,6 +1401,362 @@ export function frostBreath(ctx) {
     return 56;
 }
 
+// ---------------------------------------------------------------- Ném Tảng Đất (Boulder Hurl) - MỚI v2.2
+
+/** Loại mặt đất ngay dưới chân Yeti -> màu tảng đất nó bốc lên: 0 tuyết, 1 băng, 2 đá, 3 đất/cỏ. */
+function groundVariant(dimension, loc) {
+    try {
+        const id = dimension.getBlock({ x: loc.x, y: loc.y - 0.5, z: loc.z })?.typeId ?? "";
+        if (id.includes("ice")) return 1;
+        if (id.includes("snow") || id.includes("powder")) return 0;
+        if (/stone|deepslate|cobble|andesite|granite|diorite|tuff|basalt|calcite|gravel|ore/.test(id)) return 2;
+        if (/dirt|grass|mud|podzol|mycelium|sand|clay|moss|farmland|path/.test(id)) return 3;
+    } catch (_) {}
+    return 0;
+}
+
+/**
+ * Khom người xuống, thọc hai tay xuống đất bốc lên một TẢNG ĐẤT khổng lồ (màu theo loại đất dưới chân:
+ * tuyết / băng / đá / đất cỏ), nâng qua đầu rồi ném vòng cung vào mục tiêu. Vòng đỏ hiện ở chỗ rơi
+ * từ lúc tảng đất được nâng lên. Pha 3: tảng đất vỡ thành 5 mảnh văng ra nổ tiếp.
+ */
+export function boulderHurl(ctx) {
+    const { boss, target } = ctx;
+    const dim = boss.dimension;
+    const grab = 12, lifted = 21, windup = 26, release = 30;
+    const radius = byTier(ctx, [3.5, 4, 4.5]);
+    const size = byTier(ctx, [1.1, 1.25, 1.4]);
+    const variant = groundVariant(dim, boss.location);
+    const up = ctx.cfg.handUp;
+    // vị trí tảng đất theo tay Yeti trong animation.yeti.lift_throw (tick, tiến về trước, độ cao)
+    const path = [[grab, 2.8, 0.8], [lifted, 0.3, up + 2.6], [windup, -0.4, up + 2.9], [release, 1.4, up + 2]];
+    const hand = (t) => {
+        for (let i = 0; i < path.length - 1; i++) {
+            const [t0, f0, u0] = path[i], [t1, f1, u1] = path[i + 1];
+            if (t <= t1) {
+                const k = Math.max(0, (t - t0) / (t1 - t0));
+                return front(ctx, fx.lerp(f0, f1, k), fx.lerp(u0, u1, k));
+            }
+        }
+        return front(ctx, 1.4, up + 2);
+    };
+    let spin = Math.random() * 360;
+    let land, flight;
+
+    face(boss, target.location);
+    root(boss, release + 16);
+    playAnim(boss, "lift_throw");
+    fx.sound(dim, "mob.polarbear.warning", boss.location, 1.2, 0.7);
+    after(ctx, grab, () => {
+        const dig = fx.groundAt(dim, front(ctx, 2.8, 0));
+        fx.emit(dim, "yeti:ice_crack", fx.add(dig, { x: 0, y: 0.04, z: 0 }), { radius: 2.4 });
+        fx.emit(dim, "yeti:rock_debris", fx.add(dig, { x: 0, y: 0.3, z: 0 }), { variant });
+        fx.emit(dim, "yeti:rock_debris", fx.add(dig, { x: 0, y: 0.3, z: 0 }), { variant });
+        fx.emit(dim, "yeti:shockwave", fx.add(dig, { x: 0, y: 0.12, z: 0 }), { radius: 3.5 });
+        fx.emit(dim, "yeti:snow_dust", dig);
+        fx.shake(dim, dig, 14, 0.35, 0.4);
+        fx.sound(dim, variant === 2 ? "dig.stone" : (variant === 3 ? "dig.gravel" : "dig.snow"), dig, 2, 0.5);
+        fx.sound(dim, "random.explode", dig, 0.7, 1.5);
+    });
+    for (let t = grab; t < release; t++) {
+        after(ctx, t, () => {
+            spin += 5;
+            const pos = hand(t);
+            fx.emit(dim, "yeti:boulder", pos, { radius: size, variant, spin });
+            if (t % 4 === 0) fx.emit(dim, "yeti:snow_dust", pos);
+        });
+    }
+    after(ctx, lifted, () => {
+        const origin = boss.location;
+        let aim = predict(target.isValid ? target : boss, 16);
+        if (fx.dist2D(origin, aim) > 26) aim = fx.add(origin, fx.dirXZ(origin, aim), 26);
+        land = fx.groundAt(dim, aim);
+        flight = Math.max(12, Math.min(22, Math.round(fx.dist2D(origin, land) / 1.2)));
+        fx.warnCircle(dim, land, radius, release - lifted + flight);
+        fx.sound(dim, "mob.ravager.roar", origin, 1.2, 1.2);
+    });
+    after(ctx, release, () => {
+        if (!land) return;
+        const start = hand(release);
+        const apex = 4 + fx.dist2D(start, land) * 0.15;
+        fx.sound(dim, "mob.irongolem.throw", start, 2, 0.5);
+        fx.repeat(flight, 1, (i) => {
+            const u = (i + 1) / flight;
+            spin += 18;
+            const pos = {
+                x: fx.lerp(start.x, land.x, u),
+                y: fx.lerp(start.y, land.y + size, u) + apex * 4 * u * (1 - u),
+                z: fx.lerp(start.z, land.z, u),
+            };
+            fx.emit(dim, "yeti:boulder", pos, { radius: size, variant, spin });
+            if (i % 2 === 0) fx.emit(dim, "yeti:snow_dust", pos);
+        });
+        later(flight, () => boulderImpact(ctx, land, radius, variant, size, ctx.tier >= 3));
+    });
+    return release + 16;
+}
+
+function boulderImpact(ctx, land, radius, variant, size, shatter) {
+    const dim = ctx.boss.dimension;
+    fx.iceImpact(dim, land, radius);
+    fx.emit(dim, "yeti:rock_debris", fx.add(land, { x: 0, y: 0.4, z: 0 }), { variant });
+    fx.emit(dim, "yeti:rock_debris", fx.add(land, { x: 0, y: 0.4, z: 0 }), { variant });
+    fx.emit(dim, "yeti:shockwave", fx.add(land, { x: 0, y: 0.15, z: 0 }), { radius: radius * 2.4 });
+    fx.shake(dim, land, radius + 18, 0.9, 0.6);
+    fx.sound(dim, "random.explode", land, 2, 0.6);
+    fx.sound(dim, variant === 2 ? "dig.stone" : "dig.snow", land, 2, 0.4);
+    const maxDamage = byTier(ctx, [10, 13, 16]);
+    for (const e of victims(dim, land, radius + 0.5)) {
+        const d = fx.dist2D(e.location, land);
+        if (d > radius || Math.abs(e.location.y - land.y) > 3.5) continue;
+        hurt(ctx, e, fx.lerp(maxDamage, 5, d / radius));
+        knock(e, fx.dirXZ(land, e.location), 1.3);
+        slow(e, 60, 2);
+        fx.hitFx(dim, e.location);
+    }
+    if (!shatter) return;
+    for (let i = 0; i < 5; i++) {
+        const a = (Math.PI * 2 * i) / 5 + Math.random() * 0.6;
+        const to = fx.groundAt(dim, fx.add(land, { x: Math.cos(a), y: 0, z: Math.sin(a) }, 3.5 + Math.random() * 2.5));
+        const from = fx.add(land, { x: 0, y: size, z: 0 });
+        let spin = Math.random() * 360;
+        fx.repeat(9, 1, (k) => {
+            const u = (k + 1) / 9;
+            spin += 30;
+            fx.emit(dim, "yeti:boulder", { x: fx.lerp(from.x, to.x, u), y: fx.lerp(from.y, to.y + 0.5, u) + 2.5 * 4 * u * (1 - u), z: fx.lerp(from.z, to.z, u) },
+                { radius: size * 0.4, variant, spin });
+        });
+        later(9, () => {
+            fx.iceImpact(dim, to, 1.8);
+            fx.emit(dim, "yeti:rock_debris", fx.add(to, { x: 0, y: 0.3, z: 0 }), { variant });
+            for (const e of victims(dim, to, 1.9)) {
+                hurt(ctx, e, 5);
+                slow(e, 40, 1);
+            }
+        });
+    }
+}
+
+// ---------------------------------------------------------------- Lãnh Địa Băng Giá (Frozen Domain) - MỚI v2.2
+
+/**
+ * Yeti dựng một đấu trường băng bán kính 14-17 block trong 10 giây: tường cực quang bao quanh, bão tuyết bên trong,
+ * ai chạm tường bị đẩy ngược vào + tê cóng. 3 đợt SÓNG BĂNG quét cả lãnh địa: 2 giây trước mỗi đợt, vài VÒNG RUNE XANH
+ * hiện ra - chỉ ai đứng trong vòng rune mới an toàn, còn lại bị đóng băng và mất nhiều máu.
+ */
+export function frozenDomain(ctx) {
+    const { boss } = ctx;
+    const dim = boss.dimension;
+    const center = fx.groundAt(dim, boss.location);
+    const radius = byTier(ctx, [14, 15, 17]);
+    const duration = 200, warn = 40, safeRadius = 2.4;
+    const pulses = [70, 130, 190];
+    const safeCount = byTier(ctx, [3, 3, 2]);
+
+    root(boss, 44);
+    playAnim(boss, "summon");
+    fx.title(dim, center, radius + 16, "§b§l❄ LÃNH ĐỊA BĂNG GIÁ ❄", "§fĐứng trong vòng rune xanh để tránh sóng băng!");
+    fx.sound(dim, "beacon.power", center, 2, 0.6);
+    fx.sound(dim, "ambient.weather.thunder", center, 2, 0.7);
+    fx.emit(dim, "yeti:rune_circle", fx.add(center, { x: 0, y: 0.06, z: 0 }), { radius: 4, life: duration / 20 });
+
+    // tường cực quang + bão tuyết bên trong
+    fx.repeat(duration / 10, 10, (i) => {
+        fx.emit(dim, "yeti:dome_edge", center, { radius });
+        const n = 18;
+        for (let k = 0; k < n; k++) {
+            const a = (Math.PI * 2 * (k + (i % 2) * 0.5)) / n;
+            fx.emit(dim, "yeti:aurora", { x: center.x + Math.cos(a) * radius, y: center.y + 1.3, z: center.z + Math.sin(a) * radius });
+        }
+        if (i % 2 === 0) fx.emit(dim, "yeti:blizzard", center, { radius: radius * 0.8 });
+        if (i % 4 === 0) {
+            for (let k = 0; k < 4; k++) {
+                const a = (Math.PI / 2) * k + Math.PI / 4;
+                fx.emit(dim, "yeti:light_beam", { x: center.x + Math.cos(a) * radius, y: center.y + 5, z: center.z + Math.sin(a) * radius }, { radius: 10 });
+            }
+        }
+    });
+    // tường: không cho chạy ra ngoài
+    fx.repeat(duration / 5, 5, (i) => {
+        for (const e of victims(dim, center, radius + 5)) {
+            const d = fx.dist2D(e.location, center);
+            if (d < radius - 0.8) continue;
+            knock(e, fx.dirXZ(e.location, center), 0.7);
+            if (i % 4 === 0) {
+                hurt(ctx, e, 2);
+                freeze(e, 20, 1);
+                fx.emit(dim, "yeti:ice_burst", fx.add(e.location, { x: 0, y: 1, z: 0 }));
+            }
+        }
+    });
+    // 3 đợt sóng băng + vòng rune an toàn
+    for (const when of pulses) {
+        const zones = [];
+        later(when - warn, () => {
+            for (let k = 0; k < safeCount; k++) {
+                let spot;
+                for (let tries = 0; tries < 8; tries++) {
+                    const a = Math.random() * Math.PI * 2, r = 4 + Math.random() * (radius * 0.72 - 4);
+                    spot = fx.groundAt(dim, { x: center.x + Math.cos(a) * r, y: center.y, z: center.z + Math.sin(a) * r });
+                    if (zones.every(z => fx.dist2D(z, spot) > 6)) break;
+                }
+                zones.push(spot);
+                fx.emit(dim, "yeti:rune_circle", fx.add(spot, { x: 0, y: 0.07, z: 0 }), { radius: safeRadius, life: warn / 20 + 0.3 });
+                fx.emit(dim, "yeti:light_beam", fx.add(spot, { x: 0, y: 3, z: 0 }), { radius: 6 });
+                fx.emit(dim, "yeti:glyph", spot);
+            }
+            fx.warnCircle(dim, center, radius, warn);
+            fx.actionbar(dim, center, radius + 10, "§b❄ Chạy vào VÒNG RUNE XANH trước khi sóng băng quét qua! ❄");
+            fx.sound(dim, "note.pling", center, 2, 1.2);
+        });
+        later(when, () => {
+            fx.emit(dim, "yeti:frost_ring", fx.add(center, { x: 0, y: 0.1, z: 0 }), { radius });
+            fx.emit(dim, "yeti:shockwave", fx.add(center, { x: 0, y: 0.15, z: 0 }), { radius });
+            for (let k = 0; k < 14; k++) {
+                const a = Math.random() * Math.PI * 2, r = Math.random() * radius;
+                const at = fx.groundAt(dim, { x: center.x + Math.cos(a) * r, y: center.y, z: center.z + Math.sin(a) * r });
+                if (zones.some(z => fx.dist2D(z, at) < safeRadius + 0.5)) continue;
+                spikeFx(dim, at, 0.9 + Math.random() * 0.5, 40);
+            }
+            for (const z of zones) fx.ring(dim, z, safeRadius, 8, "yeti:sparkle", 0.6);
+            fx.shake(dim, center, radius + 10, 0.6, 0.5);
+            fx.sound(dim, "random.explode", center, 2, 0.6);
+            fx.sound(dim, "random.glass", center, 2, 0.5);
+            for (const e of victims(dim, center, radius + 1)) {
+                if (fx.dist2D(e.location, center) > radius + 0.5) continue;
+                if (zones.some(z => fx.dist2D(e.location, z) <= safeRadius + 0.3)) continue;
+                hurt(ctx, e, byTier(ctx, [8, 10, 12]));
+                freeze(e, 60, 3);
+                fx.hitFx(dim, e.location);
+            }
+        });
+    }
+    later(duration, () => {
+        fx.ring(dim, center, radius, 16, "yeti:ice_shard", 1);
+        fx.emit(dim, "yeti:shockwave", fx.add(center, { x: 0, y: 0.15, z: 0 }), { radius: radius + 3 });
+        fx.sound(dim, "random.glass", center, 2, 0.7);
+    });
+    return 44;
+}
+
+// ---------------------------------------------------------------- Băng Hà Giáng Thế (Glacial Cataclysm) - MỚI v2.2
+
+function easeOut(u) { return 1 - (1 - u) * (1 - u); }
+function easeIn(u) { return u * u; }
+
+/**
+ * Tuyệt chiêu pha 3: Yeti bật lên trời lơ lửng giữa vòng cực quang, bên dưới 3 VÀNH ĐAI băng lần lượt phát nổ
+ * (ngoài -> trong -> giữa, mỗi vành có ô đỏ phủ kín báo trước 1 giây - phải chạy sang vành an toàn),
+ * băng nhọn rơi quanh người chơi, cuối cùng Yeti lao thẳng xuống tâm tạo một vụ nổ khổng lồ.
+ */
+export function glacialCataclysm(ctx) {
+    const { boss, target } = ctx;
+    const dim = boss.dimension;
+    const center = fx.groundAt(dim, boss.location);
+    const facing = fx.add(center, fx.dirXZ(center, target.location), 10);
+    const launch = 15, top = 35, dive = 96, impact = 106, height = 12;
+    const bands = [[10, 15, 55], [0, 5, 75], [5, 10, 95]]; // [trong, ngoài, tick phát nổ]
+
+    root(boss, 126);
+    playAnim(boss, "cataclysm");
+    fx.title(dim, center, 40, "§9§l❄ BĂNG HÀ GIÁNG THẾ ❄", "§fNé khỏi các vành đai đỏ đang phát nổ!");
+    fx.sound(dim, "mob.enderdragon.growl", center, 2, 0.5);
+    fx.sound(dim, "beacon.power", center, 2, 0.4);
+    fx.emit(dim, "yeti:rune_circle", fx.add(center, { x: 0, y: 0.06, z: 0 }), { radius: 6, life: impact / 20 });
+
+    after(ctx, launch, () => {
+        fx.iceImpact(dim, center, 3);
+        fx.emit(dim, "yeti:shockwave", fx.add(center, { x: 0, y: 0.15, z: 0 }), { radius: 8 });
+        fx.sound(dim, "mob.irongolem.throw", center, 2, 0.5);
+    });
+    for (let t = launch; t <= impact; t++) {
+        after(ctx, t, () => {
+            let y;
+            if (t <= top) y = height * easeOut((t - launch) / (top - launch));
+            else if (t <= dive) y = height + Math.sin((t - top) * 0.2) * 0.4;
+            else y = height * (1 - easeIn((t - dive) / (impact - dive)));
+            const pos = { x: center.x, y: center.y + y, z: center.z };
+            try { boss.tryTeleport(pos, { facingLocation: { x: facing.x, y: pos.y, z: facing.z } }); } catch (_) {}
+            if (t > top && t < dive) {
+                if (t % 4 === 0) fx.emit(dim, "yeti:charge_gather", fx.add(pos, { x: 0, y: 3, z: 0 }));
+                if (t % 10 === 0) fx.ring(dim, pos, 6, 12, "yeti:aurora", 1);
+                if (t % 20 === 0) fx.emit(dim, "yeti:light_beam", fx.add(center, { x: 0, y: y / 2, z: 0 }), { radius: y });
+                if (t % 8 === 0 && t < 90) {
+                    const list = victims(dim, center, 18);
+                    if (list.length) dropIcicle(ctx, list[Math.floor(Math.random() * list.length)], byTier(ctx, [5, 6, 7]));
+                }
+            } else if (t < top || t > dive) {
+                fx.emit(dim, "yeti:frost_mist", fx.add(pos, { x: 0, y: 1, z: 0 }));
+            }
+        });
+    }
+    for (const [inner, outer, when] of bands) {
+        const points = [];
+        for (let r = inner + 1.1; r < outer; r += 2.2) {
+            const n = Math.max(1, Math.round((2 * Math.PI * r) / 2.2));
+            for (let k = 0; k < n; k++) {
+                const a = (Math.PI * 2 * k) / n + r;
+                points.push(fx.groundAt(dim, { x: center.x + Math.cos(a) * r, y: center.y, z: center.z + Math.sin(a) * r }));
+            }
+        }
+        later(when - 20, () => {
+            for (const p of points) fx.warnTile(dim, p, 20);
+            fx.warnCircle(dim, center, outer, 20);
+            if (inner > 0) fx.emit(dim, "yeti:rune_circle", fx.add(center, { x: 0, y: 0.08, z: 0 }), { radius: inner, life: 1 });
+            fx.sound(dim, "note.pling", center, 2, 0.7 + inner * 0.05);
+        });
+        later(when, () => {
+            points.forEach((p, i) => {
+                if (i % 2 === 0) spikeFx(dim, p, 1.1, 36);
+                if (i % 3 === 0) fx.emit(dim, "yeti:ice_burst", fx.add(p, { x: 0, y: 0.8, z: 0 }));
+            });
+            fx.emit(dim, "yeti:frost_ring", fx.add(center, { x: 0, y: 0.1, z: 0 }), { radius: outer });
+            fx.emit(dim, "yeti:shockwave", fx.add(center, { x: 0, y: 0.15, z: 0 }), { radius: outer + 2 });
+            fx.shake(dim, center, 30, 0.6, 0.5);
+            fx.sound(dim, "random.explode", center, 2.5, 0.6);
+            fx.sound(dim, "random.glass", center, 2, 0.6);
+            for (const e of victims(dim, center, outer + 0.6)) {
+                const d = fx.dist2D(e.location, center);
+                if (d < inner - 0.3 || d > outer + 0.5) continue;
+                hurt(ctx, e, byTier(ctx, [10, 12, 13]));
+                freeze(e, 60, 3);
+                fx.hitFx(dim, e.location);
+            }
+        });
+    }
+    later(impact - 20, () => fx.warnCircle(dim, center, 7, 20));
+    after(ctx, impact, () => {
+        try { boss.teleport(center, { facingLocation: facing }); } catch (_) {}
+        fx.iceImpact(dim, center, 7);
+        fx.emit(dim, "yeti:shockwave", fx.add(center, { x: 0, y: 0.15, z: 0 }), { radius: 20 });
+        fx.emit(dim, "yeti:rock_debris", fx.add(center, { x: 0, y: 0.4, z: 0 }), { variant: 1 });
+        for (const [r, n] of [[4, 8], [7, 14]]) {
+            for (let k = 0; k < n; k++) {
+                const a = (Math.PI * 2 * k) / n;
+                spikeFx(dim, fx.groundAt(dim, { x: center.x + Math.cos(a) * r, y: center.y, z: center.z + Math.sin(a) * r }), 1.4, 50);
+            }
+        }
+        for (let k = 0; k < 3; k++) {
+            const a = (Math.PI * 2 * k) / 3;
+            fx.emit(dim, "yeti:light_beam", { x: center.x + Math.cos(a) * 3, y: center.y + 6, z: center.z + Math.sin(a) * 3 }, { radius: 14 });
+        }
+        fx.flash(dim, center, 20, 0.1);
+        fx.shake(dim, center, 32, 1.0, 1.2);
+        fx.sound(dim, "random.explode", center, 3, 0.4);
+        fx.sound(dim, "random.glass", center, 3, 0.5);
+        fx.sound(dim, "mob.warden.sonic_boom", center, 2, 0.7);
+        for (const e of victims(dim, center, 7.5)) {
+            const d = fx.dist2D(e.location, center);
+            if (d > 7 || Math.abs(e.location.y - center.y) > 5) continue;
+            hurt(ctx, e, fx.lerp(byTier(ctx, [14, 16, 18]), 8, d / 7));
+            knock(e, fx.dirXZ(center, e.location), 2.2);
+            freeze(e, 80, 3);
+            fx.hitFx(dim, e.location);
+        }
+    });
+    return 126;
+}
+
 // ---------------------------------------------------------------- Dạng hấp hối (yeti_death)
 
 /** Đập hai nắm đấm xuống băng: sóng băng nhỏ quanh thân. */
@@ -1388,7 +1773,7 @@ export function lastStandPound(ctx) {
         fx.sound(dim, "random.explode", center, 1, 0.9);
         for (const p of victims(dim, center, radius)) {
             hurt(ctx, p, 5);
-            knock(p, fx.dirXZ(center, p.location), 1.4, 0.4);
+            knock(p, fx.dirXZ(center, p.location), 1.4);
             slow(p, 60, 2);
             fx.hitFx(dim, p.location);
         }

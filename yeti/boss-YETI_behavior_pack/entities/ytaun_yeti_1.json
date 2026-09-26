@@ -5,8 +5,7 @@
       "identifier": "ytaun:yeti_1",
       "is_spawnable": true,
       "is_summonable": true,
-      "is_experimental": false,
-      "runtime_identifier": "minecraft:iron_golem"
+      "is_experimental": false
     },
     "component_groups": {
       "minecraft:player_created": {
@@ -284,9 +283,6 @@
         "priority": 4,
         "speed_multiplier": 1
       },
-      "minecraft:behavior.offer_flower": {
-        "priority": 5
-      },
       "minecraft:behavior.random_stroll": {
         "priority": 6,
         "speed_multiplier": 0.6,
@@ -437,7 +433,7 @@
         "entities": {
           "max_wait_time": 1,
           "min_wait_time": 1,
-          "num_to_spawn": 10,
+          "num_to_spawn": 2,
           "should_leash": false,
           "single_use": true,
           "spawn_sound": "plop",

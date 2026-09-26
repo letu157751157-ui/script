@@ -68,6 +68,8 @@ function pounce(wolf, target) {
         fx.emit(dim, "yeti:frost_mist", fx.add(wolf.location, { x: 0, y: 0.5, z: 0 }));
         if (fx.dist(wolf.location, target.location) > 2.3) return;
         landed = true;
+        fx.emit(dim, "yeti:shockwave", fx.add(target.location, { x: 0, y: 0.15, z: 0 }), { radius: 2.5 });
+        fx.emit(dim, "yeti:snow_dust", target.location);
         hurt(wolf, target, 5);
         chill(target, 50, 2);
         fx.hitFx(dim, target.location);
@@ -102,6 +104,8 @@ function frostBolt(wraith, target) {
                     system.clearRun(handle);
                     fx.emit(dim, "yeti:ice_burst", pos);
                     fx.emit(dim, "yeti:ice_shard", pos);
+                    fx.emit(dim, "yeti:frost_ring", pos, { radius: 1.6 });
+                    fx.emit(dim, "yeti:frost_mist", pos);
                     fx.sound(dim, "random.glass", pos, 0.8, 1.5);
                     for (const e of hit) {
                         hurt(wraith, e, 4);
@@ -130,12 +134,18 @@ function groundSlam(golem, target) {
         if (!golem.isValid) return;
         const c = fx.groundAt(dim, golem.location);
         fx.iceImpact(dim, c, radius);
+        fx.emit(dim, "yeti:shockwave", fx.add(c, { x: 0, y: 0.15, z: 0 }), { radius: radius * 2 });
+        for (let i = 0; i < 8; i++) {
+            const a = (Math.PI * 2 * i) / 8;
+            fx.emit(dim, "yeti:ice_spike", fx.groundAt(dim, { x: c.x + Math.cos(a) * radius, y: c.y, z: c.z + Math.sin(a) * radius }),
+                { radius: 0.7, life: 1.3 });
+        }
         fx.shake(dim, c, 10, 0.35, 0.3);
         fx.sound(dim, "random.explode", c, 0.9, 1.1);
         for (const e of T.victims(dim, c, radius)) {
             if (Math.abs(e.location.y - c.y) > 2.5) continue;
             hurt(golem, e, 7);
-            try { e.applyKnockback({ x: fx.dirXZ(c, e.location).x * 1.4, z: fx.dirXZ(c, e.location).z * 1.4 }, 0.45); } catch (_) {}
+            try { e.applyKnockback({ x: fx.dirXZ(c, e.location).x * 1.4, z: fx.dirXZ(c, e.location).z * 1.4 }, 0); } catch (_) {}
             chill(e, 60, 2);
             fx.hitFx(dim, e.location);
         }
