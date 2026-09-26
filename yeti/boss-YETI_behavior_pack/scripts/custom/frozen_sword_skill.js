@@ -1,8 +1,10 @@
 import { world, system } from '@minecraft/server';
+import { FX, fx, groundAt } from './yeti_fx';
 
 // === FROZEN SWORD - PASSIVE SKILLS ===
 // Cầm 20s → Ice Aura
 // Khụy + cầm 4s → Ice Burst
+// v1.3: thêm particle băng mới (hào quang băng, sóng xung kích, mảnh băng)
 
 const FROZEN_SWORD_ID = "ytaun:frozen_sword";
 const HOLD_MS   = 20000; // 20 giây
@@ -39,6 +41,8 @@ function executeHoldAura(player) {
         spawnIceCircle(player, 1.5, 12, 'minecraft:snowflake_particle');
         spawnIceCircle(player, 1.0, 8,  'minecraft:ice_evaporation_particle');
         spawnIceCircle(player, 0.5, 6,  'minecraft:blue_flame_particle');
+        fx(player.dimension, FX.aura, player.location, { radius: 1.2 });
+        fx(player.dimension, FX.heal, player.location, { radius: 1 });
 
         player.addEffect('resistance',   500, { amplifier: 0, showParticles: false });
         player.addEffect('slow_falling', 200, { amplifier: 0, showParticles: false });
@@ -56,6 +60,10 @@ function executeIceBurst(player) {
         spawnIceCircle(player, 2.5, 20, 'minecraft:snowflake_particle');
         spawnIceCircle(player, 1.5, 12, 'minecraft:bleach');
         spawnIceCircle(player, 3.5, 16, 'minecraft:ice_evaporation_particle');
+        const ground = groundAt(player.dimension, player.location);
+        fx(player.dimension, FX.shockwave, ground, { radius: 4 });
+        fx(player.dimension, FX.shards, ground, { radius: 2 });
+        fx(player.dimension, FX.snow, ground, { radius: 2 });
 
         player.addEffect('speed',    100, { amplifier: 1, showParticles: true });
         player.addEffect('strength', 100, { amplifier: 0, showParticles: true });

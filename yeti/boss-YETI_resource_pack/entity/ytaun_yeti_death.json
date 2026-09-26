@@ -25,7 +25,9 @@
         "move": "animation.ytaun_yeti_death.new",
         "move_controller": "animation.ytaun_yeti_death.new",
         "arm_controller": "animation.ytaun_yeti_death.new",
-        "walk": "animation.ytaun_yeti_death.new"
+        "walk": "animation.ytaun_yeti_death.new",
+        "breathe": "animation.ytaun_yeti_death.breathe",
+        "pulse": "animation.ytaun_yeti_death.pulse"
       },
       "render_controllers": [
         "controller.render.iron_golem",
@@ -38,7 +40,8 @@
         "animate": [
           "look_at_target",
           "move_controller",
-          "arm_controller"
+          "arm_controller",
+          "breathe"
         ]
       },
       "spawn_egg": {

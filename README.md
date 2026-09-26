@@ -2,6 +2,7 @@
 
 - **Roblox**: hướng dẫn ngay bên dưới (thư mục `AatroxSword/`).
 - **Minecraft Bedrock (addon)**: xem [`bedrock/README.md`](bedrock/README.md).
+- **Boss Yeti (addon Minecraft Bedrock) v1.3**: xem [`yeti/README.md`](yeti/README.md).
 
 ## Roblox
 

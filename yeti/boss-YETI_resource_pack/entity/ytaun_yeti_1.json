@@ -25,7 +25,19 @@
         "move": "animation.ytaun_yeti_1.move",
         "move_controller": "controller.animation.ytaun_yeti_1.move",
         "arm_controller": "controller.animation.ytaun_yeti_1.arm_movement",
-        "walk": "animation.ytaun_yeti_1.walk"
+        "walk": "animation.ytaun_yeti_1.walk",
+        "skill_roar": "animation.ytaun_yeti.roar",
+        "skill_slam": "animation.ytaun_yeti.slam",
+        "skill_leap": "animation.ytaun_yeti.leap",
+        "skill_throw": "animation.ytaun_yeti.throw",
+        "skill_breath": "animation.ytaun_yeti.breath",
+        "skill_summon": "animation.ytaun_yeti.summon",
+        "skill_regen": "animation.ytaun_yeti.regen",
+        "skill_swipe": "animation.ytaun_yeti.swipe",
+        "skill_chest_beat": "animation.ytaun_yeti.chest_beat",
+        "skill_spin": "animation.ytaun_yeti.spin",
+        "skill_cast": "animation.ytaun_yeti.cast",
+        "skill_phase_intro": "animation.ytaun_yeti.phase_intro"
       },
       "render_controllers": [
         "controller.render.iron_golem",
