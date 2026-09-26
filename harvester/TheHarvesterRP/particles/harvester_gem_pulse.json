@@ -4,7 +4,7 @@
     "description": {
       "identifier": "harvester:gem_pulse",
       "basic_render_parameters": {
-        "material": "particles_add",
+        "material": "particles_blend",
         "texture": "textures/particle/harvester_particles"
       }
     },
@@ -21,20 +21,20 @@
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          "0.2 + 0.3 * v.particle_age / v.particle_lifetime",
-          "0.2 + 0.3 * v.particle_age / v.particle_lifetime"
+          "0.1 + 0.18 * v.particle_age / v.particle_lifetime",
+          "0.1 + 0.18 * v.particle_age / v.particle_lifetime"
         ],
-        "facing_camera_mode": "rotate_xyz",
+        "facing_camera_mode": "lookat_y",
         "uv": {
           "texture_width": 256,
           "texture_height": 256,
           "uv": [
-            0,
-            160
+            16,
+            176
           ],
           "uv_size": [
-            16,
-            16
+            8,
+            8
           ]
         }
       },
@@ -43,8 +43,8 @@
           "interpolant": "v.particle_age / v.particle_lifetime",
           "gradient": {
             "0.0": "#FFFFFFFF",
-            "0.4": "#FF7CFFD4",
-            "1.0": "#002FD6A8"
+            "0.7": "#FFFFFFFF",
+            "1.0": "#00FFFFFF"
           }
         }
       }

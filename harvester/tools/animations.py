@@ -38,7 +38,14 @@ PARTICLES = {
     "smoke": "harvester:black_smoke",
     "souls": "harvester:soul_burst",
     "wisp": "harvester:soul_wisp",
-    "dirt": "harvester:dirt_burst",
+    "ash": "harvester:ash_burst",
+    "flames": "harvester:soul_flames",
+    # soul fire that burns on the boss all the time (controller.animation.pa_harvester.soulfire)
+    "hem": "harvester:soulfire_hem",
+    "hem_big": "harvester:soulfire_hem_big",
+    "blade_fire": "harvester:soulfire_blade",
+    "hand_fire": "harvester:soulfire_hand",
+    "crown": "harvester:soulfire_crown",
 }
 
 ANIMS = {}
@@ -130,7 +137,7 @@ anim("skill_reap", 1.35, [
 ], particles=trail([0.62, 0.66, 0.7, 0.74, 0.78], locator="blade_tip", spins=[-60, -30, 0, 30, 60])
    + [(0.7, "ember", "blade_tip", "")])
 
-# Death's Step — sink into the cloak... TELEPORT 0.5 s
+# Ember Retreat (on hit) — sink into the cloak and burn away. TELEPORT 0.5 s
 anim("skill_vanish", 0.6, [
     (0.0, {}),
     (0.2, {"bone6": {"r": R(30, 0, 0)}, "bone7": {"r": R(25, 0, 0)}, "bone11": {"r": R(25, 0, 0)},
@@ -138,100 +145,109 @@ anim("skill_vanish", 0.6, [
     (0.5, {"bone6": {"r": R(40, 0, 0)}, "bone7": {"r": R(30, 0, 0)}, "bone11": {"r": R(30, 0, 0)},
            "bone28": {"r": R(25, 0, 0)}, "bone18": {"s": 0.04, "p": R(0, -6, 0)}}),
     (0.6, {"bone6": {"r": R(40, 0, 0)}, "bone18": {"s": 0.02, "p": R(0, -6, 0)}}),
-], particles=[(0.05, "smoke", "gem", ""), (0.45, "smoke", "feet", "")])
+], particles=[(0.05, "smoke", "gem", ""), (0.3, "flames", "feet", ""), (0.45, "smoke", "feet", "")])
 
-# ...and burst out behind the target with a rising slash. HIT 0.35 s after reappearing
-anim("skill_ambush", 0.95, [
-    (0.0, {"bone18": {"s": 0.05, "p": R(0, -6, 0)}, "bone6": {"r": R(35, 0, 0)}, "bone7": {"r": R(30, 0, 30)},
-           "bone2": {"r": R(20, 0, 0)}}),
-    (0.18, {"bone18": {"s": 1.05, "p": R(0, 1, 0)}, "bone6": {"r": R(20, 25, 0)}, "bone7": {"r": R(35, 20, 60)},
-            "bone2": {"r": R(35, 0, 20)}, "bone11": {"r": R(-30, 0, -20)}}),
-    (0.36, {"bone18": {"s": 1.0}, "bone6": {"r": R(-10, -30, 0)}, "bone7": {"r": R(-135, -40, 20)},
-            "bone2": {"r": R(-20, 0, 0)}, "bone11": {"r": R(10, 0, -20)}, "bone28": {"r": R(-12, 0, 0)}}),
-    (0.5, {"bone18": {"s": 1.0}, "bone6": {"r": R(-6, -32, 0)}, "bone7": {"r": R(-150, -45, 15)},
-           "bone2": {"r": R(-25, 0, 0)}, "bone11": {"r": R(12, 0, -18)}, "bone28": {"r": R(-10, 0, 0)}}),
-    (0.95, {"bone18": {"s": 1.0}}),
-], particles=[(0.02, "smoke", "feet", "")] + trail([0.26, 0.3, 0.34, 0.38], spins=[150, 120, 90, 60]))
-
-# Phantom Scythes — backhand throw of spectral scythes. HIT (release) 0.45 s
-anim("skill_throw", 1.1, [
+# Field of Souls — stab the scythe into the earth (soul wheat sprouts), then reap the field.
+# SPROUT 0.65 s, HARVEST 1.7 s
+_stab = {"bone7": {"r": R(-50, 12, 8)}, "bone2": {"r": R(55, 0, 0)}, "bone6": {"r": R(30, 0, 0)},
+         "bone28": {"r": R(18, 0, 0)}, "bone11": {"r": R(-10, 0, -55)}, "bone18": {"p": R(0, -2, 0)},
+         "bone": {"r": R(15, 0, 0)}}
+anim("skill_field", 2.4, [
     (0.0, {}),
-    (0.3, {"bone7": {"r": R(-70, -70, 0)}, "bone2": {"r": R(100, 0, 0)}, "bone6": {"r": R(-4, -30, 0)},
-           "bone11": {"r": R(-30, 0, -40)}, "bone28": {"r": R(0, 15, 0)}, "bone": {"r": R(0, 12, 0)}}),
-    (0.45, {"bone7": {"r": R(-70, 90, 0)}, "bone2": {"r": R(100, 0, 0)}, "bone6": {"r": R(8, 30, 0)},
-            "bone11": {"r": R(-10, 0, -60)}, "bone28": {"r": R(4, -10, 0)}, "bone": {"r": R(6, -15, 0)}}),
-    (0.6, {"bone7": {"r": R(-50, 110, 10)}, "bone2": {"r": R(95, 0, 0)}, "bone6": {"r": R(10, 36, 0)},
-           "bone11": {"r": R(-8, 0, -55)}, "bone28": {"r": R(5, -12, 0)}, "bone": {"r": R(8, -18, 0)}}),
-    (1.1, {}),
-], particles=trail([0.38, 0.43, 0.48], locator="blade_tip", spins=[-40, 0, 40]) + [(0.3, "gem", "gem", "")])
+    (0.45, {"bone7": {"r": R(-165, 0, 12)}, "bone2": {"r": R(0, 0, 0)}, "bone6": {"r": R(-10, 0, 0)},
+            "bone28": {"r": R(-16, 0, 0)}, "bone11": {"r": R(-20, 0, -65)}, "bone18": {"p": R(0, 2, 0)}}),
+    (0.65, _stab),
+    (1.25, {**_stab, "bone11": {"r": R(-100, 0, -30)}, "bone27": {"s": 1.6}}),
+    (1.55, {"bone6": {"r": R(-6, 36, 0)}, "bone7": {"r": R(-64, 110, 0)}, "bone2": {"r": R(100, 0, 0)},
+            "bone11": {"r": R(-50, 0, -24)}, "bone28": {"r": R(0, -24, 0)}, "bone": {"r": R(0, -18, 0)},
+            "bone18": {"p": R(0, -1.2, 0)}}),
+    (1.7, {"bone6": {"r": R(10, 0, 0)}, "bone7": {"r": R(-70, 15, 0)}, "bone2": {"r": R(100, 0, 0)},
+           "bone11": {"r": R(-10, 0, -30)}, "bone28": {"r": R(4, 0, 0)}, "bone": {"r": R(8, 10, 0)},
+           "bone18": {"p": R(0, 0.5, 0)}}),
+    (1.9, {"bone6": {"r": R(14, -38, 0)}, "bone7": {"r": R(-60, -65, 0)}, "bone2": {"r": R(100, 0, 0)},
+           "bone11": {"r": R(12, 0, -35)}, "bone28": {"r": R(6, 18, 0)}, "bone": {"r": R(10, 22, 0)}}),
+    (2.4, {}),
+], particles=[(0.65, "ash", "blade_tip", ""), (0.65, "flames", "blade_tip", ""), (1.25, "gem", "gem", "")]
+   + trail([1.62, 1.66, 1.7, 1.74, 1.78], locator="blade_tip", spins=[-60, -30, 0, 30, 60]))
 
-# Chains of the Damned — point at the target, then yank the chains. Bind 0.3 s, PULL 0.9 s
-anim("skill_chains", 1.5, [
+# Will-o'-the-Wisps — lift the lantern hand high, wisps gather, then send them. RELEASE 0.75 s
+anim("skill_wisps", 1.4, [
     (0.0, {}),
-    (0.3, {"bone11": {"r": R(-90, 0, -5)}, "bone6": {"r": R(5, 0, 0)}, "bone28": {"r": R(5, 0, 0)},
-           "bone7": {"r": R(10, 0, 15)}, "bone27": {"s": 1.4}}),
-    (0.75, {"bone11": {"r": R(-93, 0, -7)}, "bone6": {"r": R(6, 0, 0)}, "bone28": {"r": R(6, 0, 3)},
-            "bone7": {"r": R(12, 0, 16)}, "bone27": {"s": 1.6}}),
-    (0.9, {"bone11": {"r": R(-20, 0, -30)}, "bone6": {"r": R(-12, -20, 0)}, "bone28": {"r": R(-10, 0, 0)},
-           "bone7": {"r": R(15, 0, 20)}, "bone18": {"p": R(0, 1, 0)}, "bone27": {"s": 1.2}, "bone": {"r": R(-8, 0, 0)}}),
-    (1.1, {"bone11": {"r": R(-10, 0, -25)}, "bone6": {"r": R(-8, -15, 0)}, "bone28": {"r": R(-6, 0, 0)},
-           "bone7": {"r": R(12, 0, 18)}, "bone18": {"p": R(0, 0.5, 0)}, "bone": {"r": R(-5, 0, 0)}}),
-    (1.5, {}),
-], particles=[(0.3, "eye", "eyes", ""), (0.3, "gem", "gem", ""), (0.9, "ember", "hand_left", "")])
+    (0.35, {"bone11": {"r": R(-160, 0, -15)}, "bone6": {"r": R(-8, 0, 0)}, "bone28": {"r": R(-15, -10, 0)},
+            "bone7": {"r": R(10, 0, 12)}, "bone27": {"s": 1.5}, "bone18": {"p": R(0, 1.5, 0)}}),
+    (0.55, {"bone11": {"r": R(-165, 0, -18)}, "bone6": {"r": R(-9, 0, 0)}, "bone28": {"r": R(-16, -10, 0)},
+            "bone7": {"r": R(10, 0, 12)}, "bone27": {"s": 1.8}, "bone18": {"p": R(0, 1.8, 0)}}),
+    (0.75, {"bone11": {"r": R(-95, -15, -10)}, "bone6": {"r": R(10, -10, 0)}, "bone28": {"r": R(5, 0, 0)},
+            "bone7": {"r": R(12, 0, 14)}, "bone27": {"s": 1.3}}),
+    (1.4, {}),
+], particles=[(0.35, "gem", "gem", ""), (0.35, "eye", "eyes", ""), (0.55, "flames", "hand_left", "")])
 
-# Hands of the Underworld — raise both arms, slam them down. SLAM 0.8 s
-anim("skill_hands", 1.8, [
+# Candles of the Dead — palms up low, then lift them: candles light around the target. LIGHT 0.7 s
+_candles_up = {"bone7": {"r": R(-40, 0, 80)}, "bone11": {"r": R(-40, 0, -80)}, "bone6": {"r": R(-10, 0, 0)},
+               "bone28": {"r": R(-20, 0, 0)}, "bone18": {"p": R(0, 2, 0)}, "bone27": {"s": 1.7},
+               "bone2": {"r": R(0, 0, 30)}}
+anim("skill_candles", 1.6, [
     (0.0, {}),
-    (0.5, {"bone7": {"r": R(-150, 0, 30)}, "bone11": {"r": R(-150, 0, -30)}, "bone6": {"r": R(-12, 0, 0)},
-           "bone28": {"r": R(-25, 0, 0)}, "bone18": {"p": R(0, 3, 0)}, "bone27": {"s": 1.8}, "bone": {"r": R(-10, 0, 0)}}),
-    (0.8, {"bone7": {"r": R(-40, 0, 20)}, "bone11": {"r": R(-40, 0, -20)}, "bone2": {"r": R(-30, 0, 0)},
+    (0.4, {"bone7": {"r": R(-10, 0, 45)}, "bone11": {"r": R(-10, 0, -45)}, "bone6": {"r": R(12, 0, 0)},
+           "bone28": {"r": R(20, 0, 0)}, "bone18": {"p": R(0, -1, 0)}, "bone2": {"r": R(20, 0, 0)}}),
+    (0.7, _candles_up),
+    (1.05, {**_candles_up, "bone18": {"p": R(0, 2.4, 0)}, "bone27": {"s": 1.5}}),
+    (1.6, {}),
+], particles=[(0.7, "flames", "hand_left", ""), (0.7, "flames", "hand_right", ""), (0.7, "gem", "gem", "")])
+
+# Plague Pyre — point at the infected, hold, then clench the fist overhead. IGNITE 1.5 s
+anim("skill_pyre", 1.9, [
+    (0.0, {}),
+    (0.3, {"bone11": {"r": R(-95, -10, -8)}, "bone6": {"r": R(8, 12, 0)}, "bone28": {"r": R(6, -8, 0)},
+           "bone7": {"r": R(15, 0, 18)}}),
+    (1.1, {"bone11": {"r": R(-98, -12, -10)}, "bone6": {"r": R(9, 13, 0)}, "bone28": {"r": R(8, -8, 3)},
+           "bone7": {"r": R(15, 0, 18)}, "bone27": {"s": 1.5}}),
+    (1.45, {"bone11": {"r": R(-165, 0, -20)}, "bone6": {"r": R(-12, -10, 0)}, "bone28": {"r": R(-18, 0, 0)},
+            "bone7": {"r": R(10, 0, 25)}, "bone18": {"p": R(0, 1.5, 0)}, "bone27": {"s": 2.0}}),
+    (1.9, {}),
+], particles=[(0.3, "eye", "eyes", ""), (0.3, "flames", "hand_left", ""), (1.45, "flames", "hand_left", ""),
+              (1.45, "gem", "gem", "")])
+
+# Footsteps of the Dead — bow and trace the ground with the left hand, then snap upright.
+# The footprints start recording at 0.8 s
+anim("skill_trail", 1.2, [
+    (0.0, {}),
+    (0.3, {"bone6": {"r": R(30, 10, 0)}, "bone11": {"r": R(-40, 30, -20)}, "bone28": {"r": R(20, 0, 0)},
+           "bone7": {"r": R(20, 0, 10)}, "bone18": {"p": R(0, -1.5, 0)}}),
+    (0.6, {"bone6": {"r": R(28, -15, 0)}, "bone11": {"r": R(-40, -40, -30)}, "bone28": {"r": R(20, -10, 0)},
+           "bone7": {"r": R(20, 0, 10)}, "bone18": {"p": R(0, -1.5, 0)}}),
+    (0.8, {"bone6": {"r": R(-8, 0, 0)}, "bone11": {"r": R(-120, 0, -30)}, "bone28": {"r": R(-15, 0, 0)},
+           "bone7": {"r": R(5, 0, 15)}, "bone27": {"s": 1.6}, "bone18": {"p": R(0, 1, 0)}}),
+    (1.2, {}),
+], particles=[(0.3, "ash", "hand_left", ""), (0.6, "ash", "hand_left", ""), (0.8, "flames", "hand_left", ""),
+              (0.8, "eye", "eyes", "")])
+
+# Buried Alive — point at the grave, raise both hands, slam the lid shut. LID 1.0 s
+anim("skill_coffin", 1.5, [
+    (0.0, {}),
+    (0.3, {"bone11": {"r": R(-92, 0, -6)}, "bone6": {"r": R(5, 0, 0)}, "bone7": {"r": R(10, 0, 15)},
+           "bone28": {"r": R(4, 0, 0)}}),
+    (0.75, {"bone7": {"r": R(-150, 0, 30)}, "bone11": {"r": R(-150, 0, -30)}, "bone6": {"r": R(-12, 0, 0)},
+            "bone28": {"r": R(-25, 0, 0)}, "bone18": {"p": R(0, 3, 0)}, "bone27": {"s": 1.8}}),
+    (1.0, {"bone7": {"r": R(-40, 0, 20)}, "bone11": {"r": R(-40, 0, -20)}, "bone2": {"r": R(-30, 0, 0)},
            "bone6": {"r": R(30, 0, 0)}, "bone28": {"r": R(15, 0, 0)}, "bone18": {"p": R(0, -2, 0)},
-           "bone27": {"s": 1.2}, "bone": {"r": R(15, 0, 0)}}),
-    (1.3, {"bone7": {"r": R(-35, 0, 20)}, "bone11": {"r": R(-35, 0, -20)}, "bone2": {"r": R(-25, 0, 0)},
-           "bone6": {"r": R(25, 0, 0)}, "bone28": {"r": R(10, 0, 0)}, "bone18": {"p": R(0, -1.5, 0)},
-           "bone27": {"s": 1.1}, "bone": {"r": R(12, 0, 0)}}),
-    (1.8, {}),
-], particles=[(0.5, "gem", "gem", ""), (0.8, "dirt", "feet", ""), (0.8, "smoke", "feet", "")])
-
-# Soul Rend — claw lunges at the target, then rips the soul out. RIP 0.8 s
-anim("skill_rend", 1.5, [
-    (0.0, {}),
-    (0.35, {"bone11": {"r": R(-95, -10, -10)}, "bone6": {"r": R(15, 15, 0)}, "bone28": {"r": R(10, -10, 0)},
-            "bone7": {"r": R(20, 0, 20)}, "bone": {"r": R(10, 0, 0)}}),
-    (0.6, {"bone11": {"r": R(-98, -12, -12)}, "bone6": {"r": R(16, 16, 0)}, "bone28": {"r": R(12, -10, 4)},
-           "bone7": {"r": R(20, 0, 20)}, "bone": {"r": R(10, 0, 0)}}),
-    (0.8, {"bone11": {"r": R(-40, 30, -50)}, "bone6": {"r": R(-15, -25, 0)}, "bone28": {"r": R(-20, 15, 0)},
-           "bone7": {"r": R(10, 0, 25)}, "bone18": {"p": R(0, 1.5, 0)}, "bone27": {"s": 1.8}, "bone": {"r": R(-10, 0, 0)}}),
-    (1.0, {"bone11": {"r": R(-30, 30, -55)}, "bone6": {"r": R(-12, -22, 0)}, "bone28": {"r": R(-15, 12, 0)},
-           "bone7": {"r": R(10, 0, 22)}, "bone18": {"p": R(0, 1, 0)}, "bone27": {"s": 1.4}, "bone": {"r": R(-8, 0, 0)}}),
+           "bone": {"r": R(15, 0, 0)}, "bone27": {"s": 1.2}}),
     (1.5, {}),
-], particles=[(0.35, "eye", "eyes", ""), (0.8, "souls", "hand_left", ""), (0.8, "gem", "gem", "")])
+], particles=[(0.75, "gem", "gem", ""), (1.0, "ash", "feet", ""), (1.0, "smoke", "feet", "")])
 
-# Shadow Reapers — raise the scythe to call four phantom reapers, point it at the target. Reapers 0.4 s
-anim("skill_reapers", 1.8, [
+# Danse Macabre — raise the scythe like a baton and waltz while the dancers circle. DANCERS 0.4 s
+anim("skill_danse", 2.2, [
     (0.0, {}),
-    (0.4, {"bone7": {"r": R(-160, 0, 10)}, "bone11": {"r": R(-30, 0, -50)}, "bone6": {"r": R(-10, 0, 0)},
-           "bone28": {"r": R(-20, 0, 0)}, "bone18": {"p": R(0, 2, 0)}, "bone27": {"s": 1.6}}),
-    (0.8, {"bone7": {"r": R(-90, -10, 0)}, "bone2": {"r": R(100, 0, 0)}, "bone11": {"r": R(-20, 0, -40)},
-           "bone6": {"r": R(5, -10, 0)}, "bone28": {"r": R(5, 5, 0)}, "bone27": {"s": 1.3}}),
-    (1.4, {"bone7": {"r": R(-87, -10, 0)}, "bone2": {"r": R(100, 0, 0)}, "bone11": {"r": R(-18, 0, -40)},
-           "bone6": {"r": R(4, -10, 0)}, "bone28": {"r": R(4, 5, 3)}, "bone27": {"s": 1.5}}),
-    (1.8, {}),
-], particles=[(0.4, "gem", "gem", ""), (0.4, "eye", "eyes", ""), (0.4, "smoke", "feet", ""), (0.8, "eye", "eyes", "")])
-
-# Graves of the Plagued — raise the scythe, stab it into the ground. HIT 0.9 s (graves)
-anim("skill_summon", 1.8, [
-    (0.0, {}),
-    (0.6, {"bone7": {"r": R(-165, 0, 12)}, "bone2": {"r": R(0, 0, 0)}, "bone6": {"r": R(-10, 0, 0)},
-           "bone28": {"r": R(-16, 0, 0)}, "bone11": {"r": R(-20, 0, -65)}, "bone18": {"p": R(0, 2, 0)}}),
-    (0.9, {"bone7": {"r": R(-50, 12, 8)}, "bone2": {"r": R(55, 0, 0)}, "bone6": {"r": R(30, 0, 0)},
-           "bone28": {"r": R(18, 0, 0)}, "bone11": {"r": R(-10, 0, -55)}, "bone18": {"p": R(0, -2, 0)},
-           "bone": {"r": R(15, 0, 0)}}),
-    (1.35, {"bone7": {"r": R(-48, 12, 8)}, "bone2": {"r": R(55, 0, 0)}, "bone6": {"r": R(28, 0, 0)},
-            "bone28": {"r": R(10, 0, 0)}, "bone11": {"r": R(-45, 0, -40)}, "bone18": {"p": R(0, -2, 0)},
-            "bone": {"r": R(12, 0, 0)}}),
-    (1.8, {}),
-], particles=trail([0.78, 0.84]) + [(0.9, "dirt", "blade_tip", ""), (0.9, "souls", "blade_tip", "")])
+    (0.4, {"bone7": {"r": R(-160, 0, 10)}, "bone11": {"r": R(-30, 0, -70)}, "bone6": {"r": R(-8, 0, 0)},
+           "bone28": {"r": R(-15, 0, 0)}, "bone18": {"p": R(0, 2, 0)}, "bone27": {"s": 1.6}}),
+    (0.8, {"bone": {"r": R(0, 35, 0)}, "bone6": {"r": R(-6, 25, 5)}, "bone7": {"r": R(-150, 0, 25)},
+           "bone11": {"r": R(-40, 0, -80)}, "bone28": {"r": R(-10, 20, 0)}, "bone18": {"p": R(0, 3, 0)}}),
+    (1.2, {"bone": {"r": R(0, -35, 0)}, "bone6": {"r": R(-6, -25, -5)}, "bone7": {"r": R(-150, 0, 5)},
+           "bone11": {"r": R(-40, 0, -60)}, "bone28": {"r": R(-10, -20, 0)}, "bone18": {"p": R(0, 2, 0)}}),
+    (1.6, {"bone": {"r": R(0, 30, 0)}, "bone6": {"r": R(-6, 20, 5)}, "bone7": {"r": R(-155, 0, 20)},
+           "bone11": {"r": R(-40, 0, -75)}, "bone28": {"r": R(-10, 15, 0)}, "bone18": {"p": R(0, 3, 0)}}),
+    (2.2, {}),
+], particles=[(0.4, "gem", "gem", ""), (0.4, "eye", "eyes", ""), (0.4, "flames", "blade", "")])
 
 # Death Sentence — point the scythe at the condemned. Marks at 0.4 s
 anim("skill_sentence", 1.5, [
@@ -312,7 +328,7 @@ anim("spawn", 2.6, [
             "bone11": {"r": R(-30, 0, -55)}, "bone28": {"r": R(-22, 0, 0)}, "bone27": {"s": 1.8},
             "bone": {"r": R(-12, 0, 0)}}),
     (2.6, {}),
-], particles=[(0.0, "dirt", "feet", ""), (0.5, "dirt", "feet", ""), (1.85, "souls", "gem", "")])
+], particles=[(0.0, "ash", "feet", ""), (0.5, "flames", "feet", ""), (1.85, "souls", "gem", "")])
 
 anim("death", 1.0, [
     (0.0, {}),
@@ -451,6 +467,38 @@ def controllers_json():
                     },
                 },
             },
+            # blue soul fire that never stops burning: robe hem and scythe from the start,
+            # the hands join in phase 2 (<= 60% health), a burning crown and a bigger blaze in phase 3 (<= 30%)
+            "controller.animation.pa_harvester.soulfire": {
+                "states": {
+                    "default": {
+                        "particle_effects": [{"effect": "hem", "locator": "feet"},
+                                             {"effect": "blade_fire", "locator": "blade"}],
+                        "transitions": [{"dead": "!query.is_alive"},
+                                        {"phase2": "query.max_health > 0 && query.health <= query.max_health * 0.6"}],
+                    },
+                    "phase2": {
+                        "particle_effects": [{"effect": "hem", "locator": "feet"},
+                                             {"effect": "blade_fire", "locator": "blade"},
+                                             {"effect": "hand_fire", "locator": "hand_left"},
+                                             {"effect": "hand_fire", "locator": "hand_right"}],
+                        "transitions": [{"dead": "!query.is_alive"},
+                                        {"phase3": "query.health <= query.max_health * 0.3"},
+                                        {"default": "query.health > query.max_health * 0.6"}],
+                    },
+                    "phase3": {
+                        "particle_effects": [{"effect": "hem_big", "locator": "feet"},
+                                             {"effect": "blade_fire", "locator": "blade"},
+                                             {"effect": "blade_fire", "locator": "blade_tip"},
+                                             {"effect": "hand_fire", "locator": "hand_left"},
+                                             {"effect": "hand_fire", "locator": "hand_right"},
+                                             {"effect": "crown", "locator": "eyes"}],
+                        "transitions": [{"dead": "!query.is_alive"},
+                                        {"phase2": "query.health > query.max_health * 0.3"}],
+                    },
+                    "dead": {},
+                },
+            },
             "controller.animation.pa_harvester.look": {
                 "states": {
                     "default": {
@@ -473,6 +521,7 @@ CLIENT_ANIMATIONS = {
     "base_controller": "controller.animation.pa_harvester.base",
     "attack_controller": "controller.animation.pa_harvester.attack",
     "look_controller": "controller.animation.pa_harvester.look",
+    "soulfire_controller": "controller.animation.pa_harvester.soulfire",
 }
 
 
@@ -482,7 +531,7 @@ def update_client_entity(path):
     desc = data["minecraft:client_entity"]["description"]
     desc["animations"] = CLIENT_ANIMATIONS
     desc["particle_effects"] = PARTICLES
-    desc["scripts"] = {"animate": ["base_controller", "attack_controller", "look_controller"]}
+    desc["scripts"] = {"animate": ["base_controller", "attack_controller", "look_controller", "soulfire_controller"]}
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
         f.write("\n")

@@ -2,12 +2,13 @@
 //  THE HARVESTER — Reaper x Plague Doctor boss
 // ----------------------------------------------------------------------------
 //  Phase 1 (100% → 60%)  "Doctor of the Dead"
-//     Reaping Arc, Phantom Scythes, Death's Step, Chains of the Damned
-//  Phase 2 (60% → 30%)   "Epidemic"      + Hands of the Underworld, Soul Rend,
-//                                          Graves of the Plagued, Plague Aura (passive)
-//  Phase 3 (below 30%)   "Final Harvest" + Death Sentence, Shadow Reapers,
+//     Reaping Arc, Field of Souls, Will-o'-the-Wisps, Candles of the Dead
+//  Phase 2 (60% → 30%)   "Epidemic"      + Plague Pyre, Footsteps of the Dead, Buried Alive,
+//                                          Plague Aura (passive)
+//  Phase 3 (below 30%)   "Final Harvest" + Death Sentence, Danse Macabre,
 //                                          The Black Death, Final Harvest (ultimate)
-//
+//  Soul fire is the Harvester's element: it burns on him all the time (resource pack),
+//  and most skills leave burning ground behind.
 //  The boss aims its skills at whatever it is fighting (its current target), and
 //  its skills hurt that target even when it is a mob (iron golem, another boss...).
 //  Plague stacks: most skills infect. At 5 stacks the victim bursts.
@@ -19,7 +20,6 @@
 import { world, system, MolangVariableMap } from "@minecraft/server";
 
 const BOSS_ID = "pa:harvester";
-const THRALL_TAG = "harvester_thrall";
 const DIMENSIONS = ["overworld", "nether", "the_end"];
 const NOT_FOES = new Set([BOSS_ID, "minecraft:item", "minecraft:xp_orb", "minecraft:armor_stand",
     "minecraft:arrow", "minecraft:wither_skull", "minecraft:wither_skull_dangerous", "minecraft:painting"]);
@@ -36,18 +36,17 @@ const CONFIG = {
     castGap: [40, 30, 22, 14],
     cooldownScale: [1, 0.85, 0.7, 0.5],
     damageScale: [1.15, 1.25, 1.4, 1.6],
-    maxThralls: 8,
     plague: { max: 5, fadeAfter: 120, fadeEvery: 60, popDamage: 6 },
     skills: {
         reap:       { phase: 1, cd: 120, weight: 4, min: 0, max: 7,  lock: 27 },
-        scythes:    { phase: 1, cd: 180, weight: 3, min: 4, max: 20, lock: 22 },
-        step:       { phase: 1, cd: 220, weight: 2, min: 6, max: 24, lock: 30 },
-        chains:     { phase: 1, cd: 240, weight: 3, min: 3, max: 16, lock: 30 },
-        hands:      { phase: 2, cd: 300, weight: 3, min: 0, max: 18, lock: 36 },
-        rend:       { phase: 2, cd: 360, weight: 2, min: 0, max: 10, lock: 30 },
-        graves:     { phase: 2, cd: 480, weight: 1, min: 0, max: 30, lock: 36 },
+        field:      { phase: 1, cd: 300, weight: 3, min: 0, max: 18, lock: 46 },
+        wisps:      { phase: 1, cd: 260, weight: 3, min: 3, max: 24, lock: 26 },
+        candles:    { phase: 1, cd: 420, weight: 2, min: 0, max: 20, lock: 30 },
+        pyre:       { phase: 2, cd: 320, weight: 3, min: 0, max: 20, lock: 36 },
+        trail:      { phase: 2, cd: 420, weight: 2, min: 0, max: 20, lock: 22 },
+        coffin:     { phase: 2, cd: 280, weight: 3, min: 2, max: 16, lock: 28 },
         sentence:   { phase: 3, cd: 500, weight: 2, min: 0, max: 24, lock: 30 },
-        reapers:    { phase: 3, cd: 420, weight: 3, min: 0, max: 20, lock: 36 },
+        danse:      { phase: 3, cd: 460, weight: 3, min: 0, max: 18, lock: 44 },
         blackdeath: { phase: 3, cd: 640, weight: 2, min: 0, max: 18, lock: 86 },
         ultimate:   { phase: 3, cd: 800, weight: 3, min: 0, max: 14, lock: 68 }
     }
@@ -60,13 +59,13 @@ const P = {
     stream: "harvester:soul_stream",
     pillar: "harvester:soul_pillar",
     flames: "harvester:soul_flames",
+    firePatch: "harvester:fire_patch",
+    column: "harvester:fire_column",
     ember: "harvester:ember",
+    eyeGlow: "harvester:eye_glow",
     trail: "harvester:scythe_trail",
     trailBig: "harvester:scythe_trail_big",
     spectral: "harvester:spectral_scythe",
-    phantom: "harvester:phantom_scythe",
-    xslash: "harvester:x_slash",
-    reaper: "harvester:phantom_reaper",
     miasma: "harvester:miasma",
     deathField: "harvester:blackdeath_field",
     smoke: "harvester:black_smoke",
@@ -74,30 +73,30 @@ const P = {
     rain: "harvester:black_rain",
     drip: "harvester:plague_drip",
     splash: "harvester:plague_splash",
+    ash: "harvester:ash_burst",
     warn: "harvester:ground_warn",
     ringWarn: "harvester:ring_warn",
     runes: "harvester:rune_circle",
     shockwave: "harvester:shockwave",
-    crack: "harvester:ground_crack",
-    void: "harvester:void_rift",
     skull: "harvester:skull_sigil",
     mark: "harvester:death_mark",
     pips: "harvester:plague_pips",
     hourglass: "harvester:hourglass",
     beak: "harvester:beak_sigil",
-    grave: "harvester:grave_rise",
-    hand: "harvester:bone_hand",
-    dirt: "harvester:dirt_burst",
     lantern: "harvester:lantern",
-    chain: "harvester:chain_link",
-    chainRise: "harvester:chain_rise"
+    wheat: "harvester:soul_wheat",
+    wheatBurst: "harvester:wheat_burst",
+    candle: "harvester:candle",
+    willo: "harvester:will_o_wisp",
+    footprint: "harvester:footprint",
+    coffin: "harvester:coffin",
+    dancer: "harvester:dancer"
 };
 
 // telegraph colours (r, g, b in 0..1)
-const TEAL = [0.35, 1, 0.8];
+const SOUL = [0.45, 0.72, 1];
 const PLAGUE = [0.62, 0.85, 0.22];
 const BLOOD = [1, 0.18, 0.2];
-const VIOLET = [0.62, 0.4, 1];
 
 const bosses = new Map();   // boss id -> state
 const plague = new Map();   // entity id -> { stacks, lastGain }
@@ -152,19 +151,6 @@ function fly(dim, id, from, to, life, extra = {}) {
     fx(dim, id, from, { dir_x: d.x / len, dir_y: d.y / len, dir_z: d.z / len, speed: len / life, life, ...extra });
 }
 
-function chainLine(dim, from, to, spacing = 0.9) {
-    const len = dist3(from, to);
-    const steps = Math.floor(len / spacing);
-    for (let i = 1; i < steps; i++) fx(dim, P.chain, lerp(from, to, i / steps));
-}
-
-function groundLine(dim, from, to, ticks, c, spacing = 1.1) {
-    const len = flatDist(from, to);
-    const steps = Math.max(1, Math.floor(len / spacing));
-    const vars = color(c, { life: ticks / 20 });
-    for (let i = 0; i <= steps; i++) fx(dim, P.warn, up(lerp(from, to, i / steps), 0.06), vars);
-}
-
 function sound(dim, id, loc, pitch = 1, volume = 1) {
     try { dim.playSound(id, loc, { pitch, volume }); } catch {}
 }
@@ -210,12 +196,11 @@ function tier(s) { return s.enraged ? 3 : s.phase - 1; }
 
 // ─── targets ────────────────────────────────────────────────────────────────
 
-// Something the boss can fight: a living entity that is not itself, its thralls or an object
+// Something the boss can fight: a living entity that is not itself or an object
 function canFight(boss, e) {
     if (!alive(e) || NOT_FOES.has(e.typeId) || e.id === boss.id) return false;
     try {
         if (e.dimension.id !== boss.dimension.id) return false;
-        if (e.hasTag(THRALL_TAG)) return false;
     } catch { return false; }
     if (e.typeId === "minecraft:player" && isSpectator(e)) return false;
     return (health(e)?.currentValue ?? 0) > 0;
@@ -269,7 +254,7 @@ function victims(boss, center, radius) {
     return list;
 }
 
-// the boss's target leads single-target picks (Death Sentence marks, grave anchors)
+// the boss's target leads single-target picks (Death Sentence marks, footprints)
 function targetFirst(target, list) {
     const i = list.findIndex((e) => e.id === target?.id);
     return i > 0 ? [list[i], ...list.slice(0, i), ...list.slice(i + 1)] : list;
@@ -327,12 +312,6 @@ function inCone(origin, dir, e, radius, halfAngle, height = 3.5) {
     return to.x * dir.x + to.z * dir.z >= Math.cos(halfAngle * Math.PI / 180);
 }
 
-// distance on the ground from `e` to the infinite line through `a` with direction `dir`
-function lineDist(a, dir, e) {
-    const dx = e.location.x - a.x, dz = e.location.z - a.z;
-    return Math.abs(dx * dir.z - dz * dir.x);
-}
-
 // ─── plague stacks ──────────────────────────────────────────────────────────
 
 function addPlague(boss, e, amount = 1) {
@@ -361,9 +340,36 @@ function plagueBurst(boss, e) {
 
 function stacksOf(e) { return plague.get(e.id)?.stacks ?? 0; }
 
+// ─── burning ground ─────────────────────────────────────────────────────────
+
+// Soul fire left on the ground: every 10 ticks for `ticks`, whatever stands within `radius` of any of
+// the points burns for `dmg` (fire damage, so Fire Resistance protects). One pulse per victim even
+// where patches overlap. The first burn also gives 1 plague when `plagueOnce` is set.
+function burnPoints(boss, points, radius, ticks, dmg, plagueOnce = false) {
+    if (!points.length) return;
+    const dim = boss.dimension;
+    const c = points.reduce((acc, p) => ({ x: acc.x + p.x / points.length, y: acc.y + p.y / points.length, z: acc.z + p.z / points.length }), { x: 0, y: 0, z: 0 });
+    const reach = Math.max(...points.map((p) => flatDist(c, p))) + radius + 1;
+    const infected = new Set();
+    for (let t = 10; t <= ticks; t += 10) {
+        later(t, () => {
+            if (!alive(boss)) return;
+            for (const e of victims(boss, c, reach)) {
+                if (!points.some((p) => flatDist(p, e.location) <= radius && Math.abs(e.location.y - p.y) < 2)) continue;
+                hurt(boss, e, dmg, "fire");
+                if (plagueOnce && !infected.has(e.id)) {
+                    infected.add(e.id);
+                    addPlague(boss, e, 1);
+                }
+            }
+        });
+    }
+}
+
 // ─── skills: phase 1 ────────────────────────────────────────────────────────
 
 // Reaping Arc: cone telegraph, then a low scythe sweep from right to left. Hit at tick 13.
+// The swept ground catches soul fire and burns for 3 s.
 function castReap(boss, s, target) {
     const dim = boss.dimension;
     face(boss, target);
@@ -371,12 +377,13 @@ function castReap(boss, s, target) {
     const origin = { ...boss.location };
     const dir = flatDir(origin, target.location);
     const radius = s.phase >= 3 ? 7.5 : 6.5;
-    telegraphCone(dim, origin, dir, radius, 62, 13, TEAL);
+    telegraphCone(dim, origin, dir, radius, 62, 13, SOUL);
     sound(dim, "mob.evocation_illager.prepare_attack", origin, 0.6);
 
     later(13, () => {
         if (!alive(boss)) return;
         sound(dim, "mob.wither.shoot", origin, 0.7);
+        sound(dim, "mob.ghast.fireball", origin, 0.8, 0.6);
         for (let k = 0; k < 5; k++) {
             later(1 + k, () => {
                 // from his right (+angle) across to his left (-angle), like the animation
@@ -385,7 +392,6 @@ function castReap(boss, s, target) {
                 }
             });
         }
-        fx(dim, P.crack, up(add(origin, dir, 3), 0.05), { radius: 2.2, life: 1.6 });
         for (const e of victims(boss, origin, radius + 1)) {
             if (!inCone(origin, dir, e, radius, 64)) continue;
             hurt(boss, e, 10);
@@ -393,298 +399,298 @@ function castReap(boss, s, target) {
             addPlague(boss, e, 1);
             fx(dim, P.ember, up(e.location, 1));
         }
+        // the crescent of burning ground
+        const burning = [];
+        for (const [a, r] of [[-45, 0.5], [-15, 0.5], [15, 0.5], [45, 0.5], [-30, 0.82], [0, 0.82], [30, 0.82]]) {
+            const p = add(origin, rotateY(dir, a), radius * r);
+            burning.push(p);
+            fx(dim, P.firePatch, up(p, 0.05), { radius: 1.1, duration: 3 });
+        }
+        burnPoints(boss, burning, 1.3, 60, 1.5);
     });
 }
 
-// Phantom Scythes: spectral scythes thrown in a fan (3/4/5), they fly out and come back
-// like boomerangs, cutting on the way out and on the way back. Release at tick 9.
-function castScythes(boss, s, target) {
+// Field of Souls: the scythe is stabbed into the earth and rows of soul wheat sprout around the
+// target, every other furrow left bare. Then the Harvester reaps the field: every planted row bursts
+// into soul fire. Stand in a bare furrow. Sprout at tick 13, harvest at tick 34.
+function castField(boss, s, target) {
     const dim = boss.dimension;
     face(boss, target);
-    play(boss, "skill_throw");
-    const count = s.phase + 2;
-    const base = flatDir(boss.location, target.location);
-    const reach = Math.min(18, Math.max(7, flatDist(boss.location, target.location) + 3));
-    const paths = [];
-    for (let i = 0; i < count; i++) {
-        const dir = rotateY(base, (i - (count - 1) / 2) * 16);
-        const start = up(boss.location, 1.6);
-        const out = { x: start.x + dir.x * reach, y: target.location.y + 1, z: start.z + dir.z * reach };
-        paths.push({ start, out });
-        groundLine(dim, boss.location, add(boss.location, dir, reach), 9, TEAL);
-    }
-    sound(dim, "mob.evocation_illager.prepare_attack", boss.location, 0.9);
-    const OUT = 12, BACK = 12;
-    later(9, () => {
+    play(boss, "skill_field");
+    const center = { ...target.location };
+    const along = flatDir(boss.location, center);
+    const across = rightOf(along);
+    const half = s.phase >= 3 ? 7 : 6;
+    const lane = 1.6; // planted and bare furrows alternate
+    const rows = [];
+    for (let k = -4; k <= 4; k += 2) rows.push(k * lane); // the target's own furrow is always planted
+    sound(dim, "mob.evocation_illager.prepare_attack", boss.location, 0.6);
+    later(13, () => {
         if (!alive(boss)) return;
-        sound(dim, "item.trident.throw", boss.location, 0.6);
-        sound(dim, "mob.phantom.swoop", boss.location, 0.8);
-        for (const { start, out } of paths) {
-            fly(dim, P.phantom, start, out, OUT / 20);
-            const hitOut = new Set();
-            for (let k = 2; k <= OUT; k += 2) {
-                later(k, () => {
-                    const pos = lerp(start, out, k / OUT);
-                    fx(dim, P.wisp, pos);
-                    for (const e of victims(boss, pos, 1.6)) {
-                        if (hitOut.has(e.id) || dist3(pos, chest(e)) > 1.7) continue;
-                        hitOut.add(e.id);
-                        hurt(boss, e, 6);
-                        effect(e, "slowness", 30, 1);
-                        addPlague(boss, e, 1);
-                    }
-                });
+        sound(dim, "dig.grass", center, 0.6);
+        sound(dim, "block.sweet_berry_bush.place", center, 0.7);
+        for (const off of rows) {
+            for (let a = -half; a <= half + 0.01; a += 1.2) {
+                fx(dim, P.wheat, up(add(add(center, across, off), along, a), 0.02), { life: 1.15 });
             }
-            // the way back, toward wherever the boss stands now
-            later(OUT, () => {
-                if (!alive(boss)) return;
-                const home = chest(boss);
-                fly(dim, P.phantom, out, home, BACK / 20);
-                sound(dim, "mob.phantom.swoop", out, 1.2);
-                const hitBack = new Set();
-                for (let k = 2; k <= BACK; k += 2) {
-                    later(k, () => {
-                        const pos = lerp(out, home, k / BACK);
-                        for (const e of victims(boss, pos, 1.6)) {
-                            if (hitBack.has(e.id) || dist3(pos, chest(e)) > 1.7) continue;
-                            hitBack.add(e.id);
-                            hurt(boss, e, 6);
-                        }
-                    });
-                }
-            });
         }
     });
-}
-
-// Death's Step: skull under the target, vanish, reappear behind them and slash.
-// Teleport at tick 10, slash at tick 17.
-function castDeathStep(boss, s, target) {
-    const dim = boss.dimension;
-    play(boss, "skill_vanish", 0.05);
-    fx(dim, P.smoke, up(boss.location, 1.5));
-    fx(dim, P.skull, up(target.location, 0.07), { life: 0.9 });
-    sound(dim, "mob.endermen.portal", boss.location, 0.6);
-    later(10, () => {
-        if (!alive(boss) || !alive(target)) return;
-        let behind;
-        try { behind = flatDir({ x: 0, y: 0, z: 0 }, target.getViewDirection()); } catch { behind = flatDir(boss.location, target.location); }
-        const spots = [
-            add(target.location, behind, -2.2),
-            add(target.location, rightOf(behind), 2.2),
-            add(target.location, rightOf(behind), -2.2)
-        ];
-        let moved = false;
-        for (const spot of spots) {
-            try {
-                if (boss.tryTeleport(spot, { checkForBlocks: true, facingLocation: target.location })) { moved = true; break; }
-            } catch {}
-        }
-        if (!moved) face(boss, target);
-        play(boss, "skill_ambush", 0.2);
-        fx(dim, P.smoke, up(boss.location, 1.2));
-        sound(dim, "mob.endermen.portal", boss.location, 0.8);
-        later(7, () => {
-            if (!alive(boss)) return;
-            const origin = { ...boss.location };
-            const dir = flatDir(origin, target.location);
-            fx(dim, P.trailBig, add(up(origin, 1.4), dir, 1.8), { spin: 120 });
-            fx(dim, P.xslash, add(up(origin, 1.3), dir, 2.2), { spin: 20 });
-            sound(dim, "mob.wither.shoot", origin, 1.2);
-            for (const e of victims(boss, origin, 4.2)) {
-                if (!inCone(origin, dir, e, 4, 70)) continue;
-                hurt(boss, e, 9);
-                effect(e, "slowness", 40, 1);
-                addPlague(boss, e, 1);
-                fx(dim, P.ember, up(e.location, 1));
-            }
-        });
-    });
-}
-
-// Chains of the Damned: a rift opens under the target, chains burst out and bind whoever
-// stands on it, then the boss yanks them in (and follows up with a Reaping Arc).
-// Rift at tick 0, chains at tick 8, pull at tick 18.
-function castChains(boss, s, target) {
-    const dim = boss.dimension;
-    face(boss, target);
-    play(boss, "skill_chains");
-    const spot = { ...target.location };
-    fx(dim, P.void, up(spot, 0.06), { radius: 1.9, life: 1.3 });
-    fx(dim, P.ringWarn, up(spot, 0.07), color(VIOLET, { radius: 1.9, life: 0.4 }));
-    sound(dim, "mob.evocation_illager.prepare_attack", boss.location, 0.5);
-    const bound = [];
-    later(8, () => {
+    later(34, () => {
         if (!alive(boss)) return;
-        sound(dim, "random.anvil_land", spot, 0.5, 0.7);
-        for (let i = 0; i < 5; i++) {
-            const a = (i / 5) * Math.PI * 2;
-            const r = i === 4 ? 0 : 0.9;
-            const base = { x: spot.x + Math.cos(a) * r, y: spot.y, z: spot.z + Math.sin(a) * r };
-            for (const h of [0.35, 1.05, 1.75]) fx(dim, P.chainRise, up(base, h), { life: 1.1 });
+        sound(dim, "mob.wither.shoot", center, 0.8);
+        sound(dim, "mob.blaze.shoot", center, 0.7);
+        for (const off of rows) {
+            for (let a = -half; a <= half + 0.01; a += 2.4) fx(dim, P.wheatBurst, up(add(add(center, across, off), along, a), 0.3));
         }
-        fx(dim, P.flames, up(spot, 0.2));
-        fx(dim, P.dirt, up(spot, 0.1));
-        for (const e of victims(boss, spot, 2)) {
-            if (flatDist(spot, e.location) > 2 || Math.abs(e.location.y - spot.y) > 2) continue;
-            bound.push(e);
-            effect(e, "slowness", 12, 10);
-            effect(e, "weakness", 60, 0);
-            hurt(boss, e, 5, "magic");
+        for (const e of victims(boss, center, half + 4)) {
+            const dx = e.location.x - center.x, dz = e.location.z - center.z;
+            const a = dx * along.x + dz * along.z;
+            const c = dx * across.x + dz * across.z;
+            if (Math.abs(a) > half + 0.6 || Math.abs(e.location.y - center.y) > 2.5) continue;
+            if (!rows.some((off) => Math.abs(c - off) <= lane / 2 + 0.2)) continue;
+            hurt(boss, e, 11, "magic");
             addPlague(boss, e, 1);
-        }
-    });
-    for (let t = 9; t <= 20; t += 2) {
-        later(t, () => {
-            if (!alive(boss)) return;
-            const hand = add(chest(boss), rightOf(flatDir(boss.location, spot)), -0.9);
-            for (const e of bound) if (alive(e)) chainLine(dim, chest(e), hand);
-        });
-    }
-    later(18, () => {
-        if (!alive(boss) || bound.length === 0) return;
-        sound(dim, "random.anvil_use", boss.location, 0.5);
-        for (const e of bound) {
-            if (!alive(e)) continue;
-            const d = flatDist(e.location, boss.location);
-            const dir = flatDir(e.location, boss.location);
-            try { e.applyKnockback(dir.x, dir.z, Math.min(3.5, Math.max(0.8, d * 0.3)), 0.35); } catch {}
-            hurt(boss, e, 5);
+            try { e.applyKnockback(0, 0, 0, 0.45); } catch {}
             fx(dim, P.ember, chest(e));
         }
-        // dragged in: reap them right away
-        s.cds.reap = 0;
-        s.nextCast = Math.min(s.nextCast, now() + 14);
+    });
+}
+
+// Will-o'-the-Wisps (ma troi): the lantern hand calls 3 / 4 / 5 ghost fires that drift after the
+// target for up to 7 s, each a little faster than the last. Walking outpaces the slow ones, sprinting
+// outpaces them all; touching one makes it burst. Gather at tick 11, chase from tick 15.
+function castWisps(boss, s, target) {
+    const dim = boss.dimension;
+    face(boss, target);
+    play(boss, "skill_wisps");
+    sound(dim, "mob.evocation_illager.prepare_summon", boss.location, 0.8);
+    const count = s.phase + 2;
+    const base = flatDir(boss.location, target.location);
+    const wisps = [];
+    const burst = (w, e) => {
+        w.alive = false;
+        fx(dim, P.wheatBurst, w.pos);
+        fx(dim, P.ember, w.pos);
+        sound(dim, "mob.ghast.fireball", w.pos, 1.3, 0.7);
+        if (!e) return;
+        hurt(boss, e, 6, "magic");
+        effect(e, "darkness", 40, 0);
+        addPlague(boss, e, 1);
+    };
+    const step = (tick) => {
+        if (tick > 155 || !alive(boss)) {
+            for (const w of wisps) if (w.alive) { w.alive = false; fx(dim, P.smoke, w.pos); }
+            return;
+        }
+        const goal = alive(target) ? chest(target) : undefined;
+        for (const w of wisps) {
+            if (!w.alive) continue;
+            if (tick >= 15 && goal) {
+                const d = { x: goal.x - w.pos.x, y: goal.y - w.pos.y, z: goal.z - w.pos.z };
+                const len = Math.hypot(d.x, d.y, d.z) || 1;
+                w.vel = { x: w.vel.x * 0.75 + (d.x / len) * w.speed * 0.25, y: w.vel.y * 0.75 + (d.y / len) * w.speed * 0.25, z: w.vel.z * 0.75 + (d.z / len) * w.speed * 0.25 };
+            } else {
+                w.vel = { x: w.vel.x * 0.8, y: w.vel.y * 0.8, z: w.vel.z * 0.8 };
+            }
+            w.pos = add(w.pos, w.vel, 2);
+            fx(dim, P.willo, w.pos);
+            for (const e of victims(boss, w.pos, 2)) {
+                if (dist3(w.pos, chest(e)) > 1.2) continue;
+                burst(w, e);
+                break;
+            }
+        }
+        if (wisps.some((w) => w.alive)) later(2, () => step(tick + 2));
+    };
+    later(11, () => {
+        if (!alive(boss)) return;
+        const hand = add(up(boss.location, 3.3), rightOf(base), -0.9);
+        for (let i = 0; i < count; i++) {
+            const dir = rotateY(base, (i - (count - 1) / 2) * 35);
+            wisps.push({ pos: add(hand, dir, 0.6), vel: { x: dir.x * 0.25, y: 0.04, z: dir.z * 0.25 }, speed: 0.19 + 0.02 * i, alive: true });
+        }
+        sound(dim, "mob.allay.idle", hand, 0.6);
+        step(11);
+    });
+}
+
+// Candles of the Dead: soul candles light up in a ring around the target (3 / 4 / 5). While they
+// burn, each one gives back 10% of the damage the Harvester takes. A player snuffs a candle by
+// standing on it for 1 s. After 7 s every candle still lit erupts and feeds the Harvester.
+// Candles at tick 14, eruption at tick 154.
+function castCandles(boss, s, target) {
+    const dim = boss.dimension;
+    face(boss, target);
+    play(boss, "skill_candles");
+    sound(dim, "mob.evocation_illager.prepare_summon", boss.location, 0.6);
+    const count = 2 + s.phase;
+    const center = { ...target.location };
+    const a0 = Math.random() * 360;
+    const candles = [];
+    for (let i = 0; i < count; i++) {
+        candles.push({ pos: add(center, rotateY({ x: 0, y: 0, z: 1 }, a0 + (i * 360) / count), 5.5), lit: true, snuff: 0 });
+    }
+    const START = 14, LIFE = 140;
+    const snuff = (c) => {
+        c.lit = false;
+        s.candlesLit = Math.max(0, (s.candlesLit ?? 0) - 1);
+        fx(dim, P.smoke, up(c.pos, 0.6));
+        fx(dim, P.wisp, up(c.pos, 0.8));
+        sound(dim, "random.fizz", c.pos, 1.2, 0.8);
+    };
+    later(START, () => {
+        if (!alive(boss)) return;
+        s.candlesLit = (s.candlesLit ?? 0) + count;
+        for (const c of candles) fx(dim, P.flames, up(c.pos, 0.3));
+        sound(dim, "fire.ignite", center, 0.7);
+    });
+    for (let t = START; t < START + LIFE; t += 10) {
+        later(t, () => {
+            if (!alive(boss)) return;
+            const frame = Math.min(5, Math.floor(((t - START) / LIFE) * 6));
+            for (const c of candles) {
+                if (!c.lit) continue;
+                fx(dim, P.candle, up(c.pos, 0.3), { frame, life: 0.55 });
+                fx(dim, P.ringWarn, up(c.pos, 0.07), color(SOUL, { radius: 2.5, life: 0.55 }));
+                const standing = players(dim, c.pos, 1.8).some((p) => flatDist(p.location, c.pos) <= 1.3 && Math.abs(p.location.y - c.pos.y) < 2);
+                c.snuff = standing ? c.snuff + 10 : 0;
+                if (c.snuff >= 20) snuff(c);
+            }
+        });
+    }
+    later(START + LIFE, () => {
+        const lit = candles.filter((c) => c.lit);
+        for (const c of lit) {
+            c.lit = false;
+            s.candlesLit = Math.max(0, (s.candlesLit ?? 0) - 1);
+        }
+        if (!alive(boss) || lit.length === 0) return;
+        sound(dim, "mob.blaze.shoot", center, 0.6);
+        for (const c of lit) {
+            fx(dim, P.column, c.pos);
+            fx(dim, P.flames, up(c.pos, 0.3));
+            fx(dim, P.shockwave, up(c.pos, 0.1), color(SOUL, { radius: 2.5, life: 0.5 }));
+            fly(dim, P.stream, up(c.pos, 1.2), chest(boss), 0.6);
+            for (const e of victims(boss, c.pos, 3.5)) {
+                if (flatDist(c.pos, e.location) > 2.5 || Math.abs(e.location.y - c.pos.y) > 2.5) continue;
+                hurt(boss, e, 9, "magic");
+                addPlague(boss, e, 1);
+            }
+        }
+        const hp = health(boss);
+        if (hp) heal(boss, hp.effectiveMax * 0.025 * lit.length);
     });
 }
 
 // ─── skills: phase 2 ────────────────────────────────────────────────────────
 
-// Hands of the Underworld: rifts open one after another under the target; 0.7 s later
-// skeletal hands burst out and drag down whoever is still there. Slam at tick 16.
-function castHands(boss, s, target) {
+// Plague Pyre: the plague doctor burns the infection out. A skull and a pyre ring follow the target
+// for 1.5 s, then soul fire erupts on it: 8 + 2 per plague stack. The fire spreads: everyone within
+// 3.5 blocks of the target burns too and catches 2 plague. The ground keeps burning for 4 s.
+// Ignite at tick 30.
+function castPyre(boss, s, target) {
     const dim = boss.dimension;
     face(boss, target);
-    play(boss, "skill_hands");
-    sound(dim, "mob.warden.emerge", boss.location, 0.6, 0.8);
-    const count = 5 + (s.phase >= 3 ? 2 : 0);
-    for (let i = 0; i < count; i++) {
-        later(12 + i * 6, () => {
-            if (!alive(boss)) return;
-            let spot;
-            if (alive(target)) {
-                let v = { x: 0, z: 0 };
-                try { v = target.getVelocity(); } catch {}
-                const jitter = i === 0 ? 0 : 1.4;
-                const a = Math.random() * Math.PI * 2;
-                spot = { x: target.location.x + v.x * 8 + Math.cos(a) * jitter, y: target.location.y, z: target.location.z + v.z * 8 + Math.sin(a) * jitter };
-            } else {
-                const a = Math.random() * Math.PI * 2;
-                spot = { x: boss.location.x + Math.cos(a) * 6, y: boss.location.y, z: boss.location.z + Math.sin(a) * 6 };
-            }
-            fx(dim, P.void, up(spot, 0.06), { radius: 1.7, life: 1.2 });
-            sound(dim, "dig.gravel", spot, 0.6);
-            later(14, () => {
-                if (!alive(boss)) return;
-                for (let k = 0; k < 5; k++) {
-                    const a = (k / 5) * Math.PI * 2 + i;
-                    const r = k === 4 ? 0 : 0.8;
-                    fx(dim, P.hand, up({ x: spot.x + Math.cos(a) * r, y: spot.y, z: spot.z + Math.sin(a) * r }, 0.4), { life: 0.9 });
-                }
-                fx(dim, P.dirt, up(spot, 0.1));
-                fx(dim, P.flames, up(spot, 0.2));
-                fx(dim, P.crack, up(spot, 0.05), { radius: 1.8, life: 1.8 });
-                sound(dim, "mob.skeleton.hurt", spot, 0.5);
-                for (const e of victims(boss, spot, 2)) {
-                    if (flatDist(spot, e.location) > 1.9 || Math.abs(e.location.y - spot.y) > 1.6) continue;
-                    hurt(boss, e, 7);
-                    effect(e, "slowness", 40, 2);
-                    addPlague(boss, e, 1);
-                    try { e.applyKnockback(0, 0, 0, 0.35); } catch {}
-                }
-            });
-        });
-    }
-}
-
-// Soul Rend: the boss grabs the target's soul (skull mark + chain) and rips it out.
-// Damage scales with the victim's max health; the boss drinks it. Break the chain by
-// getting more than 13 blocks away. Grab at tick 7, rip at tick 16.
-function castRend(boss, s, target) {
-    const dim = boss.dimension;
-    face(boss, target);
-    play(boss, "skill_rend");
-    sound(dim, "mob.evocation_illager.cast_spell", boss.location, 0.4);
-    for (let t = 7; t <= 16; t += 2) {
+    play(boss, "skill_pyre");
+    sound(dim, "mob.evocation_illager.cast_spell", boss.location, 0.5);
+    for (let t = 4; t < 30; t += 4) {
         later(t, () => {
-            if (!alive(boss) || !alive(target) || flatDist(boss.location, target.location) > 13) return;
+            if (!alive(boss) || !alive(target)) return;
             fx(dim, P.mark, up(target.getHeadLocation(), 0.8));
-            chainLine(dim, chest(target), add(chest(boss), rightOf(flatDir(boss.location, target.location)), -0.9));
+            fx(dim, P.ringWarn, up(target.location, 0.07), color(SOUL, { radius: 3.5, life: 0.25 }));
+            if (t % 8 === 0) fx(dim, P.firePatch, up(target.location, 0.05), { radius: 0.6, duration: 0.3 });
         });
     }
-    later(16, () => {
+    later(30, () => {
         if (!alive(boss) || !alive(target)) return;
-        const from = chest(target);
-        if (flatDist(boss.location, target.location) > 13) {
-            fx(dim, P.ember, from);
-            sound(dim, "random.break", from, 0.6);
-            return;
+        const center = { ...target.location };
+        fx(dim, P.column, center);
+        fx(dim, P.flames, up(center, 0.3));
+        fx(dim, P.shockwave, up(center, 0.1), color(SOUL, { radius: 3.5, life: 0.5 }));
+        sound(dim, "mob.ghast.fireball", center, 0.7);
+        sound(dim, "fire.ignite", center, 0.8);
+        for (const e of victims(boss, center, 4.5)) {
+            if (e.id !== target.id && flatDist(center, e.location) > 3.5) continue;
+            hurt(boss, e, 8 + 2 * stacksOf(e), "magic");
+            addPlague(boss, e, e.id === target.id ? 1 : 2);
+            if (e.id !== target.id) fx(dim, P.column, e.location);
         }
-        const maxHp = health(target)?.effectiveMax ?? 20;
-        const dmg = Math.min(40, Math.max(6, maxHp * 0.12));
-        hurt(boss, target, dmg, "magic");
-        heal(boss, dmg * 2);
-        effect(target, "weakness", 100, 1);
-        effect(target, "slowness", 60, 1);
-        effect(target, "darkness", 60, 0);
-        addPlague(boss, target, 1);
-        fx(dim, P.souls, from);
-        sound(dim, "mob.wither.hurt", from, 0.5);
-        for (let k = 0; k < 3; k++) later(k * 3 + 1, () => fly(dim, P.stream, from, chest(boss), 0.45));
+        fx(dim, P.firePatch, up(center, 0.05), { radius: 2.2, duration: 4 });
+        burnPoints(boss, [center], 2.2, 80, 1.5);
     });
 }
 
-// Graves of the Plagued: tombstones rise, plague thralls climb out. Graves at tick 18, thralls 1.2 s later.
-function castGraves(boss, s, target) {
+// Footsteps of the Dead: for 3 s the Harvester marks where everyone walks with glowing footprints,
+// then every footprint ignites at once and burns for 3 s. Don't retrace your steps, don't stand still.
+// Footprints from tick 16 to 76, ignition at tick 82.
+function castTrail(boss, s, target) {
     const dim = boss.dimension;
-    play(boss, "skill_summon");
-    sound(dim, "mob.evocation_illager.prepare_summon", boss.location, 0.5);
-    later(18, () => {
+    play(boss, "skill_trail");
+    sound(dim, "mob.evocation_illager.cast_spell", boss.location, 0.4);
+    const prints = [];
+    for (let t = 16; t <= 76; t += 6) {
+        later(t, () => {
+            if (!alive(boss)) return;
+            for (const e of targetFirst(target, victims(boss, boss.location, 22))) {
+                const pos = { ...e.location };
+                if (prints.some((p) => flatDist(p, pos) < 0.8 && Math.abs(p.y - pos.y) < 1)) continue;
+                prints.push(pos);
+                let yaw = 0;
+                try { yaw = e.getRotation().y; } catch {}
+                fx(dim, P.footprint, up(pos, 0.04), { life: (82 - t) / 20 + 0.3, spin: yaw });
+            }
+            if (t === 16 || t === 46) sound(dim, "mob.warden.heartbeat", boss.location, 0.8);
+        });
+    }
+    later(82, () => {
+        if (!alive(boss) || prints.length === 0) return;
+        sound(dim, "mob.blaze.shoot", boss.location, 0.6);
+        for (const p of prints) fx(dim, P.firePatch, up(p, 0.05), { radius: 0.55, duration: 3 });
+        burnPoints(boss, prints, 0.9, 60, 2, true);
+    });
+}
+
+// Buried Alive: a coffin opens on the ground under the target (2 x 4 blocks, leading its movement).
+// 1 s later the lid slams: anyone inside is buried — held in place in the dark for 1.5 s while the
+// coffin burns with soul fire. Lid at tick 20.
+function castCoffin(boss, s, target) {
+    const dim = boss.dimension;
+    face(boss, target);
+    play(boss, "skill_coffin");
+    let v = { x: 0, z: 0 };
+    try { v = target.getVelocity(); } catch {}
+    const center = { x: target.location.x + v.x * 6, y: target.location.y, z: target.location.z + v.z * 6 };
+    const along = flatDir(boss.location, center);
+    // the decal only lies along the world axes: long side on z (spin 0) or on x (spin 90)
+    const longZ = Math.abs(along.z) >= Math.abs(along.x);
+    const hx = longZ ? 1 : 2, hz = longZ ? 2 : 1;
+    fx(dim, P.coffin, up(center, 0.06), { life: 2.6, spin: longZ ? 0 : 90 });
+    sound(dim, "random.chestopen", center, 0.6);
+    const inside = (e) => Math.abs(e.location.x - center.x) <= hx + 0.3 && Math.abs(e.location.z - center.z) <= hz + 0.3
+        && Math.abs(e.location.y - center.y) < 2;
+    later(20, () => {
         if (!alive(boss)) return;
-        sound(dim, "mob.warden.emerge", boss.location, 1.2, 0.8);
-        const anchors = targetFirst(target, victims(boss, boss.location, 30));
-        const count = Math.min(s.phase >= 3 ? 4 : 3, CONFIG.maxThralls - countThralls(boss));
-        const types = s.phase >= 3
-            ? ["minecraft:husk", "minecraft:bogged", "minecraft:wither_skeleton", "minecraft:husk"]
-            : ["minecraft:husk", "minecraft:husk", "minecraft:bogged"];
-        for (let i = 0; i < count; i++) {
-            const anchor = anchors.length ? anchors[i % anchors.length].location : boss.location;
-            const a = Math.random() * Math.PI * 2;
-            const r = 3 + Math.random() * 2.5;
-            const spot = { x: anchor.x + Math.cos(a) * r, y: anchor.y, z: anchor.z + Math.sin(a) * r };
-            fx(dim, P.grave, up(spot, 0.35), { life: 3.2 });
-            fx(dim, P.void, up(spot, 0.06), { radius: 1.2, life: 1.6 });
-            fx(dim, P.dirt, up(spot, 0.1));
-            later(24, () => {
-                fx(dim, P.dirt, up(spot, 0.1));
-                fx(dim, P.flames, up(spot, 0.2));
-                for (let k = 0; k < 3; k++) fx(dim, P.hand, up({ x: spot.x + (k - 1) * 0.5, y: spot.y, z: spot.z }, 0.4), { life: 0.8 });
-                sound(dim, "dig.gravel", spot, 0.7);
-                try {
-                    const thrall = dim.spawnEntity(types[i % types.length], spot);
-                    thrall.addTag(THRALL_TAG);
-                    thrall.nameTag = "§2Plague Thrall";
-                    effect(thrall, "fire_resistance", 20000000, 0);
-                    effect(thrall, "speed", 20000000, 0);
-                    if (s.phase >= 3) effect(thrall, "strength", 20000000, 0);
-                } catch {}
+        sound(dim, "random.chestclosed", center, 0.5);
+        sound(dim, "random.anvil_land", center, 0.5, 0.6);
+        fx(dim, P.ash, up(center, 0.1));
+        const edge = [];
+        for (const sx of [-1, 1]) for (const sz of [-1, 0, 1]) edge.push({ x: center.x + sx * hx, y: center.y, z: center.z + sz * hz });
+        for (const p of edge) fx(dim, P.firePatch, up(p, 0.05), { radius: 0.6, duration: 1.6 });
+        fx(dim, P.flames, up(center, 0.3));
+        const buried = victims(boss, center, 5).filter(inside);
+        for (const e of buried) {
+            hurt(boss, e, 6, "magic");
+            effect(e, "slowness", 30, 10);
+            effect(e, "darkness", 60, 0);
+            addPlague(boss, e, 2);
+        }
+        for (let t = 10; t <= 30; t += 10) {
+            later(t, () => {
+                if (!alive(boss)) return;
+                for (const e of buried) if (alive(e) && inside(e)) hurt(boss, e, 3, "fire");
             });
         }
     });
-}
-
-function countThralls(boss) {
-    try { return boss.dimension.getEntities({ location: boss.location, maxDistance: 64, tags: [THRALL_TAG] }).length; } catch { return 0; }
 }
 
 // Plague Aura (phase 2+ passive): standing next to the boss infects you every 3 s.
@@ -729,7 +735,7 @@ function castSentence(boss, s, target) {
                 plague.delete(e.id);
                 fx(dim, P.spectral, up(e.location, 1.4));
                 fx(dim, P.souls, up(e.location, 1));
-                fx(dim, P.crack, up(e.location, 0.05), { radius: 1.6, life: 1.6 });
+                fx(dim, P.column, e.location);
                 sound(dim, "mob.wither.shoot", e.location, 0.5);
                 hurt(boss, e, 6 + 3 * stacks, "magic");
                 effect(e, "wither", 40, 1);
@@ -738,49 +744,65 @@ function castSentence(boss, s, target) {
     });
 }
 
-// Shadow Reapers: four phantom reapers appear around the target, their paths drawn on the
-// ground as a cross. 1 s later they dash through the centre, cutting everything on the lines.
-// Reapers at tick 8, dash at tick 28.
-function castReapers(boss, s, target) {
+// Danse Macabre: five hooded dancers carrying soul candles circle the target and close in over 3 s,
+// one place in the ring of six left empty. Touching a dancer burns; when the ring closes they burst.
+// Slip out through the gap (or between two dancers) early. Dancers at tick 8, burst at tick 68.
+function castDanse(boss, s, target) {
     const dim = boss.dimension;
     face(boss, target);
-    play(boss, "skill_reapers");
-    sound(dim, "mob.wither.ambient", boss.location, 0.6);
-    let center, a0;
+    play(boss, "skill_danse");
+    const notes = [1.0, 1.2, 0.9, 1.35];
+    for (let i = 0; i < 4; i++) later(i * 16, () => sound(dim, "block.bell.hit", boss.location, notes[i], 0.5));
+    const DANCE = 60, r0 = 7, shrink = r0 / (DANCE / 20);
     later(8, () => {
         if (!alive(boss)) return;
-        center = alive(target) ? { ...target.location } : { ...boss.location };
-        a0 = Math.random() * 90;
-        for (let i = 0; i < 4; i++) {
-            const dir = rotateY({ x: 0, y: 0, z: 1 }, a0 + i * 90);
-            const pos = add(center, dir, 5);
-            fx(dim, P.reaper, up(pos, 1.2), { dir_x: 0, dir_z: 0, speed: 0, life: 1.1 });
-            fx(dim, P.smoke, up(pos, 1));
-            if (i < 2) groundLine(dim, pos, add(center, dir, -5), 20, VIOLET);
+        const center = alive(target) ? { ...target.location } : { ...boss.location };
+        const w = Math.random() < 0.5 ? 60 : -60; // degrees per second
+        const gap = Math.floor(Math.random() * 6);
+        const a0 = Math.random() * 360;
+        const angles = [];
+        for (let k = 0; k < 6; k++) if (k !== gap) angles.push(a0 + k * 60);
+        for (const a of angles) fx(dim, P.dancer, center, { a0: a, r0, w, shrink, life: DANCE / 20 + 0.05 });
+        fx(dim, P.ringWarn, up(center, 0.07), color(SOUL, { radius: r0, life: DANCE / 20 }));
+        sound(dim, "mob.endermen.portal", center, 0.6);
+        const touched = new Map();
+        for (let t = 2; t <= DANCE; t += 2) {
+            later(t, () => {
+                if (!alive(boss)) return;
+                const sec = t / 20;
+                const r = Math.max(r0 - sec * shrink, 0);
+                const spots = angles.map((a) => {
+                    const rad = ((a + w * sec) * Math.PI) / 180;
+                    return { x: center.x + Math.cos(rad) * r, y: center.y, z: center.z + Math.sin(rad) * r };
+                });
+                if (t % 6 === 0) for (const p of spots) fx(dim, P.eyeGlow, up(p, 2));
+                for (const e of victims(boss, center, r + 2)) {
+                    if (Math.abs(e.location.y - center.y) > 2.5) continue;
+                    spots.forEach((p, i) => {
+                        const key = e.id + ":" + i;
+                        if (flatDist(p, e.location) > 1.1 || t - (touched.get(key) ?? -99) < 10) return;
+                        touched.set(key, t);
+                        hurt(boss, e, 5, "magic");
+                        effect(e, "slowness", 20, 1);
+                        addPlague(boss, e, 1);
+                        fx(dim, P.ember, chest(e));
+                    });
+                }
+            });
         }
-        sound(dim, "mob.endermen.portal", center, 0.5);
-    });
-    later(28, () => {
-        if (!alive(boss) || !center) return;
-        sound(dim, "mob.wither.shoot", center, 0.8);
-        sound(dim, "mob.phantom.swoop", center, 0.6);
-        for (let i = 0; i < 4; i++) {
-            const dir = rotateY({ x: 0, y: 0, z: 1 }, a0 + i * 90);
-            const from = up(add(center, dir, 5), 1.2);
-            fly(dim, P.reaper, from, up(add(center, dir, -5), 1.2), 0.3);
-            for (const k of [-3, 0, 3]) fx(dim, P.trail, up(add(center, dir, k), 1.1), { spin: a0 + i * 90 });
-        }
-        fx(dim, P.xslash, up(center, 1.2), { spin: a0 + 45 });
-        fx(dim, P.crack, up(center, 0.05), { radius: 2.6, life: 2 });
-        const dirs = [rotateY({ x: 0, y: 0, z: 1 }, a0), rotateY({ x: 0, y: 0, z: 1 }, a0 + 90)];
-        for (const e of victims(boss, center, 6)) {
-            if (flatDist(center, e.location) > 5.5) continue;
-            if (!dirs.some((d) => lineDist(center, d, e) < 1.2)) continue;
-            hurt(boss, e, 12);
-            effect(e, "wither", 40, 1);
-            addPlague(boss, e, 1);
-            fx(dim, P.ember, chest(e));
-        }
+        later(DANCE, () => {
+            if (!alive(boss)) return;
+            fx(dim, P.column, center);
+            fx(dim, P.souls, up(center, 1));
+            fx(dim, P.shockwave, up(center, 0.1), color(SOUL, { radius: 3, life: 0.5 }));
+            sound(dim, "mob.wither.shoot", center, 0.7);
+            for (const e of victims(boss, center, 3.5)) {
+                if (flatDist(center, e.location) > 2.5 || Math.abs(e.location.y - center.y) > 2.5) continue;
+                hurt(boss, e, 12, "magic");
+                effect(e, "wither", 60, 1);
+                addPlague(boss, e, 1);
+            }
+        });
     });
 }
 
@@ -803,7 +825,7 @@ function castBlackDeath(boss, s) {
         const r = 5 + Math.random() * 5;
         const spot = { x: center.x + Math.cos(a) * r, y: center.y, z: center.z + Math.sin(a) * r };
         zones.push(spot);
-        fx(dim, P.ringWarn, up(spot, 0.07), color(TEAL, { radius: 2.5, life: 3.6 }));
+        fx(dim, P.ringWarn, up(spot, 0.07), color(SOUL, { radius: 2.5, life: 3.6 }));
         fx(dim, P.lantern, up(spot, 1.3), { life: 3.6 });
     }
     for (let t = 10; t < 72; t += 10) {
@@ -829,8 +851,8 @@ function castBlackDeath(boss, s) {
     });
 }
 
-// Final Harvest: circles the scythe overhead, then a full spin. Safe right next to him or far away.
-// Hit at tick 49.
+// Final Harvest: the whole ring between 3 and 11.5 blocks sprouts soul wheat while the scythe circles
+// overhead, then a full spin reaps it all. Safe right next to him or beyond the wheat. Hit at tick 49.
 function castUltimate(boss, s) {
     const dim = boss.dimension;
     play(boss, "skill_ultimate");
@@ -839,8 +861,18 @@ function castUltimate(boss, s) {
     for (const e of victims(boss, center, 40)) title(e, "§4§l☠ FINAL HARVEST ☠", "§7Get close... or get far away", 50);
     sound(dim, "mob.wither.ambient", center, 0.5);
     fx(dim, P.runes, up(center, 0.05), color(BLOOD, { radius: outer, life: 2.5 }));
-    fx(dim, P.ringWarn, up(center, 0.07), color(TEAL, { radius: inner, life: 2.5 }));
+    fx(dim, P.ringWarn, up(center, 0.07), color(SOUL, { radius: inner, life: 2.5 }));
     fx(dim, P.ringWarn, up(center, 0.08), color(BLOOD, { radius: outer, life: 2.5 }));
+    later(4, () => {
+        for (let r = 4; r <= outer - 0.4; r += 1.5) {
+            const n = Math.round((2 * Math.PI * r) / 1.7);
+            const off = Math.random() * 360;
+            for (let i = 0; i < n; i++) {
+                fx(dim, P.wheat, up(add(center, rotateY({ x: 0, y: 0, z: 1 }, off + (i * 360) / n), r), 0.02), { life: 2.3 });
+            }
+        }
+        sound(dim, "block.sweet_berry_bush.place", center, 0.6);
+    });
     for (const t of [10, 20, 30, 40]) later(t, () => sound(dim, "block.bell.hit", center, 0.4 + t / 100));
 
     later(45, () => {
@@ -854,8 +886,11 @@ function castUltimate(boss, s) {
     later(49, () => {
         if (!alive(boss)) return;
         sound(dim, "mob.wither.death", center, 1.4, 0.8);
-        fx(dim, P.shockwave, up(center, 0.1), color(TEAL, { radius: outer + 1, life: 0.5 }));
-        fx(dim, P.crack, up(center, 0.05), { radius: 4, life: 2.5 });
+        fx(dim, P.shockwave, up(center, 0.1), color(SOUL, { radius: outer + 1, life: 0.5 }));
+        for (let i = 0; i < 20; i++) {
+            const a = (i / 20) * 360, r = inner + 1 + ((i * 7) % 8);
+            fx(dim, P.wheatBurst, up(add(center, rotateY({ x: 0, y: 0, z: 1 }, a), r), 0.3));
+        }
         fx(dim, P.souls, up(center, 2));
         let reaped = 0;
         for (const e of victims(boss, center, outer + 1)) {
@@ -872,9 +907,9 @@ function castUltimate(boss, s) {
 }
 
 const CASTS = {
-    reap: castReap, scythes: castScythes, step: castDeathStep, chains: castChains,
-    hands: castHands, rend: castRend, graves: castGraves,
-    sentence: castSentence, reapers: castReapers, blackdeath: castBlackDeath, ultimate: castUltimate
+    reap: castReap, field: castField, wisps: castWisps, candles: castCandles,
+    pyre: castPyre, trail: castTrail, coffin: castCoffin,
+    sentence: castSentence, danse: castDanse, blackdeath: castBlackDeath, ultimate: castUltimate
 };
 
 // ─── phases, enrage, name ───────────────────────────────────────────────────
@@ -919,9 +954,10 @@ function enterPhase(boss, s, phase) {
     const center = { ...boss.location };
     fx(dim, P.runes, up(center, 0.05), color(phase === 3 ? BLOOD : PLAGUE, { radius: 6, life: 2.2 }));
     later(20, () => {
-        fx(dim, P.shockwave, up(center, 0.1), color(phase === 3 ? TEAL : PLAGUE, { radius: 10, life: 0.7 }));
+        fx(dim, P.shockwave, up(center, 0.1), color(phase === 3 ? SOUL : PLAGUE, { radius: 10, life: 0.7 }));
         fx(dim, phase === 3 ? P.souls : P.miasma, up(center, 2));
-        fx(dim, P.crack, up(center, 0.05), { radius: 3.5, life: 2.5 });
+        fx(dim, P.firePatch, up(center, 0.05), { radius: 3.5, duration: 1.5 });
+        fx(dim, P.column, center);
         fx(dim, P.beak, up(center, 4.2));
         sound(dim, "mob.wither.spawn", center, phase === 3 ? 0.6 : 0.8);
         for (const e of victims(boss, center, 6)) knockFrom(center, e, 2.2, 0.5);
@@ -970,7 +1006,7 @@ function initState(boss) {
         // startTick: when the fight started (enrage timer); undefined while nobody fights
         phase: 1, enraged: false, startTick: undefined, lastEngaged: 0, arena: { ...boss.location },
         cds: {}, busyUntil: 0, nextCast: t + 40, lastSkill: "", auraHits: {},
-        target: undefined, targetTick: 0, foes: new Map(), lastBlink: 0, lastMelee: 0
+        target: undefined, targetTick: 0, foes: new Map(), lastBlink: 0, lastMelee: 0, candlesLit: 0
     };
     bosses.set(boss.id, s);
     const hp = health(boss);
@@ -991,11 +1027,9 @@ function chooseSkill(boss, s, target) {
     for (const [name, cfg] of Object.entries(CONFIG.skills)) {
         if (s.phase < cfg.phase || (s.cds[name] ?? 0) > t) continue;
         if (d < cfg.min || d > cfg.max) continue;
-        if (name === "graves" && countThralls(boss) >= CONFIG.maxThralls) continue;
         let weight = cfg.weight;
         if (name === s.lastSkill) weight *= 0.25;
         if (cfg.phase === s.phase && s.phase > 1) weight *= 1.5; // favour the new phase's skills
-        if (name === "reap" && s.cds.reap === 0) weight *= 4;     // follow-up after Chains of the Damned
         options.push({ name, weight });
     }
     if (options.length === 0) return undefined;
@@ -1097,10 +1131,10 @@ on(world.afterEvents.entitySpawn, (e) => {
             s.busyUntil = now() + 52;
             s.nextCast = now() + 70;
         });
-        fx(dim, P.runes, up(at, 0.05), color(TEAL, { radius: 4, life: 2.6 }));
-        fx(dim, P.void, up(at, 0.06), { radius: 2.8, life: 2.4 });
-        fx(dim, P.dirt, up(at, 0.1));
-        later(12, () => fx(dim, P.dirt, up(at, 0.1)));
+        fx(dim, P.runes, up(at, 0.05), color(SOUL, { radius: 4, life: 2.6 }));
+        fx(dim, P.firePatch, up(at, 0.05), { radius: 2.4, duration: 2.4 });
+        fx(dim, P.ash, up(at, 0.1));
+        later(12, () => fx(dim, P.ash, up(at, 0.1)));
         later(38, () => { fx(dim, P.souls, up(at, 2)); fx(dim, P.beak, up(at, 4)); });
         sound(dim, "mob.warden.emerge", at, 0.7);
     } catch {}
@@ -1131,16 +1165,32 @@ on(world.afterEvents.entityHurt, (e) => {
         const attacker = source?.damagingEntity;
         if (!s || !attacker || attacker.typeId === BOSS_ID) return;
         setTarget(boss, s, attacker);
-        // Shadow Blink: 7% on hit, at most every 8 s, never mid-cast
+        // Candles of the Dead: each lit candle gives back 10% of the damage taken
+        if (s.candlesLit > 0 && e.damage > 0) heal(boss, e.damage * Math.min(0.5, 0.1 * s.candlesLit));
+        // Ember Retreat: 7% when struck, at most every 8 s, never mid-cast: he burns away and reforms
+        // 5 blocks back from the attacker; the spot he left keeps burning for 3 s
         if (t < s.busyUntil || t - s.lastBlink < 160 || Math.random() > 0.07) return;
         s.lastBlink = t;
+        s.busyUntil = Math.max(s.busyUntil, t + 12);
         const dim = boss.dimension;
-        fx(dim, P.smoke, up(boss.location, 1.5));
-        let behind;
-        try { behind = flatDir({ x: 0, y: 0, z: 0 }, attacker.getViewDirection()); } catch { behind = flatDir(boss.location, attacker.location); }
-        try { boss.tryTeleport(add(attacker.location, behind, -2.5), { checkForBlocks: true, facingLocation: attacker.location }); } catch {}
-        fx(dim, P.smoke, up(boss.location, 1.5));
-        sound(dim, "mob.endermen.portal", boss.location, 0.7);
+        const from = { ...boss.location };
+        root(boss, 10);
+        play(boss, "skill_vanish", 0.05);
+        fx(dim, P.flames, up(from, 0.3));
+        sound(dim, "mob.blaze.breathe", from, 0.8);
+        later(9, () => {
+            if (!alive(boss)) return;
+            const away = alive(attacker) ? flatDir(attacker.location, from) : { x: 0, y: 0, z: 1 };
+            for (const d of [away, rotateY(away, 50), rotateY(away, -50)]) {
+                try {
+                    if (boss.tryTeleport(add(from, d, 5), { checkForBlocks: true, facingLocation: alive(attacker) ? attacker.location : from })) break;
+                } catch {}
+            }
+            fx(dim, P.flames, up(boss.location, 0.3));
+            fx(dim, P.smoke, up(boss.location, 1.5));
+            fx(dim, P.firePatch, up(from, 0.05), { radius: 1.6, duration: 3 });
+            burnPoints(boss, [from], 1.6, 60, 1.5);
+        });
     } catch {}
 });
 
@@ -1166,7 +1216,7 @@ on(world.afterEvents.entityDie, (e) => {
         fx(dim, P.pillar, loc, { duration: 3 });
         fx(dim, P.souls, up(loc, 1.5));
         fx(dim, P.beak, up(loc, 3.5));
-        fx(dim, P.shockwave, up(loc, 0.1), color(TEAL, { radius: 8, life: 0.8 }));
+        fx(dim, P.shockwave, up(loc, 0.1), color(SOUL, { radius: 8, life: 0.8 }));
         later(20, () => fx(dim, P.souls, up(loc, 2.5)));
         later(40, () => fx(dim, P.souls, up(loc, 3.5)));
         sound(dim, "mob.wither.death", loc, 0.8);
@@ -1174,13 +1224,6 @@ on(world.afterEvents.entityDie, (e) => {
             plague.delete(p.id);
             title(p, "§6§l☠ THE HARVESTER FALLS ☠", "§7The plague lifts. The souls are free.", 70);
         }
-        // thralls crumble with their master
-        try {
-            for (const thrall of dim.getEntities({ location: loc, maxDistance: 80, tags: [THRALL_TAG] })) {
-                fx(dim, P.smoke, up(thrall.location, 1));
-                thrall.kill();
-            }
-        } catch {}
     } catch {}
 });
 
@@ -1203,5 +1246,14 @@ on(world.afterEvents.playerLeave, (e) => {
 });
 
 on(world.afterEvents.worldInitialize, () => {
-    console.warn("[Harvester Boss v4] loaded: 11 skills, 3 phases, targets whatever it fights.");
+    console.warn("[Harvester Boss v5] loaded: 11 soul-fire skills, 3 phases, targets whatever it fights.");
 });
+
+// Test hook for tools/simulate.mjs (the game never calls it): cast one skill now at `target`
+// and keep the AI from casting anything else for a while.
+export function castForTest(boss, name, target) {
+    const s = initState(boss);
+    s.busyUntil = now() + CONFIG.skills[name].lock;
+    s.nextCast = now() + 1000;
+    CASTS[name](boss, s, target);
+}

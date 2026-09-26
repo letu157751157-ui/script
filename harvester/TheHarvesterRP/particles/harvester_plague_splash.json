@@ -30,8 +30,8 @@
           "texture_height": 256,
           "flipbook": {
             "base_UV": [
-              192,
-              144
+              64,
+              160
             ],
             "size_UV": [
               16,
@@ -51,9 +51,9 @@
         "color": {
           "interpolant": "v.particle_age / v.particle_lifetime",
           "gradient": {
-            "0.0": "#FFDDEB8A",
-            "0.5": "#E0A8C94A",
-            "1.0": "#006E8F2A"
+            "0.0": "#FFFFFFFF",
+            "0.7": "#FFFFFFFF",
+            "1.0": "#00FFFFFF"
           }
         }
       }

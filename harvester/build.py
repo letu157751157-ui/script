@@ -20,7 +20,7 @@ import particles  # noqa: E402
 
 BP = os.path.join(ROOT, "TheHarvesterBP")
 RP = os.path.join(ROOT, "TheHarvesterRP")
-VERSION = "1.4.0"
+VERSION = "1.5.0"
 OUT = os.path.join(ROOT, "dist", "TheHarvester_v%s.mcaddon" % VERSION)
 
 BUILTIN_VARS = {"particle_age", "particle_lifetime", "emitter_age", "emitter_lifetime"} | {
@@ -55,17 +55,27 @@ def validate():
     for short, pid in client.get("particle_effects", {}).items():
         if pid not in particle_vars:
             errors.append("client entity particle %s -> %s missing" % (short, pid))
+    # geometry locators used by animation / controller particles
+    geo = load(os.path.join(RP, "models", "entity", "pa_harvester.json"))["minecraft:geometry"][0]
+    locators = {name for b in geo["bones"] for name in b.get("locators", {})}
+    bones = {b["name"] for b in geo["bones"]}
+
     for cname, ctrl in controllers.items():
         for sname, st in ctrl["states"].items():
             for a in st.get("animations", []):
                 key = a if isinstance(a, str) else next(iter(a))
                 if key not in client["animations"]:
                     errors.append("%s/%s uses unknown animation %s" % (cname, sname, key))
-
-    # geometry locators used by animation particles
-    geo = load(os.path.join(RP, "models", "entity", "pa_harvester.json"))["minecraft:geometry"][0]
-    locators = {name for b in geo["bones"] for name in b.get("locators", {})}
-    bones = {b["name"] for b in geo["bones"]}
+            for item in st.get("particle_effects", []):
+                if item["effect"] not in client.get("particle_effects", {}):
+                    errors.append("%s/%s: particle %s not in client entity" % (cname, sname, item["effect"]))
+                elif particle_vars[client["particle_effects"][item["effect"]]]:
+                    errors.append("%s/%s: %s reads Molang variables nobody sets" % (cname, sname, item["effect"]))
+                if item.get("locator") and item["locator"] not in locators:
+                    errors.append("%s/%s: locator %s missing" % (cname, sname, item["locator"]))
+            for tr in st.get("transitions", []):
+                if next(iter(tr)) not in ctrl["states"]:
+                    errors.append("%s/%s: transition to unknown state %s" % (cname, sname, next(iter(tr))))
     for aname, a in anim_file.items():
         for bone in a.get("bones", {}):
             if bone not in bones:

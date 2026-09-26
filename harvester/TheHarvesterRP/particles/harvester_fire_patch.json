@@ -2,50 +2,59 @@
   "format_version": "1.10.0",
   "particle_effect": {
     "description": {
-      "identifier": "harvester:aura_mist",
+      "identifier": "harvester:fire_patch",
       "basic_render_parameters": {
         "material": "particles_blend",
         "texture": "textures/particle/harvester_particles"
       }
     },
     "components": {
-      "minecraft:emitter_rate_instant": {
-        "num_particles": 3
+      "minecraft:emitter_rate_steady": {
+        "spawn_rate": "v.radius * 12 + 4",
+        "max_particles": 140
       },
       "minecraft:emitter_lifetime_once": {
-        "active_time": 0.05
+        "active_time": "v.duration"
       },
       "minecraft:emitter_shape_disc": {
-        "radius": 1.6,
+        "radius": "v.radius",
         "plane_normal": "y",
-        "direction": "outwards",
+        "direction": [
+          0,
+          1,
+          0
+        ],
         "offset": [
           0,
-          0.15,
+          0.05,
           0
         ]
       },
       "minecraft:particle_lifetime_expression": {
-        "max_lifetime": "math.random(1.2, 1.6)"
+        "max_lifetime": "math.random(0.5, 0.9)"
       },
-      "minecraft:particle_initial_speed": 0.3,
-      "minecraft:particle_initial_spin": {
-        "rotation": "math.random(0, 360)",
-        "rotation_rate": "math.random(-30, 30)"
+      "minecraft:particle_initial_speed": "math.random(0.6, 1.4)",
+      "minecraft:particle_motion_dynamic": {
+        "linear_acceleration": [
+          0,
+          0.8,
+          0
+        ],
+        "linear_drag_coefficient": 1.0
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          "0.45 + 0.12 * v.particle_random_2",
-          "0.45 + 0.12 * v.particle_random_2"
+          "(0.14 + 0.1 * v.particle_random_2) * (1 - 0.5 * v.particle_age / v.particle_lifetime)",
+          "(0.14 + 0.1 * v.particle_random_2) * (1 - 0.5 * v.particle_age / v.particle_lifetime)"
         ],
-        "facing_camera_mode": "rotate_xyz",
+        "facing_camera_mode": "lookat_y",
         "uv": {
           "texture_width": 256,
           "texture_height": 256,
           "flipbook": {
             "base_UV": [
-              0,
-              144
+              48,
+              96
             ],
             "size_UV": [
               16,
@@ -55,9 +64,9 @@
               16,
               0
             ],
-            "max_frame": 5,
-            "loop": false,
-            "stretch_to_lifetime": true
+            "frames_per_second": 14,
+            "max_frame": 8,
+            "loop": true
           }
         }
       },
@@ -65,9 +74,10 @@
         "color": {
           "interpolant": "v.particle_age / v.particle_lifetime",
           "gradient": {
-            "0.0": "#002B3A14",
-            "0.3": "#902B3A14",
-            "1.0": "#001A220C"
+            "0.0": "#00FFFFFF",
+            "0.12": "#FFFFFFFF",
+            "0.7": "#FFFFFFFF",
+            "1.0": "#00FFFFFF"
           }
         }
       }

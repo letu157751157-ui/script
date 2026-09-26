@@ -4,7 +4,7 @@
     "description": {
       "identifier": "harvester:soul_wisp",
       "basic_render_parameters": {
-        "material": "particles_add",
+        "material": "particles_blend",
         "texture": "textures/particle/harvester_particles"
       }
     },
@@ -36,8 +36,8 @@
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          "0.2 * (1 - 0.4 * v.particle_age / v.particle_lifetime)",
-          "0.2 * (1 - 0.4 * v.particle_age / v.particle_lifetime)"
+          "0.16 * (1 - 0.4 * v.particle_age / v.particle_lifetime)",
+          "0.16 * (1 - 0.4 * v.particle_age / v.particle_lifetime)"
         ],
         "facing_camera_mode": "rotate_xyz",
         "uv": {
@@ -46,7 +46,7 @@
           "flipbook": {
             "base_UV": [
               0,
-              144
+              160
             ],
             "size_UV": [
               16,
@@ -56,7 +56,7 @@
               16,
               0
             ],
-            "frames_per_second": 10,
+            "frames_per_second": 8,
             "max_frame": 4,
             "loop": true
           }

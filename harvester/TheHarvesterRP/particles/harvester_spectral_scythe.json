@@ -4,7 +4,7 @@
     "description": {
       "identifier": "harvester:spectral_scythe",
       "basic_render_parameters": {
-        "material": "particles_add",
+        "material": "particles_blend",
         "texture": "textures/particle/harvester_particles"
       }
     },
@@ -40,8 +40,8 @@
           "texture_width": 256,
           "texture_height": 256,
           "uv": [
-            128,
-            96
+            224,
+            64
           ],
           "uv_size": [
             32,

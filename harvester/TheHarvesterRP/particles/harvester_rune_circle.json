@@ -21,7 +21,7 @@
       },
       "minecraft:particle_initial_spin": {
         "rotation": "math.random(0, 360)",
-        "rotation_rate": 35
+        "rotation_rate": 20
       },
       "minecraft:particle_appearance_billboard": {
         "size": [

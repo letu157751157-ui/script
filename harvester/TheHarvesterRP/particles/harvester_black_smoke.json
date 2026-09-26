@@ -10,7 +10,7 @@
     },
     "components": {
       "minecraft:emitter_rate_instant": {
-        "num_particles": 14
+        "num_particles": 12
       },
       "minecraft:emitter_lifetime_once": {
         "active_time": 0.05
@@ -37,8 +37,8 @@
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          "0.45 + 0.15 * v.particle_random_2",
-          "0.45 + 0.15 * v.particle_random_2"
+          "0.4 + 0.12 * v.particle_random_2",
+          "0.4 + 0.12 * v.particle_random_2"
         ],
         "facing_camera_mode": "rotate_xyz",
         "uv": {
@@ -46,7 +46,7 @@
           "texture_height": 256,
           "flipbook": {
             "base_UV": [
-              128,
+              0,
               144
             ],
             "size_UV": [
@@ -57,7 +57,7 @@
               16,
               0
             ],
-            "max_frame": 4,
+            "max_frame": 5,
             "loop": false,
             "stretch_to_lifetime": true
           }
@@ -67,9 +67,9 @@
         "color": {
           "interpolant": "v.particle_age / v.particle_lifetime",
           "gradient": {
-            "0.0": "#E00E0E12",
-            "0.6": "#B0141418",
-            "1.0": "#00141418"
+            "0.0": "#E83A3070",
+            "0.6": "#B0221C48",
+            "1.0": "#00221C48"
           }
         }
       }

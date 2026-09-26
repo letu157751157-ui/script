@@ -47,6 +47,98 @@
         }
       }
     },
+    "controller.animation.pa_harvester.soulfire": {
+      "states": {
+        "default": {
+          "particle_effects": [
+            {
+              "effect": "hem",
+              "locator": "feet"
+            },
+            {
+              "effect": "blade_fire",
+              "locator": "blade"
+            }
+          ],
+          "transitions": [
+            {
+              "dead": "!query.is_alive"
+            },
+            {
+              "phase2": "query.max_health > 0 && query.health <= query.max_health * 0.6"
+            }
+          ]
+        },
+        "phase2": {
+          "particle_effects": [
+            {
+              "effect": "hem",
+              "locator": "feet"
+            },
+            {
+              "effect": "blade_fire",
+              "locator": "blade"
+            },
+            {
+              "effect": "hand_fire",
+              "locator": "hand_left"
+            },
+            {
+              "effect": "hand_fire",
+              "locator": "hand_right"
+            }
+          ],
+          "transitions": [
+            {
+              "dead": "!query.is_alive"
+            },
+            {
+              "phase3": "query.health <= query.max_health * 0.3"
+            },
+            {
+              "default": "query.health > query.max_health * 0.6"
+            }
+          ]
+        },
+        "phase3": {
+          "particle_effects": [
+            {
+              "effect": "hem_big",
+              "locator": "feet"
+            },
+            {
+              "effect": "blade_fire",
+              "locator": "blade"
+            },
+            {
+              "effect": "blade_fire",
+              "locator": "blade_tip"
+            },
+            {
+              "effect": "hand_fire",
+              "locator": "hand_left"
+            },
+            {
+              "effect": "hand_fire",
+              "locator": "hand_right"
+            },
+            {
+              "effect": "crown",
+              "locator": "eyes"
+            }
+          ],
+          "transitions": [
+            {
+              "dead": "!query.is_alive"
+            },
+            {
+              "phase2": "query.health > query.max_health * 0.3"
+            }
+          ]
+        },
+        "dead": {}
+      }
+    },
     "controller.animation.pa_harvester.look": {
       "states": {
         "default": {

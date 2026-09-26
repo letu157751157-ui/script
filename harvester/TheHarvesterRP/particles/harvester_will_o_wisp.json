@@ -2,9 +2,9 @@
   "format_version": "1.10.0",
   "particle_effect": {
     "description": {
-      "identifier": "harvester:phantom_scythe",
+      "identifier": "harvester:will_o_wisp",
       "basic_render_parameters": {
-        "material": "particles_add",
+        "material": "particles_blend",
         "texture": "textures/particle/harvester_particles"
       }
     },
@@ -15,38 +15,36 @@
       "minecraft:emitter_lifetime_once": {
         "active_time": 0.05
       },
-      "minecraft:emitter_shape_point": {
-        "direction": [
-          "v.dir_x",
-          "v.dir_y",
-          "v.dir_z"
-        ]
-      },
+      "minecraft:emitter_shape_point": {},
       "minecraft:particle_lifetime_expression": {
-        "max_lifetime": "v.life"
-      },
-      "minecraft:particle_initial_speed": "v.speed",
-      "minecraft:particle_initial_spin": {
-        "rotation": "math.random(0, 360)",
-        "rotation_rate": 1080
+        "max_lifetime": 0.3
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          0.85,
-          0.85
+          "0.34 * (1 - 0.5 * v.particle_age / v.particle_lifetime)",
+          "0.34 * (1 - 0.5 * v.particle_age / v.particle_lifetime)"
         ],
         "facing_camera_mode": "rotate_xyz",
         "uv": {
           "texture_width": 256,
           "texture_height": 256,
-          "uv": [
-            128,
-            96
-          ],
-          "uv_size": [
-            32,
-            32
-          ]
+          "flipbook": {
+            "base_UV": [
+              160,
+              144
+            ],
+            "size_UV": [
+              16,
+              16
+            ],
+            "step_UV": [
+              16,
+              0
+            ],
+            "frames_per_second": 12,
+            "max_frame": 4,
+            "loop": true
+          }
         }
       },
       "minecraft:particle_appearance_tinting": {
@@ -54,7 +52,7 @@
           "interpolant": "v.particle_age / v.particle_lifetime",
           "gradient": {
             "0.0": "#FFFFFFFF",
-            "0.85": "#FFFFFFFF",
+            "0.35": "#FFFFFFFF",
             "1.0": "#00FFFFFF"
           }
         }

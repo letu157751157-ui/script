@@ -56,7 +56,8 @@ function problem(kind, detail) {
     const key = kind + ": " + detail;
     problems.set(key, (problems.get(key) ?? 0) + 1);
 }
-const stats = { particles: {}, animations: {}, sounds: 0, damage: 0, casts: {}, mobDamage: 0, titles: new Set(), actionBar: 0 };
+const stats = { particles: {}, animations: {}, sounds: 0, damage: 0, casts: {}, mobDamage: 0, titles: new Set(), actionBar: 0, soundIds: {} };
+let particleLog = null; // [{ pid, loc }] while a mechanic test records
 
 const mock = `
 export const __hooks = globalThis.__harvesterMock;
@@ -126,7 +127,7 @@ class MockEntity {
         this.typeId = typeId;
         this.dimension = dim;
         this.location = { ...loc };
-        this.hp = hp; this.maxHp = hp;
+        this.hp = hp; this.maxHp = hp; this.taken = 0;
         this.tags = new Set();
         this.effects = {};
         this.valid = true;
@@ -172,6 +173,7 @@ class MockEntity {
         else if (this.typeId !== "pa:harvester" && opts?.damagingEntity?.typeId === "pa:harvester" && !opts.__melee) stats.mobDamage += amount;
         const mitigated = (this.effects.resistance?.until > tick && this.effects.resistance.amp >= 4) ? 0 : amount;
         this.hp -= mitigated;
+        this.taken += mitigated;
         world._afterQueue.push(() => after.entityHurt.fire({ hurtEntity: this, damage: amount, damageSource: { cause: opts?.cause ?? "none", damagingEntity: opts?.damagingEntity } }));
         if (this.hp <= 0 && this.valid) this.die(opts?.damagingEntity);
         return true;
@@ -264,12 +266,13 @@ function makeDim(id) {
         getPlayers(o = {}) { return dim.getEntities({ ...o, type: "minecraft:player" }); },
         spawnParticle(pid, loc, map) {
             stats.particles[pid] = (stats.particles[pid] ?? 0) + 1;
+            if (particleLog) particleLog.push({ pid, loc: { ...loc } });
             if (!particles[pid]) { if (pid.startsWith("harvester:")) problem("particle", "missing " + pid); return; }
             for (const k of ["x", "y", "z"]) if (!Number.isFinite(loc[k])) problem("particle", pid + " at NaN");
             const given = map ? Object.keys(map.vars) : [];
             for (const v of particles[pid]) if (!given.includes(v)) problem("particle", `${pid} reads v.${v} but the script did not set it`);
         },
-        playSound(sid, loc, opts) { stats.sounds++; for (const k of ["x", "y", "z"]) if (!Number.isFinite(loc[k])) problem("sound", "NaN"); },
+        playSound(sid, loc, opts) { stats.sounds++; stats.soundIds[sid] = (stats.soundIds[sid] ?? 0) + 1; for (const k of ["x", "y", "z"]) if (!Number.isFinite(loc[k])) problem("sound", "NaN"); },
         spawnEntity(type, loc) { const e = new MockEntity(type, dim, loc, 20); world._afterQueue.push(() => after.entitySpawn.fire({ entity: e, cause: "Spawned" })); return e; },
         getBlock() { return { isAir: true, isLiquid: false, typeId: "minecraft:air" }; },
         getTopmostBlock() { return undefined; },
@@ -457,6 +460,83 @@ console.log("Skill damage dealt to the iron golem:", stats.mobDamage.toFixed(0))
 golem.kill();
 for (let i = 0; i < 20 * 5; i++) step(); // target dies -> boss calms down without errors
 duel.remove();
+
+// scenario 6: each rite does what its description says (cast one at a time through the test hook)
+const H = await import(pathToFileURL(path.join(tmp, "harvester.js")));
+const run = (n) => { for (let i = 0; i < n; i++) step(); };
+const X = 3000, Z = 3000;
+const rite = new MockEntity("pa:harvester", ow, { x: X, y: 64, z: Z }, BOSS_HP);
+const dummy = (name, dx, dz) => {
+    const p = new MockPlayer(name, ow, { x: X + dx, y: 64, z: Z + dz });
+    p.hp = p.maxHp = 500;
+    return p;
+};
+const A = dummy("A", 0, 8), B = dummy("B", 1.5, 8), C = dummy("C", 6, 8);
+const fresh = () => { for (const p of [A, B, C]) { p.taken = 0; p.effects = {}; } };
+const place = (p, dx, dz) => { p.location = { x: X + dx, y: 64, z: Z + dz }; };
+const expect = (ok, what) => { if (!ok) problem("mechanic", what); };
+run(2);
+
+// Field of Souls: the target's furrow is planted, the one next to it is bare
+fresh(); place(B, 1.6, 8); place(C, 30, 30);
+H.castForTest(rite, "field", A); run(50);
+expect(A.taken > 0, "Field of Souls: the target standing in a planted furrow was not hit");
+expect(B.taken === 0, "Field of Souls: a player in a bare furrow was hit");
+
+// Will-o'-the-Wisps: a target that stands still gets caught
+fresh(); place(B, 30, -30);
+H.castForTest(rite, "wisps", A); run(170);
+expect(A.taken > 0, "Will-o'-the-Wisps: no wisp reached a target standing still");
+
+// Candles of the Dead: standing on a candle for 1 s snuffs it; the others erupt
+fresh(); place(B, 30, -30);
+particleLog = [];
+const fizz = stats.soundIds["random.fizz"] ?? 0;
+H.castForTest(rite, "candles", A); run(16);
+const candles = [];
+for (const { pid, loc } of particleLog) {
+    if (pid === "harvester:candle" && !candles.some((c) => Math.hypot(c.x - loc.x, c.z - loc.z) < 0.5)) candles.push(loc);
+}
+expect(candles.length === 3, `Candles of the Dead: ${candles.length} candles lit instead of 3`);
+if (candles[0]) place(B, candles[0].x - X, candles[0].z - Z);
+run(30);
+place(B, 30, -30);
+expect((stats.soundIds["random.fizz"] ?? 0) === fizz + 1, "Candles of the Dead: standing on a candle did not snuff it");
+particleLog = [];
+run(120);
+const columns = particleLog.filter((e) => e.pid === "harvester:fire_column").length;
+expect(columns === 2, `Candles of the Dead: ${columns} candles erupted instead of the 2 left burning`);
+particleLog = null;
+
+// Buried Alive: the target standing still is buried, a player beside the coffin is not
+fresh(); place(B, 2.5, 8);
+H.castForTest(rite, "coffin", A); run(26);
+expect((A.effects.slowness?.amp ?? 0) >= 10, "Buried Alive: the target inside the coffin was not held");
+expect(A.taken > 0, "Buried Alive: the target inside the coffin took no damage");
+expect(B.taken === 0 && !B.effects.slowness, "Buried Alive: a player beside the coffin was buried");
+run(30);
+
+// Footsteps of the Dead: standing still burns, walking away does not
+fresh(); place(B, 2, 4);
+H.castForTest(rite, "trail", A);
+for (let i = 0; i < 150; i++) { B.location = { ...B.location, x: B.location.x + 0.3 }; step(); }
+expect(A.taken > 0, "Footsteps of the Dead: a player standing still did not burn");
+expect(B.taken === 0, "Footsteps of the Dead: a player walking away burned");
+
+// Plague Pyre: the fire spreads to whoever stands next to the target, not further
+fresh(); place(B, 2, 8); place(C, 6, 8);
+H.castForTest(rite, "pyre", A); run(34);
+expect(A.taken > 0 && B.taken > 0, "Plague Pyre: the target or the player next to it did not burn");
+expect(C.taken === 0, "Plague Pyre: a player 6 blocks away burned");
+run(90);
+
+// Danse Macabre: the ring closes on a target that stays in the middle
+fresh(); place(B, 0, 30); place(C, 30, 30);
+H.castForTest(rite, "danse", A); run(75);
+expect(A.taken > 0, "Danse Macabre: the target in the middle of the ring was not hit");
+expect(B.taken === 0, "Danse Macabre: a player far outside the ring was hit");
+for (const p of [A, B, C]) p.remove();
+rite.remove();
 for (let i = 0; i < 100; i++) step();
 if (boss2.valid) problem("scenario", "second boss did not die");
 after.playerLeave.fire({ playerId: heroes[2].id, playerName: "Far" });

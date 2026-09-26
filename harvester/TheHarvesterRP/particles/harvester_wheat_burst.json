@@ -2,7 +2,7 @@
   "format_version": "1.10.0",
   "particle_effect": {
     "description": {
-      "identifier": "harvester:bone_hand",
+      "identifier": "harvester:wheat_burst",
       "basic_render_parameters": {
         "material": "particles_blend",
         "texture": "textures/particle/harvester_particles"
@@ -10,26 +10,34 @@
     },
     "components": {
       "minecraft:emitter_rate_instant": {
-        "num_particles": 1
+        "num_particles": 4
       },
       "minecraft:emitter_lifetime_once": {
         "active_time": 0.05
       },
-      "minecraft:emitter_shape_point": {},
-      "minecraft:particle_lifetime_expression": {
-        "max_lifetime": "v.life"
-      },
-      "minecraft:particle_motion_parametric": {
-        "relative_position": [
-          0,
-          "-0.35 + math.min(v.particle_age * 4, 1) * 0.35",
-          0
+      "minecraft:emitter_shape_point": {
+        "direction": [
+          "math.random(-0.25, 0.25)",
+          1,
+          "math.random(-0.25, 0.25)"
         ]
+      },
+      "minecraft:particle_lifetime_expression": {
+        "max_lifetime": "math.random(0.35, 0.55)"
+      },
+      "minecraft:particle_initial_speed": "math.random(3, 5)",
+      "minecraft:particle_motion_dynamic": {
+        "linear_acceleration": [
+          0,
+          0,
+          0
+        ],
+        "linear_drag_coefficient": 2.5
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          0.38,
-          0.38
+          "0.2 * (1 - 0.5 * v.particle_age / v.particle_lifetime)",
+          "0.2 * (1 - 0.5 * v.particle_age / v.particle_lifetime)"
         ],
         "facing_camera_mode": "lookat_y",
         "uv": {
@@ -38,7 +46,7 @@
           "flipbook": {
             "base_UV": [
               48,
-              160
+              96
             ],
             "size_UV": [
               16,
@@ -48,9 +56,9 @@
               16,
               0
             ],
-            "max_frame": 3,
-            "loop": false,
-            "stretch_to_lifetime": true
+            "frames_per_second": 14,
+            "max_frame": 8,
+            "loop": true
           }
         }
       },
@@ -58,8 +66,9 @@
         "color": {
           "interpolant": "v.particle_age / v.particle_lifetime",
           "gradient": {
-            "0.0": "#FFFFFFFF",
-            "0.85": "#FFFFFFFF",
+            "0.0": "#00FFFFFF",
+            "0.12": "#FFFFFFFF",
+            "0.7": "#FFFFFFFF",
             "1.0": "#00FFFFFF"
           }
         }

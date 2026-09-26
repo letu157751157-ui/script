@@ -24,7 +24,8 @@
         "death": "animation.pa_harvester.death",
         "base_controller": "controller.animation.pa_harvester.base",
         "attack_controller": "controller.animation.pa_harvester.attack",
-        "look_controller": "controller.animation.pa_harvester.look"
+        "look_controller": "controller.animation.pa_harvester.look",
+        "soulfire_controller": "controller.animation.pa_harvester.soulfire"
       },
       "render_controllers": [
         "controller.render.iron_golem",
@@ -34,7 +35,8 @@
         "animate": [
           "base_controller",
           "attack_controller",
-          "look_controller"
+          "look_controller",
+          "soulfire_controller"
         ]
       },
       "spawn_egg": {
@@ -50,7 +52,13 @@
         "smoke": "harvester:black_smoke",
         "souls": "harvester:soul_burst",
         "wisp": "harvester:soul_wisp",
-        "dirt": "harvester:dirt_burst"
+        "ash": "harvester:ash_burst",
+        "flames": "harvester:soul_flames",
+        "hem": "harvester:soulfire_hem",
+        "hem_big": "harvester:soulfire_hem_big",
+        "blade_fire": "harvester:soulfire_blade",
+        "hand_fire": "harvester:soulfire_hand",
+        "crown": "harvester:soulfire_crown"
       }
     }
   }
