@@ -1,0 +1,38 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frozen_boot_d2d0599c"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "ABA",
+      "CDC",
+      " C "
+    ],
+    "key": {
+      "A": {
+        "item": "ytaun:big_yeti_fur",
+        "data": 0
+      },
+      "B": {
+        "item": "ytaun:utrasmithing",
+        "data": 0
+      },
+      "C": {
+        "item": "ytaun:frozensteel",
+        "data": 0
+      },
+      "D": {
+        "item": "minecraft:netherite_boots",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "ytaun:frozen_boot",
+      "count": 1
+    }
+  }
+}

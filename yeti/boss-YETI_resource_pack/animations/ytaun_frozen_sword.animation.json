@@ -1,0 +1,79 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.ytaun_frozen_sword.first_person": {
+      "loop": true,
+      "animation_length": 1,
+      "bones": {
+        "rightitem": {
+          "rotation": [
+            -180,
+            0,
+            0
+          ],
+          "position": [
+            -5,
+            35,
+            -5.5
+          ]
+        },
+        "bone8": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.5": [
+              0,
+              0,
+              1080
+            ],
+            "1.0": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "animation.ytaun_frozen_sword.third_person": {
+      "loop": true,
+      "animation_length": 1,
+      "bones": {
+        "rightitem": {
+          "rotation": [
+            90,
+            0,
+            90
+          ],
+          "position": [
+            0,
+            22,
+            5
+          ]
+        },
+        "bone8": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.5": [
+              -3696.884186163411,
+              -1423.997939390756,
+              -4387.981569999756
+            ],
+            "1.0": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    }
+  }
+}

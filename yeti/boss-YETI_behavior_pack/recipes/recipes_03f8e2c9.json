@@ -1,0 +1,19 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_furnace": {
+    "tags": [
+      "smoker"
+    ],
+    "output": {
+      "item": "ytaun:cooked_yeti_meat",
+      "data": 0
+    },
+    "input": {
+      "item": "ytaun:yeti_meat",
+      "data": 0
+    },
+    "description": {
+      "identifier": "recipes_fdfc5fe5"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "recipes_5c5b18d0"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "ABA",
+      "ACA",
+      " D "
+    ],
+    "key": {
+      "A": {
+        "item": "ytaun:yeti_fur",
+        "data": 0
+      },
+      "B": {
+        "item": "ytaun:utra_change_smithing",
+        "data": 0
+      },
+      "C": {
+        "item": "ytaun:frozemeral_chestplate",
+        "data": 0
+      },
+      "D": {
+        "item": "minecraft:diamond_block",
+        "data": 0
+      }
+    },
+    "result": [
+      {
+        "item": "ytaun:frozen_chestplate",
+        "count": 1
+      }
+    ]
+  }
+}

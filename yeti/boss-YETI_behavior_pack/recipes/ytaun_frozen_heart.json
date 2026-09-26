@@ -1,0 +1,30 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frozen_heart_681f16df"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "AAA",
+      "ABA",
+      "AAA"
+    ],
+    "key": {
+      "A": {
+        "item": "ytaun:frozen_heart_piece",
+        "data": 0
+      },
+      "B": {
+        "item": "ytaun:yeti_core",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "ytaun:frozen_heart",
+      "count": 1
+    }
+  }
+}

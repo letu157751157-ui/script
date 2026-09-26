@@ -1,0 +1,29 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "raw_rast_iron_8386b0b7"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "AB",
+      " B"
+    ],
+    "key": {
+      "A": {
+        "item": "minecraft:iron_ingot",
+        "data": 0
+      },
+      "B": {
+        "item": "minecraft:coal",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "ytaun:raw_rast_iron",
+      "count": 1
+    }
+  }
+}

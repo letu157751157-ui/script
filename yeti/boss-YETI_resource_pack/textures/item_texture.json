@@ -1,0 +1,142 @@
+{
+  "resource_pack_name": "vanilla",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "ytaun:big_yeti_fur": {
+      "textures": "textures/items/pamobile/ytaun_big_yeti_fur"
+    },
+    "ytaun:cooked_yeti_meat": {
+      "textures": "textures/items/pamobile/ytaun_cooked_yeti_meat"
+    },
+    "ytaun:core": {
+      "textures": "textures/items/pamobile/ytaun_core"
+    },
+    "ytaun_frozemeral_chestplate": {
+      "textures": [
+        "textures/items/pamobile/ytaun_frozemeral_chestplate"
+      ]
+    },
+    "ytaun_frozen_chestplate": {
+      "textures": [
+        "textures/items/pamobile/ytaun_frozen_chestplate"
+      ]
+    },
+    "ytaun_frozen_hat": {
+      "textures": [
+        "textures/items/pamobile/ytaun_frozen_hat"
+      ]
+    },
+    "ytaun:frozen_heart": {
+      "textures": "textures/items/pamobile/ytaun_frozen_heart"
+    },
+    "ytaun:frozen_heart_piece": {
+      "textures": "textures/items/pamobile/ytaun_frozen_heart_piece"
+    },
+    "ytaun_frozen_sword": {
+      "textures": "textures/items/pamobile/ytaun_frozen_sword"
+    },
+    "ytaun:frozensteel": {
+      "textures": "textures/items/pamobile/ytaun_frozensteel"
+    },
+    "ytaun_frozether_legging": {
+      "textures": [
+        "textures/items/pamobile/ytaun_frozether_legging"
+      ]
+    },
+    "ytaun_frozpeed_boot": {
+      "textures": [
+        "textures/items/pamobile/ytaun_frozpeed_boot"
+      ]
+    },
+    "ytaun_frozenscythe": {
+      "textures": "textures/items/pamobile/ytaun_frozenscythe"
+    },
+    "ytaun:ice_ore": {
+      "textures": "textures/items/pamobile/ytaun_ice_ore"
+    },
+    "ytaun:icesteel": {
+      "textures": "textures/items/pamobile/ytaun_icesteel"
+    },
+    "ytaun_ice_bar": {
+      "textures": "textures/items/pamobile/ytaun_ice_bar"
+    },
+    "ytaun:rawfrozensteel": {
+      "textures": "textures/items/pamobile/ytaun_rawfrozensteel"
+    },
+    "ytaun:rawicesteel": {
+      "textures": "textures/items/pamobile/ytaun_rawicesteel"
+    },
+    "ytaun:yeti_1_spawn_egg": {
+      "textures": "textures/items/pamobile/ytaun_yeti_1_spawn_egg"
+    },
+    "ytaun:yeti_3_spawn_egg": {
+      "textures": "textures/items/pamobile/ytaun_yeti_3_spawn_egg"
+    },
+    "ytaun:yeti_2_spawn_egg": {
+      "textures": "textures/items/pamobile/ytaun_yeti_2_spawn_egg"
+    },
+    "ytaun:yeti_boss_pet_spawn_egg": {
+      "textures": "textures/items/pamobile/ytaun_yeti_boss_pet_spawn_egg"
+    },
+    "ytaun:yeti_core": {
+      "textures": "textures/items/pamobile/ytaun_yeti_core"
+    },
+    "ytaun:yeti_fur": {
+      "textures": "textures/items/pamobile/ytaun_yeti_fur"
+    },
+    "ytaun:yeti_meat": {
+      "textures": "textures/items/pamobile/ytaun_yeti_meat"
+    },
+    "ytaun:yeti_pet_spawn_egg": {
+      "textures": "textures/items/pamobile/ytaun_yeti_pet_spawn_egg"
+    },
+    "ytaun:yeti_boss_pet_riu_spawn_egg": {
+      "textures": "textures/items/pamobile/ytaun_yeti_boss_pet_riu_spawn_egg"
+    },
+    "ytaun:compressedfire": {
+      "textures": "textures/items/pamobile/ytaun_compressedfire"
+    },
+    "ytaun_frozen_boot": {
+      "textures": [
+        "textures/items/pamobile/ytaun_frozen_boot"
+      ]
+    },
+    "ytaun_frozen_helmet": {
+      "textures": [
+        "textures/items/pamobile/ytaun_frozen_helmet"
+      ]
+    },
+    "ytaun_frozen_legging": {
+      "textures": [
+        "textures/items/pamobile/ytaun_frozen_legging"
+      ]
+    },
+    "ytaun:rast_ingot": {
+      "textures": "textures/items/pamobile/ytaun_rast_ingot"
+    },
+    "ytaun:raw_rast_iron": {
+      "textures": "textures/items/pamobile/ytaun_raw_rast_iron"
+    },
+    "ytaun:raw_steel": {
+      "textures": "textures/items/pamobile/ytaun_raw_steel"
+    },
+    "ytaun:soul": {
+      "textures": "textures/items/pamobile/ytaun_soul"
+    },
+    "ytaun:steel_ingot": {
+      "textures": "textures/items/pamobile/ytaun_steel_ingot"
+    },
+    "ytaun:steel_stick": {
+      "textures": "textures/items/pamobile/ytaun_steel_stick"
+    },
+    "ytaun:utra_change_smithing": {
+      "textures": "textures/items/pamobile/ytaun_utra_change_smithing"
+    },
+    "ytaun:utrasmithing": {
+      "textures": "textures/items/pamobile/ytaun_utrasmithing"
+    },
+    "ytaun:yeti_death_spawn_egg": {
+      "textures": "textures/items/pamobile/ytaun_yeti_death_spawn_egg"
+    }
+  }
+}

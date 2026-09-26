@@ -1,0 +1,33 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frozether_legging_578e4901"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      " A ",
+      "BCB"
+    ],
+    "key": {
+      "A": {
+        "item": "ytaun:utra_change_smithing",
+        "data": 0
+      },
+      "B": {
+        "item": "ytaun:compressedfire",
+        "data": 0
+      },
+      "C": {
+        "item": "ytaun:frozen_legging",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "ytaun:frozether_legging",
+      "count": 1
+    }
+  }
+}

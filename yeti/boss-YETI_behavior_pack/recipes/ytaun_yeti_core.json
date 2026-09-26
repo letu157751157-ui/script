@@ -1,0 +1,38 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "yeti_core_c3be1dea"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "ABA",
+      "CDC",
+      "ABA"
+    ],
+    "key": {
+      "A": {
+        "item": "ytaun:soul",
+        "data": 0
+      },
+      "B": {
+        "item": "ytaun:big_yeti_fur",
+        "data": 0
+      },
+      "C": {
+        "item": "minecraft:blue_ice",
+        "data": 0
+      },
+      "D": {
+        "item": "ytaun:core",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "ytaun:yeti_core",
+      "count": 1
+    }
+  }
+}

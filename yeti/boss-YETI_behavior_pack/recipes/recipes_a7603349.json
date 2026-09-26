@@ -1,0 +1,40 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "recipes_cdf9100a"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      " A ",
+      "BCB",
+      " D "
+    ],
+    "key": {
+      "A": {
+        "item": "ytaun:utra_change_smithing",
+        "data": 0
+      },
+      "B": {
+        "item": "ytaun:yeti_fur",
+        "data": 0
+      },
+      "C": {
+        "item": "ytaun:frozen_hat",
+        "data": 0
+      },
+      "D": {
+        "item": "minecraft:diamond_block",
+        "data": 0
+      }
+    },
+    "result": [
+      {
+        "item": "ytaun:frozen_helmet",
+        "count": 1
+      }
+    ]
+  }
+}

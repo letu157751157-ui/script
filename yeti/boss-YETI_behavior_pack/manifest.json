@@ -1,0 +1,70 @@
+{
+  "format_version": 2,
+  "header": {
+    "description": "Boss Yeti - 3 evolution phases + Ice Spike & Charge Attack skills",
+    "name": "boss-YETI",
+    "uuid": "783c33f4-f383-4068-955f-222cbd7016e5",
+    "version": [
+      1,
+      1,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      17,
+      0
+    ]
+  },
+  "modules": [
+    {
+      "description": "Boss Yeti behavior data",
+      "type": "data",
+      "uuid": "7f74a821-3318-4850-a1a4-d6ce6788d59f",
+      "version": [
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "type": "script",
+      "uuid": "f6c85397-dc37-4ed4-a43f-0682cd2b5fea",
+      "version": [
+        1,
+        1,
+        0
+      ],
+      "entry": "scripts/main.js",
+      "language": "javascript"
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "65d381f3-0626-4781-9f38-2c86c65cfa21",
+      "version": [
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "version": "2.7.0",
+      "module_name": "@minecraft/server"
+    },
+    {
+      "version": "2.0.0",
+      "module_name": "@minecraft/server-ui"
+    }
+  ],
+  "metadata": {
+    "authors": [
+      "YTAUN"
+    ],
+    "generated_with": {
+      "MAM": [
+        "3.9.7"
+      ]
+    },
+    "url": "https://addonsmaker.com/"
+  }
+}

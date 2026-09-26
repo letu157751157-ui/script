@@ -1,0 +1,35 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "recipes_5d582fe1"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      " A ",
+      "BCB"
+    ],
+    "key": {
+      "A": {
+        "item": "ytaun:utra_change_smithing",
+        "data": 0
+      },
+      "B": {
+        "item": "ytaun:yeti_fur",
+        "data": 0
+      },
+      "C": {
+        "item": "ytaun:frozpeed_boot",
+        "data": 0
+      }
+    },
+    "result": [
+      {
+        "item": "ytaun:frozen_boot",
+        "count": 1
+      }
+    ]
+  }
+}

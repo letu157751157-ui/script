@@ -1,0 +1,38 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frozen_legging_98f8cad8"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "ABA",
+      "ACA",
+      "DAD"
+    ],
+    "key": {
+      "A": {
+        "item": "ytaun:frozensteel",
+        "data": 0
+      },
+      "B": {
+        "item": "ytaun:utrasmithing",
+        "data": 0
+      },
+      "C": {
+        "item": "minecraft:netherite_leggings",
+        "data": 0
+      },
+      "D": {
+        "item": "ytaun:big_yeti_fur",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "ytaun:frozen_legging",
+      "count": 1
+    }
+  }
+}

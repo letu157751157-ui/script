@@ -1,0 +1,38 @@
+{
+  "format_version": "1.21.120",
+  "minecraft:item": {
+    "description": {
+      "identifier": "ytaun:cooked_yeti_meat",
+      "menu_category": {
+        "category": "nature"
+      }
+    },
+    "components": {
+      "minecraft:hand_equipped": false,
+      "minecraft:max_stack_size": 64,
+      "minecraft:glint": false,
+      "minecraft:food": {
+        "saturation_modifier": 2,
+        "nutrition": 8,
+        "can_always_eat": false
+      },
+      "minecraft:use_modifiers": {
+        "emit_vibrations": true,
+        "movement_modifier": 0.35,
+        "use_duration": 1.6
+      },
+      "minecraft:allow_off_hand": false,
+      "minecraft:tags": {
+        "tags": [
+          "minecraft:is_food"
+        ]
+      },
+      "minecraft:fire_resistant": {
+        "value": true
+      },
+      "minecraft:use_animation": "eat",
+      "minecraft:icon": "ytaun:cooked_yeti_meat",
+      "ytaun_cooked_yeti_meat:trigger": {}
+    }
+  }
+}

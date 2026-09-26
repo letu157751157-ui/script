@@ -1,0 +1,43 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "ytaun:yeti_boss_pet",
+      "textures": {
+        "default": "textures/entity/pamobile/ytaun_yeti_boss_pet"
+      },
+      "materials": {
+        "default": "skeleton"
+      },
+      "geometry": {
+        "default": "geometry.ytaun_yeti_boss_pet_default"
+      },
+      "render_controllers": [
+        "controller.render.translucence"
+      ],
+      "spawn_egg": {
+        "texture": "ytaun:yeti_boss_pet_spawn_egg",
+        "texture_index": 0
+      },
+      "animations": {
+        "walk": "animation.ytaun_yeti_boss_pet.walk",
+        "stand": "animation.ytaun_yeti_boss_pet.stand",
+        "run": "animation.ytaun_yeti_boss_pet.run"
+      },
+      "scripts": {
+        "animate": [
+          "root",
+          {
+            "walk": "query.is_moving && query.modified_move_speed < 0.3"
+          },
+          {
+            "run": "query.modified_move_speed > 0.3"
+          },
+          {
+            "stand": "!query.is_moving"
+          }
+        ]
+      }
+    }
+  }
+}

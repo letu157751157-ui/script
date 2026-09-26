@@ -1,0 +1,38 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frozpeed_boot_3940a2a0"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      " A ",
+      "BCB",
+      " D "
+    ],
+    "key": {
+      "A": {
+        "item": "ytaun:utra_change_smithing",
+        "data": 0
+      },
+      "B": {
+        "item": "minecraft:feather",
+        "data": 0
+      },
+      "C": {
+        "item": "ytaun:frozen_boot",
+        "data": 0
+      },
+      "D": {
+        "item": "minecraft:rabbit_foot",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "ytaun:frozpeed_boot",
+      "count": 1
+    }
+  }
+}
