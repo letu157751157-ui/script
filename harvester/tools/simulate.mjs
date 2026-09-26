@@ -57,7 +57,10 @@ function problem(kind, detail) {
     problems.set(key, (problems.get(key) ?? 0) + 1);
 }
 const stats = { particles: {}, animations: {}, sounds: 0, damage: 0, casts: {}, mobDamage: 0, titles: new Set(), actionBar: 0, soundIds: {} };
-let particleLog = null; // [{ pid, loc }] while a mechanic test records
+let particleLog = null;
+const drops = []; // items spawned with dimension.spawnItem
+const ITEM_IDS = new Set(fs.readdirSync(path.join(BP, "items")).map((f) =>
+    JSON.parse(fs.readFileSync(path.join(BP, "items", f), "utf8"))["minecraft:item"].description.identifier)); // [{ pid, loc }] while a mechanic test records
 
 const mock = `
 export const __hooks = globalThis.__harvesterMock;
@@ -273,6 +276,12 @@ function makeDim(id) {
             for (const v of particles[pid]) if (!given.includes(v)) problem("particle", `${pid} reads v.${v} but the script did not set it`);
         },
         playSound(sid, loc, opts) { stats.sounds++; stats.soundIds[sid] = (stats.soundIds[sid] ?? 0) + 1; for (const k of ["x", "y", "z"]) if (!Number.isFinite(loc[k])) problem("sound", "NaN"); },
+        spawnItem(stack, loc) {
+            for (const k of ["x", "y", "z"]) if (!Number.isFinite(loc[k])) problem("item", "spawnItem at NaN");
+            if (!stack.typeId.startsWith("minecraft:") && !ITEM_IDS.has(stack.typeId)) problem("item", "dropped unknown item " + stack.typeId);
+            drops.push({ item: stack.typeId, amount: stack.amount, tick });
+            return new MockEntity("minecraft:item", dim, loc, 5);
+        },
         spawnEntity(type, loc) { const e = new MockEntity(type, dim, loc, 20); world._afterQueue.push(() => after.entitySpawn.fire({ entity: e, cause: "Spawned" })); return e; },
         getBlock() { return { isAir: true, isLiquid: false, typeId: "minecraft:air" }; },
         getTopmostBlock() { return undefined; },
@@ -396,6 +405,12 @@ for (let i = 0; i < TOTAL && boss.valid; i++) {
 }
 for (let i = 0; i < 200; i++) step(); // let death effects play out
 const firstDefeated = !boss.valid;
+const count = (id) => drops.filter((d) => d.item === id).reduce((n, d) => n + d.amount, 0);
+if (firstDefeated) {
+    if (count("pa:reaper_skull") !== 1) problem("loot", `first boss dropped ${count("pa:reaper_skull")} Reaper Skulls instead of 1`);
+    if (count("pa:soul") < 8 || count("pa:soul") > 12) problem("loot", `first boss dropped ${count("pa:soul")} Souls instead of 8-12`);
+}
+console.log("First boss dropped:", JSON.stringify(Object.fromEntries([...new Set(drops.map((d) => d.item))].map((id) => [id, count(id)]))));
 const roars = stats.animations["animation.pa_harvester.phase_roar"] ?? 0;
 if (roars < 2) problem("scenario", `first fight reached only ${roars} phase change(s) instead of 2`);
 

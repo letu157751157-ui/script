@@ -1,4 +1,4 @@
-# The Harvester v1.6.0 — Thần Chết × Bác sĩ Dịch hạch
+# The Harvester v1.6.1 — Thần Chết × Bác sĩ Dịch hạch
 
 Boss **The Harvester** (`pa:harvester`): **Thần Chết** (lưỡi hái, mùa gặt linh hồn, đồng hồ cát, quan tài, vũ điệu tử thần)
 kết hợp **Bác sĩ Dịch hạch** (mặt nạ mỏ chim, đèn lồng, dịch hạch, giàn thiêu).
@@ -7,9 +7,9 @@ như Ghost Rider (đầu lâu là một ngọn đuốc), và phần lớn chiêu
 Bộ chiêu và bộ particle ở bản 1.5 là thiết kế riêng, **không lấy lại** chiêu hay kiểu vẽ của các addon khác trong repo
 (Aatrox, Toji, Giant Zombie).
 
-- Cài đặt: mở [`dist/TheHarvester_v1.6.0.mcaddon`](dist/TheHarvester_v1.6.0.mcaddon) (Minecraft tự nhập cả 2 pack).
-  Nếu đã cài bản cũ: vào **Cài đặt → Bộ nhớ**, xoá các pack *The Harvester* cũ, nhập file 1.6.0,
-  rồi trong thế giới bật lại cả Behavior Pack lẫn Resource Pack **1.6.0**.
+- Cài đặt: mở [`dist/TheHarvester_v1.6.1.mcaddon`](dist/TheHarvester_v1.6.1.mcaddon) (Minecraft tự nhập cả 2 pack).
+  Nếu đã cài bản cũ: vào **Cài đặt → Bộ nhớ**, xoá các pack *The Harvester* cũ, nhập file 1.6.1,
+  rồi trong thế giới bật lại cả Behavior Pack lẫn Resource Pack **1.6.1**.
 - Kiểm tra nhanh: đầu boss phải bốc lửa xanh ngọc cao như ngọn đuốc ngay khi nó xuất hiện.
   Lửa còn màu xanh dương hoặc chỉ cháy ở gấu áo thì thế giới còn dùng pack cũ.
 - Yêu cầu: Minecraft Bedrock **1.21.90+** (giống bản gốc), không cần bật Experiments.
@@ -31,6 +31,19 @@ lắc qua lại, nhỏ dần rồi tắt, liên tục thay nhau; lửa để l�
 
 Ngoài ra các chiêu Reaping Arc, Plague Pyre, Footsteps of the Dead, Buried Alive, Ember Retreat để lại **mặt đất cháy lửa hồn**
 vài giây: đứng trong đó mất 1.5–3 máu mỗi nửa giây (sát thương lửa, nên **thuốc Kháng Lửa** chặn được).
+
+## Đồ rơi
+
+Khi boss chết, sau khi cột lửa hồn bốc lên (1 giây), đồ **bắn ra từ chỗ boss chết**, lần nào cũng rơi:
+
+| Đồ | Số lượng |
+|---|---|
+| **Reaper Skull** | 1 |
+| **Soul** | 8 – 12 |
+| Kinh nghiệm | 500 XP (khi người chơi đánh đòn cuối) |
+
+Reaper Skull + Soul dùng để chế **Harvester Scythe** (công thức trong bàn chế tạo). Đồ rơi do script thả, không dùng loot table
+(loot table cũ xuất từ AddOns Maker không nạp được trong game nên boss không rơi gì).
 
 ## Bộ chiêu
 
@@ -147,6 +160,14 @@ Giữ nguyên chỉ số, chỉ sửa lỗi và đổi hiệu ứng:
 - Kill bằng chiêu của lưỡi hái giờ cũng tính cho Dark Blessing.
 - Bỏ dòng hồi chiêu trên action bar (1.4). Dùng chiêu khi chưa hồi xong thì chat vẫn báo số giây còn lại.
 
+## Bản 1.6.1 — sửa boss không rơi đồ
+
+- **Nguyên nhân:** loot table của boss là file xuất từ AddOns Maker, có trường lạ (`"id"`, `"name"`, `"data": "0"` dạng chữ);
+  Minecraft bỏ qua cả bảng nên boss chết không rơi gì. Kể cả khi bảng chạy được, một nửa số lần chỉ rơi End Stone.
+- **Sửa:** script tự thả đồ khi boss chết (giống cách addon Giant Zombie trong repo đã sửa lỗi y hệt), bỏ loot table để không rơi đôi.
+  Lần nào cũng rơi 1 Reaper Skull + 8–12 Soul, bắn tung ra quanh chỗ boss chết.
+- Giả lập kiểm tra boss chết thì rơi đúng 1 Reaper Skull và 8–12 Soul, và mọi item được thả đều có thật trong pack.
+
 ## Bản 1.6.0 — màu xanh ngọc của model, lửa bốc liên tục kiểu Ghost Rider
 
 - **Đổi tông màu toàn bộ particle sang xanh ngọc của model** (#1DE9B6, bóng #32AF8E / #00695C) thay cho xanh dương;
@@ -247,7 +268,7 @@ harvester/
 │   ├── previews.py     ảnh trong previews/
 │   ├── cleanup.py      liệt kê (hoặc xoá với --apply) file không dùng tới
 │   └── simulate.mjs    chạy thử script trên mock @minecraft/server qua cả trận đấu
-└── dist/TheHarvester_v1.6.0.mcaddon
+└── dist/TheHarvester_v1.6.1.mcaddon
 ```
 
 - `python3 build.py` (cần `pip install pillow numpy`), thêm `--previews` để vẽ lại ảnh xem trước.

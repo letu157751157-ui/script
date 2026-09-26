@@ -479,9 +479,6 @@
         ],
         "sound": "mob.wither.shoot"
       },
-      "minecraft:loot": {
-        "table": "loot_tables/entities/pa_harvester.json"
-      },
       "minecraft:behavior.ranged_attack": {
         "priority": 2,
         "burst_shots": 1,

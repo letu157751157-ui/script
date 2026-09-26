@@ -20,7 +20,7 @@ import particles  # noqa: E402
 
 BP = os.path.join(ROOT, "TheHarvesterBP")
 RP = os.path.join(ROOT, "TheHarvesterRP")
-VERSION = "1.6.0"
+VERSION = "1.6.1"
 OUT = os.path.join(ROOT, "dist", "TheHarvester_v%s.mcaddon" % VERSION)
 
 BUILTIN_VARS = {"particle_age", "particle_lifetime", "emitter_age", "emitter_lifetime"} | {

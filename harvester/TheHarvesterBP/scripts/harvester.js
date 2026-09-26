@@ -17,7 +17,7 @@
 //  Every timing below is in game ticks (20 ticks = 1 second) and matches the
 //  keyframes in TheHarvesterRP/animations/pa_harvester.animation.json.
 // ============================================================================
-import { world, system, MolangVariableMap } from "@minecraft/server";
+import { world, system, MolangVariableMap, ItemStack } from "@minecraft/server";
 
 const BOSS_ID = "pa:harvester";
 const DIMENSIONS = ["overworld", "nether", "the_end"];
@@ -1195,6 +1195,32 @@ on(world.afterEvents.entityHurt, (e) => {
     } catch {}
 });
 
+// ─── loot ───────────────────────────────────────────────────────────────────
+
+// The Harvester's drops, thrown out of the soul pillar when he dies. Dropped by the script (the entity
+// has no loot table any more): the old AddOns Maker table did not load in game, so nothing dropped.
+const LOOT = [
+    { item: "pa:reaper_skull", min: 1, max: 1 },
+    { item: "pa:soul", min: 8, max: 12 }
+];
+
+function dropLoot(dim, loc) {
+    const at = up(loc, 1.2);
+    for (const { item, min, max } of LOOT) {
+        const count = min + Math.floor(Math.random() * (max - min + 1));
+        for (let i = 0; i < count; i++) {
+            try {
+                const drop = dim.spawnItem(new ItemStack(item, 1), at);
+                const a = Math.random() * Math.PI * 2, force = 0.12 + Math.random() * 0.15;
+                try { drop.applyImpulse({ x: Math.cos(a) * force, y: 0.3 + Math.random() * 0.15, z: Math.sin(a) * force }); } catch {}
+            } catch {}
+        }
+    }
+    fx(dim, P.flames, up(loc, 0.5));
+    fx(dim, P.column, loc);
+    sound(dim, "random.levelup", loc, 0.7, 0.8);
+}
+
 // Soul Toll: a player dying near the Harvester heals it
 on(world.afterEvents.entityDie, (e) => {
     const dead = e.deadEntity;
@@ -1216,6 +1242,7 @@ on(world.afterEvents.entityDie, (e) => {
         bosses.delete(dead.id);
         fx(dim, P.pillar, loc, { duration: 3 });
         fx(dim, P.souls, up(loc, 1.5));
+        later(20, () => dropLoot(dim, loc)); // after the death animation
         fx(dim, P.beak, up(loc, 3.5));
         fx(dim, P.shockwave, up(loc, 0.1), color(SOUL, { radius: 8, life: 0.8 }));
         later(20, () => fx(dim, P.souls, up(loc, 2.5)));
