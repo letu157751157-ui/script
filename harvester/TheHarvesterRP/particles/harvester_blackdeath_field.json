@@ -48,8 +48,8 @@
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          "0.8 + 0.7 * math.sqrt(v.particle_age / v.particle_lifetime)",
-          "0.8 + 0.7 * math.sqrt(v.particle_age / v.particle_lifetime)"
+          "0.7 + 0.3 * v.particle_random_2",
+          "0.7 + 0.3 * v.particle_random_2"
         ],
         "facing_camera_mode": "rotate_xyz",
         "uv": {
@@ -57,20 +57,20 @@
           "texture_height": 256,
           "flipbook": {
             "base_UV": [
-              0,
-              64
-            ],
-            "size_UV": [
-              32,
+              80,
               32
             ],
+            "size_UV": [
+              8,
+              8
+            ],
             "step_UV": [
-              32,
+              8,
               0
             ],
-            "frames_per_second": 3,
-            "max_frame": 4,
-            "loop": true
+            "max_frame": 8,
+            "loop": false,
+            "stretch_to_lifetime": true
           }
         }
       },

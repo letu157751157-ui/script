@@ -34,15 +34,15 @@
           "texture_height": 256,
           "flipbook": {
             "base_UV": [
-              0,
-              96
+              64,
+              0
             ],
             "size_UV": [
-              32,
-              32
+              16,
+              16
             ],
             "step_UV": [
-              32,
+              16,
               0
             ],
             "max_frame": 4,

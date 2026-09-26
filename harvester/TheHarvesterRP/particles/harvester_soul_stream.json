@@ -28,8 +28,8 @@
       "minecraft:particle_initial_speed": "v.speed",
       "minecraft:particle_appearance_billboard": {
         "size": [
-          0.26,
-          0.26
+          0.22,
+          0.22
         ],
         "facing_camera_mode": "rotate_xyz",
         "uv": {
@@ -37,15 +37,15 @@
           "texture_height": 256,
           "flipbook": {
             "base_UV": [
-              0,
-              160
+              176,
+              32
             ],
             "size_UV": [
-              16,
-              16
+              8,
+              8
             ],
             "step_UV": [
-              16,
+              8,
               0
             ],
             "frames_per_second": 12,

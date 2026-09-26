@@ -22,19 +22,19 @@
       "minecraft:particle_appearance_billboard": {
         "size": [
           0.2,
-          0.4
+          0.3
         ],
         "facing_camera_mode": "lookat_y",
         "uv": {
           "texture_width": 256,
           "texture_height": 256,
           "uv": [
-            "128 + math.clamp(v.frame, 0, 7) * 16",
-            96
+            "176 + math.clamp(v.frame, 0, 7) * 8",
+            0
           ],
           "uv_size": [
-            16,
-            32
+            8,
+            12
           ]
         }
       }

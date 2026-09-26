@@ -63,7 +63,7 @@ def skills_sheet(path, cols=4):
     sheet.save(path)
 
 
-def particles_sheet(path, scale=4):
+def particles_sheet(path):
     items = []
     for name, frames in art.SPRITES.items():
         tinted = []
@@ -73,11 +73,15 @@ def particles_sheet(path, scale=4):
                 f[..., :3] = f[..., :3] * np.array(TINTS[name]) / 255.0
             tinted.append(f.astype(np.uint8))
         items.append((name, tinted))
-    cols_w = 760
+    cols_w = 900
     x = y = 8
     row_h = 0
     placements = []
+    def scale_of(frames):
+        return 8 if max(frames[0].shape[:2]) <= 16 else 4
+
     for name, frames in items:
+        scale = scale_of(frames)
         fw = sum(f.shape[1] * scale + 4 for f in frames)
         fh = max(f.shape[0] for f in frames) * scale + 18
         if x + fw > cols_w:
@@ -91,6 +95,7 @@ def particles_sheet(path, scale=4):
     for name, frames, px, py in placements:
         draw.text((px, py), name, fill=(230, 255, 245, 255))
         cx = px
+        scale = scale_of(frames)
         for f in frames:
             im = Image.fromarray(f, "RGBA").resize((f.shape[1] * scale, f.shape[0] * scale), Image.NEAREST)
             bg = Image.new("RGBA", im.size, TILE_BG)

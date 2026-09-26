@@ -1,13 +1,13 @@
 {
     "format_version": 2,
     "header": {
-        "description": "The Harvester v1.3.1 - Boss Thần Chết × Bác sĩ Dịch hạch, chiến đấu cùng set Dark Knight.\nTác giả: YTAUN",
+        "description": "The Harvester v1.3.2 - Boss Thần Chết × Bác sĩ Dịch hạch, chiến đấu cùng set Dark Knight.\nTác giả: YTAUN",
         "name": "The Harvester",
         "uuid": "d3349a89-5713-49d8-bc07-a14008dad004",
         "version": [
             1,
             3,
-            1
+            2
         ],
         "min_engine_version": [
             1,
@@ -17,13 +17,13 @@
     },
     "modules": [
         {
-            "description": "The Harvester v1.3.1 - Boss Thần Chết × Bác sĩ Dịch hạch, chiến đấu cùng set Dark Knight.\nTác giả: YTAUN",
+            "description": "The Harvester v1.3.2 - Boss Thần Chết × Bác sĩ Dịch hạch, chiến đấu cùng set Dark Knight.\nTác giả: YTAUN",
             "type": "data",
             "uuid": "53557022-ebef-4bc6-8c86-f8fa6e1445c8",
             "version": [
                 1,
                 3,
-                1
+                2
             ]
         },
         {

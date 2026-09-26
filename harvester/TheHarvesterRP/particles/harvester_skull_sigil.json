@@ -29,12 +29,12 @@
           "texture_width": 256,
           "texture_height": 256,
           "uv": [
-            0,
-            128
+            128,
+            0
           ],
           "uv_size": [
-            32,
-            32
+            16,
+            16
           ]
         }
       },

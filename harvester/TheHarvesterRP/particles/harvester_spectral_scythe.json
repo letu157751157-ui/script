@@ -40,12 +40,12 @@
           "texture_width": 256,
           "texture_height": 256,
           "uv": [
-            128,
+            144,
             0
           ],
           "uv_size": [
-            64,
-            64
+            16,
+            16
           ]
         }
       },

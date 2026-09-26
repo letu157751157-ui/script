@@ -36,8 +36,8 @@
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          "0.22 * (1 - 0.5 * v.particle_age / v.particle_lifetime)",
-          "0.22 * (1 - 0.5 * v.particle_age / v.particle_lifetime)"
+          "0.16 * (1 - 0.4 * v.particle_age / v.particle_lifetime)",
+          "0.16 * (1 - 0.4 * v.particle_age / v.particle_lifetime)"
         ],
         "facing_camera_mode": "rotate_xyz",
         "uv": {
@@ -45,15 +45,15 @@
           "texture_height": 256,
           "flipbook": {
             "base_UV": [
-              160,
-              128
+              144,
+              32
             ],
             "size_UV": [
-              16,
-              16
+              8,
+              8
             ],
             "step_UV": [
-              16,
+              8,
               0
             ],
             "frames_per_second": 10,
