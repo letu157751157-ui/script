@@ -52,12 +52,44 @@
         "default": {
           "particle_effects": [
             {
-              "effect": "hem",
-              "locator": "feet"
+              "effect": "crown",
+              "locator": "eyes"
+            },
+            {
+              "effect": "hand_fire",
+              "locator": "shoulder_left"
+            },
+            {
+              "effect": "hand_fire",
+              "locator": "shoulder_right"
+            },
+            {
+              "effect": "hand_fire",
+              "locator": "hand_left"
+            },
+            {
+              "effect": "hand_fire",
+              "locator": "hand_right"
             },
             {
               "effect": "blade_fire",
               "locator": "blade"
+            },
+            {
+              "effect": "blade_fire",
+              "locator": "blade_tip"
+            },
+            {
+              "effect": "embers",
+              "locator": "gem"
+            },
+            {
+              "effect": "skull_fire",
+              "locator": "skull_top"
+            },
+            {
+              "effect": "hem",
+              "locator": "feet"
             }
           ],
           "transitions": [
@@ -72,12 +104,16 @@
         "phase2": {
           "particle_effects": [
             {
-              "effect": "hem",
-              "locator": "feet"
+              "effect": "crown",
+              "locator": "eyes"
             },
             {
-              "effect": "blade_fire",
-              "locator": "blade"
+              "effect": "hand_fire",
+              "locator": "shoulder_left"
+            },
+            {
+              "effect": "hand_fire",
+              "locator": "shoulder_right"
             },
             {
               "effect": "hand_fire",
@@ -86,6 +122,38 @@
             {
               "effect": "hand_fire",
               "locator": "hand_right"
+            },
+            {
+              "effect": "blade_fire",
+              "locator": "blade"
+            },
+            {
+              "effect": "blade_fire",
+              "locator": "blade_tip"
+            },
+            {
+              "effect": "embers",
+              "locator": "gem"
+            },
+            {
+              "effect": "back_fire",
+              "locator": "back"
+            },
+            {
+              "effect": "blade_fire",
+              "locator": "blade_heel"
+            },
+            {
+              "effect": "fire_smoke",
+              "locator": "skull_top"
+            },
+            {
+              "effect": "skull_fire",
+              "locator": "skull_top"
+            },
+            {
+              "effect": "hem",
+              "locator": "feet"
             }
           ],
           "transitions": [
@@ -103,16 +171,16 @@
         "phase3": {
           "particle_effects": [
             {
-              "effect": "hem_big",
-              "locator": "feet"
+              "effect": "crown",
+              "locator": "eyes"
             },
             {
-              "effect": "blade_fire",
-              "locator": "blade"
+              "effect": "hand_fire",
+              "locator": "shoulder_left"
             },
             {
-              "effect": "blade_fire",
-              "locator": "blade_tip"
+              "effect": "hand_fire",
+              "locator": "shoulder_right"
             },
             {
               "effect": "hand_fire",
@@ -123,8 +191,36 @@
               "locator": "hand_right"
             },
             {
-              "effect": "crown",
-              "locator": "eyes"
+              "effect": "blade_fire",
+              "locator": "blade"
+            },
+            {
+              "effect": "blade_fire",
+              "locator": "blade_tip"
+            },
+            {
+              "effect": "embers",
+              "locator": "gem"
+            },
+            {
+              "effect": "back_fire",
+              "locator": "back"
+            },
+            {
+              "effect": "blade_fire",
+              "locator": "blade_heel"
+            },
+            {
+              "effect": "fire_smoke",
+              "locator": "skull_top"
+            },
+            {
+              "effect": "skull_fire_big",
+              "locator": "skull_top"
+            },
+            {
+              "effect": "hem_big",
+              "locator": "feet"
             }
           ],
           "transitions": [

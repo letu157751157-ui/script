@@ -21,12 +21,15 @@ import os
 
 LOCATORS = {
     # bone: {name: file-space position}
-    "bone5": {"blade": [-22.8, 46.7, -15.5], "blade_tip": [-22.8, 36.0, -24.8]},
+    "bone5": {"blade": [-22.8, 46.7, -15.5], "blade_tip": [-22.8, 36.0, -24.8], "blade_heel": [-22.8, 58, -7]},
     "bone10": {"hand_right": [-19.9, 18.1, -5.9]},
     "bone17": {"hand_left": [18.9, 18.1, -5.9]},
     "bone27": {"gem": [0, 37, -10.5]},
-    "bone28": {"eyes": [0, 45.5, -6.5]},
+    "bone28": {"eyes": [0, 45.5, -6.5], "skull_top": [0, 55, 0]},
     "bone18": {"feet": [0, 3, 0]},
+    "bone15": {"shoulder_left": [10, 39.5, 2]},
+    "bone8": {"shoulder_right": [-11, 39.5, 2]},
+    "bone6": {"back": [0, 40, 10]},
 }
 
 PARTICLES = {
@@ -40,12 +43,17 @@ PARTICLES = {
     "wisp": "harvester:soul_wisp",
     "ash": "harvester:ash_burst",
     "flames": "harvester:soul_flames",
-    # soul fire that burns on the boss all the time (controller.animation.pa_harvester.soulfire)
+    # Ghost Rider soul fire that never stops (controller.animation.pa_harvester.soulfire)
+    "skull_fire": "harvester:soulfire_skull",
+    "skull_fire_big": "harvester:soulfire_skull_big",
+    "crown": "harvester:soulfire_crown",
     "hem": "harvester:soulfire_hem",
     "hem_big": "harvester:soulfire_hem_big",
     "blade_fire": "harvester:soulfire_blade",
     "hand_fire": "harvester:soulfire_hand",
-    "crown": "harvester:soulfire_crown",
+    "back_fire": "harvester:soulfire_back",
+    "embers": "harvester:soulfire_embers",
+    "fire_smoke": "harvester:soulfire_smoke",
 }
 
 ANIMS = {}
@@ -441,6 +449,23 @@ def animation_json():
     return {"format_version": "1.8.0", "animations": anims}
 
 
+SOULFIRE_BASE = [
+    {"effect": "crown", "locator": "eyes"},
+    {"effect": "hand_fire", "locator": "shoulder_left"},
+    {"effect": "hand_fire", "locator": "shoulder_right"},
+    {"effect": "hand_fire", "locator": "hand_left"},
+    {"effect": "hand_fire", "locator": "hand_right"},
+    {"effect": "blade_fire", "locator": "blade"},
+    {"effect": "blade_fire", "locator": "blade_tip"},
+    {"effect": "embers", "locator": "gem"},
+]
+SOULFIRE_PHASE2 = [
+    {"effect": "back_fire", "locator": "back"},
+    {"effect": "blade_fire", "locator": "blade_heel"},
+    {"effect": "fire_smoke", "locator": "skull_top"},
+]
+
+
 def controllers_json():
     return {
         "format_version": "1.19.0",
@@ -467,32 +492,27 @@ def controllers_json():
                     },
                 },
             },
-            # blue soul fire that never stops burning: robe hem and scythe from the start,
-            # the hands join in phase 2 (<= 60% health), a burning crown and a bigger blaze in phase 3 (<= 30%)
+            # Ghost Rider soul fire that never stops: the skull is a torch and fire pours off the shoulders,
+            # hands, robe and scythe from the first second; below 60% health the back and the scythe heel
+            # catch too and smoke rises off the skull; below 30% the skull and robe become an inferno
             "controller.animation.pa_harvester.soulfire": {
                 "states": {
                     "default": {
-                        "particle_effects": [{"effect": "hem", "locator": "feet"},
-                                             {"effect": "blade_fire", "locator": "blade"}],
+                        "particle_effects": SOULFIRE_BASE + [{"effect": "skull_fire", "locator": "skull_top"},
+                                                             {"effect": "hem", "locator": "feet"}],
                         "transitions": [{"dead": "!query.is_alive"},
                                         {"phase2": "query.max_health > 0 && query.health <= query.max_health * 0.6"}],
                     },
                     "phase2": {
-                        "particle_effects": [{"effect": "hem", "locator": "feet"},
-                                             {"effect": "blade_fire", "locator": "blade"},
-                                             {"effect": "hand_fire", "locator": "hand_left"},
-                                             {"effect": "hand_fire", "locator": "hand_right"}],
+                        "particle_effects": SOULFIRE_BASE + SOULFIRE_PHASE2 + [
+                            {"effect": "skull_fire", "locator": "skull_top"}, {"effect": "hem", "locator": "feet"}],
                         "transitions": [{"dead": "!query.is_alive"},
                                         {"phase3": "query.health <= query.max_health * 0.3"},
                                         {"default": "query.health > query.max_health * 0.6"}],
                     },
                     "phase3": {
-                        "particle_effects": [{"effect": "hem_big", "locator": "feet"},
-                                             {"effect": "blade_fire", "locator": "blade"},
-                                             {"effect": "blade_fire", "locator": "blade_tip"},
-                                             {"effect": "hand_fire", "locator": "hand_left"},
-                                             {"effect": "hand_fire", "locator": "hand_right"},
-                                             {"effect": "crown", "locator": "eyes"}],
+                        "particle_effects": SOULFIRE_BASE + SOULFIRE_PHASE2 + [
+                            {"effect": "skull_fire_big", "locator": "skull_top"}, {"effect": "hem_big", "locator": "feet"}],
                         "transitions": [{"dead": "!query.is_alive"},
                                         {"phase2": "query.health > query.max_health * 0.3"}],
                     },

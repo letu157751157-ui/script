@@ -43,7 +43,7 @@ const P = {
     skull: "harvester:skull_sigil",
     smoke: "harvester:black_smoke"
 };
-const TEAL = { cr: 0.35, cg: 1, cb: 0.8 };
+const TEAL = { cr: 0.11, cg: 0.91, cb: 0.71 }; // the Harvester's teal (1DE9B6)
 
 function fx(dim, id, loc, vars) {
     try {

@@ -1,13 +1,14 @@
 """Pixel-art sprites for The Harvester particles — the boss's own look.
 
 Art direction: "memento mori woodcut + soul fire".
-* Soul fire is the Harvester's element: blue — white core, ice cyan, soul blue, indigo and a deep
-  violet rim. Flames are curling tongues with hooked tips.
+* Soul fire is the Harvester's element, in the teal of his model (gem, eyes, scythe blade:
+  #1DE9B6, shaded #32AF8E / #00695C): white-mint core, pale mint, model teal, sea teal, dark teal
+  and a deep teal rim. Flames are curling tongues with hooked tips.
 * Gradients are ordered-dithered with a 4x4 Bayer matrix instead of being cut into flat bands,
   and sprites dissolve through the same matrix, so they break up into a regular checker like a print.
 * Objects (skull, candle, coffin, hourglass, lantern, plague mask, dancer, scythe) are drawn like the
   woodcuts of a Danse Macabre: ink outline, bone/parchment fill, diagonal hatching on the shadow side.
-* Plague is a sickly yellow-green, dithered the same way. Smoke is drawn as curls, not round puffs.
+* Plague is a murky sea-green from the same family, dithered the same way. Smoke is drawn as curls, not round puffs.
 Grayscale sprites (smoke, dial ring, sigil, tile, flame wave) are coloured by tinting in the JSON.
 
 Every sprite is a list of frames; a frame is an RGBA numpy array (h, w, 4).
@@ -20,18 +21,20 @@ import numpy as np
 # Palettes (character -> RGB)
 # ---------------------------------------------------------------------------
 
-FIRE = {"V": (44, 26, 112), "I": (62, 78, 214), "B": (76, 158, 255), "C": (162, 230, 255), "W": (246, 252, 255)}
-PLAGUE = {"D": (46, 64, 20), "M": (100, 132, 36), "G": (158, 192, 62), "Y": (222, 238, 130)}
+# the model's teal: 1DE9B6 (B), 32AF8E (T), 00695C (I)
+FIRE = {"V": (6, 56, 50), "I": (0, 105, 92), "T": (50, 175, 142), "B": (29, 233, 182),
+        "C": (150, 248, 218), "W": (236, 255, 248)}
+PLAGUE = {"D": (10, 50, 38), "M": (24, 106, 80), "G": (64, 176, 128), "Y": (156, 232, 196)}
 GRAY = {"1": (86, 86, 86), "2": (150, 150, 150), "3": (208, 208, 208), "4": (255, 255, 255)}
 INK = (20, 14, 28)
 # woodcut objects: ink, bone (light / hatch / deep), robe & wood darks, plus the fire and plague colours
 WOODCUT = {"K": INK, "P": (236, 224, 196), "Q": (184, 168, 134), "R": (124, 108, 84),
-           "D": (40, 32, 54), "E": (72, 58, 86), "F": (104, 88, 118),
+           "D": (24, 30, 32), "E": (44, 54, 56), "F": (70, 84, 86),
            "Z": (90, 60, 40), "X": (132, 92, 58),
            **FIRE, "G": PLAGUE["G"], "Y": PLAGUE["Y"], "M": PLAGUE["M"]}
 ASH = {"1": (70, 66, 78), "2": (128, 124, 136), "3": (196, 192, 204)}
 
-FIRE_RAMP = "VIBCW"
+FIRE_RAMP = "VITBCW"
 PLAGUE_RAMP = "DMGY"
 GRAY_RAMP = "1234"
 
@@ -499,7 +502,7 @@ def scythe_sprite():
         for d in (-2, -1, 1):
             if 0 <= x + d < 32:
                 rows[y][x + d] = "Q" if d < 0 else "P"
-    rows = outline(["".join(r) for r in rows], "PQRVIBCW")
+    rows = outline(["".join(r) for r in rows], "PQRVITBCW")
     return to_rgba(rows, WOODCUT)
 
 
@@ -527,7 +530,7 @@ def hourglass_frame(frame, frames=8):
         sand = (y <= 6 and y > 6 - top_fill) or (y >= 13 - bottom_fill + 1 and y >= 8)
         for x in range(l, r + 1):
             if sand:
-                rows[y][x] = "W" if (y == 7 - top_fill or y == 14 - bottom_fill) else dither("IBC", 0.7, x, y)
+                rows[y][x] = "W" if (y == 7 - top_fill or y == 14 - bottom_fill) else dither("ITBC", 0.7, x, y)
     if 0 < f < 1:
         for y in range(7, 14 - bottom_fill):
             rows[y][7] = "C" if y % 2 else "W"

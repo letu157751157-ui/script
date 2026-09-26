@@ -2,7 +2,7 @@
   "format_version": "1.10.0",
   "particle_effect": {
     "description": {
-      "identifier": "harvester:soulfire_crown",
+      "identifier": "harvester:soulfire_skull",
       "basic_render_parameters": {
         "material": "particles_blend",
         "texture": "textures/particle/harvester_particles"
@@ -10,14 +10,14 @@
     },
     "components": {
       "minecraft:emitter_rate_steady": {
-        "spawn_rate": 16,
-        "max_particles": 25
+        "spawn_rate": 26,
+        "max_particles": 37
       },
       "minecraft:emitter_lifetime_looping": {
         "active_time": 1
       },
       "minecraft:emitter_shape_disc": {
-        "radius": 0.48,
+        "radius": 0.42,
         "plane_normal": "y",
         "direction": [
           "math.random(-0.25, 0.25)",
@@ -26,9 +26,9 @@
         ]
       },
       "minecraft:particle_lifetime_expression": {
-        "max_lifetime": "math.random(0.35, 0.6)"
+        "max_lifetime": "math.random(0.45, 0.7)"
       },
-      "minecraft:particle_initial_speed": "math.random(0.8, 1.6)",
+      "minecraft:particle_initial_speed": "math.random(1.6, 2.8)",
       "minecraft:particle_motion_dynamic": {
         "linear_acceleration": [
           "math.sin(v.particle_age * 700 + v.particle_random_3 * 360) * 1.4",
@@ -39,8 +39,8 @@
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          "(0.1 + 0.07 * v.particle_random_2) * (1 - 0.5 * v.particle_age / v.particle_lifetime)",
-          "(0.1 + 0.07 * v.particle_random_2) * (1 - 0.5 * v.particle_age / v.particle_lifetime)"
+          "(0.2 + 0.09999999999999998 * v.particle_random_2) * (1 - 0.5 * v.particle_age / v.particle_lifetime)",
+          "2 * (0.2 + 0.09999999999999998 * v.particle_random_2) * (1 - 0.5 * v.particle_age / v.particle_lifetime)"
         ],
         "facing_camera_mode": "lookat_y",
         "uv": {
@@ -48,19 +48,19 @@
           "texture_height": 256,
           "flipbook": {
             "base_UV": [
-              48,
-              96
+              0,
+              64
             ],
             "size_UV": [
               16,
-              16
+              32
             ],
             "step_UV": [
               16,
               0
             ],
             "frames_per_second": 14,
-            "max_frame": 8,
+            "max_frame": 6,
             "loop": true
           }
         }

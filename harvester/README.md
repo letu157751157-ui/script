@@ -1,30 +1,32 @@
-# The Harvester v1.5.0 — Thần Chết × Bác sĩ Dịch hạch
+# The Harvester v1.6.0 — Thần Chết × Bác sĩ Dịch hạch
 
 Boss **The Harvester** (`pa:harvester`): **Thần Chết** (lưỡi hái, mùa gặt linh hồn, đồng hồ cát, quan tài, vũ điệu tử thần)
 kết hợp **Bác sĩ Dịch hạch** (mặt nạ mỏ chim, đèn lồng, dịch hạch, giàn thiêu).
-Nguyên tố riêng của boss là **lửa hồn xanh**: lửa cháy **liên tục** trên người boss, và phần lớn chiêu để lại mặt đất cháy.
+Nguyên tố riêng của boss là **lửa hồn xanh ngọc**, đúng màu xanh của model (#1DE9B6): lửa bốc **liên tục** khắp người boss
+như Ghost Rider (đầu lâu là một ngọn đuốc), và phần lớn chiêu để lại mặt đất cháy.
 Bộ chiêu và bộ particle ở bản 1.5 là thiết kế riêng, **không lấy lại** chiêu hay kiểu vẽ của các addon khác trong repo
 (Aatrox, Toji, Giant Zombie).
 
-- Cài đặt: mở [`dist/TheHarvester_v1.5.0.mcaddon`](dist/TheHarvester_v1.5.0.mcaddon) (Minecraft tự nhập cả 2 pack).
-  Nếu đã cài bản cũ: vào **Cài đặt → Bộ nhớ**, xoá các pack *The Harvester* cũ, nhập file 1.5.0,
-  rồi trong thế giới bật lại cả Behavior Pack lẫn Resource Pack **1.5.0**.
-- Kiểm tra nhanh: lửa xanh phải cháy quanh gấu áo và lưỡi hái của boss ngay khi nó xuất hiện.
-  Không thấy lửa thì thế giới còn dùng pack cũ.
+- Cài đặt: mở [`dist/TheHarvester_v1.6.0.mcaddon`](dist/TheHarvester_v1.6.0.mcaddon) (Minecraft tự nhập cả 2 pack).
+  Nếu đã cài bản cũ: vào **Cài đặt → Bộ nhớ**, xoá các pack *The Harvester* cũ, nhập file 1.6.0,
+  rồi trong thế giới bật lại cả Behavior Pack lẫn Resource Pack **1.6.0**.
+- Kiểm tra nhanh: đầu boss phải bốc lửa xanh ngọc cao như ngọn đuốc ngay khi nó xuất hiện.
+  Lửa còn màu xanh dương hoặc chỉ cháy ở gấu áo thì thế giới còn dùng pack cũ.
 - Yêu cầu: Minecraft Bedrock **1.21.90+** (giống bản gốc), không cần bật Experiments.
 - Gọi boss: `/summon pa:harvester`, hoặc gặp tự nhiên ở The End như trước.
 
 ![Các tư thế chiêu của boss, có lửa hồn theo giai đoạn](previews/skills.png)
 
-## Lửa hồn xanh (luôn cháy)
+## Lửa hồn xanh ngọc — cháy liên tục kiểu Ghost Rider
 
-Resource pack gắn các emitter lửa **chạy liên tục** vào người boss (không cần script, không tốn lệnh):
+Resource pack gắn các emitter lửa **lặp vô hạn** vào người boss (không cần script, không tốn lệnh). Lửa bắn thẳng lên,
+lắc qua lại, nhỏ dần rồi tắt, liên tục thay nhau; lửa để lại trong không khí nên khi boss di chuyển nó **kéo thành vệt lửa** phía sau.
 
 | Lúc | Chỗ cháy |
 |---|---|
-| Từ khi xuất hiện | vòng lửa quanh **gấu áo** + lửa trên **lưỡi hái** |
-| Dưới 60% máu | thêm lửa ở **hai bàn tay** |
-| Dưới 30% máu | gấu áo cháy **to gấp đôi**, thêm lửa ở **mũi lưỡi hái** và **vương miện lửa** trên đầu |
+| Từ khi xuất hiện | **đầu lâu là ngọn đuốc** (lửa cao bốc từ đỉnh mũ + lửa liếm quanh mặt), **hai vai**, **hai bàn tay**, **gấu áo**, **lưỡi hái** (thân lưỡi và mũi), tàn lửa bay lên từ viên ngọc ở ngực |
+| Dưới 60% máu | thêm lửa cao **sau lưng**, lửa ở **gót lưỡi hái**, khói xanh đen bốc lên từ đầu |
+| Dưới 30% máu | đầu và gấu áo thành **biển lửa** (dày gần gấp đôi, cao hơn) |
 | Boss chết | lửa tắt |
 
 Ngoài ra các chiêu Reaping Arc, Plague Pyre, Footsteps of the Dead, Buried Alive, Ember Retreat để lại **mặt đất cháy lửa hồn**
@@ -101,16 +103,21 @@ mặt đất rồi bật dậy), `skill_coffin` (chỉ vào mục tiêu, giơ ha
 chỉ huy, lắc người theo điệu valse), `skill_blackdeath`, `skill_ultimate`.
 
 - Thêm controller `soulfire` gắn lửa hồn liên tục theo máu của boss (bảng ở trên).
+- Locator mới cho lửa: `skull_top` (đỉnh mũ), `shoulder_left`, `shoulder_right`, `back`, `blade_heel`.
 - Keyframe dùng nội suy Catmull-Rom (mượt như key "smooth" của Blockbench), mở được trong Blockbench để chỉnh.
-- Model có **locator** (`blade`, `blade_tip`, `gem`, `eyes`, `hand_left`, `hand_right`, `feet`) để lửa và particle bám theo.
+- Model có **locator** (`blade`, `blade_tip`, `blade_heel`, `gem`, `eyes`, `skull_top`, `hand_left`, `hand_right`,
+  `shoulder_left`, `shoulder_right`, `back`, `feet`) để lửa và particle bám theo.
   Hình dáng model và texture **không đổi**.
 
-## Particle (43) — kiểu vẽ riêng
+## Particle (48) — kiểu vẽ riêng
 
 ![Sprite của các particle](previews/particles.png)
 
 Kiểu vẽ riêng của Harvester: **"tranh khắc gỗ memento mori + lửa hồn"**, không dùng lại kiểu dải nhiệt / vỡ vụn của các addon khác.
-- **Lửa hồn xanh**: trắng → xanh băng → xanh hồn → chàm → viền tím than; ngọn lửa là những lưỡi lửa cong móc ở đầu.
+- **Tông màu lấy từ model**: xanh ngọc #1DE9B6 của viên ngọc, mắt và lưỡi hái, bóng #32AF8E / #00695C, áo choàng đen,
+  xương trắng ngà. Lửa hồn: trắng bạc hà → bạc hà nhạt → xanh ngọc → xanh biển → xanh đậm → viền gần đen; ngọn lửa là những
+  lưỡi lửa cong móc ở đầu. Dịch hạch là xanh rêu biển đục cùng họ màu. Vòng cảnh báo, ấn, sóng xung kích tô xanh ngọc;
+  vòng nguy hiểm của Final Harvest tô **vàng** (màu viền vàng trên model) thay cho đỏ.
 - **Chuyển màu bằng dither** (lưới Bayer 4×4) thay vì cắt thành dải màu phẳng, và sprite tan biến cũng theo lưới đó
   nên vỡ thành ô cờ đều như bản in.
 - **Đồ vật vẽ như tranh khắc gỗ** thời Vũ Điệu Tử Thần: viền mực, màu xương / giấy da, gạch chéo phía tối
@@ -119,7 +126,9 @@ Kiểu vẽ riêng của Harvester: **"tranh khắc gỗ memento mori + lửa h�
   (đồng hồ cát bắt chéo lưỡi hái).
 
 Tất cả nằm trong `TheHarvesterRP/particles/harvester_*.json`, dùng chung atlas `textures/particle/harvester_particles.png`:
-- Lửa hồn: `soulfire_hem`, `soulfire_hem_big`, `soulfire_blade`, `soulfire_hand`, `soulfire_crown` (5 emitter **lặp vô hạn** gắn trên boss),
+- Lửa hồn trên người boss (**lặp vô hạn**): `soulfire_skull`, `soulfire_skull_big`, `soulfire_crown`, `soulfire_hem`, `soulfire_hem_big`,
+  `soulfire_hand` (vai, tay), `soulfire_blade`, `soulfire_back`, `soulfire_embers`, `soulfire_smoke`.
+- Lửa hồn của chiêu:
   `soul_flames`, `fire_patch` (mặt đất cháy), `fire_column` (cột lửa), `soul_pillar`, `ember`, `gem_pulse`, `eye_glow`.
 - Linh hồn: `soul_wisp`, `soul_burst`, `soul_stream` (hồn ma nhỏ có mắt).
 - Nghi lễ của Harvester: `soul_wheat` + `wheat_burst` (lúa hồn), `will_o_wisp` (ma trơi), `candle` (nến cháy ngắn dần),
@@ -137,6 +146,16 @@ Giữ nguyên chỉ số, chỉ sửa lỗi và đổi hiệu ứng:
   **không còn đánh dân làng, thương nhân, giáp đứng hay thú đã thuần**.
 - Kill bằng chiêu của lưỡi hái giờ cũng tính cho Dark Blessing.
 - Bỏ dòng hồi chiêu trên action bar (1.4). Dùng chiêu khi chưa hồi xong thì chat vẫn báo số giây còn lại.
+
+## Bản 1.6.0 — màu xanh ngọc của model, lửa bốc liên tục kiểu Ghost Rider
+
+- **Đổi tông màu toàn bộ particle sang xanh ngọc của model** (#1DE9B6, bóng #32AF8E / #00695C) thay cho xanh dương;
+  dịch hạch thành xanh rêu biển cùng họ màu; khói xanh đen; vòng cảnh báo / ấn / sóng tô xanh ngọc; vòng nguy hiểm tô vàng
+  (màu viền trên model) thay cho đỏ. Lưỡi hái vũ khí dùng cùng màu.
+- **Lửa bốc liên tục kiểu Ghost Rider** ngay từ đầu trận: đầu lâu thành ngọn đuốc lửa cao, lửa ở hai vai, hai tay, gấu áo,
+  cả lưỡi hái, tàn lửa bay lên; lửa lắc lư, kéo thành vệt khi boss di chuyển. Dưới 60% máu cháy thêm sau lưng và bốc khói,
+  dưới 30% thành biển lửa. 5 locator mới trên model (hình dáng model không đổi).
+- Lửa của các chiêu (mặt đất cháy) bốc cao và nhanh hơn.
 
 ## Bản 1.5.0 — chiêu và particle tự thiết kế, lửa hồn xanh cháy liên tục
 
@@ -222,13 +241,13 @@ harvester/
 ├── build.py            tạo lại particle + animation, kiểm tra tham chiếu/manifest/file rác, đóng gói dist/*.mcaddon
 ├── tools/
 │   ├── art.py          vẽ sprite pixel art cho particle (kiểu khắc gỗ + lửa hồn dither)
-│   ├── particles.py    atlas + 43 file particle JSON (kể cả 5 emitter lửa lặp vô hạn)
+│   ├── particles.py    atlas + 48 file particle JSON (kể cả 10 emitter lửa lặp vô hạn)
 │   ├── animations.py   18 animation, controller, locator (có ghi chú hướng xoay của từng xương)
 │   ├── render.py       renderer nhỏ để xem trước model/animation
 │   ├── previews.py     ảnh trong previews/
 │   ├── cleanup.py      liệt kê (hoặc xoá với --apply) file không dùng tới
 │   └── simulate.mjs    chạy thử script trên mock @minecraft/server qua cả trận đấu
-└── dist/TheHarvester_v1.5.0.mcaddon
+└── dist/TheHarvester_v1.6.0.mcaddon
 ```
 
 - `python3 build.py` (cần `pip install pillow numpy`), thêm `--previews` để vẽ lại ảnh xem trước.

@@ -93,10 +93,11 @@ const P = {
     dancer: "harvester:dancer"
 };
 
-// telegraph colours (r, g, b in 0..1)
-const SOUL = [0.45, 0.72, 1];
-const PLAGUE = [0.62, 0.85, 0.22];
-const BLOOD = [1, 0.18, 0.2];
+// telegraph colours (r, g, b in 0..1), taken from the model: its teal (1DE9B6), a murky sea-green
+// for the plague, and the gold of its trim (F8DD72) for the one ring you must not stand in
+const SOUL = [0.11, 0.91, 0.71];
+const PLAGUE = [0.25, 0.69, 0.54];
+const GOLD = [0.97, 0.87, 0.45];
 
 const bosses = new Map();   // boss id -> state
 const plague = new Map();   // entity id -> { stacks, lastGain }
@@ -860,9 +861,9 @@ function castUltimate(boss, s) {
     const inner = 3, outer = 11.5;
     for (const e of victims(boss, center, 40)) title(e, "§4§l☠ FINAL HARVEST ☠", "§7Get close... or get far away", 50);
     sound(dim, "mob.wither.ambient", center, 0.5);
-    fx(dim, P.runes, up(center, 0.05), color(BLOOD, { radius: outer, life: 2.5 }));
+    fx(dim, P.runes, up(center, 0.05), color(GOLD, { radius: outer, life: 2.5 }));
     fx(dim, P.ringWarn, up(center, 0.07), color(SOUL, { radius: inner, life: 2.5 }));
-    fx(dim, P.ringWarn, up(center, 0.08), color(BLOOD, { radius: outer, life: 2.5 }));
+    fx(dim, P.ringWarn, up(center, 0.08), color(GOLD, { radius: outer, life: 2.5 }));
     later(4, () => {
         for (let r = 4; r <= outer - 0.4; r += 1.5) {
             const n = Math.round((2 * Math.PI * r) / 1.7);
@@ -952,7 +953,7 @@ function enterPhase(boss, s, phase) {
     play(boss, "phase_roar", 0.25);
     setName(boss, s);
     const center = { ...boss.location };
-    fx(dim, P.runes, up(center, 0.05), color(phase === 3 ? BLOOD : PLAGUE, { radius: 6, life: 2.2 }));
+    fx(dim, P.runes, up(center, 0.05), color(phase === 3 ? GOLD : PLAGUE, { radius: 6, life: 2.2 }));
     later(20, () => {
         fx(dim, P.shockwave, up(center, 0.1), color(phase === 3 ? SOUL : PLAGUE, { radius: 10, life: 0.7 }));
         fx(dim, phase === 3 ? P.souls : P.miasma, up(center, 2));
@@ -979,7 +980,7 @@ function checkEnrage(boss, s) {
     setName(boss, s);
     applyBuffs(boss, s);
     sound(boss.dimension, "mob.wither.spawn", boss.location, 0.5);
-    fx(boss.dimension, P.runes, up(boss.location, 0.05), color(BLOOD, { radius: 8, life: 2 }));
+    fx(boss.dimension, P.runes, up(boss.location, 0.05), color(GOLD, { radius: 8, life: 2 }));
 }
 
 // Nobody fought for 30 s: the enrage timer resets and the boss mends slowly

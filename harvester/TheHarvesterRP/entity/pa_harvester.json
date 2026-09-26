@@ -54,11 +54,16 @@
         "wisp": "harvester:soul_wisp",
         "ash": "harvester:ash_burst",
         "flames": "harvester:soul_flames",
+        "skull_fire": "harvester:soulfire_skull",
+        "skull_fire_big": "harvester:soulfire_skull_big",
+        "crown": "harvester:soulfire_crown",
         "hem": "harvester:soulfire_hem",
         "hem_big": "harvester:soulfire_hem_big",
         "blade_fire": "harvester:soulfire_blade",
         "hand_fire": "harvester:soulfire_hand",
-        "crown": "harvester:soulfire_crown"
+        "back_fire": "harvester:soulfire_back",
+        "embers": "harvester:soulfire_embers",
+        "fire_smoke": "harvester:soulfire_smoke"
       }
     }
   }

@@ -38,47 +38,56 @@ SKILL_POSES = [
 
 # how grayscale sprites are tinted in game (representative colours)
 TINTS = {
-    "smoke": (120, 110, 190), "ring": (115, 184, 255), "wave": (115, 184, 255),
-    "sigil": (115, 184, 255), "tile": (115, 184, 255),
+    "smoke": (28, 74, 68), "ring": (29, 233, 182), "wave": (29, 233, 182),
+    "sigil": (29, 233, 182), "tile": (29, 233, 182),
 }
 
 LOC = {name: (bone, pos) for bone, locs in animations.LOCATORS.items() for name, pos in locs.items()}
 
 
 def soul_fire(model, pose, phase):
-    """Where the looping soulfire_* emitters burn in that phase: (world point, flame size)."""
+    """Where the looping soulfire_* emitters burn in that phase: (world point, size, tall flame?)."""
     if phase == 0:
         return []  # the fire goes out when he dies
     at = lambda name: locator_world(model, pose, *LOC[name])  # noqa: E731
     points = []
     feet = at("feet")
-    n, ring = (10, 12) if phase < 3 else (14, 15)
+    n, ring = (12, 13) if phase < 3 else (16, 16)
     for k in range(n):
         a = k / n * 2 * np.pi
-        points.append((feet + np.array([np.cos(a) * ring, 1 + (k % 3) * 3, np.sin(a) * ring]), 1.0 if phase < 3 else 1.3))
-    points.append((at("blade") + np.array([0, 2, 0]), 0.7))
+        points.append((feet + np.array([np.cos(a) * ring, 1 + (k % 3) * 3, np.sin(a) * ring]), 1.1 if phase < 3 else 1.4, False))
+    top = at("skull_top")
+    big = 1.0 if phase < 3 else 1.3
+    for k in range(11):  # the skull torch: a blaze of tall flames at every height
+        a = k * 2.4
+        r = 5.5 * (1 - k / 14)
+        points.append((top + np.array([np.cos(a) * r, k * 1.7, np.sin(a) * r]), big * (1.15 - k * 0.04), True))
+    eyes = at("eyes")
+    for k in range(6):  # flames licking up around the face
+        a = k / 6 * 2 * np.pi
+        points.append((eyes + np.array([np.cos(a) * 8, 2 + (k % 2) * 3, np.sin(a) * 8 + 6]), 0.8, False))
+    for name in ("shoulder_left", "shoulder_right", "hand_left", "hand_right", "blade", "blade_tip"):
+        points.append((at(name) + np.array([0, 2, 0]), 0.75, False))
     if phase >= 2:
-        points += [(at("hand_left") + np.array([0, 1, 0]), 0.6), (at("hand_right") + np.array([0, 1, 0]), 0.6)]
-    if phase >= 3:
-        points += [(at("blade_tip") + np.array([0, 2, 0]), 0.7)]
-        points += [(at("eyes") + np.array([dx, 7, 0]), 0.8) for dx in (-3, 0, 3)]
+        points += [(at("back") + np.array([0, 5, 0]), 0.9, True), (at("blade_heel") + np.array([0, 2, 0]), 0.75, False)]
     return points
 
 
 def draw_fire(tile, zbuf, points, size, scale, yaw, pitch, center):
-    flames = art.SPRITES["flame"]
-    view_center = np.array([-center[0], center[1], center[2]], dtype=float)
     from render import rot_matrix
     view = rot_matrix(pitch, yaw, 0)
-    for i, (p, k) in enumerate(points):
+    view_center = np.array([-center[0], center[1], center[2]], dtype=float)
+    for i, (p, k, tall) in enumerate(points):
         x, y = project(p, size, scale, yaw, pitch, center)
         depth = (view @ (p - view_center))[2]
         ix, iy = int(x), int(y)
         if 0 <= ix < size[0] and 0 <= iy < size[1] and zbuf[iy, ix] < depth - 3:
             continue  # behind the body
-        px = int(18 * k)
-        im = Image.fromarray(flames[(i * 3) % len(flames)], "RGBA").resize((px, px), Image.NEAREST)
-        tile.alpha_composite(im, (int(x - px / 2), int(y - px * 0.8)))
+        frames = art.SPRITES["flame_tall" if tall else "flame"]
+        w = int(18 * k)
+        h = w * 2 if tall else w
+        im = Image.fromarray(frames[(i * 3) % len(frames)], "RGBA").resize((w, h), Image.NEAREST)
+        tile.alpha_composite(im, (int(x - w / 2), int(y - h * 0.85)))
 
 
 def load_model():

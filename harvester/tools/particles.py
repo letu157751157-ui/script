@@ -162,10 +162,11 @@ T = "v.particle_age / v.particle_lifetime"
 WHITE_FADE = {"0.0": "#FFFFFFFF", "0.7": "#FFFFFFFF", "1.0": "#00FFFFFF"}
 FLAME_FADE = {"0.0": "#00FFFFFF", "0.12": "#FFFFFFFF", "0.7": "#FFFFFFFF", "1.0": "#00FFFFFF"}
 SOUL_FADE = {"0.0": "#FFFFFFFF", "0.6": "#E6FFFFFF", "1.0": "#00FFFFFF"}
-PLAGUE_GAS = {"0.0": "#00A8C94A", "0.15": "#C08DB33A", "0.7": "#9C6E8F2A", "1.0": "#003F5A17"}
-DARK_GAS = {"0.0": "#00221A3A", "0.2": "#D8221A3A", "0.75": "#B0120E22", "1.0": "#000A0816"}
-INDIGO_SMOKE = {"0.0": "#E83A3070", "0.6": "#B0221C48", "1.0": "#00221C48"}
-PLAGUE_BRIGHT = {"0.0": "#FFDDEB8A", "0.5": "#E0A8C94A", "1.0": "#006E8F2A"}
+# every tint is drawn from the model's teal (1DE9B6 / 32AF8E / 00695C) and its near-black robe
+PLAGUE_GAS = {"0.0": "#0040B08A", "0.15": "#C0309A76", "0.7": "#9C1E6E56", "1.0": "#000E3A2E"}
+DARK_GAS = {"0.0": "#00102422", "0.2": "#D8102422", "0.75": "#B0081614", "1.0": "#00040C0A"}
+TEAL_SMOKE = {"0.0": "#E01C4A44", "0.6": "#B0102C28", "1.0": "#00102C28"}
+PLAGUE_BRIGHT = {"0.0": "#FF9CE8C4", "0.5": "#E040B08A", "1.0": "#001E6E56"}
 
 
 def fade_in_out(fin=0.1, fout=0.8, alpha="FF"):
@@ -179,14 +180,19 @@ def looping(rate, max_particles):
     }
 
 
-def body_fire(rate, shape, size, life_range, rise):
-    """Soul fire that never stops burning on the boss (looping emitter bound to a locator)."""
+def body_fire(rate, shape, size, life_range, rise, sprite="flame", tall=False, turbulence=1.4):
+    """Soul fire that never stops pouring off the boss, Ghost Rider style: a looping emitter bound to a
+    locator, flames that shoot up, wobble sideways and shrink away. World-space, so they trail behind
+    him when he moves."""
+    w = "(%s + %s * v.particle_random_2) * (1 - 0.5 * %s)" % (size[0], size[1] - size[0], T)
+    wobble = "math.sin(v.particle_age * 700 + v.particle_random_3 * 360) * %s" % turbulence
+    wobble_z = "math.cos(v.particle_age * 640 + v.particle_random_4 * 360) * %s" % turbulence
     return ("particles_blend", {
-        **looping(rate, int(rate * 1.4) + 4), **shape,
+        **looping(rate, int(rate * 1.2) + 6), **shape,
         **life("math.random(%s, %s)" % life_range), **speed("math.random(%s, %s)" % rise),
-        **dynamic((0, 1.2, 0), 1.6),
-        **billboard(["(%s + %s * v.particle_random_2) * (1 - 0.55 * %s)" % (size[0], size[1] - size[0], T)] * 2,
-                    flipbook("flame", 14), "lookat_y"),
+        **{"minecraft:particle_motion_dynamic": {"linear_acceleration": [wobble, 2.4, wobble_z],
+                                                 "linear_drag_coefficient": 1.3}},
+        **billboard([w, "2 * " + w] if tall else [w, w], flipbook(sprite, 14), "lookat_y"),
         **tint(FLAME_FADE),
     })
 
@@ -196,11 +202,32 @@ def effects():
 
     # ---------------------------------------------------------------- soul fire (the Harvester's element)
     up_cone = ["math.random(-0.25, 0.25)", 1, "math.random(-0.25, 0.25)"]
-    E["soulfire_hem"] = body_fire(16, disc(0.75, [0, 1, 0]), (0.12, 0.2), (0.6, 1.0), (0.5, 1.2))
-    E["soulfire_hem_big"] = body_fire(30, disc(0.95, [0, 1, 0]), (0.16, 0.27), (0.7, 1.2), (0.8, 1.6))
-    E["soulfire_blade"] = body_fire(10, sphere(0.18, up_cone), (0.08, 0.14), (0.4, 0.7), (0.2, 0.5))
-    E["soulfire_hand"] = body_fire(6, sphere(0.1, up_cone), (0.07, 0.11), (0.35, 0.6), (0.2, 0.4))
-    E["soulfire_crown"] = body_fire(9, disc(0.3, up_cone), (0.09, 0.15), (0.45, 0.75), (0.4, 0.9))
+    # Ghost Rider: the skull is a torch, fire pours off shoulders, hands, back and the whole scythe
+    E["soulfire_skull"] = body_fire(26, disc(0.42, up_cone), (0.2, 0.3), (0.45, 0.7), (1.6, 2.8), "flame_tall", True)
+    E["soulfire_skull_big"] = body_fire(42, disc(0.52, up_cone), (0.24, 0.36), (0.5, 0.85), (1.8, 3.2), "flame_tall", True, 1.8)
+    E["soulfire_crown"] = body_fire(16, disc(0.48, up_cone), (0.1, 0.17), (0.35, 0.6), (0.8, 1.6))
+    E["soulfire_hem"] = body_fire(24, disc(0.8, [0, 1, 0]), (0.14, 0.23), (0.55, 0.9), (0.9, 1.8))
+    E["soulfire_hem_big"] = body_fire(40, disc(1.0, [0, 1, 0]), (0.18, 0.3), (0.6, 1.1), (1.2, 2.4), "flame", False, 1.8)
+    E["soulfire_hand"] = body_fire(9, sphere(0.16, up_cone), (0.1, 0.17), (0.4, 0.65), (0.8, 1.5))
+    E["soulfire_blade"] = body_fire(11, sphere(0.2, up_cone), (0.1, 0.16), (0.35, 0.6), (0.6, 1.3))
+    E["soulfire_back"] = body_fire(14, disc(0.4, up_cone), (0.16, 0.26), (0.5, 0.8), (1.2, 2.2), "flame_tall", True)
+    E["soulfire_embers"] = ("particles_blend", {
+        **looping(12, 24), **sphere(0.7, up_cone),
+        **life("math.random(0.8, 1.4)"), **speed("math.random(1.5, 3)"),
+        **{"minecraft:particle_motion_dynamic": {
+            "linear_acceleration": ["math.sin(v.particle_age * 500 + v.particle_random_3 * 360) * 2.5", 1.2,
+                                    "math.cos(v.particle_age * 450 + v.particle_random_4 * 360) * 2.5"],
+            "linear_drag_coefficient": 0.9}},
+        **billboard("0.04 + 0.03 * v.particle_random_2", flipbook("ember", stretch=True, loop=False), "lookat_y"),
+        **tint(WHITE_FADE),
+    })
+    E["soulfire_smoke"] = ("particles_blend", {
+        **looping(6, 12), **disc(0.35, up_cone),
+        **life("math.random(1.1, 1.6)"), **speed("math.random(1.4, 2.2)"), **dynamic((0, 0.6, 0), 1.2),
+        **spin("math.random(0, 360)", "math.random(-60, 60)"),
+        **billboard(["0.22 + 0.25 * %s" % T] * 2, flipbook("smoke", stretch=True, loop=False)),
+        **tint(TEAL_SMOKE),
+    })
 
     E["soul_flames"] = ("particles_blend", {
         **once(10), **disc(0.6, up_cone),
@@ -210,7 +237,7 @@ def effects():
     })
     E["fire_patch"] = ("particles_blend", {
         **steady("v.radius * 12 + 4", 140, "v.duration"), **disc("v.radius", [0, 1, 0], [0, 0.05, 0]),
-        **life("math.random(0.5, 0.9)"), **speed("math.random(0.6, 1.4)"), **dynamic((0, 0.8, 0), 1.0),
+        **life("math.random(0.5, 0.9)"), **speed("math.random(1.0, 2.0)"), **dynamic((0, 1.6, 0), 1.2),
         **billboard(["(0.14 + 0.1 * v.particle_random_2) * (1 - 0.5 * %s)" % T] * 2, flipbook("flame", 14), "lookat_y"),
         **tint(FLAME_FADE),
     })
@@ -293,18 +320,18 @@ def effects():
     E["black_smoke"] = ("particles_blend", {
         **once(12), **sphere(0.7), **life("math.random(0.7, 1.2)"), **speed(2.5),
         **dynamic((0, 0.8, 0), 3.0), **spin("math.random(0, 360)", "math.random(-90, 90)"),
-        **curl(0.4), **tint(INDIGO_SMOKE),
+        **curl(0.4), **tint(TEAL_SMOKE),
     })
     E["aura_mist"] = ("particles_blend", {
         **once(3), **disc(1.6, "outwards", [0, 0.15, 0]), **life("math.random(1.2, 1.6)"), **speed(0.3),
         **spin("math.random(0, 360)", "math.random(-30, 30)"),
-        **curl(0.45), **tint({"0.0": "#002B3A14", "0.3": "#902B3A14", "1.0": "#001A220C"}),
+        **curl(0.45), **tint({"0.0": "#00123A30", "0.3": "#90123A30", "1.0": "#000A221C"}),
     })
     E["black_rain"] = ("particles_blend", {
         **steady("v.radius * 10", 160, "v.duration"), **disc("v.radius", [0, -1, 0], [0, 7, 0]),
         **life(0.5), **speed(14),
         **billboard([0.035, 0.2], still("drop"), "lookat_y"),
-        **tint({"0.0": "#C02B3A14", "1.0": "#A0141A0A"}),
+        **tint({"0.0": "#C0123A30", "1.0": "#A00A1C18"}),
     })
     E["plague_drip"] = ("particles_blend", {
         **once(1), **point([0, -1, 0]), **life(0.5), **speed(0.5), **dynamic((0, -9, 0), 0.5),

@@ -2,62 +2,63 @@
   "format_version": "1.10.0",
   "particle_effect": {
     "description": {
-      "identifier": "harvester:miasma",
+      "identifier": "harvester:soulfire_embers",
       "basic_render_parameters": {
         "material": "particles_blend",
         "texture": "textures/particle/harvester_particles"
       }
     },
     "components": {
-      "minecraft:emitter_rate_instant": {
-        "num_particles": 4
+      "minecraft:emitter_rate_steady": {
+        "spawn_rate": 12,
+        "max_particles": 24
       },
-      "minecraft:emitter_lifetime_once": {
-        "active_time": 0.05
+      "minecraft:emitter_lifetime_looping": {
+        "active_time": 1
       },
       "minecraft:emitter_shape_sphere": {
-        "radius": 0.45,
-        "direction": "outwards"
+        "radius": 0.7,
+        "direction": [
+          "math.random(-0.25, 0.25)",
+          1,
+          "math.random(-0.25, 0.25)"
+        ]
       },
       "minecraft:particle_lifetime_expression": {
-        "max_lifetime": "math.random(1.6, 2.4)"
+        "max_lifetime": "math.random(0.8, 1.4)"
       },
-      "minecraft:particle_initial_speed": 0.35,
+      "minecraft:particle_initial_speed": "math.random(1.5, 3)",
       "minecraft:particle_motion_dynamic": {
         "linear_acceleration": [
-          0,
-          0.25,
-          0
+          "math.sin(v.particle_age * 500 + v.particle_random_3 * 360) * 2.5",
+          1.2,
+          "math.cos(v.particle_age * 450 + v.particle_random_4 * 360) * 2.5"
         ],
-        "linear_drag_coefficient": 0.6
-      },
-      "minecraft:particle_initial_spin": {
-        "rotation": "math.random(0, 360)",
-        "rotation_rate": "math.random(-40, 40)"
+        "linear_drag_coefficient": 0.9
       },
       "minecraft:particle_appearance_billboard": {
         "size": [
-          "0.35 + 0.12 * v.particle_random_2",
-          "0.35 + 0.12 * v.particle_random_2"
+          "0.04 + 0.03 * v.particle_random_2",
+          "0.04 + 0.03 * v.particle_random_2"
         ],
-        "facing_camera_mode": "rotate_xyz",
+        "facing_camera_mode": "lookat_y",
         "uv": {
           "texture_width": 256,
           "texture_height": 256,
           "flipbook": {
             "base_UV": [
-              0,
-              144
+              16,
+              176
             ],
             "size_UV": [
-              16,
-              16
+              8,
+              8
             ],
             "step_UV": [
-              16,
+              8,
               0
             ],
-            "max_frame": 5,
+            "max_frame": 3,
             "loop": false,
             "stretch_to_lifetime": true
           }
@@ -67,10 +68,9 @@
         "color": {
           "interpolant": "v.particle_age / v.particle_lifetime",
           "gradient": {
-            "0.0": "#0040B08A",
-            "0.15": "#C0309A76",
-            "0.7": "#9C1E6E56",
-            "1.0": "#000E3A2E"
+            "0.0": "#FFFFFFFF",
+            "0.7": "#FFFFFFFF",
+            "1.0": "#00FFFFFF"
           }
         }
       }
