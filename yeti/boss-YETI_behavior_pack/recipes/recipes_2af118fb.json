@@ -1,0 +1,20 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_furnace": {
+    "tags": [
+      "campfire",
+      "soul_campfire"
+    ],
+    "output": {
+      "item": "ytaun:cooked_yeti_meat",
+      "data": 0
+    },
+    "input": {
+      "item": "ytaun:yeti_meat",
+      "data": 0
+    },
+    "description": {
+      "identifier": "recipes_90e638a7"
+    }
+  }
+}

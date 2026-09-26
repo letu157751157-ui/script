@@ -1,0 +1,142 @@
+item.ytaun:big_yeti_fur.name=Big Yeti Fur
+item.ytaun:big_yeti_fur=Big Yeti Fur
+item.ytaun:cooked_yeti_meat.name=Cookee Yeti Meat
+item.ytaun:cooked_yeti_meat=Cookee Yeti Meat
+item.ytaun:core.name=§l§eCore
+item.ytaun:core=§l§eCore
+item.ytaun:frozemeral_chestplate.name=Frozemeral Chestplate 
+item.ytaun:frozemeral_chestplate=Frozemeral Chestplate 
+item.ytaun:frozen_chestplate.name=§9§lFrozen Chestplate
+item.ytaun:frozen_chestplate=§9§lFrozen Chestplate
+item.ytaun:frozen_hat.name=§9Frozen Hat
+item.ytaun:frozen_hat=§9Frozen Hat
+item.ytaun:frozen_heart.name=§l§1Frozen Heart
+item.ytaun:frozen_heart=§l§1Frozen Heart
+item.ytaun:frozen_heart_piece.name=§l§1Frozen Heart Piece 
+item.ytaun:frozen_heart_piece=§l§1Frozen Heart Piece 
+item.ytaun:frozen_sword.name=§bFrozen Sword
+item.ytaun:frozen_sword=§bFrozen Sword
+item.ytaun:frozenscythe.name=§bFrozen Scythe
+item.ytaun:frozenscythe=§bFrozen Scythe
+item.ytaun:frozensteel.name=§9Frozen Steel
+item.ytaun:frozensteel=§9Frozen Steel
+item.ytaun:frozether_legging.name=Frozether Legging
+item.ytaun:frozether_legging=Frozether Legging
+item.ytaun:frozpeed_boot.name=Frozpeed Boot
+item.ytaun:frozpeed_boot=Frozpeed Boot
+item.ytaun:ice_bar.name=§bIce Bar
+item.ytaun:ice_bar=§bIce Bar
+item.ytaun:ice_ore.name=Ice ore
+item.ytaun:ice_ore=Ice ore
+item.ytaun:icesteel.name=Ice Steel
+item.ytaun:icesteel=Ice Steel
+item.ytaun:rawfrozensteel.name=Raw Frozen Steel
+item.ytaun:rawfrozensteel=Raw Frozen Steel
+item.ytaun:rawicesteel.name=Raw Ice Steel
+item.ytaun:rawicesteel=Raw Ice Steel
+item.spawn_egg.entity.ytaun:yeti_1.name=Spawn §b§lYETI
+entity.ytaun:yeti_1.name=§b§lYETI
+item.spawn_egg.entity.ytaun:yeti_2.name=Spawn §3§lYETI
+entity.ytaun:yeti_2.name=§3§lYETI
+item.spawn_egg.entity.ytaun:yeti_3.name=Spawn §9§lYETI
+entity.ytaun:yeti_3.name=§9§lYETI
+item.spawn_egg.entity.ytaun:yeti_boss_pet.name=Spawn Pet boss
+entity.ytaun:yeti_boss_pet.name=Pet boss
+item.ytaun:yeti_core.name=§l§3Yeti Core
+item.ytaun:yeti_core=§l§3Yeti Core
+item.ytaun:yeti_fur.name=Yeti Fur
+item.ytaun:yeti_fur=Yeti Fur
+item.ytaun:yeti_meat.name=Yeti Meat
+item.ytaun:yeti_meat=Yeti Meat
+item.spawn_egg.entity.ytaun:yeti_pet.name=Spawn 1
+entity.ytaun:yeti_pet.name=1
+item.spawn_egg.entity.ytaun:yeti_boss_pet_riu.name=Spawn Pet boss normal
+entity.ytaun:yeti_boss_pet_riu.name=Pet boss normal
+pa:itemGroup.name.§2§lgiantZombie=§2§lGiant zombie
+pa:itemGroup.name.§a§lkingFrog=§a§lKing Frog
+pa:itemGroup.name.§c§lrobotCrab=§c§lRobot Crab
+## Comments can be added anywhere on a valid line by starting with '##'
+##
+## Note, trailing spaces will NOT be trimmed. If you want room between the end of the string and the start of a
+## comment on the same line, use TABs.
+accessibility.disableTTS=Text To Speech disabled
+accessibility.enableTTS=Text To Speech enabled
+
+
+
+entity.lamborghini:gallardo_yellow.name=Lamborghini Gallardo Yellow
+item.spawn_egg.entity.lamborghini:gallardo_yellow.name=Lamborghini Gallardo Yellow
+
+entity.lamborghini:gallardo_red.name=Lamborghini Gallardo Red
+item.spawn_egg.entity.lamborghini:gallardo_red.name=Lamborghini Gallardo Red
+
+entity.lamborghini:gallardo_blue.name=Lamborghini Gallardo Blue
+item.spawn_egg.entity.lamborghini:gallardo_blue.name=Lamborghini Gallardo Blue
+
+entity.lamborghini:gallardo_green.name=Lamborghini Gallardo Green
+item.spawn_egg.entity.lamborghini:gallardo_green.name=Lamborghini Gallardo Green
+
+entity.lamborghini:gallardo_black.name=Lamborghini Gallardo Black
+item.spawn_egg.entity.lamborghini:gallardo_black.name=Lamborghini Gallardo Black
+
+entity.lamborghini:gallardo_white.name=Lamborghini Gallardo White
+item.spawn_egg.entity.lamborghini:gallardo_white.name=Lamborghini Gallardo White
+
+entity.lamborghini:gallardo_orange.name=Lamborghini Gallardo Orange
+item.spawn_egg.entity.lamborghini:gallardo_orange.name=Lamborghini Gallardo Orange
+
+entity.lamborghini:gallardo_purple.name=Lamborghini Gallardo Purple
+item.spawn_egg.entity.lamborghini:gallardo_purple.name=Lamborghini Gallardo Purple
+
+entity.lamborghini:gallardo_cyan.name=Lamborghini Gallardo Cyan
+item.spawn_egg.entity.lamborghini:gallardo_cyan.name=Lamborghini Gallardo Cyan
+
+##Items
+
+item.compound.salt.name=Ivory Tusk
+item.compound.sodiumoxide.name=Stinky Cheese
+
+##Spawn Eggs
+
+item.spawn_egg.entity.mooshroom.name=Spawn Red Mooshroom
+
+##Entities
+
+entity.mooshroom.name=Red Mooshroom
+
+##new furni
+action.hint.exit.cat=Now you can rotate it	#
+action.hint.exit.unknown=Now you can rotate it	#
+action.interact.rotar=Rotate	#
+action.interact.patitas=Open#
+action.interact.conducir=Dive	#
+action.interact.sit = Sit	#
+
+entity.unknown.name=PA inventory
+
+item.ytaun:compressedfire.name=Compressed Fire
+item.ytaun:compressedfire=Compressed Fire
+item.ytaun:frozen_boot.name=§9§lFrozen Boot
+item.ytaun:frozen_boot=§9§lFrozen Boot
+item.ytaun:frozen_helmet.name=§9§lFrozen Helmet
+item.ytaun:frozen_helmet=§9§lFrozen Helmet
+item.ytaun:frozen_legging.name=§9§lFrozen Legging
+item.ytaun:frozen_legging=§9§lFrozen Legging
+item.ytaun:rast_ingot.name=Rast Ingot
+item.ytaun:rast_ingot=Rast Ingot
+item.ytaun:raw_rast_iron.name=Raw rast iron
+item.ytaun:raw_rast_iron=Raw rast iron
+item.ytaun:raw_steel.name=Raw Steel
+item.ytaun:raw_steel=Raw Steel
+item.ytaun:soul.name=Soul
+item.ytaun:soul=Soul
+item.ytaun:steel_ingot.name= Steel Ingot
+item.ytaun:steel_ingot= Steel Ingot
+item.ytaun:steel_stick.name= Steel Stick
+item.ytaun:steel_stick= Steel Stick
+item.ytaun:utra_change_smithing.name=§autra change smithing §0
+item.ytaun:utra_change_smithing=§autra change smithing §0
+item.ytaun:utrasmithing.name=§aUtra Smithing Update§0
+item.ytaun:utrasmithing=§aUtra Smithing Update§0
+item.spawn_egg.entity.ytaun:yeti_death.name=Spawn §4§lYeti
+entity.ytaun:yeti_death.name=§4§lYeti

@@ -1,0 +1,34 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "rawicesteel_14352b4a"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      " AB",
+      "CBC",
+      "BA "
+    ],
+    "key": {
+      "A": {
+        "item": "minecraft:iron_ingot",
+        "data": 0
+      },
+      "B": {
+        "item": "ytaun:ice_ore",
+        "data": 0
+      },
+      "C": {
+        "item": "ytaun:yeti_fur",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "ytaun:rawicesteel",
+      "count": 1
+    }
+  }
+}

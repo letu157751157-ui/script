@@ -1,0 +1,62 @@
+{
+  "format_version": "1.21.120",
+  "minecraft:item": {
+    "description": {
+      "identifier": "ytaun:frozpeed_boot",
+      "menu_category": {
+        "category": "equipment",
+        "group": "minecraft:itemGroup.name.boots"
+      }
+    },
+    "components": {
+      "minecraft:icon": "ytaun_frozpeed_boot",
+      "minecraft:max_stack_size": 1,
+      "minecraft:allow_off_hand": false,
+      "minecraft:enchantable": {
+        "value": 10,
+        "slot": "armor_feet"
+      },
+      "minecraft:wearable": {
+        "slot": "slot.armor.feet",
+        "protection": 3
+      },
+      "minecraft:durability": {
+        "max_durability": 3200,
+        "damage_chance": {
+          "min": 60,
+          "max": 100
+        }
+      },
+      "minecraft:mining_speed": 5,
+      "minecraft:glint": false,
+      "minecraft:hand_equipped": false,
+      "minecraft:repairable": {
+        "repair_items": [
+          {
+            "items": [
+              "ytaun:frozensteel",
+              "ytaun:frozpeed_boot"
+            ],
+            "repair_amount": 500
+          }
+        ]
+      },
+      "minecraft:tags": {
+        "tags": [
+          "minecraft:is_armor",
+          "minecraft:transformable_items",
+          "minecraft:trimmable_armors"
+        ]
+      },
+      "minecraft:damage_absorption": {
+        "absorbable_causes": [
+          "fall",
+          "freezing"
+        ]
+      },
+      "minecraft:fire_resistant": {
+        "value": true
+      }
+    }
+  }
+}

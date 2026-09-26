@@ -1,0 +1,1 @@
+summon ytaun:yeti_death

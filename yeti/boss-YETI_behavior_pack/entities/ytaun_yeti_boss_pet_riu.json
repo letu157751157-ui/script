@@ -1,0 +1,451 @@
+{
+  "format_version": "1.13.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "ytaun:yeti_boss_pet_riu",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "is_experimental": false
+    },
+    "component_groups": {
+      "minecraft:hadro_adult": {
+        "minecraft:scale": {
+          "value": 1
+        },
+        "minecraft:knockback_resistance": {
+          "value": 0.75
+        }
+      },
+      "minecraft:hadro_adult_wild": {
+        "minecraft:type_family": {
+          "family": [
+            "herbdinosaur",
+            "monster",
+            "hadro"
+          ]
+        },
+        "minecraft:behavior.breed": {
+          "priority": 0,
+          "speed_multiplier": 0.7
+        },
+        "minecraft:breedable": {
+          "requireTame": false,
+          "breedsWith": {
+            "mateType": "pa:hadro",
+            "babyType": "pa:hadro",
+            "breed_event": {
+              "event": "minecraft:entity_born",
+              "target": "baby"
+            }
+          },
+          "breedItems": [
+            "potato",
+            "wheat",
+            "carrot",
+            "apple"
+          ]
+        },
+        "minecraft:health": {
+          "value": 14,
+          "max": 14
+        },
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 2,
+          "within_radius": 23,
+          "entity_types": [
+            {
+              "filters": {
+                "any_of": [
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "value": "player"
+                  }
+                ]
+              },
+              "max_dist": 23.0,
+              "must_see": false
+            }
+          ],
+          "must_see": false,
+          "must_reach": false
+        },
+        "minecraft:behavior.random_stroll": {
+          "priority": 5,
+          "speed_multiplier": 0.8
+        },
+        "minecraft:behavior.hurt_by_target": {
+          "priority": 5
+        }
+      },
+      "minecraft:hadro_baby_wild": {
+        "minecraft:behavior.tempt": {
+          "priority": 3,
+          "speed_multiplier": 0.6,
+          "items": [
+            "potato",
+            "wheat",
+            "carrot",
+            "apple"
+          ]
+        },
+        "minecraft:health": {
+          "value": 14,
+          "max": 14
+        },
+        "minecraft:behavior.follow_parent": {
+          "priority": 3,
+          "speed_multiplier": 0.7
+        },
+        "minecraft:scale_by_age": {
+          "start_scale": 0.3,
+          "end_scale": 1
+        },
+        "minecraft:ageable": {
+          "duration": 1600,
+          "feedItems": [
+            {
+              "item": "potato",
+              "growth": 0.1
+            },
+            {
+              "item": "wheat",
+              "growth": 0.1
+            },
+            {
+              "item": "carrot",
+              "growth": 0.1
+            },
+            {
+              "item": "apple",
+              "growth": 0.1
+            }
+          ],
+          "grow_up": {
+            "event": "minecraft:ageable_grow_up_wild",
+            "target": "self"
+          }
+        },
+        "minecraft:behavior.panic": {
+          "priority": 1,
+          "speed_multiplier": 0.7
+        }
+      }
+    },
+    "components": {
+      "minecraft:nameable": {
+        "allow_name_tag_renaming": false,
+        "always_show": false
+      },
+      "minecraft:type_family": {
+        "family": [
+          "monster"
+        ]
+      },
+      "minecraft:movement": {
+        "value": 0.3
+      },
+      "minecraft:underwater_movement": {
+        "value": 0.2
+      },
+      "minecraft:behavior.eat_block": {
+        "priority": 2,
+        "success_chance": "100",
+        "time_until_eat": 30,
+        "eat_and_replace_block_pairs": [
+          {
+            "replace_block": "minecraft:air"
+          }
+        ]
+      },
+      "minecraft:movement.amphibious": {
+        "max_turn": 30.0
+      },
+      "minecraft:navigation.generic": {
+        "avoid_damage_blocks": false,
+        "avoid_portals": false,
+        "avoid_sun": false,
+        "avoid_water": false,
+        "can_breach": true,
+        "can_break_doors": false,
+        "can_jump": true,
+        "can_open_doors": false,
+        "can_open_iron_doors": false,
+        "can_pass_doors": true,
+        "can_path_from_air": false,
+        "can_path_over_lava": false,
+        "can_path_over_water": true,
+        "can_sink": false,
+        "can_swim": false,
+        "can_walk": true,
+        "can_walk_in_lava": false,
+        "is_amphibious": false
+      },
+      "minecraft:follow_range": {
+        "value": 23.0
+      },
+      "minecraft:collision_box": {
+        "height": 1.2,
+        "width": 1.0
+      },
+      "minecraft:behavior.random_look_around_and_sit": {
+        "priority": 6,
+        "min_look_count": 2,
+        "max_look_count": 5,
+        "min_look_time": 100,
+        "max_look_time": 300,
+        "probability": 0.002
+      },
+      "minecraft:behavior.delayed_attack": {
+        "priority": 4,
+        "speed_multiplier": 1.4,
+        "reach_multiplier": 1.2,
+        "attack_duration": 1.52,
+        "hit_delay_pct": 0.3,
+        "track_target": true,
+        "sound_event": "attack.strong"
+      },
+      "minecraft:behavior.move_to_land": {
+        "priority": 6,
+        "search_range": 30,
+        "search_height": 5,
+        "goal_radius": 0.5,
+        "probability": 0.2
+      },
+      "minecraft:behavior.random_stroll": {
+        "priority": 9,
+        "probability": 0.1,
+        "interval": 100
+      },
+      "minecraft:behavior.look_at_player": {
+        "priority": 10,
+        "look_distance": 6,
+        "probability": 0.2
+      },
+      "minecraft:behavior.look_at_entity": {
+        "priority": 10,
+        "look_distance": 8,
+        "angle_of_view_horizontal": 45,
+        "filters": {
+          "test": "is_family",
+          "subject": "other",
+          "value": "mob"
+        }
+      },
+      "minecraft:behavior.random_look_around": {
+        "priority": 10,
+        "probability": 0.2
+      },
+      "minecraft:behavior.nap": {
+        "priority": 6,
+        "cooldown_min": 0,
+        "cooldown_max": 0,
+        "mob_detect_dist": 1,
+        "mob_detect_height": 1,
+        "can_nap_filters": {
+          "all_of": [
+            {
+              "test": "in_water",
+              "subject": "self",
+              "operator": "==",
+              "value": false
+            },
+            {
+              "test": "is_daytime",
+              "subject": "self",
+              "operator": "==",
+              "value": false
+            },
+            {
+              "test": "on_ground",
+              "subject": "self",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      },
+      "minecraft:behavior.hurt_by_target": {
+        "alert_same_type": false,
+        "hurt_owner": false,
+        "priority": 3
+      },
+      "minecraft:health": {
+        "value": 14.0,
+        "max": 14.0
+      },
+      "minecraft:experience_reward": {
+        "on_death": 12.0
+      },
+      "minecraft:scale": {
+        "value": 1.8
+      },
+      "minecraft:attack": {
+        "damage": 2,
+        "effect_name": "slowness",
+        "effect_duration": 30.0
+      },
+      "minecraft:behavior.melee_attack": {
+        "attack_once": false,
+        "can_spread_on_fire": false,
+        "cooldown_time": 1.0,
+        "inner_boundary_time_increase": 0.25,
+        "max_path_time": 0.55,
+        "melee_fov": 90.0,
+        "min_path_time": 0.2,
+        "outer_boundary_time_increase": 0.5,
+        "path_fail_time_increase": 0.75,
+        "path_inner_boundary": 16.0,
+        "path_outer_boundary": 32.0,
+        "random_stop_interval": 100,
+        "reach_multiplier": 1.4,
+        "require_complete_path": false,
+        "speed_multiplier": 1.0,
+        "track_target": false,
+        "x_max_rotation": 30.0,
+        "y_max_head_rotation": 30.0,
+        "priority": 2
+      },
+      "minecraft:behavior.nearest_attackable_target": {
+        "attack_owner": false,
+        "must_reach": false,
+        "must_see": false,
+        "must_see_forget_duration": 3.0,
+        "persist_time": 0.0,
+        "reselect_targets": false,
+        "scan_interval": 10,
+        "set_persistent": false,
+        "target_invisible_multiplier": 0.7,
+        "target_search_height": -1.0,
+        "target_sneak_visibility_multiplier": 0.8,
+        "within_radius": 23.0,
+        "entity_types": [
+          {
+            "filters": {
+              "test": "is_family",
+              "subject": "other",
+              "value": "irongolem"
+            },
+            "max_dist": 23.0
+          },
+          {
+            "filters": {
+              "test": "is_family",
+              "subject": "other",
+              "value": "player"
+            },
+            "max_dist": 23.0
+          }
+        ]
+      },
+      "minecraft:behavior.owner_hurt_by_target": {
+        "priority": 1
+      },
+      "minecraft:behavior.owner_hurt_target": {
+        "priority": 2
+      },
+      "minecraft:physics": {
+        "has_collision": true,
+        "has_gravity": true,
+        "push_towards_closest_space": false
+      },
+      "minecraft:loot": {
+        "table": "loot_tables/entities/ytaun_yeti_boss_pet_riu.json"
+      }
+    },
+    "events": {
+      "from_egg": {
+        "add": {
+          "component_groups": [
+            "minecraft:hadro_baby_wild"
+          ]
+        }
+      },
+      "minecraft:entity_spawned": {
+        "randomize": [
+          {
+            "weight": 8,
+            "add": {
+              "component_groups": [
+                "minecraft:hadro_adult_wild"
+              ]
+            }
+          },
+          {
+            "weight": 8,
+            "add": {
+              "component_groups": [
+                "minecraft:hadro_adult"
+              ]
+            }
+          },
+          {
+            "weight": 8,
+            "add": {
+              "component_groups": [
+                "minecraft:hadro_baby_wild"
+              ]
+            }
+          },
+          {
+            "weight": 8,
+            "add": {
+              "component_groups": [
+                "minecraft:hadro_adult_wild",
+                "minecraft:hadro_adult"
+              ]
+            }
+          }
+        ]
+      },
+      "minecraft:entity_born": {
+        "add": {
+          "component_groups": [
+            "minecraft:hadro_baby_wild"
+          ]
+        }
+      },
+      "minecraft:entity_transformed": {
+        "add": {
+          "component_groups": [
+            "minecraft:hadro_baby_wild"
+          ]
+        }
+      },
+      "minecraft:ageable_grow_up_wild": {
+        "remove": {
+          "component_groups": [
+            "minecraft:hadro_baby_wild"
+          ]
+        },
+        "add": {
+          "component_groups": [
+            "minecraft:hadro_adult",
+            "minecraft:hadro_adult_wild"
+          ]
+        }
+      },
+      "on:death": {
+        "queue_command": {}
+      },
+      "on:hurt": {
+        "queue_command": {}
+      },
+      "on:hurt_by_player": {
+        "queue_command": {}
+      },
+      "on:ignite": {
+        "queue_command": {}
+      },
+      "on:target_acquired": {
+        "queue_command": {}
+      },
+      "on:target_escape": {
+        "queue_command": {}
+      },
+      "on:wake_with_owner": {
+        "queue_command": {}
+      }
+    }
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.ytaun_frozen_boot",
+        "texture_width": 64.0,
+        "texture_height": 64.0,
+        "visible_bounds_height": 4.5,
+        "visible_bounds_offset": [
+          0.0,
+          1.75,
+          0.0
+        ],
+        "visible_bounds_width": 5.0
+      },
+      "bones": [
+        {
+          "name": "Giy",
+          "pivot": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "leftLeg",
+          "parent": "Giy",
+          "pivot": [
+            2,
+            12,
+            0
+          ]
+        },
+        {
+          "name": "Boot_RightLeg",
+          "parent": "leftLeg",
+          "pivot": [
+            2,
+            12,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                0,
+                0,
+                -2
+              ],
+              "size": [
+                4,
+                3,
+                4
+              ],
+              "inflate": 0.55,
+              "uv": {
+                "north": {
+                  "uv": [
+                    12,
+                    39
+                  ],
+                  "uv_size": [
+                    5,
+                    4
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    34,
+                    38
+                  ],
+                  "uv_size": [
+                    4,
+                    5
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    12,
+                    39
+                  ],
+                  "uv_size": [
+                    5,
+                    4
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    34,
+                    38
+                  ],
+                  "uv_size": [
+                    4,
+                    5
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    11,
+                    23
+                  ],
+                  "uv_size": [
+                    4,
+                    4
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    13,
+                    47
+                  ],
+                  "uv_size": [
+                    4,
+                    -4
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "rightLeg",
+          "parent": "Giy",
+          "pivot": [
+            -2,
+            12,
+            0
+          ]
+        },
+        {
+          "name": "Boot_LeftLeg",
+          "parent": "rightLeg",
+          "pivot": [
+            -2,
+            12,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -4,
+                0,
+                -2
+              ],
+              "size": [
+                4,
+                3,
+                4
+              ],
+              "inflate": 0.55,
+              "uv": {
+                "north": {
+                  "uv": [
+                    17,
+                    39
+                  ],
+                  "uv_size": [
+                    -5,
+                    4
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    38,
+                    38
+                  ],
+                  "uv_size": [
+                    -4,
+                    5
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    17,
+                    39
+                  ],
+                  "uv_size": [
+                    -5,
+                    4
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    38,
+                    38
+                  ],
+                  "uv_size": [
+                    -4,
+                    5
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    11,
+                    26
+                  ],
+                  "uv_size": [
+                    4,
+                    4
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    8,
+                    35
+                  ],
+                  "uv_size": [
+                    3,
+                    -3
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "format_version": "1.8.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "ytaun:ice_spike_yeti_boss",
+      "materials": {
+        "default": "skeleton"
+      },
+      "textures": {
+        "default": "textures/entity/pamobile/ytaun_ice_spike_yeti_boss"
+      },
+      "geometry": {
+        "default": "geometry.ytaun_ice_spike_yeti_boss_default"
+      },
+      "scripts": {
+        "pre_animation": [
+          "variable.tcos0 = (Math.cos(query.modified_distance_moved * 38.17) * query.modified_move_speed / variable.gliding_speed_value) * 57.3;"
+        ]
+      },
+      "animations": {
+        "look_at_target_default": "animation.ytaun_ice_spike_yeti_boss.look_at_target.default",
+        "look_at_target_gliding": "animation.ytaun_ice_spike_yeti_boss.look_at_target.gliding",
+        "look_at_target_swimming": "animation.ytaun_ice_spike_yeti_boss.look_at_target.swimming",
+        "move": "animation.ytaun_ice_spike_yeti_boss.move",
+        "riding.arms": "animation.ytaun_ice_spike_yeti_boss.riding.arms",
+        "riding.legs": "animation.ytaun_ice_spike_yeti_boss.riding.legs",
+        "holding": "animation.ytaun_ice_spike_yeti_boss.holding",
+        "brandish_spear": "animation.ytaun_ice_spike_yeti_boss.brandish_spear",
+        "charging": "animation.ytaun_ice_spike_yeti_boss.charging",
+        "attack.rotations": "animation.ytaun_ice_spike_yeti_boss.attack.rotations",
+        "sneaking": "animation.ytaun_ice_spike_yeti_boss.sneaking",
+        "bob": "animation.ytaun_ice_spike_yeti_boss.bob",
+        "damage_nearby_mobs": "animation.ytaun_ice_spike_yeti_boss.damage_nearby_mobs",
+        "bow_and_arrow": "animation.ytaun_ice_spike_yeti_boss.bow_and_arrow",
+        "swimming": "animation.ytaun_ice_spike_yeti_boss.swimming",
+        "use_item_progress": "animation.ytaun_ice_spike_yeti_boss.use_item_progress",
+        "skeleton_attack": "animation.ytaun_ice_spike_yeti_boss.attack",
+        "spawn": "animation.ytaun_ice_spike_yeti_boss.spawn"
+      },
+      "animation_controllers": [
+        {
+          "look_at_target": "controller.animation.humanoid.look_at_target"
+        },
+        {
+          "move": "controller.animation.humanoid.move"
+        },
+        {
+          "riding": "controller.animation.humanoid.riding"
+        },
+        {
+          "holding": "controller.animation.humanoid.holding"
+        },
+        {
+          "brandish_spear": "controller.animation.humanoid.brandish_spear"
+        },
+        {
+          "charging": "controller.animation.humanoid.charging"
+        },
+        {
+          "attack": "controller.animation.humanoid.attack"
+        },
+        {
+          "sneaking": "controller.animation.humanoid.sneaking"
+        },
+        {
+          "bob": "controller.animation.humanoid.bob"
+        },
+        {
+          "damage_nearby_mobs": "controller.animation.humanoid.damage_nearby_mobs"
+        },
+        {
+          "bow_and_arrow": "controller.animation.humanoid.bow_and_arrow"
+        },
+        {
+          "swimming": "controller.animation.humanoid.swimming"
+        },
+        {
+          "use_item_progress": "controller.animation.humanoid.use_item_progress"
+        },
+        {
+          "skeleton_attack": "controller.animation.skeleton.attack"
+        }
+      ],
+      "spawn_egg": {
+        "base_color": "#51E1EA",
+        "overlay_color": "#1D206F"
+      },
+      "render_controllers": [
+        "controller.render.skeleton"
+      ],
+      "enable_attachables": true
+    }
+  }
+}

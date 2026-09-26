@@ -1,0 +1,1 @@
+give @s ytaun:cooked_yeti_meat

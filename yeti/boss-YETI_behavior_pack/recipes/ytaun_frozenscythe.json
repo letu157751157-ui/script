@@ -1,0 +1,46 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frozenscythe_21a82349"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      " AB",
+      "CDB",
+      "E F"
+    ],
+    "key": {
+      "A": {
+        "item": "ytaun:big_yeti_fur",
+        "data": 0
+      },
+      "B": {
+        "item": "ytaun:icesteel",
+        "data": 0
+      },
+      "C": {
+        "item": "ytaun:steel_stick",
+        "data": 0
+      },
+      "D": {
+        "item": "ytaun:utrasmithing",
+        "data": 0
+      },
+      "E": {
+        "item": "minecraft:netherite_sword",
+        "data": 0
+      },
+      "F": {
+        "item": "ytaun:ice_ore",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "ytaun:frozenscythe",
+      "count": 1
+    }
+  }
+}

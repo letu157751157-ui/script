@@ -1,0 +1,38 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frozen_chestplate_0e424b28"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "ABA",
+      "ACA",
+      "ADA"
+    ],
+    "key": {
+      "A": {
+        "item": "ytaun:frozensteel",
+        "data": 0
+      },
+      "B": {
+        "item": "ytaun:utrasmithing",
+        "data": 0
+      },
+      "C": {
+        "item": "minecraft:netherite_chestplate",
+        "data": 0
+      },
+      "D": {
+        "item": "ytaun:big_yeti_fur",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "ytaun:frozen_chestplate",
+      "count": 1
+    }
+  }
+}

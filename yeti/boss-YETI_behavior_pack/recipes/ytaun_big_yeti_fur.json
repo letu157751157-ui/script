@@ -1,0 +1,30 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "big_yeti_fur_2e96f0f5"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "ABA",
+      "BBB",
+      "ABA"
+    ],
+    "key": {
+      "A": {
+        "item": "minecraft:white_wool",
+        "data": 0
+      },
+      "B": {
+        "item": "ytaun:yeti_fur",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "ytaun:big_yeti_fur",
+      "count": 1
+    }
+  }
+}

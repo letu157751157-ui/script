@@ -1,0 +1,43 @@
+{
+  "format_version": "1.12",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "spawn_egg_f780d8d9"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "ABC",
+      "CDC",
+      "CEC"
+    ],
+    "key": {
+      "A": {
+        "item": "minecraft:powder_snow_bucket",
+        "data": 0
+      },
+      "B": {
+        "item": "minecraft:diamond_block",
+        "data": 0
+      },
+      "C": {
+        "item": "ytaun:big_yeti_fur",
+        "data": 0
+      },
+      "D": {
+        "item": "ytaun:frozen_heart",
+        "data": 0
+      },
+      "E": {
+        "item": "minecraft:netherite_ingot",
+        "data": 0
+      }
+    },
+    "result": {
+      "item": "minecraft:spawn_egg",
+      "count": 1,
+      "data": "query.get_actor_info_id('ytaun:yeti_1')"
+    }
+  }
+}
