@@ -1,1 +1,0 @@
-give @s pa:obsidian_sharp

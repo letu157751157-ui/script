@@ -433,6 +433,18 @@ def controllers_json():
                     "dead": {"animations": ["death"], "blend_transition": 0.1},
                 },
             },
+            # melee swing: variable.attack_time is set by the engine while a mob swings
+            # (melee hits and, with "swing": true, ranged shots) -- no script needed
+            "controller.animation.pa_harvester.attack": {
+                "states": {
+                    "default": {"transitions": [{"attacking": "variable.attack_time > 0 && query.is_alive"}]},
+                    "attacking": {
+                        "animations": ["attack"],
+                        "transitions": [{"default": "query.all_animations_finished || !query.is_alive"}],
+                        "blend_transition": 0.08,
+                    },
+                },
+            },
             "controller.animation.pa_harvester.look": {
                 "states": {
                     "default": {
@@ -444,6 +456,30 @@ def controllers_json():
             },
         },
     }
+
+
+CLIENT_ANIMATIONS = {
+    "idle": "animation.pa_harvester.idle",
+    "move": "animation.pa_harvester.move",
+    "attack": "animation.pa_harvester.attack",
+    "look_at_target": "animation.pa_harvester.look_at_target",
+    "death": "animation.pa_harvester.death",
+    "base_controller": "controller.animation.pa_harvester.base",
+    "attack_controller": "controller.animation.pa_harvester.attack",
+    "look_controller": "controller.animation.pa_harvester.look",
+}
+
+
+def update_client_entity(path):
+    with open(path) as f:
+        data = json.load(f)
+    desc = data["minecraft:client_entity"]["description"]
+    desc["animations"] = CLIENT_ANIMATIONS
+    desc["particle_effects"] = PARTICLES
+    desc["scripts"] = {"animate": ["base_controller", "attack_controller", "look_controller"]}
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2)
+        f.write("\n")
 
 
 def add_locators(geo_path):
@@ -466,6 +502,7 @@ def build(rp_root):
         json.dump(controllers_json(), f, indent=2)
         f.write("\n")
     add_locators(os.path.join(rp_root, "models", "entity", "pa_harvester.json"))
+    update_client_entity(os.path.join(rp_root, "entity", "pa_harvester.json"))
     return sorted(ANIMS)
 
 

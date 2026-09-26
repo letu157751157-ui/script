@@ -1,1 +1,0 @@
-particle yeti_particle ~ ~ ~

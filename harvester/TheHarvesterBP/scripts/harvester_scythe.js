@@ -215,7 +215,7 @@ function soulHarvest(player) {
 }
 
 // ─── EVENT: Right-click → Shadow Reap ────────────────────────────────────────
-world.afterEvents.itemUse.subscribe((event) => {
+world.afterEvents.itemUse?.subscribe((event) => {
     const player = event.source;
     const item = event.itemStack;
     if (item.typeId !== CONFIG.itemId) return;
@@ -227,7 +227,7 @@ world.afterEvents.itemUse.subscribe((event) => {
 // Before-events run in read-only mode (no damage/effects/health changes allowed),
 // so the skill itself runs on the next tick.
 let lastInteract = new Map();
-world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
+world.beforeEvents.playerInteractWithEntity?.subscribe((event) => {
     const player = event.player;
     if (!hasScythe(player)) return;
     const now = Date.now();
@@ -241,7 +241,7 @@ world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
 });
 
 // ─── PASSIVE 1: Death Mark — hit = mark, marked = +50% dmg + Wither ──────────
-world.afterEvents.entityHurt.subscribe((event) => {
+world.afterEvents.entityHurt?.subscribe((event) => {
     const attacker = event.damageSource.damagingEntity;
     const victim = event.hurtEntity;
     if (!attacker || attacker.typeId !== "minecraft:player") return;
@@ -290,7 +290,7 @@ world.afterEvents.entityHurt.subscribe((event) => {
 });
 
 // ─── PASSIVE 2: Dark Blessing — killing grants Speed II + Strength I ─────────
-world.afterEvents.entityDie.subscribe((event) => {
+world.afterEvents.entityDie?.subscribe((event) => {
     try {
         const killer = event.damageSource?.damagingEntity;
         if (!killer || killer.typeId !== "minecraft:player") return;
@@ -393,7 +393,7 @@ system.runInterval(() => {
     }
 }, 10);
 
-world.afterEvents.worldInitialize.subscribe(() => {
+world.afterEvents.worldInitialize?.subscribe(() => {
     console.warn("§5[Harvester Scythe v3] §fLoaded!");
     console.warn("§7Active: Shadow Reap (right-click) | Soul Harvest (interact with a mob)");
     console.warn("§7Passive: Death Mark (+50% dmg) | Soul Explosion (auto 20s) | Dark Blessing (kill→Speed+Strength)");

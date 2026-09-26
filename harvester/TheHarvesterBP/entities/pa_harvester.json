@@ -455,7 +455,7 @@
         "attack_interval_min": 4.0,
         "attack_interval_max": 6.0,
         "attack_radius": 20.0,
-        "swing": false
+        "swing": true
       }
     },
     "events": {

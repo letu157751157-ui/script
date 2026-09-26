@@ -1,1 +1,0 @@
-effect @s weakness 1 1

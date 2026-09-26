@@ -152,13 +152,18 @@ function effect(entity, id, ticks, amplifier = 0) {
     try { entity.addEffect(id, ticks, { amplifier, showParticles: true }); } catch {}
 }
 
+// Players the boss fights. Creative players count too (they take no damage, but the boss still
+// casts at them, which is how most people test it); spectators are ignored.
+// The game mode is compared as text because its enum spelling differs between API versions.
 function players(dim, center, radius) {
-    try {
-        return dim.getEntities({
-            location: center, maxDistance: radius, type: "minecraft:player",
-            excludeGameModes: ["creative", "spectator"]
-        }).filter((p) => (health(p)?.currentValue ?? 0) > 0);
-    } catch { return []; }
+    let list = [];
+    try { list = dim.getEntities({ location: center, maxDistance: radius, type: "minecraft:player" }); } catch { return []; }
+    return list.filter((p) => {
+        try {
+            if (String(p.getGameMode()).toLowerCase() === "spectator") return false;
+        } catch {}
+        return (health(p)?.currentValue ?? 0) > 0;
+    });
 }
 
 function tell(boss, radius, message) {
@@ -168,6 +173,10 @@ function tell(boss, radius, message) {
 }
 
 function state(boss) { return bosses.get(boss.id); }
+
+function on(signal, callback) {
+    try { signal?.subscribe(callback); } catch {}
+}
 
 function tier(s) { return s.enraged ? 3 : s.phase - 1; }
 
@@ -932,7 +941,7 @@ system.runInterval(() => {
 // ─── events ─────────────────────────────────────────────────────────────────
 
 // Rise from the grave on a real spawn (not when the chunk loads)
-world.afterEvents.entitySpawn.subscribe((e) => {
+on(world.afterEvents.entitySpawn, (e) => {
     try {
         if (e.entity.typeId !== BOSS_ID || e.cause === "Loaded") return;
         const boss = e.entity;
@@ -956,8 +965,8 @@ world.afterEvents.entitySpawn.subscribe((e) => {
     } catch {}
 });
 
-// Melee swing animation + counter blink when struck
-world.afterEvents.entityHurt.subscribe((e) => {
+// Melee hits spread the plague (phase 2+) + counter blink when struck
+on(world.afterEvents.entityHurt, (e) => {
     try {
         const victim = e.hurtEntity;
         const source = e.damageSource;
@@ -966,9 +975,9 @@ world.afterEvents.entityHurt.subscribe((e) => {
             const boss = source.damagingEntity;
             const s = bosses.get(boss.id);
             const t = now();
-            if (s && skillHitTick.get(victim.id) !== t && t >= s.busyUntil && t - s.lastMelee > 12) {
+            // (the swing animation itself is played by the resource pack from variable.attack_time)
+            if (s && skillHitTick.get(victim.id) !== t && t - s.lastMelee > 12) {
                 s.lastMelee = t;
-                try { boss.playAnimation("animation.pa_harvester.attack", { blendOutTime: 0.15, controller: "harvester.melee" }); } catch {}
                 if (s.phase >= 2) addPlague(boss, victim, 1);
             }
             return;
@@ -993,7 +1002,7 @@ world.afterEvents.entityHurt.subscribe((e) => {
 });
 
 // Soul Toll: a player dying near the Harvester heals it
-world.afterEvents.entityDie.subscribe((e) => {
+on(world.afterEvents.entityDie, (e) => {
     const dead = e.deadEntity;
     try {
         if (dead.typeId === "minecraft:player") {
@@ -1035,7 +1044,7 @@ world.afterEvents.entityDie.subscribe((e) => {
 });
 
 // Milk cures the plague
-world.afterEvents.itemCompleteUse.subscribe((e) => {
+on(world.afterEvents.itemCompleteUse, (e) => {
     try {
         if (e.itemStack?.typeId !== "minecraft:milk_bucket") return;
         if (!plague.has(e.source.id)) return;
@@ -1045,11 +1054,11 @@ world.afterEvents.itemCompleteUse.subscribe((e) => {
     } catch {}
 });
 
-world.afterEvents.entityRemove.subscribe((e) => {
+on(world.afterEvents.entityRemove, (e) => {
     if (e.typeId === BOSS_ID) bosses.delete(e.removedEntityId);
 });
 
-world.afterEvents.playerLeave.subscribe((e) => {
+on(world.afterEvents.playerLeave, (e) => {
     plague.delete(e.playerId);
     fighters.delete(e.playerId);
 });
@@ -1059,6 +1068,6 @@ export function inHarvesterFight(player) {
     return now() - (fighters.get(player.id) ?? -1000) < 40;
 }
 
-world.afterEvents.worldInitialize.subscribe(() => {
+on(world.afterEvents.worldInitialize, () => {
     console.warn("[Harvester Boss v3] Reaper x Plague Doctor loaded: 10 skills, 3 phases, plague stacks.");
 });

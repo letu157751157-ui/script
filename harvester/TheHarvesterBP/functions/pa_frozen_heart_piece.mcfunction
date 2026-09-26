@@ -1,1 +1,0 @@
-give @s pa:frozen_heart_piece

@@ -2,10 +2,11 @@
 //
 //   node harvester/tools/simulate.mjs
 //
-// Runs scripts/harvester.js and scripts/harvester_scythe.js against a mock of
-// @minecraft/server through a full boss fight (spawn -> phase 2 -> phase 3 -> enrage -> death)
-// and reports:
-//   * exceptions swallowed by the scripts' try/catch blocks,
+// Loads the whole behavior pack script graph (scripts/main.js) against a mock of
+// @minecraft/server that only offers the events of the API version declared in manifest.json,
+// plays a full boss fight (spawn -> phase 2 -> phase 3 -> enrage -> death) and reports:
+//   * scripts that fail to load (e.g. subscribing to an event the declared API version lacks),
+//   * uncaught errors in timers/events, and exceptions swallowed by the Harvester try/catch blocks,
 //   * particles spawned that don't exist or miss Molang variables they read,
 //   * animations played that aren't defined in the resource pack.
 import fs from "node:fs";
@@ -15,7 +16,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.dirname(HERE);
-const BP = path.join(ROOT, "TheHarvesterBP");
+const BP = process.env.HARVESTER_BP || path.join(ROOT, "TheHarvesterBP");
 const RP = path.join(ROOT, "TheHarvesterRP");
 
 // ---------------------------------------------------------------- resource pack facts
@@ -34,6 +35,15 @@ const animations = new Set(Object.keys(JSON.parse(fs.readFileSync(path.join(RP, 
 for (const file of fs.readdirSync(path.join(RP, "animations"))) {
     for (const id of Object.keys(JSON.parse(fs.readFileSync(path.join(RP, "animations", file), "utf8")).animations)) animations.add(id);
 }
+
+// ---------------------------------------------------------------- API surface per version
+// Event signals that exist in each @minecraft/server version (from its index.d.ts).
+const EVENTS = {"1.14.0": {"WorldAfterEvents": ["blockExplode", "buttonPush", "dataDrivenEntityTrigger", "effectAdd", "entityDie", "entityHealthChanged", "entityHitBlock", "entityHitEntity", "entityHurt", "entityLoad", "entityRemove", "entitySpawn", "explosion", "gameRuleChange", "itemCompleteUse", "itemReleaseUse", "itemStartUse", "itemStartUseOn", "itemStopUse", "itemStopUseOn", "itemUse", "itemUseOn", "leverAction", "pistonActivate", "playerBreakBlock", "playerDimensionChange", "playerEmote", "playerGameModeChange", "playerInputPermissionCategoryChange", "playerJoin", "playerLeave", "playerPlaceBlock", "playerSpawn", "pressurePlatePop", "pressurePlatePush", "projectileHitBlock", "projectileHitEntity", "targetBlockHit", "tripWireTrip", "weatherChange", "worldInitialize"], "WorldBeforeEvents": ["effectAdd", "entityRemove", "explosion", "itemUse", "itemUseOn", "playerBreakBlock", "playerGameModeChange", "playerLeave", "weatherChange", "worldInitialize"], "SystemAfterEvents": ["scriptEventReceive"], "SystemBeforeEvents": []}, "1.15.0": {"WorldAfterEvents": ["blockExplode", "buttonPush", "dataDrivenEntityTrigger", "effectAdd", "entityDie", "entityHealthChanged", "entityHitBlock", "entityHitEntity", "entityHurt", "entityLoad", "entityRemove", "entitySpawn", "explosion", "gameRuleChange", "itemCompleteUse", "itemReleaseUse", "itemStartUse", "itemStartUseOn", "itemStopUse", "itemStopUseOn", "itemUse", "itemUseOn", "leverAction", "pistonActivate", "playerBreakBlock", "playerDimensionChange", "playerEmote", "playerGameModeChange", "playerInputPermissionCategoryChange", "playerInteractWithBlock", "playerInteractWithEntity", "playerJoin", "playerLeave", "playerPlaceBlock", "playerSpawn", "pressurePlatePop", "pressurePlatePush", "projectileHitBlock", "projectileHitEntity", "targetBlockHit", "tripWireTrip", "weatherChange", "worldInitialize"], "WorldBeforeEvents": ["effectAdd", "entityRemove", "explosion", "itemUse", "itemUseOn", "playerBreakBlock", "playerGameModeChange", "playerInteractWithBlock", "playerInteractWithEntity", "playerLeave", "weatherChange", "worldInitialize"], "SystemAfterEvents": ["scriptEventReceive"], "SystemBeforeEvents": []}};
+// Runtime exports of each version (classes, enums, constants); anything a script imports that is
+// not listed here fails to link, exactly like in game.
+const EXPORTS = {"1.14.0": ["Block", "BlockComponent", "BlockComponentEntityFallOnEvent", "BlockComponentOnPlaceEvent", "BlockComponentPlayerDestroyEvent", "BlockComponentPlayerInteractEvent", "BlockComponentPlayerPlaceBeforeEvent", "BlockComponentRandomTickEvent", "BlockComponentRegistry", "BlockComponentStepOffEvent", "BlockComponentStepOnEvent", "BlockComponentTickEvent", "BlockComponentTypes", "BlockCustomComponentAlreadyRegisteredError", "BlockCustomComponentReloadNewComponentError", "BlockCustomComponentReloadNewEventError", "BlockCustomComponentReloadVersionError", "BlockEvent", "BlockExplodeAfterEvent", "BlockExplodeAfterEventSignal", "BlockInventoryComponent", "BlockPermutation", "BlockPistonComponent", "BlockPistonState", "BlockRecordPlayerComponent", "BlockSignComponent", "BlockStateType", "BlockStates", "BlockType", "BlockTypes", "BlockVolumeBase", "ButtonPushAfterEvent", "ButtonPushAfterEventSignal", "Camera", "CommandError", "CommandResult", "Component", "Container", "ContainerSlot", "CustomComponentInvalidRegistryError", "CustomComponentNameError", "CustomComponentNameErrorReason", "DataDrivenEntityTriggerAfterEvent", "DataDrivenEntityTriggerAfterEventSignal", "Dimension", "DimensionType", "DimensionTypes", "Direction", "DisplaySlotId", "DyeColor", "EasingType", "Effect", "EffectAddAfterEvent", "EffectAddAfterEventSignal", "EffectAddBeforeEvent", "EffectAddBeforeEventSignal", "EffectType", "EffectTypes", "EnchantmentLevelOutOfBoundsError", "EnchantmentSlot", "EnchantmentType", "EnchantmentTypeNotCompatibleError", "EnchantmentTypeUnknownIdError", "EnchantmentTypes", "Entity", "EntityAddRiderComponent", "EntityAgeableComponent", "EntityAttributeComponent", "EntityBaseMovementComponent", "EntityCanClimbComponent", "EntityCanFlyComponent", "EntityCanPowerJumpComponent", "EntityColor2Component", "EntityColorComponent", "EntityComponent", "EntityComponentTypes", "EntityDamageCause", "EntityDefinitionFeedItem", "EntityDieAfterEvent", "EntityDieAfterEventSignal", "EntityEquippableComponent", "EntityFireImmuneComponent", "EntityFloatsInLiquidComponent", "EntityFlyingSpeedComponent", "EntityFrictionModifierComponent", "EntityGroundOffsetComponent", "EntityHealableComponent", "EntityHealthChangedAfterEvent", "EntityHealthChangedAfterEventSignal", "EntityHealthComponent", "EntityHitBlockAfterEvent", "EntityHitBlockAfterEventSignal", "EntityHitEntityAfterEvent", "EntityHitEntityAfterEventSignal", "EntityHurtAfterEvent", "EntityHurtAfterEventSignal", "EntityInitializationCause", "EntityInventoryComponent", "EntityIsBabyComponent", "EntityIsChargedComponent", "EntityIsChestedComponent", "EntityIsDyeableComponent", "EntityIsHiddenWhenInvisibleComponent", "EntityIsIgnitedComponent", "EntityIsIllagerCaptainComponent", "EntityIsSaddledComponent", "EntityIsShakingComponent", "EntityIsShearedComponent", "EntityIsStackableComponent", "EntityIsStunnedComponent", "EntityIsTamedComponent", "EntityItemComponent", "EntityLavaMovementComponent", "EntityLeashableComponent", "EntityLoadAfterEvent", "EntityLoadAfterEventSignal", "EntityMarkVariantComponent", "EntityMovementAmphibiousComponent", "EntityMovementBasicComponent", "EntityMovementComponent", "EntityMovementFlyComponent", "EntityMovementGenericComponent", "EntityMovementGlideComponent", "EntityMovementHoverComponent", "EntityMovementJumpComponent", "EntityMovementSkipComponent", "EntityMovementSwayComponent", "EntityNavigationClimbComponent", "EntityNavigationComponent", "EntityNavigationFloatComponent", "EntityNavigationFlyComponent", "EntityNavigationGenericComponent", "EntityNavigationHoverComponent", "EntityNavigationWalkComponent", "EntityOnFireComponent", "EntityProjectileComponent", "EntityPushThroughComponent", "EntityRemoveAfterEvent", "EntityRemoveAfterEventSignal", "EntityRemoveBeforeEvent", "EntityRemoveBeforeEventSignal", "EntityRideableComponent", "EntityRidingComponent", "EntityScaleComponent", "EntitySkinIdComponent", "EntitySpawnAfterEvent", "EntitySpawnAfterEventSignal", "EntityStrengthComponent", "EntityTameMountComponent", "EntityTameableComponent", "EntityType", "EntityTypeFamilyComponent", "EntityTypes", "EntityUnderwaterMovementComponent", "EntityVariantComponent", "EntityWantsJockeyComponent", "EquipmentSlot", "ExplosionAfterEvent", "ExplosionAfterEventSignal", "ExplosionBeforeEvent", "ExplosionBeforeEventSignal", "FeedItem", "FeedItemEffect", "FluidType", "GameMode", "GameRule", "GameRuleChangeAfterEvent", "GameRuleChangeAfterEventSignal", "GameRules", "HudElement", "HudElementsCount", "HudVisibility", "HudVisibilityCount", "IButtonPushAfterEventSignal", "ILeverActionAfterEventSignal", "IPlayerJoinAfterEventSignal", "IPlayerLeaveAfterEventSignal", "IPlayerSpawnAfterEventSignal", "InputPermissionCategory", "InvalidContainerSlotError", "InvalidStructureError", "ItemCompleteUseAfterEvent", "ItemCompleteUseAfterEventSignal", "ItemCompleteUseEvent", "ItemComponent", "ItemComponentBeforeDurabilityDamageEvent", "ItemComponentCompleteUseEvent", "ItemComponentConsumeEvent", "ItemComponentHitEntityEvent", "ItemComponentMineBlockEvent", "ItemComponentRegistry", "ItemComponentTypes", "ItemComponentUseEvent", "ItemComponentUseOnEvent", "ItemCooldownComponent", "ItemCustomComponentAlreadyRegisteredError", "ItemCustomComponentReloadNewComponentError", "ItemCustomComponentReloadNewEventError", "ItemCustomComponentReloadVersionError", "ItemDurabilityComponent", "ItemEnchantableComponent", "ItemFoodComponent", "ItemLockMode", "ItemReleaseUseAfterEvent", "ItemReleaseUseAfterEventSignal", "ItemStack", "ItemStartUseAfterEvent", "ItemStartUseAfterEventSignal", "ItemStartUseOnAfterEvent", "ItemStartUseOnAfterEventSignal", "ItemStopUseAfterEvent", "ItemStopUseAfterEventSignal", "ItemStopUseOnAfterEvent", "ItemStopUseOnAfterEventSignal", "ItemType", "ItemTypes", "ItemUseAfterEvent", "ItemUseAfterEventSignal", "ItemUseBeforeEvent", "ItemUseBeforeEventSignal", "ItemUseOnAfterEvent", "ItemUseOnAfterEventSignal", "ItemUseOnBeforeEvent", "ItemUseOnBeforeEventSignal", "ItemUseOnEvent", "LeverActionAfterEvent", "LeverActionAfterEventSignal", "ListBlockVolume", "LocationInUnloadedChunkError", "LocationOutOfWorldBoundariesError", "MinecraftDimensionTypes", "MolangVariableMap", "MoonPhase", "MoonPhaseCount", "ObjectiveSortOrder", "PaletteColor", "PistonActivateAfterEvent", "PistonActivateAfterEventSignal", "Player", "PlayerBreakBlockAfterEvent", "PlayerBreakBlockAfterEventSignal", "PlayerBreakBlockBeforeEvent", "PlayerBreakBlockBeforeEventSignal", "PlayerCursorInventoryComponent", "PlayerDimensionChangeAfterEvent", "PlayerDimensionChangeAfterEventSignal", "PlayerEmoteAfterEvent", "PlayerEmoteAfterEventSignal", "PlayerGameModeChangeAfterEvent", "PlayerGameModeChangeAfterEventSignal", "PlayerGameModeChangeBeforeEvent", "PlayerGameModeChangeBeforeEventSignal", "PlayerInputPermissionCategoryChangeAfterEvent", "PlayerInputPermissionCategoryChangeAfterEventSignal", "PlayerInputPermissions", "PlayerInteractWithBlockAfterEvent", "PlayerInteractWithBlockAfterEventSignal", "PlayerInteractWithBlockBeforeEvent", "PlayerInteractWithBlockBeforeEventSignal", "PlayerInteractWithEntityAfterEvent", "PlayerInteractWithEntityAfterEventSignal", "PlayerInteractWithEntityBeforeEvent", "PlayerInteractWithEntityBeforeEventSignal", "PlayerJoinAfterEvent", "PlayerJoinAfterEventSignal", "PlayerLeaveAfterEvent", "PlayerLeaveAfterEventSignal", "PlayerLeaveBeforeEvent", "PlayerLeaveBeforeEventSignal", "PlayerPlaceBlockAfterEvent", "PlayerPlaceBlockAfterEventSignal", "PlayerSpawnAfterEvent", "PlayerSpawnAfterEventSignal", "PressurePlatePopAfterEvent", "PressurePlatePopAfterEventSignal", "PressurePlatePushAfterEvent", "PressurePlatePushAfterEventSignal", "ProjectileHitBlockAfterEvent", "ProjectileHitBlockAfterEventSignal", "ProjectileHitEntityAfterEvent", "ProjectileHitEntityAfterEventSignal", "Scoreboard", "ScoreboardIdentity", "ScoreboardIdentityType", "ScoreboardObjective", "ScoreboardScoreInfo", "ScreenDisplay", "ScriptEventCommandMessageAfterEvent", "ScriptEventCommandMessageAfterEventSignal", "ScriptEventSource", "Seat", "SignSide", "Structure", "StructureAnimationMode", "StructureManager", "StructureMirrorAxis", "StructureRotation", "StructureSaveMode", "System", "SystemAfterEvents", "TargetBlockHitAfterEvent", "TargetBlockHitAfterEventSignal", "TicksPerSecond", "TimeOfDay", "Trigger", "TripWireTripAfterEvent", "TripWireTripAfterEventSignal", "WeatherChangeAfterEvent", "WeatherChangeAfterEventSignal", "WeatherChangeBeforeEvent", "WeatherChangeBeforeEventSignal", "WeatherType", "World", "WorldAfterEvents", "WorldBeforeEvents", "WorldInitializeAfterEvent", "WorldInitializeAfterEventSignal", "WorldInitializeBeforeEvent", "WorldInitializeBeforeEventSignal", "system", "world"], "1.15.0": ["Block", "BlockComponent", "BlockComponentEntityFallOnEvent", "BlockComponentOnPlaceEvent", "BlockComponentPlayerDestroyEvent", "BlockComponentPlayerInteractEvent", "BlockComponentPlayerPlaceBeforeEvent", "BlockComponentRandomTickEvent", "BlockComponentRegistry", "BlockComponentStepOffEvent", "BlockComponentStepOnEvent", "BlockComponentTickEvent", "BlockComponentTypes", "BlockCustomComponentAlreadyRegisteredError", "BlockCustomComponentReloadNewComponentError", "BlockCustomComponentReloadNewEventError", "BlockCustomComponentReloadVersionError", "BlockEvent", "BlockExplodeAfterEvent", "BlockExplodeAfterEventSignal", "BlockInventoryComponent", "BlockLocationIterator", "BlockPermutation", "BlockPistonComponent", "BlockPistonState", "BlockRecordPlayerComponent", "BlockSignComponent", "BlockStateType", "BlockStates", "BlockType", "BlockTypes", "BlockVolume", "BlockVolumeBase", "BlockVolumeIntersection", "ButtonPushAfterEvent", "ButtonPushAfterEventSignal", "Camera", "CommandError", "CommandResult", "Component", "Container", "ContainerSlot", "CustomComponentInvalidRegistryError", "CustomComponentNameError", "CustomComponentNameErrorReason", "DataDrivenEntityTriggerAfterEvent", "DataDrivenEntityTriggerAfterEventSignal", "Dimension", "DimensionType", "DimensionTypes", "Direction", "DisplaySlotId", "DyeColor", "EasingType", "Effect", "EffectAddAfterEvent", "EffectAddAfterEventSignal", "EffectAddBeforeEvent", "EffectAddBeforeEventSignal", "EffectType", "EffectTypes", "EnchantmentLevelOutOfBoundsError", "EnchantmentSlot", "EnchantmentType", "EnchantmentTypeNotCompatibleError", "EnchantmentTypeUnknownIdError", "EnchantmentTypes", "Entity", "EntityAddRiderComponent", "EntityAgeableComponent", "EntityAttributeComponent", "EntityBaseMovementComponent", "EntityBreathableComponent", "EntityCanClimbComponent", "EntityCanFlyComponent", "EntityCanPowerJumpComponent", "EntityColor2Component", "EntityColorComponent", "EntityComponent", "EntityComponentTypes", "EntityDamageCause", "EntityDefinitionFeedItem", "EntityDieAfterEvent", "EntityDieAfterEventSignal", "EntityEquippableComponent", "EntityFireImmuneComponent", "EntityFloatsInLiquidComponent", "EntityFlyingSpeedComponent", "EntityFrictionModifierComponent", "EntityGroundOffsetComponent", "EntityHealableComponent", "EntityHealthChangedAfterEvent", "EntityHealthChangedAfterEventSignal", "EntityHealthComponent", "EntityHitBlockAfterEvent", "EntityHitBlockAfterEventSignal", "EntityHitEntityAfterEvent", "EntityHitEntityAfterEventSignal", "EntityHurtAfterEvent", "EntityHurtAfterEventSignal", "EntityInitializationCause", "EntityInventoryComponent", "EntityIsBabyComponent", "EntityIsChargedComponent", "EntityIsChestedComponent", "EntityIsDyeableComponent", "EntityIsHiddenWhenInvisibleComponent", "EntityIsIgnitedComponent", "EntityIsIllagerCaptainComponent", "EntityIsSaddledComponent", "EntityIsShakingComponent", "EntityIsShearedComponent", "EntityIsStackableComponent", "EntityIsStunnedComponent", "EntityIsTamedComponent", "EntityItemComponent", "EntityLavaMovementComponent", "EntityLeashableComponent", "EntityLoadAfterEvent", "EntityLoadAfterEventSignal", "EntityMarkVariantComponent", "EntityMovementAmphibiousComponent", "EntityMovementBasicComponent", "EntityMovementComponent", "EntityMovementFlyComponent", "EntityMovementGenericComponent", "EntityMovementGlideComponent", "EntityMovementHoverComponent", "EntityMovementJumpComponent", "EntityMovementSkipComponent", "EntityMovementSwayComponent", "EntityNavigationClimbComponent", "EntityNavigationComponent", "EntityNavigationFloatComponent", "EntityNavigationFlyComponent", "EntityNavigationGenericComponent", "EntityNavigationHoverComponent", "EntityNavigationWalkComponent", "EntityOnFireComponent", "EntityProjectileComponent", "EntityPushThroughComponent", "EntityRemoveAfterEvent", "EntityRemoveAfterEventSignal", "EntityRemoveBeforeEvent", "EntityRemoveBeforeEventSignal", "EntityRideableComponent", "EntityRidingComponent", "EntityScaleComponent", "EntitySkinIdComponent", "EntitySpawnAfterEvent", "EntitySpawnAfterEventSignal", "EntityStrengthComponent", "EntityTameMountComponent", "EntityTameableComponent", "EntityType", "EntityTypeFamilyComponent", "EntityTypes", "EntityUnderwaterMovementComponent", "EntityVariantComponent", "EntityWantsJockeyComponent", "EquipmentSlot", "ExplosionAfterEvent", "ExplosionAfterEventSignal", "ExplosionBeforeEvent", "ExplosionBeforeEventSignal", "FeedItem", "FeedItemEffect", "FluidType", "GameMode", "GameRule", "GameRuleChangeAfterEvent", "GameRuleChangeAfterEventSignal", "GameRules", "HudElement", "HudElementsCount", "HudVisibility", "HudVisibilityCount", "IButtonPushAfterEventSignal", "ILeverActionAfterEventSignal", "IPlayerJoinAfterEventSignal", "IPlayerLeaveAfterEventSignal", "IPlayerSpawnAfterEventSignal", "InputPermissionCategory", "InvalidContainerSlotError", "InvalidIteratorError", "InvalidStructureError", "ItemCompleteUseAfterEvent", "ItemCompleteUseAfterEventSignal", "ItemCompleteUseEvent", "ItemComponent", "ItemComponentBeforeDurabilityDamageEvent", "ItemComponentCompleteUseEvent", "ItemComponentConsumeEvent", "ItemComponentHitEntityEvent", "ItemComponentMineBlockEvent", "ItemComponentRegistry", "ItemComponentTypes", "ItemComponentUseEvent", "ItemComponentUseOnEvent", "ItemCooldownComponent", "ItemCustomComponentAlreadyRegisteredError", "ItemCustomComponentReloadNewComponentError", "ItemCustomComponentReloadNewEventError", "ItemCustomComponentReloadVersionError", "ItemDurabilityComponent", "ItemEnchantableComponent", "ItemFoodComponent", "ItemLockMode", "ItemReleaseUseAfterEvent", "ItemReleaseUseAfterEventSignal", "ItemStack", "ItemStartUseAfterEvent", "ItemStartUseAfterEventSignal", "ItemStartUseOnAfterEvent", "ItemStartUseOnAfterEventSignal", "ItemStopUseAfterEvent", "ItemStopUseAfterEventSignal", "ItemStopUseOnAfterEvent", "ItemStopUseOnAfterEventSignal", "ItemType", "ItemTypes", "ItemUseAfterEvent", "ItemUseAfterEventSignal", "ItemUseBeforeEvent", "ItemUseBeforeEventSignal", "ItemUseOnAfterEvent", "ItemUseOnAfterEventSignal", "ItemUseOnBeforeEvent", "ItemUseOnBeforeEventSignal", "ItemUseOnEvent", "LeverActionAfterEvent", "LeverActionAfterEventSignal", "ListBlockVolume", "LocationInUnloadedChunkError", "LocationOutOfWorldBoundariesError", "MinecraftDimensionTypes", "MolangVariableMap", "MoonPhase", "MoonPhaseCount", "ObjectiveSortOrder", "PaletteColor", "PistonActivateAfterEvent", "PistonActivateAfterEventSignal", "Player", "PlayerBreakBlockAfterEvent", "PlayerBreakBlockAfterEventSignal", "PlayerBreakBlockBeforeEvent", "PlayerBreakBlockBeforeEventSignal", "PlayerCursorInventoryComponent", "PlayerDimensionChangeAfterEvent", "PlayerDimensionChangeAfterEventSignal", "PlayerEmoteAfterEvent", "PlayerEmoteAfterEventSignal", "PlayerGameModeChangeAfterEvent", "PlayerGameModeChangeAfterEventSignal", "PlayerGameModeChangeBeforeEvent", "PlayerGameModeChangeBeforeEventSignal", "PlayerInputPermissionCategoryChangeAfterEvent", "PlayerInputPermissionCategoryChangeAfterEventSignal", "PlayerInputPermissions", "PlayerInteractWithBlockAfterEvent", "PlayerInteractWithBlockAfterEventSignal", "PlayerInteractWithBlockBeforeEvent", "PlayerInteractWithBlockBeforeEventSignal", "PlayerInteractWithEntityAfterEvent", "PlayerInteractWithEntityAfterEventSignal", "PlayerInteractWithEntityBeforeEvent", "PlayerInteractWithEntityBeforeEventSignal", "PlayerJoinAfterEvent", "PlayerJoinAfterEventSignal", "PlayerLeaveAfterEvent", "PlayerLeaveAfterEventSignal", "PlayerLeaveBeforeEvent", "PlayerLeaveBeforeEventSignal", "PlayerPlaceBlockAfterEvent", "PlayerPlaceBlockAfterEventSignal", "PlayerSpawnAfterEvent", "PlayerSpawnAfterEventSignal", "PressurePlatePopAfterEvent", "PressurePlatePopAfterEventSignal", "PressurePlatePushAfterEvent", "PressurePlatePushAfterEventSignal", "ProjectileHitBlockAfterEvent", "ProjectileHitBlockAfterEventSignal", "ProjectileHitEntityAfterEvent", "ProjectileHitEntityAfterEventSignal", "Scoreboard", "ScoreboardIdentity", "ScoreboardIdentityType", "ScoreboardObjective", "ScoreboardScoreInfo", "ScreenDisplay", "ScriptEventCommandMessageAfterEvent", "ScriptEventCommandMessageAfterEventSignal", "ScriptEventSource", "Seat", "SignSide", "Structure", "StructureAnimationMode", "StructureManager", "StructureMirrorAxis", "StructureRotation", "StructureSaveMode", "System", "SystemAfterEvents", "TargetBlockHitAfterEvent", "TargetBlockHitAfterEventSignal", "TicksPerSecond", "TimeOfDay", "Trigger", "TripWireTripAfterEvent", "TripWireTripAfterEventSignal", "WeatherChangeAfterEvent", "WeatherChangeAfterEventSignal", "WeatherChangeBeforeEvent", "WeatherChangeBeforeEventSignal", "WeatherType", "World", "WorldAfterEvents", "WorldBeforeEvents", "WorldInitializeAfterEvent", "WorldInitializeAfterEventSignal", "WorldInitializeBeforeEvent", "WorldInitializeBeforeEventSignal", "system", "world"]};
+const manifest = JSON.parse(fs.readFileSync(path.join(BP, "manifest.json"), "utf8"));
+const API = manifest.dependencies.find((d) => d.module_name === "@minecraft/server")?.version;
 
 // ---------------------------------------------------------------- mock @minecraft/server
 const problems = new Map();
@@ -54,15 +64,25 @@ export class MolangVariableMap {
 }
 export const system = H.system;
 export const world = H.world;
-export const EquipmentSlot = { Mainhand: "Mainhand" };
+export const EquipmentSlot = { Mainhand: "Mainhand", Head: "Head", Chest: "Chest", Legs: "Legs", Feet: "Feet", Offhand: "Offhand" };
 export const GameMode = { creative: "creative", spectator: "spectator", survival: "survival", adventure: "adventure" };
+const names = (list) => Object.fromEntries(list.map((n) => [n, n]));
+export const EntityDamageCause = names(["anvil","blockExplosion","campfire","charging","contact","drowning","entityAttack","entityExplosion","fall","fallingBlock","fire","fireTick","fireworks","flyIntoWall","freezing","lava","lightning","magic","magma","none","override","piston","projectile","ramAttack","selfDestruct","sonicBoom","soulCampfire","stalactite","stalagmite","starve","suffocation","suicide","temperature","thorns","void","wither"]);
+export const ItemComponentTypes = { Durability: "minecraft:durability", Enchantable: "minecraft:enchantable", Cooldown: "minecraft:cooldown", Food: "minecraft:food" };
+export const EntityComponentTypes = { Equippable: "minecraft:equippable", Health: "minecraft:health", Inventory: "minecraft:inventory" };
+export const Direction = { Down: "Down", East: "East", North: "North", South: "South", Up: "Up", West: "West" };
+export class ItemStack { constructor(typeId, amount = 1) { this.typeId = typeId; this.amount = amount; } getComponent() { return undefined; } hasComponent() { return false; } getTags() { return []; } hasTag() { return false; } }
 `;
 
 class Signal {
     constructor() { this.subs = []; }
     subscribe(fn) { this.subs.push(fn); return fn; }
     unsubscribe(fn) { this.subs = this.subs.filter((s) => s !== fn); }
-    fire(e) { for (const fn of this.subs) fn(e); }
+    fire(e) {
+        for (const fn of this.subs) {
+            try { fn(e); } catch (err) { problem("uncaught", String(err && err.stack ? err.stack.split("\n").slice(0, 2).join(" | ") : err)); }
+        }
+    }
 }
 
 let tick = 0;
@@ -73,18 +93,27 @@ const system = {
     runInterval(fn, ticks = 1) { const t = { every: Math.max(1, ticks | 0), at: tick + Math.max(1, ticks | 0), fn }; timers.push(t); return timers.length; },
     run(fn) { timers.push({ at: tick + 1, fn }); },
     clearRun() {},
+    afterEvents: null,
+    beforeEvents: {},
 };
 
+if (!EVENTS[API]) { console.log("Unknown @minecraft/server version in manifest:", API); process.exit(1); }
 const after = {};
-for (const n of ["entitySpawn", "entityHurt", "entityDie", "itemCompleteUse", "entityRemove", "playerLeave",
-    "worldInitialize", "itemUse", "entityHitEntity", "playerSpawn"]) after[n] = new Signal();
-const before = { playerInteractWithEntity: new Signal(), itemUse: new Signal() };
+for (const n of EVENTS[API].WorldAfterEvents) after[n] = new Signal();
+const before = {};
+for (const n of EVENTS[API].WorldBeforeEvents) before[n] = new Signal();
+const systemAfter = {};
+for (const n of EVENTS[API].SystemAfterEvents) systemAfter[n] = new Signal();
 let readOnly = false; // before-event callbacks run in read-only mode
 function fireBefore(signal, e) { readOnly = true; try { signal.fire(e); } finally { readOnly = false; } }
 function writable(what) { if (readOnly) throw new Error(what + " can't be called in read-only mode"); }
 
 let nextId = 1;
 const entities = new Map();
+
+function mockItem(typeId) {
+    return { typeId, amount: 1, hasComponent: () => false, getComponent: () => undefined, getTags: () => [], hasTag: () => false };
+}
 
 class MockEntity {
     constructor(typeId, dim, loc, hp = 20) {
@@ -113,11 +142,11 @@ class MockEntity {
         }
         if (id === "minecraft:inventory") {
             const self = this;
-            return { container: { getItem(slot) { return self.held && slot === self.selectedSlotIndex ? { typeId: self.held } : undefined; } } };
+            return { container: { getItem(slot) { return self.held && slot === self.selectedSlotIndex ? mockItem(self.held) : undefined; } } };
         }
         if (id === "minecraft:equippable") {
             const self = this;
-            return { getEquipment() { return self.held ? { typeId: self.held } : undefined; } };
+            return { getEquipment(slot) { return self.held && (slot === "Mainhand" || slot === undefined) ? mockItem(self.held) : undefined; }, setEquipment() { return true; } };
         }
         return undefined;
     }
@@ -133,6 +162,7 @@ class MockEntity {
         writable("applyDamage");
         if (!this.valid) throw new Error("InvalidEntity");
         if (!Number.isFinite(amount)) problem("damage", "non-finite " + amount);
+        if (this.gameMode === "creative" || this.gameMode === "spectator") return false; // invulnerable, like in game
         if (this.typeId === "minecraft:player") stats.damage += amount;
         const mitigated = (this.effects.resistance?.until > tick && this.effects.resistance.amp >= 4) ? 0 : amount;
         this.hp -= mitigated;
@@ -258,16 +288,31 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harvester-sim-"));
 fs.writeFileSync(path.join(tmp, "package.json"), '{"type":"module"}');
 fs.mkdirSync(path.join(tmp, "node_modules/@minecraft/server"), { recursive: true });
 fs.writeFileSync(path.join(tmp, "node_modules/@minecraft/server/package.json"), '{"name":"@minecraft/server","type":"module","main":"index.js"}');
-fs.writeFileSync(path.join(tmp, "node_modules/@minecraft/server/index.js"), mock);
-for (const file of ["harvester.js", "harvester_scythe.js"]) {
-    let src = fs.readFileSync(path.join(BP, "scripts", file), "utf8");
-    // report everything the scripts' catch blocks would swallow
-    src = src.replace(/from "\.\/harvester"/g, 'from "./harvester.js"');
-    src = src.replace(/catch\s*\{/g, "catch (__e) { globalThis.__harvesterMock.problem('swallowed', '" + file + ": ' + (__e && __e.stack ? __e.stack.split('\\n').slice(0, 2).join(' | ') : __e));");
+const explicit = new Set([...mock.matchAll(/export (?:const|class) (\w+)/g)].map((m) => m[1]));
+const stubs = EXPORTS[API].filter((n) => !explicit.has(n))
+    .map((n) => `export const ${n} = new Proxy(function () {}, { get: (t, k) => (typeof k === "string" ? k : undefined) });`).join("\n");
+const extraMocked = [...explicit].filter((n) => !EXPORTS[API].includes(n) && !n.startsWith("__"));
+if (extraMocked.length) problem("mock", "mock exports names the real API lacks: " + extraMocked.join(", "));
+fs.writeFileSync(path.join(tmp, "node_modules/@minecraft/server/index.js"), mock + "\n" + stubs + "\n");
+system.afterEvents = systemAfter;
+const scriptsDir = path.join(BP, "scripts");
+for (const file of fs.readdirSync(scriptsDir, { recursive: true })) {
+    if (!file.endsWith(".js")) continue;
+    let src = fs.readFileSync(path.join(scriptsDir, file), "utf8");
+    // Bedrock resolves extensionless specifiers, node needs the extension
+    src = src.replace(/(from\s+|import\s+)(["'])(\.{1,2}\/[^"']+?)(?<!\.js)\2/g, "$1$2$3.js$2");
+    if (file.startsWith("harvester")) {
+        // report everything the Harvester catch blocks would swallow
+        src = src.replace(/catch\s*\{/g, "catch (__e) { globalThis.__harvesterMock.problem('swallowed', '" + file + ": ' + (__e && __e.stack ? __e.stack.split('\\n').slice(0, 2).join(' | ') : __e));");
+    }
+    fs.mkdirSync(path.dirname(path.join(tmp, file)), { recursive: true });
     fs.writeFileSync(path.join(tmp, file), src);
 }
-await import(pathToFileURL(path.join(tmp, "harvester.js")));
-await import(pathToFileURL(path.join(tmp, "harvester_scythe.js")));
+try {
+    await import(pathToFileURL(path.join(tmp, "main.js")));
+} catch (e) {
+    problem("load", "scripts/main.js failed to load: " + String(e && e.stack ? e.stack.split("\n").slice(0, 2).join(" | ") : e));
+}
 
 function flush() {
     while (world._afterQueue.length) world._afterQueue.shift()();
@@ -277,14 +322,22 @@ function step() {
     tick++;
     const due = timers.filter((t) => t.at <= tick);
     for (const t of due) {
-        t.fn();
+        try { t.fn(); } catch (e) { problem("uncaught", String(e && e.stack ? e.stack.split("\n").slice(0, 2).join(" | ") : e)); }
         if (t.every) t.at = tick + t.every; else timers.splice(timers.indexOf(t), 1);
     }
     flush();
 }
 
 // ---------------------------------------------------------------- scenario
-after.worldInitialize.fire({});
+const registered = new Set();
+before.worldInitialize?.fire({ itemComponentRegistry: { registerCustomComponent(id) { registered.add(id); } }, blockComponentRegistry: { registerCustomComponent() {} } });
+after.worldInitialize?.fire({});
+for (const file of fs.readdirSync(path.join(BP, "items"))) {
+    const item = JSON.parse(fs.readFileSync(path.join(BP, "items", file), "utf8"))["minecraft:item"];
+    for (const id of item.components["minecraft:custom_components"] ?? []) {
+        if (!registered.has(id)) problem("item", `${item.description.identifier} uses custom component ${id} that no script registers`);
+    }
+}
 const ow = dims.overworld;
 const boss = new MockEntity("pa:harvester", ow, { x: 0, y: 64, z: 0 }, 600);
 after.entitySpawn.fire({ entity: boss, cause: "Spawned" });
@@ -321,7 +374,7 @@ for (let i = 0; i < TOTAL && boss.valid; i++) {
     if (tick % 300 === 10) after.itemUse.fire({ source: heroes[0], itemStack: { typeId: "pa:harvester_scythe" } });
     if (tick % 400 === 20) {
         const ev = { player: heroes[0], target: boss, cancel: false, itemStack: { typeId: "pa:harvester_scythe" } };
-        fireBefore(before.playerInteractWithEntity, ev);
+        if (before.playerInteractWithEntity) fireBefore(before.playerInteractWithEntity, ev);
     }
     if (process.env.SIM_DEBUG && tick % 600 === 0) console.log("t", tick / 20, "boss hp", boss.hp.toFixed(1), "name", boss.nameTag, "effects", Object.keys(boss.effects).filter((k) => boss.effects[k].until > tick).join(","));
     if (tick === 20 * 100) after.itemCompleteUse.fire({ source: heroes[1], itemStack: { typeId: "minecraft:milk_bucket" }, useDuration: 32 });
@@ -352,20 +405,36 @@ for (const p of heroes) p.location = { x: -398, y: 64, z: -398 };
 for (let i = 0; i < 40; i++) step();
 if (lonely.nameTag.includes("ENRAGED")) problem("scenario", "boss enraged immediately when players arrived");
 lonely.remove();
+
+// scenario 4: only a creative player nearby -> the boss still fights (that's how people test it);
+// only a spectator nearby -> it ignores them
+for (const p of heroes) p.location = { x: 5000, y: 64, z: 5000 };
+creative.location = { x: 802, y: 64, z: 800 };
+const tester = new MockEntity("pa:harvester", ow, { x: 800, y: 64, z: 800 }, 600);
+const castsBefore = Object.values(stats.casts).reduce((a, b) => a + b, 0);
+for (let i = 0; i < 20 * 20; i++) step();
+if (Object.values(stats.casts).reduce((a, b) => a + b, 0) === castsBefore) problem("scenario", "boss cast nothing with a creative player next to it");
+tester.remove();
+creative.gameMode = "spectator";
+const watcher = new MockEntity("pa:harvester", ow, { x: 800, y: 64, z: 800 }, 600);
+const castsSpectator = Object.values(stats.casts).reduce((a, b) => a + b, 0);
+for (let i = 0; i < 20 * 20; i++) step();
+if (Object.values(stats.casts).reduce((a, b) => a + b, 0) !== castsSpectator) problem("scenario", "boss attacked a spectator");
+watcher.remove();
 for (let i = 0; i < 100; i++) step();
 if (boss2.valid) problem("scenario", "second boss did not die");
 after.playerLeave.fire({ playerId: heroes[2].id, playerName: "Far" });
 step();
 
 // ---------------------------------------------------------------- report
+console.log(`@minecraft/server ${API}: scripts loaded through main.js.`);
 console.log(`Simulated ${tick} ticks (${(tick / 1200).toFixed(1)} min). First boss ${firstDefeated ? "defeated" : "ALIVE hp=" + boss.hp.toFixed(0)}.`);
 if (!firstDefeated) problem("scenario", "first boss survived the scripted damage");
 console.log("Skill casts:", JSON.stringify(stats.casts));
 console.log("Animations:", Object.keys(stats.animations).length, "distinct;", "particles:", Object.keys(stats.particles).filter((p) => p.startsWith("harvester:")).length, "distinct harvester ids;", "damage dealt to players:", stats.damage.toFixed(0));
 const unused = Object.keys(particles).filter((p) => p.startsWith("harvester:") && !stats.particles[p]);
 console.log("Particles never spawned by script (animation-only or unused):", unused.join(", ") || "none");
-const creativeHurt = creative.hp < creative.maxHp;
-if (creativeHurt) problem("targeting", "creative player took damage");
+
 if (problems.size === 0) {
     console.log("OK: no problems found.");
 } else {

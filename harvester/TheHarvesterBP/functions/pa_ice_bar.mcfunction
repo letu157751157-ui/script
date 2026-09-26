@@ -1,1 +1,0 @@
-replaceitem entity @s slot.weapon.mainhand 0 air

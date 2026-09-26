@@ -25,6 +25,28 @@
         }
       }
     },
+    "controller.animation.pa_harvester.attack": {
+      "states": {
+        "default": {
+          "transitions": [
+            {
+              "attacking": "variable.attack_time > 0 && query.is_alive"
+            }
+          ]
+        },
+        "attacking": {
+          "animations": [
+            "attack"
+          ],
+          "transitions": [
+            {
+              "default": "query.all_animations_finished || !query.is_alive"
+            }
+          ],
+          "blend_transition": 0.08
+        }
+      }
+    },
     "controller.animation.pa_harvester.look": {
       "states": {
         "default": {

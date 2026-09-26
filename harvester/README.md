@@ -1,11 +1,13 @@
-# The Harvester v1.3.0 — Thần Chết × Bác sĩ Dịch hạch
+# The Harvester v1.3.1 — Thần Chết × Bác sĩ Dịch hạch
 
 Boss **The Harvester** (`pa:harvester`) được làm lại theo ý tưởng **Thần Chết** (lưỡi hái, linh hồn, đồng hồ cát, bia mộ)
 kết hợp **Bác sĩ Dịch hạch** (mặt nạ mỏ chim, bình thuốc dịch, khí độc, bầy quạ).
 Bản này đổi toàn bộ bộ chiêu, thêm 17 animation và 35 particle mới, và sửa nhiều lỗi của bản 1.2.
 
-- Cài đặt: mở [`dist/TheHarvester_v1.3.0.mcaddon`](dist/TheHarvester_v1.3.0.mcaddon) (Minecraft tự nhập cả 2 pack).
-  Nếu đang dùng bản 1.2, gỡ pack cũ khỏi thế giới rồi bật pack 1.3.0.
+- Cài đặt: mở [`dist/TheHarvester_v1.3.1.mcaddon`](dist/TheHarvester_v1.3.1.mcaddon) (Minecraft tự nhập cả 2 pack).
+  Nếu đã cài bản 1.2 hoặc 1.3.0: vào **Cài đặt → Bộ nhớ**, xoá các pack *The Harvester* cũ, nhập file 1.3.1,
+  rồi trong thế giới bật lại cả Behavior Pack lẫn Resource Pack **1.3.1**.
+- Kiểm tra nhanh: thanh máu của boss phải ghi *The Harvester — Doctor of the Dead*. Nếu vẫn là tên cũ thì thế giới còn dùng pack cũ.
 - Yêu cầu: Minecraft Bedrock **1.21.90+** (giống bản gốc), không cần bật Experiments.
 - Gọi boss: `/summon pa:harvester`, hoặc gặp tự nhiên ở The End như trước.
 
@@ -93,7 +95,35 @@ Giữ nguyên chỉ số, chỉ sửa lỗi và đổi hiệu ứng:
 - Kill bằng chiêu của lưỡi hái giờ cũng tính cho Dark Blessing.
 - Khi đang đánh Harvester, action bar hiện thông tin boss thay vì hồi chiêu lưỡi hái.
 
-## Các lỗi của bản 1.2 đã sửa
+## Bản 1.3.1 — sửa lỗi "không có skill, không có animation đánh" và dọn file rác
+
+**Nguyên nhân không có skill:** `main.js` nạp tất cả script, và pack khai báo `@minecraft/server` **1.14.0**. Ở bản 1.14.0 chưa có
+`world.beforeEvents.playerInteractWithEntity` / `playerInteractWithBlock`, nên `harvester_scythe.js` lỗi ngay khi nạp.
+Lỗi đó làm cả `main.js` hỏng, toàn bộ script (kể cả boss) không chạy. Bản 1.2 gốc cũng bị y như vậy.
+Ngoài ra `utimate_emeral_helmet.js` là code **KubeJS của Java Edition** (`PlayerEvents.tick`), không chạy được trên Bedrock.
+- Nâng lên `@minecraft/server` **1.15.0** (bản đầu tiên có các event trên, cách gọi API giữ nguyên như 1.14).
+- Mọi chỗ đăng ký event đều có kiểm tra, một event thiếu không làm hỏng cả script nữa.
+- Boss không còn bỏ qua người chơi Creative (trước đây test trong Creative thì boss không bao giờ ra chiêu).
+- Lọc chế độ chơi bằng `getGameMode()` thay vì chuỗi `"creative"` (tên enum này đổi thành `"Creative"` ở API 2.x).
+
+**Animation đánh:** đòn chém thường giờ do resource pack tự chạy khi boss vung tay (`variable.attack_time`), không cần script.
+Boss cũng vung lưỡi hái khi bắn đầu lâu wither (`ranged_attack` → `swing: true`).
+
+**Sửa thêm:** 8 item (thỏi thép, thép thô, gậy thép, Super Smithing Update...) dùng custom component chưa hề được đăng ký;
+bảng loot của boss rơi `pa:ender_dust`, item không có trong pack (đã bỏ, giờ rơi Reaper Skull hoặc End Stone + 8 Soul).
+
+**Dọn file rác:** pack này được cắt ra từ addon "A chaotic world", còn sót lại đồ của Yeti, Giant Zombie, Robot Crab,
+Ice Golem, vũ khí băng, Lamborghini... Đã xoá **~420 file**, pack giảm từ ~12.9 MB còn ~1.3 MB (file .mcaddon 0.2 MB):
+- 10 script của mob/vũ khí không có trong pack (chạy mỗi tick vô ích), 2 file tiện ích chỉ chúng dùng, và `utimate_emeral_helmet.js` (KubeJS).
+- ~165 function, 22 loot table, 11 spawn rule, trade, 4 recipe, 80 model, ~95 texture, 7 particle, âm thanh Yeti.
+- Các file **ghi đè đồ vanilla**: `enderman.animation_controllers.json` (Enderman), `player.render_controllers.json`
+  (cách vẽ người chơi), `materials/particles.material` (shader particle), và dòng lang đổi tên Mooshroom / Text-To-Speech.
+- Khối lông Yeti `pa:fur_block` (6 texture 1024×1024 giống hệt nhau, ~7 MB, không có công thức, không ai rơi ra).
+- File của app AddOns Maker (`.data`, `.error`), 4 animation controller giáp Dark Knight không gắn vào entity nào.
+- Giữ lại: boss, Harvester Scythe, bộ Dark Knight, táo, thỏi/thép và mọi thứ chúng dùng. `A_chaotic_world_(beta)_`
+  giờ chỉ give các item có thật trong pack. Tất cả file đã xoá vẫn còn trong lịch sử git nếu cần lấy lại.
+
+## Các lỗi của bản 1.2 đã sửa (1.3.0)
 
 - Nhầm **mili-giây với tick**: Chaos Storm kéo dài ~400 giây thay vì 8, Soul Vortex ~5 phút, Reaper's Judgment nổ sau 150 giây,
   Soul Harvest (chiêu cuối) chờ 22 giây. Bản mới tính mọi thời gian bằng tick, khớp với animation.
@@ -101,31 +131,33 @@ Giữ nguyên chỉ số, chỉ sửa lỗi và đổi hiệu ứng:
 - Người chơi có thể **hồi máu cho boss bằng thỏi sắt** và boss "tặng hoa" (sót lại từ iron golem), đã bỏ.
 - Hiệu ứng khi boss chết chạy trên entity đã bị xoá (lỗi âm thầm), và lệnh sinh `minecraft:chest` (không phải entity) đã bỏ.
 - Thông báo chiêu gửi cho cả server; giờ chỉ gửi cho người chơi ở gần.
-- Chiêu của boss bỏ qua người chơi Creative/Spectator.
+- Boss bỏ qua người chơi Spectator. Người chơi Creative vẫn bị boss nhắm chiêu (không mất máu), nên test trong Creative vẫn thấy chiêu.
 
 ## Cấu trúc & build
 
 ```
 harvester/
 ├── TheHarvesterBP/ , TheHarvesterRP/   hai pack (đã sửa)
-├── build.py            tạo lại particle + animation, kiểm tra tham chiếu, đóng gói dist/*.mcaddon
+├── build.py            tạo lại particle + animation, kiểm tra tham chiếu/manifest/file rác, đóng gói dist/*.mcaddon
 ├── tools/
 │   ├── art.py          vẽ sprite pixel art cho particle
 │   ├── particles.py    atlas + 35 file particle JSON
 │   ├── animations.py   17 animation, controller, locator (có ghi chú hướng xoay của từng xương)
 │   ├── render.py       renderer nhỏ để xem trước model/animation
 │   ├── previews.py     ảnh trong previews/
+│   ├── cleanup.py      liệt kê (hoặc xoá với --apply) file không dùng tới
 │   └── simulate.mjs    chạy thử script trên mock @minecraft/server qua cả trận đấu
-└── dist/TheHarvester_v1.3.0.mcaddon
+└── dist/TheHarvester_v1.3.1.mcaddon
 ```
 
 - `python3 build.py` (cần `pip install pillow numpy`), thêm `--previews` để vẽ lại ảnh xem trước.
-- `node tools/simulate.mjs`: đánh giả lập ~15 phút (GĐ1 → GĐ3 → enrage → boss chết, thêm một boss vào thẳng GĐ3),
-  báo lỗi bị `try/catch` nuốt mất, particle thiếu biến Molang, animation không tồn tại, và các lệnh ghi trong chế độ chỉ đọc.
+- `node tools/simulate.mjs`: nạp **toàn bộ** script qua `main.js` với đúng danh sách event/export của phiên bản
+  `@minecraft/server` ghi trong manifest, rồi đánh giả lập ~16 phút (GĐ1 → GĐ3 → enrage → boss chết, boss vào thẳng GĐ3,
+  chỉ có người chơi Creative / Spectator). Báo: script không nạp được, lỗi không bắt, lỗi bị `try/catch` nuốt,
+  particle thiếu biến Molang, animation không tồn tại, component item chưa đăng ký, lệnh ghi trong chế độ chỉ đọc.
 - Chỉnh sát thương, hồi chiêu, tầm: `CONFIG` ở đầu `TheHarvesterBP/scripts/harvester.js`.
 
 ## Lưu ý
 
 - Mình chưa chạy được bản này trong Minecraft thật (chỉ chạy giả lập ở trên). Nếu thấy chiêu nào lệch hướng hay particle sai cỡ, báo mình để chỉnh.
-- Pack được sửa trực tiếp. Nếu mở lại bằng app **AddOns Maker** rồi xuất lại (file `.data` trong BP), app có thể ghi đè các thay đổi này.
-- `spawn_rules/pa_giraffee.json` (của bản gốc, cho mob không có trong pack) bị lỗi JSON từ trước; mình không động vào.
+- Pack được sửa trực tiếp. Nếu mở lại bằng app **AddOns Maker** rồi xuất lại, app có thể ghi đè các thay đổi này (file `.data` của app đã được xoá khỏi pack).

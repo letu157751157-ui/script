@@ -19,9 +19,11 @@
       "animations": {
         "idle": "animation.pa_harvester.idle",
         "move": "animation.pa_harvester.move",
+        "attack": "animation.pa_harvester.attack",
         "look_at_target": "animation.pa_harvester.look_at_target",
         "death": "animation.pa_harvester.death",
         "base_controller": "controller.animation.pa_harvester.base",
+        "attack_controller": "controller.animation.pa_harvester.attack",
         "look_controller": "controller.animation.pa_harvester.look"
       },
       "render_controllers": [
@@ -31,6 +33,7 @@
       "scripts": {
         "animate": [
           "base_controller",
+          "attack_controller",
           "look_controller"
         ]
       },

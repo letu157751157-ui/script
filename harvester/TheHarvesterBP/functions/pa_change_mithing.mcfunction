@@ -1,1 +1,0 @@
-give @s pa:change_mithing

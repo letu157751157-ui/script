@@ -1,1 +1,0 @@
-give @s pa:bigobsidian_shard

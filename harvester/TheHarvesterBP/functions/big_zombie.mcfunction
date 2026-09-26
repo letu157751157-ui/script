@@ -1,5 +1,0 @@
-summon minecraft:zombie
-summon minecraft:zombie
-summon minecraft:zombie
-summon minecraft:zombie
-summon minecraft:zombie

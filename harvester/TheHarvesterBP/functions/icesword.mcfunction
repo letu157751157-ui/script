@@ -1,1 +1,0 @@
-effect @p resistance 2 60

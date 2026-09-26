@@ -1,1 +1,0 @@
-summon pa:death_iceron_golem

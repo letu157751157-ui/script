@@ -15,11 +15,12 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 
 import animations  # noqa: E402
+import cleanup  # noqa: E402
 import particles  # noqa: E402
 
 BP = os.path.join(ROOT, "TheHarvesterBP")
 RP = os.path.join(ROOT, "TheHarvesterRP")
-VERSION = "1.3.0"
+VERSION = "1.3.1"
 OUT = os.path.join(ROOT, "dist", "TheHarvester_v%s.mcaddon" % VERSION)
 
 BUILTIN_VARS = {"particle_age", "particle_lifetime", "emitter_age", "emitter_lifetime"} | {
@@ -94,8 +95,23 @@ def validate():
     return errors
 
 
+def check_manifest(errors):
+    manifest = load(os.path.join(BP, "manifest.json"))
+    server = next(d["version"] for d in manifest["dependencies"] if d.get("module_name") == "@minecraft/server")
+    # 1.14.0 has no playerInteractWithEntity/Block before-events: main.js would fail to load
+    if tuple(int(x) for x in server.split(".")) < (1, 15, 0):
+        errors.append("manifest: @minecraft/server %s is too old (need 1.15.0+)" % server)
+    for pack in (BP, RP):
+        version = load(os.path.join(pack, "manifest.json"))["header"]["version"]
+        if ".".join(map(str, version)) != VERSION:
+            errors.append("%s manifest version %s != %s" % (os.path.basename(pack), version, VERSION))
+
+
 def package():
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    for old in os.listdir(os.path.dirname(OUT)):
+        if old.endswith(".mcaddon") and old != os.path.basename(OUT):
+            os.remove(os.path.join(os.path.dirname(OUT), old))
     with zipfile.ZipFile(OUT, "w", zipfile.ZIP_DEFLATED) as zf:
         for pack in ("TheHarvesterBP", "TheHarvesterRP"):
             for folder, _, files in sorted(os.walk(os.path.join(ROOT, pack))):
@@ -110,6 +126,8 @@ if __name__ == "__main__":
     print(len(names), "particles")
     print(len(animations.build(RP)), "animations")
     problems = validate()
+    check_manifest(problems)
+    problems += ["leftover file: %s (%s)" % (cleanup.rel(f), why) for f, why in sorted(cleanup.junk.items())]
     if problems:
         print("VALIDATION FAILED:")
         for p in problems:
