@@ -1,12 +1,12 @@
 {
   "format_version": 2,
   "header": {
-    "description": "Boss Yeti v2.6 - 3 phases + last stand, 23 skills with ground warnings, no knock-up, 3 ice minions, particle ice spikes",
+    "description": "Boss Yeti v2.7 - 3 phases + last stand, 23 skills with ground warnings, no knock-up, 3 ice minions, particle ice spikes",
     "name": "boss-YETI",
-    "uuid": "43a0a452-7e85-4f8f-adb6-12e5adad6cd6",
+    "uuid": "05e14dfc-92f7-47ba-846d-9634f03db3a6",
     "version": [
       2,
-      6,
+      7,
       0
     ],
     "min_engine_version": [
@@ -19,19 +19,19 @@
     {
       "description": "Boss Yeti behavior data",
       "type": "data",
-      "uuid": "46c67b15-8acf-4d64-a015-6e2e344bf3bc",
+      "uuid": "68a6ed3b-5d4a-4c88-a76b-dfe2fb9d139a",
       "version": [
         2,
-        6,
+        7,
         0
       ]
     },
     {
       "type": "script",
-      "uuid": "4d062c6e-e653-45d3-8f83-32b4daea0dec",
+      "uuid": "41c5246c-9fe7-46e2-aff7-4159c7abc7f8",
       "version": [
         2,
-        6,
+        7,
         0
       ],
       "entry": "scripts/main.js",
@@ -40,10 +40,10 @@
   ],
   "dependencies": [
     {
-      "uuid": "071f4d43-2bf7-41ce-9da0-e19d1f153faa",
+      "uuid": "69aedc8f-bec4-44d2-a7ae-e1e74ab8716d",
       "version": [
         2,
-        6,
+        7,
         0
       ]
     },

@@ -420,47 +420,93 @@ DEBRIS = [
 ]
 
 
-# Ice spike (v2.6): simple low-res pixel art on 2 quads crossed like a "+" (seen from above), like vanilla plants.
-# One fat spike per variant: (centre column, height in rows, half width at the base, how fast it widens).
-SPIKE_LAYOUTS = [(8, 30, 6, 0.75), (7, 29, 6, 0.9)]
-SPIKE_W, SPIKE_TEX_H = 16, 32
+# Ice spike (v2.7): flat-colour pixel art on 2 quads crossed like a "+" (seen from above), like vanilla plants.
+# Spikes of each variant: the main one, then 2 small ones in front of its foot
+# (centre column, height in rows, half width at the base, how fast it widens).
+SPIKE_LAYOUTS = [
+    [(12, 45, 7, 0.75), (4, 14, 3, 0.8), (20, 11, 3, 0.8)],
+    [(11, 44, 7, 0.85), (20, 15, 3, 0.8), (4, 10, 3, 0.8)],
+]
+SPIKE_W, SPIKE_TEX_H = 24, 48
 ICE_SPIKE_PALETTE = {**ICE, "S": (220, 234, 246), "G": (150, 176, 204)}
 
 
 def ice_spike(variant):
-    """16x32 simple pixel-art ice spike, vanilla style: navy outline with staircase edges, pale left side with a
-    small shine, white ridge, aqua and dark blue right side, white frosty tip, a strip of snow at the bottom."""
+    """24x48 pixel-art ice spike, vanilla style but a bit more detailed: a fat main spike and two small ones at its
+    foot, navy staircase outline, 4 facet tones (pale left facet with a shine, white ridge, aqua middle, dark blue
+    right edge) with checker dithering between them, jagged cracks, air bubbles, frosty tip with a sparkle,
+    snow clump with a shadow at the base. Flat colours only, no gradients."""
     c = blank(SPIKE_W, SPIKE_TEX_H)
-    cx, height, hwb, curve = SPIKE_LAYOUTS[variant]
-    bottom = SPIKE_TEX_H - 3
-    top = bottom - height + 1
-    for y in range(top, bottom + 1):
-        k = (y - top + 1) / height                         # 0 at the tip .. 1 at the base
-        hw = round(hwb * k ** curve)
-        for d in range(-hw, hw + 1):
-            x = cx + d
-            if not 0 <= x < SPIKE_W:
+    bottom = SPIKE_TEX_H - 4
+    for cx, height, hwb, curve in SPIKE_LAYOUTS[variant]:
+        top = bottom - height + 1
+        for y in range(top, bottom + 1):
+            k = (y - top + 1) / height                     # 0 at the tip .. 1 at the base
+            hw = round(hwb * k ** curve)
+            for d in range(-hw, hw + 1):
+                x = cx + d
+                if not 0 <= x < SPIKE_W:
+                    continue
+                u = d / max(hw, 1)
+                dith = (x + y) % 2 == 0                    # checker pattern where two tones meet
+                if abs(d) == hw:
+                    ch = "N"
+                elif k < 0.14:
+                    ch = "W"                               # frosty tip
+                elif d == -hw + 1:
+                    ch = "W" if 0.25 < k < 0.7 else "C"    # shine along the lit edge
+                elif u < -0.3:
+                    ch = "C"
+                elif u <= 0.05:
+                    ch = "W" if k < 0.7 else "C"          # ridge
+                elif u < 0.5:
+                    ch = "A"
+                elif u < 0.62:
+                    ch = "B" if dith else "A"
+                elif u < 0.85:
+                    ch = "B"
+                else:
+                    ch = "D"
+                c[y][x] = ch
+    main_cx, main_h = SPIKE_LAYOUTS[variant][0][:2]
+    # jagged cracks on the main spike
+    for k0, x_off, length in ((0.36, -2, 7), (0.6, 2, 8)):
+        x = main_cx + x_off + variant
+        y = bottom - main_h + 1 + round(main_h * k0)
+        for step in range(length):
+            if c[y][x] in "CW":
+                c[y][x] = "B"
+            elif c[y][x] == "A":
+                c[y][x] = "D"
+            y += 1
+            x += (1, 0, -1, 0)[(step + variant) % 4]
+    # air bubbles in the aqua part
+    for y in range(SPIKE_TEX_H):
+        for x in range(SPIKE_W):
+            if c[y][x] == "A" and hash01(x, y, 280 + variant) < 0.07:
+                c[y][x] = "C"
+    # sparkle next to the tip
+    tip_y = bottom - main_h + 1
+    sx, sy = main_cx + 3 - variant * 6, tip_y + 5
+    for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)):
+        if 0 <= sx + dx < SPIKE_W and 0 <= sy + dy < SPIKE_TEX_H and c[sy + dy][sx + dx] == ".":
+            c[sy + dy][sx + dx] = "W" if (dx, dy) == (0, 0) else "C"
+    # snow clump along the bottom: white top with bumps, grey shadow underneath
+    for x in range(SPIKE_W):
+        bump = (x * 7 + variant * 3) % 5 == 0
+        for y in range(SPIKE_TEX_H - 4, SPIKE_TEX_H):
+            level = y - (SPIKE_TEX_H - 4)                  # 0..3
+            if x in (0, SPIKE_W - 1) and level < 2:
                 continue
-            u = d / max(hw, 1)
-            if abs(d) == hw:
-                ch = "N"
-            elif k < 0.18:
-                ch = "W"                                   # frosty tip
-            elif d == -hw + 1 and 0.3 < k < 0.62:
-                ch = "W"                                   # shine along the lit edge
-            elif u < -0.3:
-                ch = "C"
-            elif u <= 0:
-                ch = "W" if k < 0.7 else "C"               # ridge
-            elif u < 0.55:
-                ch = "A"
+            if level == 0 and not bump:
+                continue
+            if level <= 1:
+                ch = "W"
+            elif level == 2:
+                ch = "S" if (x + variant) % 4 else "W"
             else:
-                ch = "B"
+                ch = "G" if (x + variant) % 3 == 0 else "S"
             c[y][x] = ch
-    # snow along the bottom
-    for x in range(1, SPIKE_W - 1):
-        c[SPIKE_TEX_H - 2][x] = "W" if (x + variant) % 5 else "S"
-        c[SPIKE_TEX_H - 1][x] = "S" if (x + variant) % 3 else "G"
     return rows(c)
 
 

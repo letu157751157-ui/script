@@ -41,12 +41,12 @@
           "texture_width": 256,
           "texture_height": 256,
           "uv": [
-            "0 + math.floor(v.variant) * 16",
+            "0 + math.floor(v.variant) * 24",
             128
           ],
           "uv_size": [
-            16,
-            32
+            24,
+            48
           ]
         }
       }
